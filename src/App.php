@@ -77,8 +77,9 @@ class App
     /**
      *
      * @param Config $config
+     * @param string $env App environment. @see Busarm\PhpMini\Env
      */
-    public function __construct(public Config $config)
+    public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
         self::$__instance = &$this;
 
@@ -102,7 +103,7 @@ class App
         $this->router = new Router();
 
         // Set logger
-        $this->logger = new ConsoleLogger(new ConsoleOutput(($this->config->env == Env::LOCAL || $this->config->env == Env::DEV) ? ConsoleOutput::VERBOSITY_DEBUG : ConsoleOutput::VERBOSITY_NORMAL, true));
+        $this->logger = new ConsoleLogger(new ConsoleOutput(($this->env == Env::LOCAL || $this->env == Env::DEV) ? ConsoleOutput::VERBOSITY_DEBUG : ConsoleOutput::VERBOSITY_NORMAL, true));
 
         // Set up error reporting
         $this->setUpErrorHandlers();
@@ -528,12 +529,12 @@ class App
             $response = new ResponseDto();
             $response->success = $status == 200 || $status == 201;
             $response->message = $message;
-            $response->env = $this->config->env;
+            $response->env = $this->env;
             $response->version = $this->config->version;
             $response->ip = $this->request->ip();
 
             // Show more info if not production
-            if (!$response->success && $this->config->env !== Env::PROD) {
+            if (!$response->success && $this->env !== Env::PROD) {
                 $response->code = !empty($errorCode) ? $errorCode : null;
                 $response->line = !empty($errorLine) ? $errorLine : null;
                 $response->file = !empty($errorFile) ? $errorFile : null;

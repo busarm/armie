@@ -24,14 +24,6 @@ final class Config
      */
     public string|null $version = '1.0.0';
 
-
-    /**
-     * App environment. @see Busarm\PhpMini\Env
-     *
-     * @var string|null
-     */
-    public string|null $env = Env::LOCAL;
-
     /**
      * System base path to service. e.g '/var/www/html'
      * (Without trailing slash)
@@ -134,7 +126,6 @@ final class Config
     public int|null $httpCorsMaxAge;
 
 
-
     /**
      * Set app name
      *
@@ -159,20 +150,6 @@ final class Config
     public function setVersion($version)
     {
         $this->version = $version;
-
-        return $this;
-    }
-
-    /**
-     * Set app environment. @see Busarm\PhpMini\Env
-     *
-     * @param  string|null  $env  App environment. @see Busarm\PhpMini\Env
-     *
-     * @return  self
-     */
-    public function setEnv($env)
-    {
-        $this->env = $env;
 
         return $this;
     }

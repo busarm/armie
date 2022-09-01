@@ -57,14 +57,6 @@ final class Config
     public string|null $configPath;
 
     /**
-     * Cookie Prefix
-     * Prefix appended to cookie name to prevent collisions
-     *
-     * @var string|null
-     */
-    public string|null $cookiePrefix = 'php_mini';
-
-    /**
      * CORS Check
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS). Useful if you
      * are hosting your API on a different domain from the application that
@@ -79,9 +71,9 @@ final class Config
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
      * source domain
      *
-     * @var array|null
+     * @var bool|null
      */
-    public array|null $httpAllowAnyCorsDomain;
+    public bool|null $httpAllowAnyCorsDomain;
 
     /**
      * CORS Allowable Domains
@@ -206,20 +198,6 @@ final class Config
     public function setConfigPath($configPath)
     {
         $this->configPath = $configPath;
-
-        return $this;
-    }
-
-    /**
-     * Set prefix appended to cookie name to prevent collisions
-     *
-     * @param  string|null  $cookiePrefix  Prefix appended to cookie name to prevent collisions
-     *
-     * @return  self
-     */
-    public function setCookiePrefix($cookiePrefix)
-    {
-        $this->cookiePrefix = $cookiePrefix;
 
         return $this;
     }

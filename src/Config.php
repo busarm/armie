@@ -219,7 +219,7 @@ final class Config
     /**
      * Set source domain
      *
-     * @param  array|null  $httpAllowAnyCorsDomain  source domain
+     * @param  bool|null  $httpAllowAnyCorsDomain  source domain
      *
      * @return  self
      */

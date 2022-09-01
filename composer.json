@@ -3,7 +3,6 @@
     "description": "A micro php framework designed for micro-services",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
     "authors": [
         {
             "name": "Samuel Gabriel",
@@ -24,6 +23,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "php": ">=8.0",
         "phpunit/phpunit": "^9.5",
         "psr/log": "^3.0",
         "symfony/console": "^6.0",

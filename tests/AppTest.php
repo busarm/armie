@@ -26,6 +26,6 @@ final class AppTest extends TestCase {
         ->setConfigPath('Configs')
         ->setViewPath('Views');
         $app = new App($config);
-        $this->assertNotEmpty($response);
+        $this->assertNotEmpty($app);
     }
 }

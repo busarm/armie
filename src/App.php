@@ -11,6 +11,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
@@ -22,6 +24,7 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * PHP Mini Framework
@@ -77,14 +80,11 @@ class App
     /**
      *
      * @param Config $config
-     * @param string $env App environment. @see Busarm\PhpMini\Env
+     * @param string $env App environment. @see Busarm\PhpMini\Enums\Env
      */
     public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
         self::$__instance = &$this;
-
-        // Bootstrap files
-        $this->bootstrap();
 
         // Benchmark start time
         $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
@@ -100,10 +100,16 @@ class App
         $this->loader = new Loader();
 
         // Set router
-        $this->router = new Router();
+        $this->router = Router::withRequest($this->request);
 
         // Set logger
-        $this->logger = new ConsoleLogger(new ConsoleOutput(($this->env == Env::LOCAL || $this->env == Env::DEV) ? ConsoleOutput::VERBOSITY_DEBUG : ConsoleOutput::VERBOSITY_NORMAL, true));
+        $this->logger = new ConsoleLogger(new ConsoleOutput(match ($this->config->loggerVerborsity) {
+            Verbose::QUIET => OutputInterface::VERBOSITY_QUIET,
+            Verbose::NORMAL => OutputInterface::VERBOSITY_NORMAL,
+            Verbose::VERBOSE => OutputInterface::VERBOSITY_VERBOSE,
+            Verbose::VERY_VERBOSE => OutputInterface::VERBOSITY_VERY_VERBOSE,
+            Verbose::DEBUG => OutputInterface::VERBOSITY_DEBUG
+        }, true));
 
         // Set up error reporting
         $this->setUpErrorHandlers();
@@ -119,17 +125,6 @@ class App
         $this->addResolver(ErrorReportingInterface::class, fn () => $this->reporter);
         $this->addResolver(LoggerInterface::class, fn () => $this->logger);
         $this->addResolver(LoaderInterface::class, fn () => $this->loader);
-    }
-
-    /**
-     * Load bootstrap files 
-     *
-     * @return void
-     */
-    public static function bootstrap()
-    {
-        // Load bootstrap files
-        require_once('./bootstrap/helpers.php');
     }
 
     ############################
@@ -294,8 +289,11 @@ class App
 
         // Initiate rerouting
         if ($this->router) {
-            if (!$this->processMiddleware($this, array_merge($this->middlewares, $this->router->process()))) {
-                throw new NotFoundException("Not found - " . $this->router->getRequestMethod() . ' ' . $this->router->getRequestPath());
+            if ($this->processMiddleware($this, array_merge($this->middlewares, $this->router->process())) === false) {
+                if ($this->router->getIsHttp()) {
+                    throw new NotFoundException("Not found - " . ($this->router->getRequestMethod() . ' ' . $this->router->getRequestPath()));
+                }
+                throw new NotFoundException("Resource not found");
             }
         } else throw new SystemError("Router not configured. See `setRouter`");
 
@@ -309,7 +307,7 @@ class App
      * @param self $app
      * @param MiddlewareInterface[] $middlewares
      * @param int $index
-     * @return mixed
+     * @return boolean|mixed
      */
     protected function processMiddleware(self $app, array $middlewares, $index = 0)
     {
@@ -542,13 +540,9 @@ class App
                 $response->duration = (floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 
-            $this->response
-                ->setParameters($response->toArray())
-                ->setStatusCode(($status >= 100 && $status < 600) ? $status : 500)
-                ->send();
+            $this->response->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
         }
     }
-
 
     /**
      * Send HTTP JSON Response
@@ -576,8 +570,6 @@ class App
 
         $this->response
             ->addHttpHeaders($headers)
-            ->setParameters($data)
-            ->setStatusCode(($status >= 100 && $status < 600) ? $status : 500)
-            ->send();
+            ->json($data, ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
     }
 }

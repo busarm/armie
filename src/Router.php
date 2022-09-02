@@ -6,6 +6,7 @@ use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
 use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
 
@@ -43,11 +44,23 @@ class Router implements RouterInterface
         "/\{\w*\}/" => "([a-zA-Z0-9-_]+)"
     ];
 
+    /** @var string Request Controller */
+    protected string|null $controller = null;
+
+    /** @var string Request Function */
+    protected string|null $function = null;
+
+    /** @var string Request Params */
+    protected array|null $params = [];
+
     /** @var string HTTP request method */
     protected string|null $requestMethod = null;
 
     /** @var string HTTP request route */
     protected string|null $requestPath = null;
+
+    /** @var bool If http router */
+    protected bool $isHttp = false;
 
     /** @var RouteInterface Current HTTP route */
     protected RouteInterface|null $currentRoute = null;
@@ -55,19 +68,36 @@ class Router implements RouterInterface
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
 
+    protected function __construct()
+    {
+    }
+
+    /**
+     * @return self
+     */
+    public static function withRequest(RequestInterface $request): self
+    {
+        $router = new self;
+        $router->requestMethod = $request->method();
+        $router->requestPath = $request->uri();
+        $router->isHttp = true;
+        return $router;
+    }
+
     /**
      * @param string $controller
      * @param string $function
      * @param array $params
+     * @return self
      */
-    public function __construct(private $controller = null, private $function = null, private $params = [])
+    public static function withController($controller, $function, $params = []): self
     {
-        // Set Request Method
-        $this->requestMethod = strtoupper(env('REQUEST_METHOD')) ?? NULL;
-
-        // Set Request Path
-        $this->requestPath = env('PATH_INFO') ?: (env('ORIG_PATH_INFO') ?: env('REQUEST_URI'));
-        $this->requestPath = explode('?', $this->requestPath)[0];
+        $router = new self;
+        $router->controller = $controller;
+        $router->function = $function;
+        $router->params = $params;
+        $router->isHttp = false;
+        return $router;
     }
 
     /**
@@ -100,6 +130,14 @@ class Router implements RouterInterface
     public function getCurrentRoute(): RouteInterface|null
     {
         return $this->currentRoute;
+    }
+
+    /**
+     * @return boolean
+     */ 
+    public function getIsHttp()
+    {
+        return $this->isHttp;
     }
 
     /**

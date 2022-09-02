@@ -184,22 +184,29 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param StreamInterface|string $body
-     * @return self
-     */
-    public function setBody(StreamInterface|string|null $body): self
-    {
-        $this->body = $body;
-        return $this;
-    }
-
-    /**
      * @param array $parameters
      * @return self
      */
     public function setParameters(array $parameters): self
     {
         $this->parameters = $parameters;
+        return $this;
+    }
+
+    /**
+     * @return StreamInterface|string
+     */
+    public function getBody() {
+        return $this->body;
+    }
+    
+    /**
+     * @param StreamInterface|string $body
+     * @return self
+     */
+    public function setBody(StreamInterface|string|null $body): self
+    {
+        $this->body = $body;
         return $this;
     }
 

@@ -34,6 +34,11 @@ interface ResponseInterface
     public function getParameters();
 
     /**
+     * @return StreamInterface|string
+     */
+    public function getBody();
+
+    /**
      * @param array $parameters
      * @return self
      */

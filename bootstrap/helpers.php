@@ -185,10 +185,10 @@ if (!function_exists('out')) {
 
 if (!function_exists('response')) {
     /**
-     * Get app request object
+     * Get app response object
      * @return \Busarm\PhpMini\Interfaces\ResponseInterface|mixed
      */
-    function response()
+    function &response()
     {
         return app()->response;
     }
@@ -196,7 +196,7 @@ if (!function_exists('response')) {
 
 if (!function_exists('request')) {
     /**
-     * Get app response object
+     * Get app request object
      * @return \Busarm\PhpMini\Interfaces\RequestInterface|mixed
      */
     function &request()

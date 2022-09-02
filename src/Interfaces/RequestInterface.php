@@ -36,9 +36,24 @@ interface RequestInterface
     public function uri();
 
     /**
+     * @return array
+     */
+    public function segments();
+
+    /**
      * @return string
      */
     public function currentUrl();
+
+    /**
+     * @return string
+     */ 
+    public function method();
+
+    /**
+     * @return string
+     */ 
+    public function contentType();
 
     /**
      * @param string $name
@@ -66,7 +81,7 @@ interface RequestInterface
      * @param mixed  $default
      * @return mixed
      */
-    public function headers($name, $default = null);
+    public function header($name, $default = null);
 
     /**
      * @return array

@@ -32,6 +32,8 @@ class Request implements RequestInterface
     protected $baseUrl;
     protected $uri;
     protected $currentUrl;
+    protected $method;
+    protected $contentType;
 
     /**
      * Constructor.
@@ -52,21 +54,22 @@ class Request implements RequestInterface
         $request->host = $request->scheme  . "://" . env('HTTP_HOST');
         $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
         $request->uri = env('PATH_INFO') ?: (env('ORIG_PATH_INFO') ?: env('REQUEST_URI'));
-        $request->uri = explode('?', $request->uri)[0];
+        $request->uri = rawurldecode(explode('?', $request->uri)[0]);
         $request->currentUrl = $request->host . $request->uri;
 
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-        $contentType = $request->server('CONTENT_TYPE', '');
-        $requestMethod = $request->server('REQUEST_METHOD', 'GET');
+        $request->contentType = $request->server('CONTENT_TYPE', '');
+        $request->method = $request->server('REQUEST_METHOD', 'GET');
+        
         if (
-            0 === strpos($contentType, 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($requestMethod), array('PUT', 'DELETE'))
+            0 === strpos($request->contentType, 'application/x-www-form-urlencoded')
+            && in_array(strtoupper($request->method), array('PUT', 'DELETE'))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = $data;
         } elseif (
-            0 === strpos($contentType, 'application/json')
-            && in_array(strtoupper($requestMethod), array('POST', 'PUT', 'DELETE'))
+            0 === strpos($request->contentType, 'application/json')
+            && in_array(strtoupper($request->method), array('POST', 'PUT', 'DELETE'))
         ) {
             $data = json_decode($request->getContent(), true);
             $request->request = $data;
@@ -151,6 +154,35 @@ class Request implements RequestInterface
     }
 
     /**
+     * @return string
+     */ 
+    public function method()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string
+     */ 
+    public function contentType()
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * Get all of the segments for the request path.
+     *
+     * @return array
+     */
+    public function segments()
+    {
+        $segments = explode('/', $this->uri());
+        return array_values(array_filter($segments, function ($value) {
+            return $value !== '';
+        }));
+    }
+
+    /**
      * @param string $name
      * @param mixed  $default
      * @return mixed
@@ -185,7 +217,7 @@ class Request implements RequestInterface
      * @param mixed  $default
      * @return mixed
      */
-    public function headers($name, $default = null)
+    public function header($name, $default = null)
     {
         $headers = array_change_key_case($this->headers);
         $name = strtolower($name);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Busarm\PhpMini\Enums;
 
 /**
  * PHP Mini Framework

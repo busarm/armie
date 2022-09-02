@@ -57,6 +57,13 @@ final class Config
     public string|null $configPath;
 
     /**
+     * Logger verbosity
+     * @see \Busarm\PhpMini\Enums\Verbose
+     * @var int|null
+     */
+    public int|null $loggerVerborsity = \Busarm\PhpMini\Enums\Verbose::DEBUG;
+
+    /**
      * CORS Check
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS). Useful if you
      * are hosting your API on a different domain from the application that
@@ -117,6 +124,12 @@ final class Config
      */
     public int|null $httpCorsMaxAge;
 
+    /**
+     * Send HTTP response without exiting
+     * 
+     * @var bool|null
+     */
+    public bool|null $httpSendAndContinue = false;
 
     /**
      * Set app name
@@ -198,6 +211,20 @@ final class Config
     public function setConfigPath($configPath)
     {
         $this->configPath = $configPath;
+
+        return $this;
+    }
+
+    /**
+     * Set logger verbosity
+     *
+     * @param  int|null  $loggerVerborsity  Logger verbosity
+     *
+     * @return  self
+     */ 
+    public function setLoggerVerborsity($loggerVerborsity)
+    {
+        $this->loggerVerborsity = $loggerVerborsity;
 
         return $this;
     }
@@ -296,6 +323,20 @@ final class Config
     public function setHttpCorsMaxAge($httpCorsMaxAge)
     {
         $this->httpCorsMaxAge = $httpCorsMaxAge;
+
+        return $this;
+    }
+
+    /**
+     * Set send HTTP response without exiting
+     *
+     * @param  bool|null  $httpSendAndContinue  Send HTTP response without exiting
+     *
+     * @return  self
+     */ 
+    public function setHttpSendAndContinue($httpSendAndContinue)
+    {
+        $this->httpSendAndContinue = $httpSendAndContinue;
 
         return $this;
     }

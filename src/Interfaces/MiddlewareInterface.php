@@ -17,7 +17,7 @@ interface MiddlewareInterface
      *
      * @param App $app
      * @param Callable|null $next
-     * @return mixed
+     * @return boolean|mixed Return `false` if failed
      */
     public function handle(App $app, Callable $next = null): mixed;
 }

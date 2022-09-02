@@ -22,9 +22,9 @@ final class ResponseMiddleware implements MiddlewareInterface
         $response = $next ? $next() : null;
         if ($response !== false) {
             if ($response instanceof ResponseInterface) {
-                return $response->send();
+                return $response->send('json', $app->config->httpSendAndContinue);
             } else if ($response instanceof View) {
-                return $response->send();
+                return $response->send($app->config->httpSendAndContinue);
             } else if ($response instanceof CollectionBaseDto) {
                 return $app->sendHttpResponse(200, $response->toArray());
             } else if ($response instanceof BaseDto) {
@@ -32,7 +32,7 @@ final class ResponseMiddleware implements MiddlewareInterface
             } else if (is_array($response) || is_object($response)) {
                 return $app->sendHttpResponse(200, $response);
             } else {
-                return $app->response->html((string) $response);
+                return $app->response->html((string) $response, 200, $app->config->httpSendAndContinue);
             }
         }
         return false;

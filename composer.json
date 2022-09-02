@@ -10,8 +10,12 @@
         }
     ],
     "autoload": {
+        "files": [
+            "bootstrap/helpers.php"
+        ],
         "psr-4": {
-            "Busarm\\PhpMini\\": "src/"
+            "Busarm\\PhpMini\\": "src/",
+            "Busarm\\PhpMini\\Test\\": "tests/"
         }
     },
     "scripts": {

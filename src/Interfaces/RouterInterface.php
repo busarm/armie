@@ -13,6 +13,11 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 interface RouterInterface
 {
     /**
+     * @return boolean
+     */ 
+    public function getIsHttp();
+
+    /**
      * @return string|null
      */
     public function getRequestMethod(): string|null;

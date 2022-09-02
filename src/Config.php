@@ -221,7 +221,7 @@ final class Config
      * @param  int|null  $loggerVerborsity  Logger verbosity
      *
      * @return  self
-     */ 
+     */
     public function setLoggerVerborsity($loggerVerborsity)
     {
         $this->loggerVerborsity = $loggerVerborsity;
@@ -333,7 +333,7 @@ final class Config
      * @param  bool|null  $httpSendAndContinue  Send HTTP response without exiting
      *
      * @return  self
-     */ 
+     */
     public function setHttpSendAndContinue($httpSendAndContinue)
     {
         $this->httpSendAndContinue = $httpSendAndContinue;

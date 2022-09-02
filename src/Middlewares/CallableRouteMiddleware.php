@@ -6,7 +6,6 @@ use Closure;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\DI;
 use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 
 /**

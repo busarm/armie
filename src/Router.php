@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
@@ -18,29 +19,23 @@ use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
  */
 class Router implements RouterInterface
 {
-    const MATCH_ALPHA = "alpha";
-    const MATCH_ALPHA_NUM = "alpha-dash";
-    const MATCH_ALPHA_NUM_DASH = "alpha-num-dash";
-    const MATCH_NUM = "num";
-    const MATCH_ANY = "any";
-
     const PATH_EXCLUDE_LIST = ["$", "<", ">", "[", "]", "{", "}", "^", "\\", "|", "%"];
-    const MATCH_ESCAPE_LIST = [
+    const ESCAPE_LIST = [
         "/" => "\/",
         "." => "\."
     ];
     const MATCHER_REGX = [
-        "/\(" . self::MATCH_ALPHA . "\)/" => "([a-zA-Z]+)",
-        "/\(" . self::MATCH_ALPHA_NUM . "\)/" => "([a-zA-Z-_]+)",
-        "/\(" . self::MATCH_ALPHA_NUM_DASH . "\)/" => "([a-zA-Z0-9-_]+)",
-        "/\(" . self::MATCH_NUM . "\)/" => "([0-9]+)",
-        "/\(" . self::MATCH_ANY . "\)/" => "(.+)"
+        "/\(" . RouteMatcher::ALPHA . "\)/" => "([a-zA-Z]+)",
+        "/\(" . RouteMatcher::ALPHA_NUM . "\)/" => "([a-zA-Z-_]+)",
+        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => "([a-zA-Z0-9-_]+)",
+        "/\(" . RouteMatcher::NUM . "\)/" => "([0-9]+)",
+        "/\(" . RouteMatcher::ANY . "\)/" => "(.+)"
     ];
 
     /**
      * Use to match route path to an exact variable name. e.g $uid = /user/{uid}
      */
-    const MATCH_PARAM_NAME_REGX = [
+    const PARAM_NAME_REGX = [
         "/\{\w*\}/" => "([a-zA-Z0-9-_]+)"
     ];
 
@@ -134,7 +129,7 @@ class Router implements RouterInterface
 
     /**
      * @return boolean
-     */ 
+     */
     public function getIsHttp()
     {
         return $this->isHttp;
@@ -216,7 +211,7 @@ class Router implements RouterInterface
         $path = str_replace(self::PATH_EXCLUDE_LIST, "", $path, $excludeCount);
         if ($excludeCount > 0) throw new BadRequestException(sprintf("The following charaters are not allowed in the url: %s", implode(',', array_values(self::PATH_EXCLUDE_LIST))));
         // Escape charaters to be a safe Regexp
-        $route = str_replace(array_keys(self::MATCH_ESCAPE_LIST), array_values(self::MATCH_ESCAPE_LIST), $route);
+        $route = str_replace(array_keys(self::ESCAPE_LIST), array_values(self::ESCAPE_LIST), $route);
         // Replace matching keywords with regexp 
         $route = preg_replace(array_keys(self::MATCHER_REGX), array_values(self::MATCHER_REGX), $route);
         // Replace matching parameters keywords with regexp 
@@ -242,8 +237,8 @@ class Router implements RouterInterface
     protected function createMatchParamsRoute($route, &$paramMatches = [])
     {
         $count = 0;
-        $regxList = array_values(self::MATCH_PARAM_NAME_REGX);
-        return preg_replace_callback(array_keys(self::MATCH_PARAM_NAME_REGX), function ($match) use ($count, &$paramMatches, $regxList) {
+        $regxList = array_values(self::PARAM_NAME_REGX);
+        return preg_replace_callback(array_keys(self::PARAM_NAME_REGX), function ($match) use ($count, &$paramMatches, $regxList) {
             $paramMatches[] = str_replace(['{', '}'], ['', ''], ($match[0] ?? $match));
             $replace = $regxList[$count] ?? '';
             ++$count;

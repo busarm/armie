@@ -5,6 +5,7 @@ namespace Busarm\PhpMini;
 use Closure;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Errors\DependencyError;
+use ReflectionMethod;
 
 /**
  * PHP Mini Framework
@@ -17,7 +18,9 @@ use Busarm\PhpMini\Errors\DependencyError;
  */
 class DI
 {
-    private final function __construct() {}
+    private final function __construct()
+    {
+    }
 
     /**
      * Instantiate class with dependencies
@@ -29,8 +32,10 @@ class DI
     public static function instantiate(App $app, $class)
     {
         if ($resolver = $app->getResolver($class)) $instance = $resolver();
-        else if (method_exists($class, '__construct')) $instance = new $class(...self::resolveMethodDependencies($app, $class, '__construct'));
-        else $instance = new $class;
+        else if (method_exists($class, '__construct')) {
+            if ((new ReflectionMethod($class, '__construct'))->isPublic()) $instance = new $class(...self::resolveMethodDependencies($app, $class, '__construct'));
+            else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
+        } else $instance = new $class;
         return $instance;
     }
 

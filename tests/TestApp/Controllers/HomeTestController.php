@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Test\TestApp\Controllers;
 
+use Busarm\PhpMini\App;
+
 /**
  * PHP Mini Framework
  *
@@ -10,6 +12,11 @@ namespace Busarm\PhpMini\Test\TestApp\Controllers;
  */
 class HomeTestController
 {
+    public function __construct(private App $app)
+    {
+        log_debug(HomeTestController::class . ' started - ' . $app->env);
+    }
+
     public function ping()
     {
         return "success";

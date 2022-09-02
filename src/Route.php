@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\HttpMethod;
 use Closure;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
@@ -15,14 +16,8 @@ use Busarm\PhpMini\Interfaces\RouteInterface;
 class Route implements RouteInterface
 {
 
-    const GET_METHOD =  "GET";
-    const POST_METHOD =  "POST";
-    const PUT_METHOD =  "PUT";
-    const PATCH_METHOD =  "PATCH";
-    const DELETE_METHOD =  "DELETE";
-
     /** @var Closure Request executable function */
-    private Closure|null $callable = null;
+    protected Closure|null $callable = null;
 
     /** @var string Request controller */
     protected string|null $controller = null;
@@ -162,7 +157,7 @@ class Route implements RouteInterface
      */
     public static function get(string $path): RouteInterface
     {
-        $route = new Route(self::GET_METHOD, $path);
+        $route = new Route(HttpMethod::GET, $path);
         return $route;
     }
 
@@ -174,7 +169,7 @@ class Route implements RouteInterface
      */
     public static function post(string $path): RouteInterface
     {
-        $route = new Route(self::POST_METHOD, $path);
+        $route = new Route(HttpMethod::POST, $path);
         return $route;
     }
 
@@ -186,7 +181,7 @@ class Route implements RouteInterface
      */
     public static function put(string $path): RouteInterface
     {
-        $route = new Route(self::PUT_METHOD, $path);
+        $route = new Route(HttpMethod::PUT, $path);
         return $route;
     }
 
@@ -198,7 +193,7 @@ class Route implements RouteInterface
      */
     public static function patch(string $path): RouteInterface
     {
-        $route = new Route(self::PATCH_METHOD, $path);
+        $route = new Route(HttpMethod::PATCH, $path);
         return $route;
     }
 
@@ -210,7 +205,7 @@ class Route implements RouteInterface
      */
     public static function delete(string $path): RouteInterface
     {
-        $route = new Route(self::DELETE_METHOD, $path);
+        $route = new Route(HttpMethod::DELETE, $path);
         return $route;
     }
 }

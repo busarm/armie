@@ -19,7 +19,7 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit"
+        "test": "./vendor/bin/phpunit tests/AppTest.php"
     },
     "keywords": [
         "php",

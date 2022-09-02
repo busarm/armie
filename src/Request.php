@@ -18,13 +18,13 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
  */
 class Request implements RequestInterface
 {
-    protected $attributes;
-    protected $request;
-    protected $query;
-    protected $server;
-    protected $files;
-    protected $cookies;
-    protected $headers;
+    protected $attributes   =   [];
+    protected $request      =   [];
+    protected $query        =   [];
+    protected $server       =   [];
+    protected $files        =   [];
+    protected $cookies      =   [];
+    protected $headers      =   [];
     protected $content;
     protected $ip;
     protected $scheme;
@@ -38,7 +38,7 @@ class Request implements RequestInterface
     /**
      * Constructor.
      */
-    private function __construct()
+    protected function __construct()
     {
     }
 
@@ -58,22 +58,6 @@ class Request implements RequestInterface
         $request->currentUrl = $request->host . $request->uri;
 
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-        $request->contentType = $request->server('CONTENT_TYPE', '');
-        $request->method = $request->server('REQUEST_METHOD', 'GET');
-        
-        if (
-            0 === strpos($request->contentType, 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->method), array('PUT', 'DELETE'))
-        ) {
-            parse_str($request->getContent(), $data);
-            $request->request = $data;
-        } elseif (
-            0 === strpos($request->contentType, 'application/json')
-            && in_array(strtoupper($request->method), array('POST', 'PUT', 'DELETE'))
-        ) {
-            $data = json_decode($request->getContent(), true);
-            $request->request = $data;
-        }
         return $request;
     }
 
@@ -88,12 +72,12 @@ class Request implements RequestInterface
      * @param array  $cookies    - The COOKIE parameters
      * @param array  $files      - The FILES parameters
      * @param array  $server     - The SERVER parameters
-     * @param string $content    - The raw body data
      * @param array  $headers    - The headers
+     * @param string $content    - The raw body data
      *
      * @api
      */
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null, array $headers = null)
+    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), array $headers = array(), $content = null)
     {
         $this->request = $request;
         $this->query = $query;
@@ -103,6 +87,23 @@ class Request implements RequestInterface
         $this->server = $server;
         $this->content = $content;
         $this->headers = is_null($headers) ? $this->getHeadersFromServer($this->server) : $headers;
+
+        $this->contentType = $this->server('CONTENT_TYPE', '');
+        $this->method = $this->server('REQUEST_METHOD', 'GET');
+
+        if (
+            0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
+            && in_array(strtoupper($this->method), array('PUT', 'DELETE'))
+        ) {
+            parse_str($this->getContent(), $data);
+            $this->request = $data;
+        } elseif (
+            0 === strpos($this->contentType, 'application/json')
+            && in_array(strtoupper($this->method), array('POST', 'PUT', 'DELETE'))
+        ) {
+            $data = json_decode($this->getContent(), true);
+            $this->request = $data;
+        }
     }
 
     /**
@@ -155,7 +156,7 @@ class Request implements RequestInterface
 
     /**
      * @return string
-     */ 
+     */
     public function method()
     {
         return $this->method;
@@ -163,7 +164,7 @@ class Request implements RequestInterface
 
     /**
      * @return string
-     */ 
+     */
     public function contentType()
     {
         return $this->contentType;

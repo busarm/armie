@@ -196,10 +196,11 @@ class Response implements ResponseInterface
     /**
      * @return StreamInterface|string
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
-    
+
     /**
      * @param StreamInterface|string $body
      * @return self
@@ -359,7 +360,6 @@ class Response implements ResponseInterface
      */
     public function send($format = 'json', $continue = false)
     {
-
         // headers have already been sent by the developer
         if (headers_sent()) {
             return;

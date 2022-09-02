@@ -12,6 +12,7 @@ use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
@@ -218,7 +219,14 @@ class App
             $headers = [];
             $allowed_cors_headers = $this->config->httpAllowedCorsHeaders ?? ['*'];
             $exposed_cors_headers = $this->config->httpExposedCorsHeaders ?? ['*'];
-            $allowed_cors_methods = $this->config->httpAllowedCorsMethods ?? ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'];
+            $allowed_cors_methods = $this->config->httpAllowedCorsMethods ?? [
+                HttpMethod::GET,
+                HttpMethod::POST,
+                HttpMethod::PUT,
+                HttpMethod::PATCH,
+                HttpMethod::OPTIONS,
+                HttpMethod::DELETE
+            ];
             $max_cors_age = $this->config->httpCorsMaxAge ?? 3600;
 
             // Convert the config items into strings
@@ -249,14 +257,14 @@ class App
             }
 
             // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
-            if (strtolower($method) === 'options') {
+            if (strtoupper($method) === HttpMethod::OPTIONS) {
                 $headers['Cache-Control'] = "max-age=$max_cors_age";
                 $this->sendHttpResponse(200, null, $headers);
             } else {
                 $this->response->addHttpHeaders($headers);
             }
         } else {
-            if (strtolower($method) === 'options') {
+            if (strtoupper($method) === HttpMethod::OPTIONS) {
                 // kill the response and send it to the client
                 $this->showMessage(200, "Preflight Ok");
             }

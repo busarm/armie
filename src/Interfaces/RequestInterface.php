@@ -60,6 +60,27 @@ interface RequestInterface
      * @param mixed  $default
      * @return mixed
      */
+    public function file($name, $default = null);
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
+    public function attribute($name, $default = null);
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
+    public function cookie($name, $default = null);
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
     public function query($name, $default = null);
 
     /**
@@ -83,6 +104,18 @@ interface RequestInterface
      */
     public function header($name, $default = null);
 
+    /**
+     * @return array
+     */
+    public function getFileList();
+    /**
+     * @return array
+     */
+    public function getCookieList();
+    /**
+     * @return array
+     */
+    public function getAttributeList();
     /**
      * @return array
      */

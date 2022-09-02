@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\HttpMethod;
 use LogicException;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 
@@ -93,13 +94,13 @@ class Request implements RequestInterface
 
         if (
             0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($this->method), array('PUT', 'DELETE'))
+            && in_array(strtoupper($this->method), array(HttpMethod::PUT, HttpMethod::DELETE))
         ) {
             parse_str($this->getContent(), $data);
             $this->request = $data;
         } elseif (
             0 === strpos($this->contentType, 'application/json')
-            && in_array(strtoupper($this->method), array('POST', 'PUT', 'DELETE'))
+            && in_array(strtoupper($this->method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
         ) {
             $data = json_decode($this->getContent(), true);
             $this->request = $data;
@@ -188,6 +189,36 @@ class Request implements RequestInterface
      * @param mixed  $default
      * @return mixed
      */
+    public function file($name, $default = null)
+    {
+        return isset($this->files[$name]) ? $this->files[$name] : $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
+    public function attribute($name, $default = null)
+    {
+        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
+    public function cookie($name, $default = null)
+    {
+        return isset($this->cookies[$name]) ? $this->cookies[$name] : $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
     public function query($name, $default = null)
     {
         return isset($this->query[$name]) ? $this->query[$name] : $default;
@@ -255,6 +286,27 @@ class Request implements RequestInterface
     public function getHeaderList()
     {
         return $this->headers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileList() {
+        return $this->files;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getCookieList() {
+        return $this->cookies;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getAttributeList() {
+        return $this->attributes;
     }
 
     /**

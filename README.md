@@ -8,7 +8,7 @@ A micro php framework designed for micro-services
 
 ## Structure
 
-App folders can be structured in whatever way pattern you wish
+App folders can be structured in whatever pattern you wish.
 
 ## Usage
 

@@ -33,7 +33,7 @@ Add config file to your config path. E.g `myapp/Configs/database.php`
     # index.php (initialization script)
     ....
     $app = new App($config);
-    $app->loadConfig('database.php')
+    $app->loadConfig('database')
     ....
 
     # database.php
@@ -80,7 +80,7 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
     # index.php (initialization script)
     ....
     $app = new App($config);
-    $app->loadConfig('route.php')
+    $app->loadConfig('route')
     ....
 
     # route.php

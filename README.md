@@ -191,7 +191,7 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
 
         public function render()
         {
-            return $this->include('components/login');
+            return $this->include('components/login', true);
         }
     }
 ```

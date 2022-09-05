@@ -155,7 +155,7 @@ Bind an interface to a particular class. Hence, the specified class object will 
 Add view file to your view path. E.g `myapp/Views/login.php`
 
 ```php
-    # In Controller (or anywhere you wishs to load view)
+    # In Controller (or anywhere you wish to load view)
     // Using app instance
     app()->loader->view('login', ['username' => $uname, 'password' => $pass]);
     // Using helpers

@@ -1,5 +1,7 @@
 <?php
 
+namespace Busarm\PhpMini\Helpers;
+
 /**
  * PHP Mini Framework
  *
@@ -169,6 +171,21 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('view')) {
+    /**
+     * Load view file
+     *
+     * @param string $path
+     * @param array $params
+     * @param boolean $return Print out view or return content
+     * @return mixed
+     */
+    function view(string $path, $params = [], $return = false)
+    {
+        return app()->loader->view($path, $params, $return);
+    }
+}
+
 if (!function_exists('out')) {
     /**
      * Print output end exit
@@ -317,15 +334,15 @@ if (!function_exists('run')) {
      *
      * @param string $command
      * @param array $params
-     * @param Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param int $timeout Default = 600 seconds
      * @param boolean $wait Default = true
      * @return Symfony\Component\Process\Process
      */
-    function run(string $command, array $params, Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600, $wait = true)
+    function run(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600, $wait = true)
     {
-        $output->getFormatter()->setStyle('error', new Symfony\Component\Console\Formatter\OutputFormatterStyle('red'));
-        $process = new Symfony\Component\Process\Process([
+        $output->getFormatter()->setStyle('error', new \Symfony\Component\Console\Formatter\OutputFormatterStyle('red'));
+        $process = new \Symfony\Component\Process\Process([
             $command,
             ...array_filter($params, fn ($arg) => !empty($arg))
         ]);
@@ -358,11 +375,11 @@ if (!function_exists('run_async')) {
      *
      * @param string $command
      * @param array $params
-     * @param Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param int $timeout Default = 600 seconds
      * @return Symfony\Component\Process\Process
      */
-    function run_async(string $command, array $params, Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600)
+    function run_async(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600)
     {
         return run($command, $params, $output, $timeout, false);
     }

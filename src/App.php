@@ -27,6 +27,9 @@ use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Busarm\PhpMini\Helpers\env;
+use function Busarm\PhpMini\Helpers\is_cli;
+
 /**
  * PHP Mini Framework
  *
@@ -135,7 +138,8 @@ class App
     /**
      * Get custom config or set if not available
      * 
-     * @param string $config
+     * @param string $name
+     * @param mixed $value
      * @return mixed
      */
     public function config(string $name, $value = null)

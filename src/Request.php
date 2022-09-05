@@ -6,6 +6,10 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use LogicException;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 
+use function Busarm\PhpMini\Helpers\env;
+use function Busarm\PhpMini\Helpers\get_ip_address;
+use function Busarm\PhpMini\Helpers\is_https;
+
 /**
  * PHP Mini Framework
  *

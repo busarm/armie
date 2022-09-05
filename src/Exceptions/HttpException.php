@@ -4,6 +4,8 @@ namespace Busarm\PhpMini\Exceptions;
 
 use Exception;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * PHP Mini Framework
  *

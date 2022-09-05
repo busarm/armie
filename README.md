@@ -148,6 +148,54 @@ Bind an interface to a particular class. Hence, the specified class object will 
     }
 ```
 
+## Views
+
+### Generic Component
+
+Add view file to your view path. E.g `myapp/Views/login.php`
+
+```php
+    # In Controller (or anywhere you wishs to load view)
+    // Using app instance
+    app()->loader->view('login', ['username' => $uname, 'password' => $pass]);
+    // Using helpers
+    view('login', ['username' => $uname, 'password' => $pass]);
+```
+
+### Dedicated View Model
+
+Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/Views/components/login.php`
+
+```php
+    # In-line rendering
+    class LoginPage extends View
+    {
+        public function __construct(protected LoginPageDto|BaseDto|array|null $data = null, protected $headers = array())
+        {
+        }
+
+        public function render()
+        {
+        ?>
+            <html> </html>
+        <?php
+        }
+    }
+
+    # Component rendering
+    class LoginPage extends View
+    {
+        public function __construct(protected LoginPageDto|BaseDto|array|null $data = null, protected $headers = array())
+        {
+        }
+
+        public function render()
+        {
+            return $this->include('components/login');
+        }
+    }
+```
+
 ## Tests
 
 To execute the test suite, you'll need to install all development dependencies.

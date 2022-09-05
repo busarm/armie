@@ -4,6 +4,8 @@ namespace Busarm\PhpMini\Errors;
 
 use Error;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * PHP Mini Framework
  *

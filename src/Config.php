@@ -160,7 +160,7 @@ final class Config
     }
 
     /**
-     * Set (Without leading or trailing slash)
+     * System base path to service. e.g '/var/www/html'
      *
      * @param  string|null  $basePath  (Without leading or trailing slash)
      *
@@ -174,7 +174,7 @@ final class Config
     }
 
     /**
-     * Set (Without leading or trailing slash)
+     * Relative path to app folder. e.g 'app'
      *
      * @param  string|null  $appPath  (Without leading or trailing slash)
      *
@@ -188,7 +188,7 @@ final class Config
     }
 
     /**
-     * Set (Without leading or trailing slash)
+     * Set path to view files - relative to app folder
      *
      * @param  string|null  $viewPath  (Without leading or trailing slash)
      *
@@ -202,7 +202,7 @@ final class Config
     }
 
     /**
-     * Set (Without leading or trailing slash)
+     * Set path to config files - relative to app folder
      *
      * @param  string|null  $configPath  (Without leading or trailing slash)
      *

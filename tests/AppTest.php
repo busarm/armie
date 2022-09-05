@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp;
+namespace Busarm\PhpMini\Test;
 
 use PHPUnit\Framework\TestCase;
 use Busarm\PhpMini\App;
@@ -9,6 +9,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Router;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
+
 
 /**
  * PHP Mini Framework

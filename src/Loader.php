@@ -7,6 +7,8 @@ use Busarm\PhpMini\Errors\LoaderError;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Throwable;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * PHP Mini Framework
  *

@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Traits;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * Created by VSCODE.
  * User: Samuel

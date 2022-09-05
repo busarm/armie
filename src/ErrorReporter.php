@@ -5,6 +5,10 @@ namespace Busarm\PhpMini;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 
+use function Busarm\PhpMini\Helpers\log_debug;
+use function Busarm\PhpMini\Helpers\log_error;
+use function Busarm\PhpMini\Helpers\log_exception;
+
 /**
  * PHP Mini Framework
  *

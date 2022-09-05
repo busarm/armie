@@ -6,6 +6,8 @@ use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Throwable;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * PHP Mini Framework
  *

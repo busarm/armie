@@ -85,6 +85,9 @@ class App
      */
     public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
+        // Set current app instance
+        Server::$__app = &$this;
+
         // Benchmark start time
         $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
 
@@ -284,7 +287,7 @@ class App
 
         // Set request & response & router
         $request = $request ?? (($req = $this->getBinding(RequestInterface::class)) ? $this->make($req, false) : $this->request);
-        if($request != $this->request) {
+        if ($request != $this->request) {
             $this->request = $request;
             $this->router->setPath($request->uri());
         }

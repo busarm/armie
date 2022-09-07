@@ -216,7 +216,7 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
 You can use PHP server built-in server to test:
 
 ```bash
-php -S localhost:8181 -t tests/TestServer
+$ php -S localhost:8181 -t tests/TestServer
 ```
 
 To execute the test suite, you'll need to install all development dependencies.

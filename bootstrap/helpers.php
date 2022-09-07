@@ -68,7 +68,7 @@ function get_ip_address()
     if (!empty(env('HTTP_X_FORWARDED_FOR'))) {
         // check if multiple ips exist in var
         if (strpos(env('HTTP_X_FORWARDED_FOR'), ',') !== false) {
-            $iplist = explode(',', env('HTTP_X_FORWARDED_FOR'));
+            $iplist = explode(',', env('HTTP_X_FORWARDED_FOR'), 20);
             foreach ($iplist as $ip) {
                 if (validate_ip($ip))
                     return $ip;

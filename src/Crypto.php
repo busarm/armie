@@ -106,7 +106,7 @@ class Crypto
         $keyHashIterations = $configs['KEY_HASH_ITERATIONS'] ?? self::$KEY_HASH_ITERATIONS;
         $keyHashLength = $configs['KEY_HASH_LENGTH'] ?? self::$KEY_HASH_LENGTH;
 
-        if (!empty($passphrase) && !empty($cipher) && ($data = explode('*', base64_decode($cipher)))) {
+        if (!empty($passphrase) && !empty($cipher) && ($data = explode('*', base64_decode($cipher), 5))) {
             $crypt = $data[0] ?? null;
             $salt = $data[1] ?? null;
             $iv  = $data[2] ?? null;

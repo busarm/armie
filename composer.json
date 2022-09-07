@@ -19,7 +19,7 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit tests"
+        "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit tests"
     },
     "keywords": [
         "php",

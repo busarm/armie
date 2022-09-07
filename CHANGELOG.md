@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.11]
+
+### Changed
+
+-   Fixed 'explode' extra param bug
+
+## [1.0.10]
+
+### Changed
+
+-   Removed function exist checking from helpers
+
 ## [1.0.9]
 
 ### Added

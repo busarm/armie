@@ -17,6 +17,7 @@ use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @covers \Busarm\PhpMini\App
  */
 final class AppTest extends TestCase
 {

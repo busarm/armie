@@ -16,6 +16,7 @@ use GuzzleHttp\Client;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @covers \Busarm\PhpMini\Server
  */
 final class ServerTest extends TestCase
 {

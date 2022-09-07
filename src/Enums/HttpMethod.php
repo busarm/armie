@@ -7,6 +7,7 @@ namespace Busarm\PhpMini\Enums;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @codeCoverageIgnore
  */
 class HttpMethod
 {

@@ -3,7 +3,7 @@
 use Busarm\PhpMini\Server;
 use Busarm\PhpMini\Test\ServerTest;
 
-require __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 $server = (new Server())
     ->addRoutePath('v1', __DIR__ . '/../TestApp')

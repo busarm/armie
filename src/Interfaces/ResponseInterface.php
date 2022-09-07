@@ -26,6 +26,11 @@ interface ResponseInterface
     public function setStatusCode($statusCode, $text = null): self;
 
     /**
+     * @return int
+     */
+    public function getStatusCode();
+    
+    /**
      * @return string
      */
     public function getStatusText();

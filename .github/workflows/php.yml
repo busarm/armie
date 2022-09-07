@@ -35,8 +35,5 @@ jobs:
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
-    - name: Start test server
-      run: php -S localhost:8181 -t tests/TestServer
-
     - name: Run test suite
       run: composer run-script test

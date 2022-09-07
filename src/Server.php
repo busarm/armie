@@ -5,6 +5,8 @@ namespace Busarm\PhpMini;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 
+use function Busarm\PhpMini\Helpers\is_cli;
+
 /**
  * PHP Mini Framework
  *
@@ -107,7 +109,7 @@ class Server
      * Run server
      *
      * @param RequestInterface|null $request Custom request object
-     * @return mixed
+     * @return ResponseInterface|bool True if successful. ResponseInterface if failed
      */
     public function run(RequestInterface|null $request = null)
     {
@@ -122,10 +124,10 @@ class Server
 
     /**
      * Match route
-     * @param Request $request
-     * @return mixed
+     * @param RequestInterface $request
+     * @return ResponseInterface|bool|null False if failed
      */
-    public function matchRoute(Request $request)
+    public function matchRoute(RequestInterface $request)
     {
         $segments = $request->segments();
 
@@ -141,8 +143,8 @@ class Server
             // Check route paths
             if (array_key_exists($route, $this->routePaths)) {
                 $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                $_SERVER['REQUEST_URI'] = '/' . $uri;
-                $_SERVER['PATH_INFO'] = '/' . $uri;
+                $_SERVER['REQUEST_URI']     =   '/' . $uri;
+                $_SERVER['PATH_INFO']       =   '/' . $uri;
                 return include_once($this->routePaths[$route]);
             }
         }
@@ -152,10 +154,10 @@ class Server
 
     /**
      * Match domain
-     * @param Request $request
-     * @return mixed
+     * @param RequestInterface $request
+     * @return ResponseInterface|false|null False if failed
      */
-    public function matchDomain(Request $request)
+    public function matchDomain(RequestInterface $request)
     {
         $domain = $request->domain();
 
@@ -166,6 +168,12 @@ class Server
 
         // Check domain paths
         if (array_key_exists($domain, $this->domainPaths)) {
+            if (is_cli()) {
+                $_SERVER['HTTP_HOST']       =   $request->domain();
+                $_SERVER['REQUEST_URI']     =   '/' . $request->uri();
+                $_SERVER['PATH_INFO']       =   '/' . $request->uri();
+                $_SERVER['REQUEST_METHOD']  =   $request->method();
+            }
             return include_once($this->domainPaths[$domain]);
         }
         return false;

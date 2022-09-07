@@ -7,12 +7,10 @@ use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Request;
+use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Router;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use GuzzleHttp\Client;
-
-use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -26,7 +24,6 @@ final class AppTest extends TestCase
     const HTTP_TEST_PORT = 8181;
 
     private App|null $app = NULL;
-    private Client $http;
 
     public static function setupBeforeClass(): void
     {
@@ -44,7 +41,6 @@ final class AppTest extends TestCase
             ->setConfigPath('Configs')
             ->setViewPath('Views');
         $this->app = new App($config);
-        $this->http = new Client(['timeout' => 10, 'base_uri' => self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT]);
     }
 
     /**
@@ -75,13 +71,17 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app run HTTP
+     * Test app run mock HTTP
      *
      * @return void
      */
-    public function testAppRunHTTP()
+    public function testAppRunMockHttp()
     {
-        $response = $this->http->get('v1/pingHtml');
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getBody());
     }

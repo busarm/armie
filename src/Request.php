@@ -3,12 +3,14 @@
 namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Errors\SystemError;
 use LogicException;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 
 use function Busarm\PhpMini\Helpers\env;
 use function Busarm\PhpMini\Helpers\get_ip_address;
 use function Busarm\PhpMini\Helpers\is_https;
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -49,19 +51,29 @@ class Request implements RequestInterface
     }
 
     /**
-     * Set custom url
+     * Create mock request using url
+     *
+     * @param string $url
+     * @param string $method
      * @return self
      */
-    public static function withUrl($scheme, $domain, $uri): self
+    public static function withUrl($url, $method = HttpMethod::GET): self
     {
-        $request = new self;
-        $request->scheme = $scheme;
-        $request->domain = $domain;
-        $request->host = $request->scheme  . "://" . $request->domain;
-        $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
-        $request->uri = $uri;
-        $request->currentUrl = $request->host . $request->uri;
-        return $request;
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $request = new self;
+            $result = parse_url($url);
+            $request->ip = '::1';
+            $request->scheme = $result['scheme'] ?? '';
+            $request->domain = isset($result['host']) ? $result['host'] . (isset($result['port']) ? (':' . $result['port']) : '') : '';
+            $request->host = $request->scheme  . "://" . $request->domain;
+            $request->baseUrl = $request->host;
+            $request->uri = $result['path'] ?? '';
+            $request->currentUrl = $request->host . $request->uri;
+            $request->method = $method;
+            return $request;
+        } else {
+            throw new SystemError("$url is not a valid URL");
+        }
     }
 
     /**
@@ -111,7 +123,7 @@ class Request implements RequestInterface
         $this->headers = empty($headers) ? $this->getHeadersFromServer($this->server) : $headers;
 
         $this->contentType = $this->server('CONTENT_TYPE', '');
-        $this->method = $this->server('REQUEST_METHOD', HttpMethod::GET);
+        $this->method = $this->server('REQUEST_METHOD', $this->method ?? HttpMethod::GET);
 
         if (
             0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
@@ -207,7 +219,7 @@ class Request implements RequestInterface
      */
     public function segments()
     {
-        $segments = explode('/', $this->uri(), -1);
+        $segments = explode('/', $this->uri(), 100);
         return array_values(array_filter($segments, function ($value) {
             return $value !== '';
         }));
@@ -436,7 +448,7 @@ class Request implements RequestInterface
 
         return $headers;
     }
-    
+
     /**
      * Set custom url
      * @return self

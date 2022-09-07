@@ -27,6 +27,12 @@ App folders can be structured in whatever pattern you wish.
     $app->run();
 ```
 
+You can use PHP server built-in server to test:
+
+```bash
+$ php -S localhost:8181 -t tests/TestServer
+```
+
 ### Multi Tenancy
 
 ```php
@@ -212,12 +218,6 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
 ```
 
 ## Tests
-
-You can use PHP server built-in server to test:
-
-```bash
-$ php -S localhost:8181 -t tests/TestServer
-```
 
 To execute the test suite, you'll need to install all development dependencies.
 

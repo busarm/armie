@@ -5,7 +5,7 @@ use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 
-require '../bootstrap.php';
+require __DIR__ . '/../bootstrap.php';
 
 $config = (new Config())
     ->setAppPath(__DIR__)

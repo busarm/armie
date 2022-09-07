@@ -8,6 +8,7 @@ use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Server;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Request;
 use GuzzleHttp\Client;
 
 /**
@@ -23,7 +24,6 @@ final class ServerTest extends TestCase
 
     private Server|null $server = NULL;
     private App|null $app = NULL;
-    private Client $http;
 
     public static function setupBeforeClass(): void
     {
@@ -42,7 +42,6 @@ final class ServerTest extends TestCase
             ->setConfigPath('Configs')
             ->setViewPath('Views');
         $this->app = new App($config);
-        $this->http = new Client(['timeout' => 10, 'base_uri' => self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT]);
     }
 
     /**
@@ -61,26 +60,29 @@ final class ServerTest extends TestCase
     }
 
     /**
-     * Test server run HTTP for route
+     * Test app run mock HTTP For Route
      *
      * @return void
      */
-    public function testServerRunHTTPForRoute()
+    public function testServerRunHttpForRoute()
     {
-        $response = $this->http->get('v1/pingHtml');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('success', $response->getBody());
+        $this->server->addRoutePath('v1', __DIR__ . '/TestApp');
+        $response = $this->server->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/pingHtml'));
+        $this->assertNotNull($response);
+        $this->assertEquals(true, $response);
     }
 
+
     /**
-     * Test server run HTTP for domain
+     * Test app run mock HTTP For Domain
      *
      * @return void
      */
-    public function testServerRunHTTPForDomain()
+    public function testServerRunHttpForDomain()
     {
-        $response = $this->http->get('pingHtml');
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('success', $response->getBody());
+        $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/TestApp');
+        $response = $this->server->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $this->assertNotNull($response);
+        $this->assertEquals(true, $response);
     }
 }

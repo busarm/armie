@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+-   Add simple mock request capabilities to facilitate testing
 -   Fixed 'explode' extra param bug
 
 ## [1.0.10]

@@ -25,15 +25,7 @@ final class Config
     public string|null $version = '1.0.0';
 
     /**
-     * System base path to service. e.g '/var/www/html'
-     * (Without trailing slash)
-     *
-     * @var string|null
-     */
-    public string|null $basePath;
-
-    /**
-     * Relative path to app folder. e.g 'app'
+     * Path to app folder - relative to system base path. e.g '/var/www/html/app'
      * (Without leading or trailing slash)
      *
      * @var string|null
@@ -41,7 +33,7 @@ final class Config
     public string|null $appPath;
 
     /**
-     * Set path to view files - relative to app folder.
+     * Path to view folder - relative to app folder.
      * (Without leading or trailing slash)
      *
      * @var string|null
@@ -49,7 +41,7 @@ final class Config
     public string|null $viewPath;
 
     /**
-     * Set path to config files - relative to app folder. 
+     * Path to config folder - relative to app folder. 
      * (Without leading or trailing slash)
      *
      * @var string|null
@@ -71,7 +63,7 @@ final class Config
      *
      * @var bool|null
      */
-    public bool|null $httpCheckCors;
+    public bool|null $httpCheckCors = false;
 
     /**
      * CORS Allow Any Domain
@@ -125,11 +117,18 @@ final class Config
     public int|null $httpCorsMaxAge;
 
     /**
-     * Send HTTP response without exiting
+     * Send HTTP response without exiting. `json`|`xml`
      * 
      * @var bool|null
      */
     public bool|null $httpSendAndContinue = false;
+
+    /**
+     * HTPP default response format
+     * 
+     * @var string|null
+     */
+    public string|null $httpResponseFormat = 'json';
 
     /**
      * Set app name
@@ -160,21 +159,7 @@ final class Config
     }
 
     /**
-     * System base path to service. e.g '/var/www/html'
-     *
-     * @param  string|null  $basePath  (Without leading or trailing slash)
-     *
-     * @return  self
-     */
-    public function setBasePath($basePath)
-    {
-        $this->basePath = $basePath;
-
-        return $this;
-    }
-
-    /**
-     * Relative path to app folder. e.g 'app'
+     * Path to app folder - relative to system base path. e.g '/var/www/html/app'
      *
      * @param  string|null  $appPath  (Without leading or trailing slash)
      *
@@ -188,7 +173,7 @@ final class Config
     }
 
     /**
-     * Set path to view files - relative to app folder
+     * Set path to view folder - relative to app folder
      *
      * @param  string|null  $viewPath  (Without leading or trailing slash)
      *
@@ -337,6 +322,20 @@ final class Config
     public function setHttpSendAndContinue($httpSendAndContinue)
     {
         $this->httpSendAndContinue = $httpSendAndContinue;
+
+        return $this;
+    }
+
+    /**
+     * Set HTPP default response format
+     *
+     * @param  string|null  $httpResponseFormat  HTPP default response format. `json`|`xml`
+     *
+     * @return  self
+     */ 
+    public function setHttpResponseFormat($httpResponseFormat)
+    {
+        $this->httpResponseFormat = $httpResponseFormat;
 
         return $this;
     }

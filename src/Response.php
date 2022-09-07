@@ -7,6 +7,9 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Throwable;
 
+use function Busarm\PhpMini\Helpers\is_cli;
+use function Busarm\PhpMini\Helpers\request;
+
 /**
  * PHP Mini Framework
  *
@@ -49,6 +52,11 @@ class Response implements ResponseInterface
      * @var array
      */
     protected $httpHeaders = array();
+
+    /**
+     * @var boolean
+     */
+    private $clearBuffer = false;
 
     /**
      * @var array
@@ -365,11 +373,12 @@ class Response implements ResponseInterface
             return;
         }
 
-        // clean buffer
-        while (ob_get_level()) {
-            ob_end_clean();
+        // clear buffer
+        if ($this->clearBuffer) {
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
         }
-
 
         try {
             // start buffer
@@ -393,6 +402,9 @@ class Response implements ResponseInterface
             }
             echo $this->getResponseBody($format);
             ob_end_flush();
+
+            // Clear buffer on the next response
+            $this->clearBuffer = !$continue;
             if (!$continue) die;
         } catch (Throwable $e) {
             ob_end_clean();
@@ -404,36 +416,42 @@ class Response implements ResponseInterface
      * @param array $data
      * @param int $code response code
      * @param bool $continue
+     * @return self
      */
-    public function json($data, $code = 200, $continue = false)
+    public function json($data, $code = 200, $continue = false): self|null
     {
         $this->setParameters($data);
         $this->setStatusCode($code);
-        $this->send('json', $continue);
+        if (!is_cli()) $this->send('json', $continue);
+        return $this;
     }
 
     /**
      * @param mixed $data
      * @param int $code response code
      * @param bool $continue
+     * @return self
      */
-    public function xml($data, $code = 200, $continue = false)
+    public function xml($data, $code = 200, $continue = false): self|null
     {
         $this->setParameters($data);
         $this->setStatusCode($code);
-        $this->send('xml', $continue);
+        if (!is_cli()) $this->send('xml', $continue);
+        return $this;
     }
 
     /**
      * @param StreamInterface|string|null $data
      * @param int $code response code
      * @param bool $continue
+     * @return self
      */
-    public function html($data, $code = 200, $continue = false)
+    public function html($data, $code = 200, $continue = false): self|null
     {
         $this->setBody($data);
         $this->setStatusCode($code);
-        $this->send('html', $continue);
+        if (!is_cli()) $this->send('html', $continue);
+        return $this;
     }
 
     /**

@@ -57,11 +57,11 @@ class ErrorReporter implements ErrorReportingInterface
     {
         $contexts = [];
         if ($file) $contexts[] = $file . ':' . ($line ?? 0);
+        log_error($message);
         log_debug([
             'Crumbs' => $this->breadCrumbs,
             'Contexts' => $contexts,
         ]);
-        log_error($message);
     }
 
     /**
@@ -75,10 +75,10 @@ class ErrorReporter implements ErrorReportingInterface
         $contexts = array_map(function ($instance) {
             return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '0');
         }, $exception->getTrace());
+        log_exception($exception);
         log_debug([
             'Crumbs' => $this->breadCrumbs,
             'Contexts' => $contexts,
         ]);
-        log_exception($exception);
     }
 }

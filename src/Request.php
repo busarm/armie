@@ -33,6 +33,7 @@ class Request implements RequestInterface
     protected $content;
     protected $ip;
     protected $scheme;
+    protected $domain;
     protected $host;
     protected $baseUrl;
     protected $uri;
@@ -48,6 +49,22 @@ class Request implements RequestInterface
     }
 
     /**
+     * Set custom url
+     * @return self
+     */
+    public static function withUrl($scheme, $domain, $uri): self
+    {
+        $request = new self;
+        $request->scheme = $scheme;
+        $request->domain = $domain;
+        $request->host = $request->scheme  . "://" . $request->domain;
+        $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
+        $request->uri = $uri;
+        $request->currentUrl = $request->host . $request->uri;
+        return $request;
+    }
+
+    /**
      * Create request object from Globals
      * @return self
      */
@@ -56,12 +73,12 @@ class Request implements RequestInterface
         $request = new self;
         $request->ip = get_ip_address();
         $request->scheme = (is_https() ? "https" : "http");
-        $request->host = $request->scheme  . "://" . env('HTTP_HOST');
+        $request->domain = env('HTTP_HOST');
+        $request->host = $request->scheme  . "://" . $request->domain;
         $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
-        $request->uri = env('PATH_INFO') ?: (env('ORIG_PATH_INFO') ?: env('REQUEST_URI'));
+        $request->uri = env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO'));
         $request->uri = rawurldecode(explode('?', $request->uri)[0]);
         $request->currentUrl = $request->host . $request->uri;
-
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
         return $request;
     }
@@ -91,10 +108,10 @@ class Request implements RequestInterface
         $this->files = $files;
         $this->server = $server;
         $this->content = $content;
-        $this->headers = is_null($headers) ? $this->getHeadersFromServer($this->server) : $headers;
+        $this->headers = empty($headers) ? $this->getHeadersFromServer($this->server) : $headers;
 
         $this->contentType = $this->server('CONTENT_TYPE', '');
-        $this->method = $this->server('REQUEST_METHOD', 'GET');
+        $this->method = $this->server('REQUEST_METHOD', HttpMethod::GET);
 
         if (
             0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
@@ -125,6 +142,14 @@ class Request implements RequestInterface
     public function scheme()
     {
         return $this->scheme;
+    }
+
+    /**
+     * @return string
+     */
+    public function domain()
+    {
+        return $this->domain;
     }
 
     /**
@@ -295,21 +320,24 @@ class Request implements RequestInterface
     /**
      * @return array
      */
-    public function getFileList() {
+    public function getFileList()
+    {
         return $this->files;
     }
-    
+
     /**
      * @return array
      */
-    public function getCookieList() {
+    public function getCookieList()
+    {
         return $this->cookies;
     }
-    
+
     /**
      * @return array
      */
-    public function getAttributeList() {
+    public function getAttributeList()
+    {
         return $this->attributes;
     }
 
@@ -407,5 +435,20 @@ class Request implements RequestInterface
         }
 
         return $headers;
+    }
+    
+    /**
+     * Set custom url
+     * @return self
+     */
+    public function setUrl($scheme, $domain, $uri): self
+    {
+        $this->scheme = $scheme;
+        $this->domain = $domain;
+        $this->host = $this->scheme  . "://" . $this->domain;
+        $this->baseUrl = $this->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
+        $this->uri = $uri;
+        $this->currentUrl = $this->host . $this->uri;
+        return $this;
     }
 }

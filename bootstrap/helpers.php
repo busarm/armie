@@ -2,6 +2,10 @@
 
 namespace Busarm\PhpMini\Helpers;
 
+use Busarm\PhpMini\Errors\SystemError;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
 /**
  * PHP Mini Framework
  *
@@ -33,7 +37,7 @@ if (!function_exists('env')) {
      */
     function env($name, $default = null)
     {
-        return (!empty($data = @getenv($name)) ? $data : $default);
+        return (!empty($data = @getenv($name)) ? $data : ($_SERVER[$name] ?? $default));
     }
 }
 
@@ -149,14 +153,40 @@ if (!function_exists('get_server_protocol')) {
     }
 }
 
+if (!function_exists('out')) {
+    /**
+     * Print output end exit
+     * @param mixed $data
+     * @param int $responseCode
+     */
+    function out($data = null, $responseCode = 500)
+    {
+        if (!is_array($data) && !is_object($data)) {
+            return (new \Busarm\PhpMini\Response())->html($data, $responseCode);
+        }
+        return (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false);
+    }
+}
+
+if (!function_exists('server')) {
+    /**
+     * Get server instance
+     * @return \Busarm\PhpMini\Server
+     */
+    function server(): \Busarm\PhpMini\Server
+    {
+        return \Busarm\PhpMini\Server::$__instance ?? throw new SystemError('Failed to get server instance');
+    }
+}
+
 if (!function_exists('app')) {
     /**
-     * Get app instance
+     * Get current app instance
      * @return \Busarm\PhpMini\App
      */
     function app(): \Busarm\PhpMini\App
     {
-        return \Busarm\PhpMini\App::$__instance;
+        return \Busarm\PhpMini\Server::$__app ?? throw new SystemError('Failed to get current app instance');
     }
 }
 
@@ -183,20 +213,6 @@ if (!function_exists('view')) {
     function view(string $path, $params = [], $return = false)
     {
         return app()->loader->view($path, $params, $return);
-    }
-}
-
-if (!function_exists('out')) {
-    /**
-     * Print output end exit
-     * @param mixed $data
-     */
-    function out($data = null)
-    {
-        if (!is_array($data) && !is_object($data)) {
-            return app()->response->html($data, 500);
-        }
-        return app()->response->json(json_decode(json_encode($data), true), 500, false);
     }
 }
 
@@ -255,17 +271,7 @@ if (!function_exists('router')) {
     }
 }
 
-if (!function_exists('log_emergency')) {
-    /**
-     * @param mixed $message
-     */
-    function log_emergency($message)
-    {
-        return app()->logger->emergency($message);
-    }
-}
-
-if (!function_exists('log_error')) {
+if (!function_exists('log_message')) {
     /**
      * @param string $level @see \Psr\Log\LogLevel
      * @param mixed $message
@@ -273,7 +279,21 @@ if (!function_exists('log_error')) {
      */
     function log_message($level, $message, array $context = [])
     {
-        return app()->logger->log($level, is_array($message) || is_object($message) ? json_encode($message, JSON_PRETTY_PRINT) : (string) $message, $context);
+        try {
+            return app()->logger->log($level, is_array($message) || is_object($message) ? json_encode($message, JSON_PRETTY_PRINT) : (string) $message, $context);
+        } catch (\Throwable $th) {
+            return (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? json_encode($message, JSON_PRETTY_PRINT) : (string) $message, $context);
+        }
+    }
+}
+
+if (!function_exists('log_emergency')) {
+    /**
+     * @param mixed $message
+     */
+    function log_emergency($message)
+    {
+        return log_message(\Psr\Log\LogLevel::EMERGENCY, $message);
     }
 }
 

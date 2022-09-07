@@ -48,6 +48,9 @@ class Router implements RouterInterface
     /** @var string Request Params */
     protected array|null $params = [];
 
+    /** @var string HTTP request host */
+    protected string|null $requestHost = null;
+
     /** @var string HTTP request method */
     protected string|null $requestMethod = null;
 
@@ -98,6 +101,14 @@ class Router implements RouterInterface
     /**
      * @return string|null
      */
+    public function getRequestHost(): string|null
+    {
+        return $this->requestHost;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getRequestMethod(): string|null
     {
         return $this->requestMethod;
@@ -133,6 +144,15 @@ class Router implements RouterInterface
     public function getIsHttp()
     {
         return $this->isHttp;
+    }
+
+    /**
+     * @return self
+     */
+    public function setPath(string $path): self
+    {
+        $this->requestPath = $path;
+        return $this;
     }
 
     /**
@@ -199,12 +219,15 @@ class Router implements RouterInterface
      *
      * @param string $path Request path
      * @param string $route Route to compare to
+     * @param boolean $startsWith path starts with route
+     * @param boolean $startsWith path ends with route
      * @return boolean|array
      */
-    protected function isMatch($path, $route)
+    public function isMatch($path, $route, $startsWith = true, $endsWith = true)
     {
-        // Remove trailing slash
-        $path = trim(rtrim($path, '/'));
+        // Trim leading & trailing slash and spaces
+        $route = trim($route, " /\t\n\r");
+        $path = trim($path, " /\t\n\r");
         // Decode url
         $path = urldecode($path);
         // Remove unwanted characters from path
@@ -217,7 +240,7 @@ class Router implements RouterInterface
         // Replace matching parameters keywords with regexp 
         $route = $this->createMatchParamsRoute($route, $paramMatches);
         // Search request path against route
-        $result = preg_match("/$route$/i", $path, $matches);
+        $result = preg_match($startsWith ? ($endsWith ? "/^$route$/i" : "/^$route/i") : ($endsWith ? "/$route$/i" : "/$route/i"), $path, $matches);
         if (!empty($path) && $result >= 1) {
             if (!empty($paramMatches)) {
                 $params = array_combine($paramMatches, array_splice($matches, 1));

@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Psr\Http\Message\StreamInterface;
+
 /**
  * PHP Mini Framework
  *
@@ -37,6 +39,12 @@ interface ResponseInterface
      * @return StreamInterface|string
      */
     public function getBody();
+
+    /**
+     * @param StreamInterface|string $body
+     * @return self
+     */
+    public function setBody(StreamInterface|string|null $body);
 
     /**
      * @param array $parameters
@@ -97,23 +105,26 @@ interface ResponseInterface
      * @param array $data
      * @param int $code response code
      * @param bool $continue
+     * @return self|null
      */
-    public function json($data, $code = 200, $continue = false);
+    public function json($data, $code = 200, $continue = false): self|null;
 
     /**
      * @param array $data
      * @param int $code response code
      * @param bool $continue
+     * @return self|null
      */
-    public function xml($data, $code = 200, $continue = false);
+    public function xml($data, $code = 200, $continue = false): self|null;
 
     /**
-     * @param string|null $data
+     * @param StreamInterface|string|null $data
      * @param int $code response code
      * @param bool $continue
+     * @return self|null
      */
-    public function html($data, $code = 200, $continue = false);
-    
+    public function html($data, $code = 200, $continue = false): self|null;
+
     /**
      * @return Boolean
      *

@@ -3,18 +3,35 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.0.9]
+
 ### Added
-- Namespace for helper functions
+
+-   Multi tenancy support
+-   Namespace for helper functions
+-   Guzzle Http for dev test
+-   Response optional buffer clearing based on 'continue' option
+
+### Changed
+
+-   Removed basePath from configs. Use appPath only
 
 ## [1.0.6]
+
 ### Fixed
-- Dependency Injection related bugs
+
+-   Dependency Injection related bugs
 
 ## [1.0.5]
+
 ### Added
-- Tests scripts
-- Enums folder
+
+-   Tests scripts
+-   Enums folder
+
 ### Changed
-- Request, Response and Routing mechanisms
+
+-   Request, Response and Routing mechanisms
+
 ### Fixed
-- Minor bugs
+
+-   Minor bugs

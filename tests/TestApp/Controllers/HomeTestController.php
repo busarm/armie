@@ -3,6 +3,8 @@
 namespace Busarm\PhpMini\Test\TestApp\Controllers;
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
 
 use function Busarm\PhpMini\Helpers\log_debug;
 
@@ -21,6 +23,11 @@ class HomeTestController
 
     public function ping()
     {
-        return "success";
+        return 'success';
+    }
+
+    public function pingHtml(ResponseInterface $response)
+    {
+        return $response->html('success', 200, false);
     }
 }

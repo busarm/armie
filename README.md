@@ -12,6 +12,8 @@ App folders can be structured in whatever pattern you wish.
 
 ## Usage
 
+### Single App
+
 ```php
     define('APP_START_TIME', floor(microtime(true) * 1000));
     require __DIR__ . '/../vendor/autoload.php';
@@ -23,6 +25,19 @@ App folders can be structured in whatever pattern you wish.
             ->setViewPath('Views');
     $app = new App($config);
     $app->run();
+```
+
+### Multi Tenancy
+
+```php
+    require __DIR__ . '/../vendor/autoload.php';
+
+    $server = (new Server())
+        // Use `myapp` for requests with path `v1/....`
+        ->addRoutePath('v1', __DIR__ . '/../myapp')
+        // Use `mydevapp` for requests with domain name `dev.myapp.com`
+        ->addDomainPath('dev.myapp.com', __DIR__ . '/../mydevapp');
+    $server->run();
 ```
 
 ## Configs
@@ -197,6 +212,12 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
 ```
 
 ## Tests
+
+You can use PHP server built-in server to test:
+
+```bash
+php -S localhost:8181 -t tests/TestServer
+```
 
 To execute the test suite, you'll need to install all development dependencies.
 

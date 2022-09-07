@@ -5,14 +5,10 @@ namespace Busarm\PhpMini\Test;
 use PHPUnit\Framework\TestCase;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Server;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Router;
-use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use GuzzleHttp\Client;
-
-use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -20,11 +16,12 @@ use function Busarm\PhpMini\Helpers\log_debug;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-final class AppTest extends TestCase
+final class ServerTest extends TestCase
 {
     const HTTP_TEST_URL = 'http://localhost';
     const HTTP_TEST_PORT = 8181;
 
+    private Server|null $server = NULL;
     private App|null $app = NULL;
     private Client $http;
 
@@ -39,6 +36,7 @@ final class AppTest extends TestCase
      */
     protected function setUp(): void
     {
+        $this->server = new Server();
         $config = (new Config())
             ->setAppPath(__DIR__ . '/TestApp')
             ->setConfigPath('Configs')
@@ -54,6 +52,7 @@ final class AppTest extends TestCase
      */
     public function testInitializeApp()
     {
+        $this->assertNotNull($this->server);
         $this->assertNotNull($this->app);
         $this->assertNotNull($this->app->request);
         $this->assertNotNull($this->app->response);
@@ -62,26 +61,25 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app run CLI
+     * Test server run HTTP for route
      *
      * @return void
      */
-    public function testAppRunCLI()
+    public function testServerRunHTTPForRoute()
     {
-        $this->app->setRouter(Router::withController(HomeTestController::class, 'ping'));
-        $response = $this->app->run();
-        $this->assertNotNull($response);
+        $response = $this->http->get('v1/pingHtml');
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getBody());
     }
 
     /**
-     * Test app run HTTP
+     * Test server run HTTP for domain
      *
      * @return void
      */
-    public function testAppRunHTTP()
+    public function testServerRunHTTPForDomain()
     {
-        $response = $this->http->get('v1/pingHtml');
+        $response = $this->http->get('pingHtml');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getBody());
     }

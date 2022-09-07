@@ -18,6 +18,29 @@ use function Busarm\PhpMini\Helpers\app;
 class Loader implements LoaderInterface
 {
 
+    /** @var string */
+    protected string|null $appPath = null;
+    /** @var string */
+    protected string|null $viewPath = null;
+    /** @var string */
+    protected string|null $configPath = null;
+
+    protected function __construct()
+    {
+    }
+
+    /**
+     * @return self
+     */
+    public static function withConfig(Config $config): self
+    {
+        $loader = new self;
+        $loader->appPath = $config->appPath;
+        $loader->viewPath = $config->viewPath;
+        $loader->configPath = $config->configPath;
+        return $loader;
+    }
+
     /**
      * Fetches print result intead of sending it to the output buffer
      *
@@ -50,7 +73,7 @@ class Loader implements LoaderInterface
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
-        $path = app()->config->basePath  . DIRECTORY_SEPARATOR . app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->viewPath . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {
             $content = $this->load($path, $vars);
             if ($return) return $content;
@@ -70,7 +93,7 @@ class Loader implements LoaderInterface
      */
     public function config($path)
     {
-        $path = app()->config->basePath  . DIRECTORY_SEPARATOR . app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->configPath . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = $this->appPath . DIRECTORY_SEPARATOR . $this->configPath . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {
             return require_once $path;
         } else {

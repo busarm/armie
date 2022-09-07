@@ -14,11 +14,16 @@ interface RequestInterface
      * @return string
      */
     public function ip();
-    
+
     /**
      * @return string
      */
     public function scheme();
+
+    /**
+     * @return string
+     */
+    public function domain();
 
     /**
      * @return string
@@ -47,12 +52,12 @@ interface RequestInterface
 
     /**
      * @return string
-     */ 
+     */
     public function method();
 
     /**
      * @return string
-     */ 
+     */
     public function contentType();
 
     /**
@@ -132,4 +137,10 @@ interface RequestInterface
      * @return array
      */
     public function getHeaderList();
+    
+    /**
+     * Set custom url
+     * @return self
+     */
+    public function setUrl($scheme, $domain, $uri): self;
 }

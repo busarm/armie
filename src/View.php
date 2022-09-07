@@ -4,6 +4,7 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Throwable;
 
 use function Busarm\PhpMini\Helpers\app;
@@ -120,12 +121,13 @@ abstract class View
 
     /**
      * @param bool $continue
+     * @return ResponseInterface|null
      */
-    public function send($continue = false)
+    public function send($continue = false): ResponseInterface|null
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
-            return;
+            return null;
         }
 
         // clean buffer

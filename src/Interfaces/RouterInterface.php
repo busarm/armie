@@ -13,9 +13,19 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 interface RouterInterface
 {
     /**
+     * @return self
+     */
+    public function setPath(string $path): self;
+
+    /**
      * @return boolean
      */ 
     public function getIsHttp();
+
+    /**
+     * @return string|null
+     */
+    public function getRequestHost(): string|null;
 
     /**
      * @return string|null
@@ -54,4 +64,15 @@ interface RouterInterface
      * @return self
      */
     public function addRoutes(array $routes): self;
+
+    /**
+     * Check if path matches
+     *
+     * @param string $path Request path
+     * @param string $route Route to compare to
+     * @param boolean $startsWith path starts with route
+     * @param boolean $startsWith path ends with route
+     * @return boolean|array
+     */
+    public function isMatch($path, $route, $startsWith = true, $endsWith = true);
 }

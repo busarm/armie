@@ -9,6 +9,8 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\View;
 
+use function Busarm\PhpMini\Helpers\is_cli;
+
 /**
  * PHP Mini Framework
  *
@@ -22,7 +24,7 @@ final class ResponseMiddleware implements MiddlewareInterface
         $response = $next ? $next() : null;
         if ($response !== false) {
             if ($response instanceof ResponseInterface) {
-                return $response->send('json', $app->config->httpSendAndContinue);
+                return is_cli() ? $response : $response->send($app->config->httpResponseFormat, $app->config->httpSendAndContinue);
             } else if ($response instanceof View) {
                 return $response->send($app->config->httpSendAndContinue);
             } else if ($response instanceof CollectionBaseDto) {

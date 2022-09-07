@@ -78,9 +78,12 @@ class DI
         $params = [];
         foreach ($parameters as $param) {
             if ($type = $param->getType()) {
+                $instance = NULL;
                 // If type is an interface - Get app interface binding
                 if (interface_exists($type->getName())) {
-                    if (!($className = $app->getBinding($type->getName()))) {
+                    if ($resolver = $app->getResolver($type->getName())) {
+                        $instance = $resolver();
+                    } else if (!($className = $app->getBinding($type->getName()))) {
                         throw new DependencyError("No interface binding exists for " . $type->getName());
                     }
                 }
@@ -89,7 +92,7 @@ class DI
                 // Get class name
                 else $className = $type->getName();
                 // Resolve dependencies for type
-                $instance = self::instantiate($app, $className);
+                $instance = $instance ?? self::instantiate($app, $className);
                 // If type is an Request Dto - Parse request
                 if ($instance instanceof BaseDto) {
                     $instance->load($app->request->getRequestList(), true);

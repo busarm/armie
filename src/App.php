@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Dto\ErrorTraceDto;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\HttpMethod;
@@ -38,9 +39,6 @@ use function Busarm\PhpMini\Helpers\is_cli;
  */
 class App
 {
-    /** @var static */
-    public static $__instance;
-
     /** @var MiddlewareInterface[] */
     public $middlewares = [];
 
@@ -82,29 +80,26 @@ class App
     private Closure|null $completeHook = null;
 
     /**
-     *
-     * @param Config $config
+     * @param Config $config App configuration object
      * @param string $env App environment. @see Busarm\PhpMini\Enums\Env
      */
     public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
-        self::$__instance = &$this;
-
         // Benchmark start time
         $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
+
+        // Set error reporter
+        $this->reporter = new ErrorReporter();
 
         // Create request & response objects
         $this->request = Request::fromGlobal();
         $this->response = new Response();
 
-        // Set error reporter
-        $this->reporter = new ErrorReporter();
-
-        // Set Loader
-        $this->loader = new Loader();
-
         // Set router
         $this->router = Router::withRequest($this->request);
+
+        // Set Loader
+        $this->loader = Loader::withConfig($this->config);
 
         // Set logger
         $this->logger = new ConsoleLogger(new ConsoleOutput(match ($this->config->loggerVerborsity) {
@@ -122,13 +117,19 @@ class App
         $this->addMiddleware(new ResponseMiddleware());
 
         // Add app resolvers
-        $this->addResolver(self::class, fn () => $this);
-        $this->addResolver(RequestInterface::class, fn () => $this->request);
-        $this->addResolver(ResponseInterface::class, fn () => $this->response);
-        $this->addResolver(RouterInterface::class, fn () => $this->router);
-        $this->addResolver(ErrorReportingInterface::class, fn () => $this->reporter);
-        $this->addResolver(LoggerInterface::class, fn () => $this->logger);
-        $this->addResolver(LoaderInterface::class, fn () => $this->loader);
+        $this->addResolver(self::class, $this);
+        $this->addResolver(Request::class, $this->request);
+        $this->addResolver(RequestInterface::class, $this->request);
+        $this->addResolver(Response::class, $this->response);
+        $this->addResolver(ResponseInterface::class, $this->response);
+        $this->addResolver(Router::class, $this->router);
+        $this->addResolver(RouterInterface::class, $this->router);
+        $this->addResolver(ErrorReporter::class, $this->reporter);
+        $this->addResolver(ErrorReportingInterface::class, $this->reporter);
+        $this->addResolver(ConsoleLogger::class, $this->logger);
+        $this->addResolver(LoggerInterface::class, $this->logger);
+        $this->addResolver(Loader::class, $this->loader);
+        $this->addResolver(LoaderInterface::class, $this->loader);
     }
 
     ############################
@@ -154,7 +155,7 @@ class App
     /**
      * Load config file
      * 
-     * @param string $config Config file name/path relative to Config Path (@see `AppConfig::setConfigPath`)
+     * @param string $config Config file name/path relative to Config Path (@see `Config::setConfigPath`)
      * @return self
      */
     public function loadConfig(string $config)
@@ -170,10 +171,10 @@ class App
     }
 
     /**
-     * Set up configs
-     * @param array $configs
+     * Load config file
+     * @param array $configs List of config file name/path relative to Config Path (@see `Config::setConfigPath`)
      */
-    private function setUpConfigs($configs = array())
+    public function loadConfigs($configs = array())
     {
         if (!empty($configs)) {
             foreach ($configs as $config) {
@@ -199,12 +200,7 @@ class App
             } else {
                 $this->reporter->reportException($e);
                 $trace = array_map(function ($instance) {
-                    return [
-                        'file' => $instance['file'] ?? null,
-                        'line' => $instance['line'] ?? null,
-                        'class' => $instance['class'] ?? null,
-                        'function' => $instance['function'] ?? null,
-                    ];
+                    return (new ErrorTraceDto($instance))->toArray();
                 }, $e->getTrace());
                 $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
             }
@@ -278,12 +274,20 @@ class App
     /**
      * Run application
      *
+     * @param RequestInterface|null $request Custom request object
      * @return ResponseInterface
      */
-    public function run(): ResponseInterface
+    public function run(RequestInterface|null $request = null): ResponseInterface
     {
-        // Set request & response bindings if exists
-        $this->request = ($req = $this->getBinding(RequestInterface::class)) ? $this->make($req, false) : $this->request;
+        // Set current app instance
+        Server::$__app = &$this;
+
+        // Set request & response & router
+        $request = $request ?? (($req = $this->getBinding(RequestInterface::class)) ? $this->make($req, false) : $this->request);
+        if($request != $this->request) {
+            $this->request = $request;
+            $this->router->setPath($request->uri());
+        }
         $this->response = ($res = $this->getBinding(ResponseInterface::class)) ? $this->make($res, false) : $this->response;
 
         // Preflight Checking
@@ -324,7 +328,7 @@ class App
     protected function processMiddleware(self $app, array $middlewares, $index = 0)
     {
         if (isset($middlewares[$index])) {
-            return @$middlewares[$index]->handle(app: $app, next: fn () => $this->processMiddleware($app, $middlewares, ++$index));
+            return $middlewares[$index]->handle(app: $app, next: fn () => $this->processMiddleware($app, $middlewares, ++$index));
         }
         return false;
     }
@@ -376,12 +380,12 @@ class App
      * Add resolver
      *
      * @param string $name Class name, Interface name or Unique name of resolver
-     * @param Closure $resolver Annonymous resolver function returning the result of the resolution
+     * @param mixed $result Result of the resolution. e.g Class object
      * @return self
      */
-    public function addResolver($name, callable $resolver)
+    public function addResolver($name, &$result)
     {
-        $this->resolvers[$name] = $resolver;
+        $this->resolvers[$name] = fn & () => $result;
         return $this;
     }
 
@@ -404,7 +408,7 @@ class App
      * @param object|null $object
      * @return self
      */
-    public function addSingleton($className, &$object = null)
+    public function addSingleton($className, &$object)
     {
         $this->singletons[$className] = $object;
         return $this;
@@ -512,6 +516,7 @@ class App
      * @param string $errorLine 
      * @param string $errorFile 
      * @param array $errorTrace 
+     * @return void
      */
     public function showMessage($status, $message = null, $errorCode = null, $errorLine = null, $errorFile = null,  $errorTrace = [])
     {
@@ -561,8 +566,9 @@ class App
      * @param string $status Status Code
      * @param BaseDto|array|object|string $data Data
      * @param array $headers Headers
+     * @return ResponseInterface|null
      */
-    public function sendHttpResponse($status, $data = null, $headers = [])
+    public function sendHttpResponse($status, $data = null, $headers = []): ResponseInterface|null
     {
         if (!is_array($data)) {
             if ($data instanceof CollectionBaseDto) {
@@ -580,7 +586,7 @@ class App
             }
         }
 
-        $this->response
+        return $this->response
             ->addHttpHeaders($headers)
             ->json($data, ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
     }

@@ -1,4 +1,4 @@
-[![PHP Composer](https://github.com/Busarm/php-mini/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/Busarm/php-mini/actions/workflows/php.yml)
+[![Test](https://github.com/Busarm/php-mini/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/Busarm/php-mini/actions/workflows/php.yml)
 
 # PHP Mini by Busarm
 

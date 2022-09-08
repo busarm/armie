@@ -89,7 +89,7 @@ class Request implements RequestInterface
         $request->host = $request->scheme  . "://" . $request->domain;
         $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
         $request->uri = env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO'));
-        $request->uri = rawurldecode(explode('?', $request->uri, 2)[0]);
+        $request->uri = rawurldecode(explode('?', $request->uri ?? '', 2)[0]);
         $request->currentUrl = $request->host . $request->uri;
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
         return $request;
@@ -219,7 +219,7 @@ class Request implements RequestInterface
      */
     public function segments()
     {
-        $segments = explode('/', $this->uri(), 100);
+        $segments = explode('/', $this->uri() ?? '', 100);
         return array_values(array_filter($segments, function ($value) {
             return $value !== '';
         }));
@@ -433,7 +433,7 @@ class Request implements RequestInterface
                 $headers['AUTHORIZATION'] = $authorizationHeader;
                 // Decode AUTHORIZATION header into PHP_AUTH_USER and PHP_AUTH_PW when authorization header is basic
                 if (0 === stripos($authorizationHeader, 'basic')) {
-                    $exploded = explode(':', base64_decode(substr($authorizationHeader, 6), 3));
+                    $exploded = explode(':', base64_decode(substr($authorizationHeader, 6) ?? '', 3));
                     if (count($exploded) == 2) {
                         list($headers['PHP_AUTH_USER'], $headers['PHP_AUTH_PW']) = $exploded;
                     }

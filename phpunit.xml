@@ -10,7 +10,7 @@
          beStrictAboutTodoAnnotatedTests="true"
          convertDeprecationsToExceptions="true"
          failOnRisky="true"
-         failOnWarning="false"
+         failOnWarning="true"
          verbose="true">
     <testsuites>
         <testsuite name="default">

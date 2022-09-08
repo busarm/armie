@@ -202,7 +202,8 @@ final class Config
 
     /**
      * Set logger verbosity
-     *
+     * 
+     * @see \Busarm\PhpMini\Enums\Verbose
      * @param  int|null  $loggerVerborsity  Logger verbosity
      *
      * @return  self

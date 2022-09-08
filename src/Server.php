@@ -137,7 +137,7 @@ class Server
             // Check route apps
             if (array_key_exists($route, $this->routeApps)) {
                 $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                return $this->routeApps[$route]->run($request->setUrl($request->scheme(), $request->domain(), $uri));
+                return $this->routeApps[$route]->run($request->withUrl($request->scheme(), $request->domain(), $uri));
             }
 
             // Check route paths

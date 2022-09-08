@@ -12,6 +12,14 @@ namespace Busarm\PhpMini\Interfaces;
 interface RequestInterface
 {
     /**
+     * @param string $scheme
+     * @param string $domain
+     * @param string $uri
+     * @return self
+     */
+    public function withUrl(string $scheme, string $domain, string $uri): self;
+
+    /**
      * @return string
      */
     public function ip();
@@ -138,10 +146,4 @@ interface RequestInterface
      * @return array
      */
     public function getHeaderList();
-    
-    /**
-     * Set custom url
-     * @return self
-     */
-    public function setUrl($scheme, $domain, $uri): self;
 }

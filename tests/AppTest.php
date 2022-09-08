@@ -81,7 +81,7 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $response = $this->app->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getBody());

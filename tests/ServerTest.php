@@ -9,7 +9,6 @@ use Busarm\PhpMini\Server;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Request;
-use GuzzleHttp\Client;
 
 /**
  * PHP Mini Framework
@@ -68,7 +67,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForRoute()
     {
         $this->server->addRoutePath('v1', __DIR__ . '/TestApp');
-        $response = $this->server->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/pingHtml'));
+        $response = $this->server->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(true, $response);
     }
@@ -82,7 +81,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForDomain()
     {
         $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/TestApp');
-        $response = $this->server->run(Request::withUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $response = $this->server->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(true, $response);
     }

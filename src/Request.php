@@ -2,15 +2,14 @@
 
 namespace Busarm\PhpMini;
 
+use LogicException;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Errors\SystemError;
-use LogicException;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 
 use function Busarm\PhpMini\Helpers\env;
 use function Busarm\PhpMini\Helpers\get_ip_address;
 use function Busarm\PhpMini\Helpers\is_https;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -51,18 +50,18 @@ class Request implements RequestInterface
     }
 
     /**
-     * Create mock request using url
+     * Create request object using custom URL
      *
      * @param string $url
      * @param string $method
      * @return self
      */
-    public static function withUrl($url, $method = HttpMethod::GET): self
+    public static function fromUrl($url, $method = HttpMethod::GET): self
     {
         if (filter_var($url, FILTER_VALIDATE_URL)) {
             $request = new self;
             $result = parse_url($url);
-            $request->ip = '::1';
+            $request->ip = get_ip_address();
             $request->scheme = $result['scheme'] ?? '';
             $request->domain = isset($result['host']) ? $result['host'] . (isset($result['port']) ? (':' . $result['port']) : '') : '';
             $request->host = $request->scheme  . "://" . $request->domain;
@@ -78,6 +77,7 @@ class Request implements RequestInterface
 
     /**
      * Create request object from Globals
+     * 
      * @return self
      */
     public static function fromGlobal(): self
@@ -91,6 +91,7 @@ class Request implements RequestInterface
         $request->uri = env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO'));
         $request->uri = rawurldecode(explode('?', $request->uri ?? '', 2)[0]);
         $request->currentUrl = $request->host . $request->uri;
+
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
         return $request;
     }
@@ -109,9 +110,9 @@ class Request implements RequestInterface
      * @param array  $headers    - The headers
      * @param string $content    - The raw body data
      *
-     * @api
+     * @return self
      */
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), array $headers = array(), $content = null)
+    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), array $headers = array(), $content = null): self
     {
         $this->request = $request;
         $this->query = $query;
@@ -122,8 +123,8 @@ class Request implements RequestInterface
         $this->content = $content;
         $this->headers = empty($headers) ? $this->getHeadersFromServer($this->server) : $headers;
 
-        $this->contentType = $this->server('CONTENT_TYPE', '');
-        $this->method = $this->server('REQUEST_METHOD', $this->method ?? HttpMethod::GET);
+        $this->contentType = $this->contentType ?? $this->server('CONTENT_TYPE', '');
+        $this->method = $this->method ?? $this->server('REQUEST_METHOD', HttpMethod::GET);
 
         if (
             0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
@@ -138,6 +139,28 @@ class Request implements RequestInterface
             $data = json_decode($this->getContent(), true);
             $this->request = $data;
         }
+
+        return $this;
+    }
+
+    /**
+     * Change request's url. Clone request with new url
+     * 
+     * @param string $scheme
+     * @param string $domain
+     * @param string $uri
+     * @return self
+     */
+    public function withUrl(string $scheme, string $domain, string $uri): self
+    {
+        $request = clone $this;
+        $request->scheme = $scheme;
+        $request->domain = $domain;
+        $request->host = $request->scheme  . "://" . $request->domain;
+        $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
+        $request->uri = $uri;
+        $request->currentUrl = $request->host . $request->uri;
+        return $request;
     }
 
     /**
@@ -447,20 +470,5 @@ class Request implements RequestInterface
         }
 
         return $headers;
-    }
-
-    /**
-     * Set custom url
-     * @return self
-     */
-    public function setUrl($scheme, $domain, $uri): self
-    {
-        $this->scheme = $scheme;
-        $this->domain = $domain;
-        $this->host = $this->scheme  . "://" . $this->domain;
-        $this->baseUrl = $this->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
-        $this->uri = $uri;
-        $this->currentUrl = $this->host . $this->uri;
-        return $this;
     }
 }

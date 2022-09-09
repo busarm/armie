@@ -13,7 +13,6 @@ use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ErrorTraceDto;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
@@ -25,6 +24,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
+use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -75,6 +75,9 @@ class App
     /** @var int Request start time in milliseconds */
     public $startTimeMs;
 
+    /** @var bool */
+    public $isCli;
+
     // SYSTEM HOOKS 
     private Closure|null $startHook = null;
     private Closure|null $completeHook = null;
@@ -87,6 +90,9 @@ class App
     {
         // Set current app instance
         Server::$__app = &$this;
+
+        // Set cli state
+        $this->isCli = is_cli();
 
         // Benchmark start time
         $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
@@ -118,6 +124,10 @@ class App
 
         // Add response middleware as the first in the chain
         $this->addMiddleware(new ResponseMiddleware());
+        // Add cors middleware if not cli
+        if ($this->isCli) {
+            $this->addMiddleware(new CorsMiddleware());
+        }
 
         // Add app resolvers
         $this->addResolver(self::class, $this);
@@ -211,70 +221,6 @@ class App
     }
 
     /**
-     * Preflight Check
-     *
-     * @return void
-     */
-    private function preflight($method)
-    {
-        // Check for CORS access request
-        if ($this->config->httpCheckCors == TRUE) {
-            $headers = [];
-            $allowed_cors_headers = $this->config->httpAllowedCorsHeaders ?? ['*'];
-            $exposed_cors_headers = $this->config->httpExposedCorsHeaders ?? ['*'];
-            $allowed_cors_methods = $this->config->httpAllowedCorsMethods ?? [
-                HttpMethod::GET,
-                HttpMethod::POST,
-                HttpMethod::PUT,
-                HttpMethod::PATCH,
-                HttpMethod::OPTIONS,
-                HttpMethod::DELETE
-            ];
-            $max_cors_age = $this->config->httpCorsMaxAge ?? 3600;
-
-            // Convert the config items into strings
-            $allowed_headers = implode(', ', is_array($allowed_cors_headers) ? $allowed_cors_headers : []);
-            $exposed_cors_headers = implode(', ', is_array($exposed_cors_headers) ? $exposed_cors_headers : []);
-            $allowed_methods = implode(', ', is_array($allowed_cors_methods) ? $allowed_cors_methods : []);
-
-            // If we want to allow any domain to access the API
-            if ($this->config->httpAllowAnyCorsDomain == TRUE) {
-                $headers['Access-Control-Allow-Origin'] = '*';
-                $headers['Access-Control-Allow-Methods'] = $allowed_methods;
-                $headers['Access-Control-Allow-Headers'] = $allowed_headers;
-                $headers['Access-Control-Expose-Headers'] = $exposed_cors_headers;
-                $headers['Access-Control-Allow-Max-Age'] = $max_cors_age;
-            } else {
-                // We're going to allow only certain domains access
-                // Store the HTTP Origin header
-                $origin = env('HTTP_ORIGIN') ?? env('HTTP_REFERER') ?? '';
-                $allowed_origins = $this->config->httpAllowedCorsOrigins ?? [];
-                // If the origin domain is in the allowed_cors_origins list, then add the Access Control headers
-                if (is_array($allowed_origins) && in_array(trim($origin, "/"), $allowed_origins)) {
-                    $headers['Access-Control-Allow-Origin'] = $origin;
-                    $headers['Access-Control-Allow-Methods'] = $allowed_methods;
-                    $headers['Access-Control-Allow-Headers'] = $allowed_headers;
-                    $headers['Access-Control-Expose-Headers'] = $exposed_cors_headers;
-                    $headers['Access-Control-Allow-Max-Age'] = $max_cors_age;
-                }
-            }
-
-            // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
-            if (strtoupper($method) === HttpMethod::OPTIONS) {
-                $headers['Cache-Control'] = "max-age=$max_cors_age";
-                $this->sendHttpResponse(200, null, $headers);
-            } else {
-                $this->response->addHttpHeaders($headers);
-            }
-        } else {
-            if (strtoupper($method) === HttpMethod::OPTIONS) {
-                // kill the response and send it to the client
-                $this->showMessage(200, "Preflight Ok");
-            }
-        }
-    }
-
-    /**
      * Run application
      *
      * @param RequestInterface|null $request Custom request object
@@ -293,11 +239,6 @@ class App
         }
         $this->response = ($res = $this->getBinding(ResponseInterface::class)) ? $this->make($res, false) : $this->response;
 
-        // Preflight Checking
-        if (!is_cli()) {
-            $this->preflight($this->router->getRequestMethod());
-        }
-
         // Run start hook
         if ($this->startHook) ($this->startHook)($this);
 
@@ -305,7 +246,7 @@ class App
         register_shutdown_function(function (App $app) {
             if ($app->completeHook) ($app->completeHook)($app);
         }, $this);
-
+        
         // Initiate rerouting
         if ($this->router) {
             if ($this->processMiddleware($this, array_merge($this->middlewares, $this->router->process())) === false) {
@@ -523,7 +464,7 @@ class App
      */
     public function showMessage($status, $message = null, $errorCode = null, $errorLine = null, $errorFile = null,  $errorTrace = [])
     {
-        if (is_cli()) {
+        if ($this->isCli) {
             if ($status !== 200 || $status !== 201) {
                 $this->logger->error(
                     PHP_EOL . "success\t-\tfalse" .

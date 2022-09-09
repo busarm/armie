@@ -57,7 +57,7 @@ class Router implements RouterInterface
     /** @var string HTTP request route */
     protected string|null $requestPath = null;
 
-    /** @var bool If http router */
+    /** @var bool If router is for HTTP request*/
     protected bool $isHttp = false;
 
     /** @var RouteInterface Current HTTP route */

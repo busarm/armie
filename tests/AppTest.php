@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Test;
 use PHPUnit\Framework\TestCase;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Request;
@@ -61,6 +62,7 @@ final class AppTest extends TestCase
     /**
      * Test app run CLI
      *
+     * @covers \Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController
      * @return void
      */
     public function testAppRunCLI()
@@ -85,5 +87,89 @@ final class AppTest extends TestCase
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getBody());
+    }
+
+    /**
+     * Test app run mock HTTP CORS
+     * 
+     * @covers \Busarm\PhpMini\Middlewares\CorsMiddleware
+     * @return void
+     */
+    public function testAppRunMockHttpCORS()
+    {
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Preflight Ok', $response->getBody());
+    }
+
+    /**
+     * Test app run mock HTTP CORS Active
+     *
+     * @return void
+     */
+    public function testAppRunMockHttpCORSActive()
+    {
+        $this->app->config->setHttpCheckCors(true);
+        $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Preflight Ok', $response->getBody());
+        $this->assertEquals('*', $response->getHttpHeader('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Test app run mock HTTP CORS Active with custom origin
+     *
+     * @return void
+     */
+    public function testAppRunMockHttpCORSActiveOrigin()
+    {
+        $this->app->config->setHttpCheckCors(true);
+        $this->app->config->setHttpAllowAnyCorsDomain(false);
+        $this->app->config->setHttpAllowedCorsOrigins([
+            'localhost:81'
+        ]);
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(Request::fromUrl(
+            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+            HttpMethod::OPTIONS,
+            [
+                'HTTP_ORIGIN' => 'localhost:81'
+            ]
+        ));
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Preflight Ok', $response->getBody());
+        $this->assertEquals('localhost:81', $response->getHttpHeader('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Test app run mock HTTP CORS Inactive
+     *
+     * @covers \Busarm\PhpMini\Middlewares\CorsMiddleware
+     * @return void
+     */
+    public function testAppRunMockHttpCORSInactive()
+    {
+        $this->app->config->setHttpCheckCors(false);
+        $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Preflight Ok', $response->getBody());
+        $this->assertEmpty($response->getHttpHeader('Access-Control-Allow-Origin'));
     }
 }

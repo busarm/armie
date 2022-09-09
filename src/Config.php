@@ -72,7 +72,7 @@ final class Config
      *
      * @var bool|null
      */
-    public bool|null $httpAllowAnyCorsDomain;
+    public bool|null $httpAllowAnyCorsDomain = false;
 
     /**
      * CORS Allowable Domains
@@ -81,7 +81,7 @@ final class Config
      *
      * @var array|null
      */
-    public array|null $httpAllowedCorsOrigins;
+    public array|null $httpAllowedCorsOrigins = [];
 
     /**
      * CORS Allowable Headers
@@ -89,7 +89,7 @@ final class Config
      *
      * @var array|null
      */
-    public array|null $httpAllowedCorsHeaders;
+    public array|null $httpAllowedCorsHeaders = [];
 
     /**
      * CORS Allowable Methods
@@ -97,7 +97,7 @@ final class Config
      *
      * @var array|null
      */
-    public array|null $httpAllowedCorsMethods;
+    public array|null $httpAllowedCorsMethods = [];
 
     /**
      * CORS Exposed Headers
@@ -105,7 +105,7 @@ final class Config
      *
      * @var array|null
      */
-    public array|null $httpExposedCorsHeaders;
+    public array|null $httpExposedCorsHeaders = [];
 
     /**
      * CORS Max Age
@@ -114,7 +114,7 @@ final class Config
      *
      * @var int|null
      */
-    public int|null $httpCorsMaxAge;
+    public int|null $httpCorsMaxAge = -1;
 
     /**
      * Send HTTP response without exiting. `json`|`xml`

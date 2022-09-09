@@ -17,7 +17,10 @@ class CorsMiddleware implements MiddlewareInterface
     public function handle(App $app, callable $next = null): mixed
     {
         $result = $this->preflight($app);
-        return $next ? $next() : $result;
+        if($result === false) {
+            return $next ? $next() : true;
+        }
+        return $result;
     }
 
     /**
@@ -69,15 +72,15 @@ class CorsMiddleware implements MiddlewareInterface
             // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
             if (strtoupper($app->request->method()) === HttpMethod::OPTIONS) {
                 $app->response->setHttpHeader('Cache-Control', "max-age=$max_cors_age");
-                return $app->response->html("Preflight Ok", 200);
+                return $app->response->html("Preflight Ok", 200, false);
             }
         } else {
             if (strtoupper($app->request->method()) === HttpMethod::OPTIONS) {
                 // kill the response and send it to the client
-                return $app->sendHttpResponse(200, "Preflight Ok");
+                return $app->response->html("Preflight Ok", 200, false);
             }
         }
 
-        return true;
+        return false;
     }
 }

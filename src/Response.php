@@ -184,32 +184,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @param array $parameters
-     * @return self
-     */
-    public function setParameters(array $parameters): self
-    {
-        $this->parameters = $parameters;
-        return $this;
-    }
-
-    /**
-     * @return StreamInterface|string
-     */
-    public function getBody()
-    {
-        return $this->body;
-    }
-
-    /**
      * @param StreamInterface|string $body
      * @return self
      */
@@ -217,6 +191,14 @@ class Response implements ResponseInterface
     {
         $this->body = $body;
         return $this;
+    }
+
+    /**
+     * @return StreamInterface|string
+     */
+    public function getBody(): StreamInterface|string
+    {
+        return $this->body;
     }
 
     /**
@@ -230,15 +212,14 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @param array $parameters
+     * @return self
      */
-    public function getParameter($name, $default = null)
+    public function setParameters(array $parameters): self
     {
-        return isset($this->parameters[$name]) ? $this->parameters[$name] : $default;
+        $this->parameters = $parameters;
+        return $this;
     }
-
     /**
      * @param string $name
      * @param mixed  $value
@@ -247,6 +228,34 @@ class Response implements ResponseInterface
     public function setParameter($name, $value): self
     {
         $this->parameters[$name] = $value;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+     */
+    public function getParameter($name, $default = null): mixed
+    {
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $httpHeaders
+     * @return self
+     */
+    public function addHttpHeaders(array $httpHeaders): self
+    {
+        $this->httpHeaders = array_merge($this->httpHeaders, $httpHeaders);
         return $this;
     }
 
@@ -272,31 +281,21 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param array $httpHeaders
-     * @return self
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
      */
-    public function addHttpHeaders(array $httpHeaders): self
+    public function getHttpHeader($name, $default = null): mixed
     {
-        $this->httpHeaders = array_merge($this->httpHeaders, $httpHeaders);
-        return $this;
+        return isset($this->httpHeaders[$name]) ? $this->httpHeaders[$name] : $default;
     }
 
     /**
      * @return array
      */
-    public function getHttpHeaders()
+    public function getHttpHeaders(): array
     {
         return $this->httpHeaders;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
-     */
-    public function getHttpHeader($name, $default = null)
-    {
-        return isset($this->httpHeaders[$name]) ? $this->httpHeaders[$name] : $default;
     }
 
     /**

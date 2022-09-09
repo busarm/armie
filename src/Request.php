@@ -54,9 +54,10 @@ class Request implements RequestInterface
      *
      * @param string $url
      * @param string $method
+     * @param string $environmentVars
      * @return self
      */
-    public static function fromUrl($url, $method = HttpMethod::GET): self
+    public static function fromUrl($url, $method = HttpMethod::GET, $environmentVars = []): self
     {
         if (filter_var($url, FILTER_VALIDATE_URL)) {
             $request = new self;
@@ -69,6 +70,8 @@ class Request implements RequestInterface
             $request->uri = $result['path'] ?? '';
             $request->currentUrl = $request->host . $request->uri;
             $request->method = $method;
+            $request->server = $environmentVars;
+            $request->headers = $request->getHeadersFromServer($request->server);
             return $request;
         } else {
             throw new SystemError("$url is not a valid URL");
@@ -407,7 +410,7 @@ class Request implements RequestInterface
      * @param array $server
      * @return array
      */
-    private function getHeadersFromServer($server)
+    protected function getHeadersFromServer($server)
     {
         $headers = array();
         foreach ($server as $key => $value) {

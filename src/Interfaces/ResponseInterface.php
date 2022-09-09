@@ -14,12 +14,6 @@ use Psr\Http\Message\StreamInterface;
 interface ResponseInterface
 {
     /**
-     * @param array $httpHeaders
-     * @return self
-     */
-    public function addHttpHeaders(array $httpHeaders): self;
-
-    /**
      * @param int $statusCode
      * @param string $text
      * @return self
@@ -37,20 +31,15 @@ interface ResponseInterface
     public function getStatusText();
 
     /**
-     * @return array
-     */
-    public function getParameters();
-
-    /**
-     * @return StreamInterface|string
-     */
-    public function getBody();
-
-    /**
      * @param StreamInterface|string $body
      * @return self
      */
     public function setBody(StreamInterface|string|null $body);
+
+    /**
+     * @return StreamInterface|string
+     */
+    public function getBody(): StreamInterface|string;
 
     /**
      * @param array $parameters
@@ -69,7 +58,12 @@ interface ResponseInterface
      * @param mixed  $default
      * @return mixed
      */
-    public function getParameter($name, $default = null);
+    public function getParameter($name, $default = null): mixed;
+
+    /**
+     * @return array
+     */
+    public function getParameters(): array;
 
     /**
      * @param string $name
@@ -77,6 +71,12 @@ interface ResponseInterface
      * @return self
      */
     public function setParameter($name, $value): self;
+
+    /**
+     * @param array $httpHeaders
+     * @return self
+     */
+    public function addHttpHeaders(array $httpHeaders): self;
 
     /**
      * @param array $httpHeaders
@@ -90,6 +90,17 @@ interface ResponseInterface
      * @return self
      */
     public function setHttpHeader($name, $value): self;
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function getHttpHeader($name): mixed;
+
+    /**
+     * @return mixed
+     */
+    public function getHttpHeaders(): array;
 
     /**
      * Header Redirect

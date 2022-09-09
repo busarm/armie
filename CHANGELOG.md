@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.15]
+
+### Fixed
+
+-   Cors not working in HTTP mode.
+
+### Changed
+
+-   Remove default cors middleware.
+
 ## [1.0.14]
 
 ### Added

@@ -24,7 +24,6 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
-use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -124,10 +123,6 @@ class App
 
         // Add response middleware as the first in the chain
         $this->addMiddleware(new ResponseMiddleware());
-        // Add cors middleware if not cli
-        if ($this->isCli) {
-            $this->addMiddleware(new CorsMiddleware());
-        }
 
         // Add app resolvers
         $this->addResolver(self::class, $this);

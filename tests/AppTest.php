@@ -8,6 +8,7 @@ use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Router;
@@ -97,6 +98,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORS()
     {
+        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -113,6 +115,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActive()
     {
+        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(true);
         $this->app->config->setHttpAllowAnyCorsDomain(true);
         $this->app->router->addRoutes([
@@ -132,6 +135,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActiveOrigin()
     {
+        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(true);
         $this->app->config->setHttpAllowAnyCorsDomain(false);
         $this->app->config->setHttpAllowedCorsOrigins([
@@ -156,11 +160,11 @@ final class AppTest extends TestCase
     /**
      * Test app run mock HTTP CORS Inactive
      *
-     * @covers \Busarm\PhpMini\Middlewares\CorsMiddleware
      * @return void
      */
     public function testAppRunMockHttpCORSInactive()
     {
+        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(false);
         $this->app->config->setHttpAllowAnyCorsDomain(true);
         $this->app->router->addRoutes([

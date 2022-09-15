@@ -2,12 +2,9 @@
 
 namespace Busarm\PhpMini;
 
-use Exception;
 use Busarm\PhpMini\Errors\LoaderError;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Throwable;
-
-use function Busarm\PhpMini\Helpers\app;
 
 /**
  * PHP Mini Framework
@@ -42,13 +39,13 @@ class Loader implements LoaderInterface
     }
 
     /**
-     * Fetches print result intead of sending it to the output buffer
+     * Fetches print result instead of sending it to the output buffer
      *
      * @param string $path
      * @param array $data
      * @return string The rendered content
      */
-    public static function load($path,  $data = null)
+    public static function load($path, $data = null)
     {
         try {
             ob_start();
@@ -64,12 +61,26 @@ class Loader implements LoaderInterface
     }
 
     /**
+     * Require file
+     *
+     * @param string $path
+     * @param array $data
+     * @return mixed
+     */
+    public static function require($path, $data = null)
+    {
+        if (is_array($data)) extract($data);
+        return require $path;
+    }
+
+    /**
      * Load View File
+     * 
      * @param $path
      * @param array $vars
      * @param bool $return
+     * @throws LoaderError
      * @return string
-     * @throws Exception
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
@@ -87,11 +98,12 @@ class Loader implements LoaderInterface
 
     /**
      * Load Config File
+     * 
      * @param $path
-     * @throws Exception
+     * @throws LoaderError
      * @return mixed
      */
-    public function config($path)
+    public function config($path): mixed
     {
         $path = $this->appPath . DIRECTORY_SEPARATOR . $this->configPath . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {

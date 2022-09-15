@@ -155,7 +155,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return RouteInterface
      */
-    public static function get(string $path): RouteInterface
+    public static function get(string $path): static
     {
         $route = new Route(HttpMethod::GET, $path);
         return $route;
@@ -167,7 +167,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
-    public static function post(string $path): RouteInterface
+    public static function post(string $path): static
     {
         $route = new Route(HttpMethod::POST, $path);
         return $route;
@@ -179,7 +179,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
-    public static function put(string $path): RouteInterface
+    public static function put(string $path): static
     {
         $route = new Route(HttpMethod::PUT, $path);
         return $route;
@@ -191,7 +191,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
-    public static function patch(string $path): RouteInterface
+    public static function patch(string $path): static
     {
         $route = new Route(HttpMethod::PATCH, $path);
         return $route;
@@ -203,7 +203,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
-    public static function delete(string $path): RouteInterface
+    public static function delete(string $path): static
     {
         $route = new Route(HttpMethod::DELETE, $path);
         return $route;

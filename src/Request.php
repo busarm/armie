@@ -10,6 +10,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use function Busarm\PhpMini\Helpers\env;
 use function Busarm\PhpMini\Helpers\get_ip_address;
 use function Busarm\PhpMini\Helpers\is_https;
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -54,27 +55,25 @@ class Request implements RequestInterface
      *
      * @param string $url
      * @param string $method
-     * @param string $environmentVars
      * @return self
      */
-    public static function fromUrl($url, $method = HttpMethod::GET, $environmentVars = []): self
+    public static function fromUrl($url, $method = HttpMethod::GET): self
     {
-        if (filter_var($url, FILTER_VALIDATE_URL)) {
+        if ($validUrl = filter_var($url, FILTER_VALIDATE_URL)) {
             $request = new self;
-            $result = parse_url($url);
+            $result = parse_url($validUrl);
             $request->ip = get_ip_address();
             $request->scheme = $result['scheme'] ?? '';
             $request->domain = isset($result['host']) ? $result['host'] . (isset($result['port']) ? (':' . $result['port']) : '') : '';
             $request->host = $request->scheme  . "://" . $request->domain;
+            $request->uri =  '/' . ltrim(($result['path'] ?? ''), '/');
             $request->baseUrl = $request->host;
-            $request->uri = $result['path'] ?? '';
-            $request->currentUrl = $request->host . $request->uri;
+            $request->currentUrl = $request->baseUrl . $request->uri;
             $request->method = $method;
-            $request->server = $environmentVars;
-            $request->headers = $request->getHeadersFromServer($request->server);
+
             return $request;
         } else {
-            throw new SystemError("$url is not a valid URL");
+            throw new SystemError("'$url' is not a valid URL");
         }
     }
 
@@ -90,10 +89,10 @@ class Request implements RequestInterface
         $request->scheme = (is_https() ? "https" : "http");
         $request->domain = env('HTTP_HOST');
         $request->host = $request->scheme  . "://" . $request->domain;
-        $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
-        $request->uri = env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO'));
+        $request->uri = '/' . ltrim(env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO')), '/');
         $request->uri = rawurldecode(explode('?', $request->uri ?? '', 2)[0]);
-        $request->currentUrl = $request->host . $request->uri;
+        $request->baseUrl = $request->host;
+        $request->currentUrl = $request->baseUrl . $request->uri;
 
         $request->initialize($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
         return $request;
@@ -117,17 +116,17 @@ class Request implements RequestInterface
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), array $headers = array(), $content = null): self
     {
-        $this->request = $request;
-        $this->query = $query;
-        $this->attributes = $attributes;
-        $this->cookies = $cookies;
-        $this->files = $files;
-        $this->server = $server;
-        $this->content = $content;
-        $this->headers = empty($headers) ? $this->getHeadersFromServer($this->server) : $headers;
+        $this->request      = empty($request) ? $this->request : $request;
+        $this->query        = empty($query) ? $this->query : $query;
+        $this->attributes   = empty($attributes) ? $this->attributes : $attributes;
+        $this->cookies      = empty($cookies) ? $this->cookies : $cookies;
+        $this->files        = empty($files) ? $this->files : $files;
+        $this->server       = empty($server) ? $this->server : $server;
+        $this->content      = empty($content) ? $this->content : $content;
+        $this->headers      = empty($headers) ? $this->getHeadersFromServer($this->server) : $headers;
 
-        $this->contentType = $this->contentType ?? $this->server('CONTENT_TYPE', '');
-        $this->method = $this->method ?? $this->server('REQUEST_METHOD', HttpMethod::GET);
+        $this->contentType  = $this->contentType ?? $this->server('CONTENT_TYPE', '');
+        $this->method       = $this->method ?? $this->server('REQUEST_METHOD', HttpMethod::GET);
 
         if (
             0 === strpos($this->contentType, 'application/x-www-form-urlencoded')
@@ -160,9 +159,9 @@ class Request implements RequestInterface
         $request->scheme = $scheme;
         $request->domain = $domain;
         $request->host = $request->scheme  . "://" . $request->domain;
-        $request->baseUrl = $request->host . str_replace(basename(env('SCRIPT_NAME')), "", env('SCRIPT_NAME'));
-        $request->uri = $uri;
-        $request->currentUrl = $request->host . $request->uri;
+        $request->uri =  '/' . ltrim($uri, '/');
+        $request->baseUrl = $request->host;
+        $request->currentUrl = $request->baseUrl . $request->uri;
         return $request;
     }
 
@@ -323,6 +322,7 @@ class Request implements RequestInterface
 
         return isset($headers[$name]) ? $headers[$name] : $default;
     }
+
     /**
      * @return array
      */
@@ -473,5 +473,89 @@ class Request implements RequestInterface
         }
 
         return $headers;
+    }
+
+    /**
+     * Set the value of attributes
+     *
+     * @return  self
+     */ 
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of request
+     *
+     * @return  self
+     */ 
+    public function setRequest($request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of query
+     *
+     * @return  self
+     */ 
+    public function setQuery($query)
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of server
+     *
+     * @return  self
+     */ 
+    public function setServer($server)
+    {
+        $this->server = $server;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of files
+     *
+     * @return  self
+     */ 
+    public function setFiles($files)
+    {
+        $this->files = $files;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of cookies
+     *
+     * @return  self
+     */ 
+    public function setCookies($cookies)
+    {
+        $this->cookies = $cookies;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of headers
+     *
+     * @return  self
+     */ 
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+
+        return $this;
     }
 }

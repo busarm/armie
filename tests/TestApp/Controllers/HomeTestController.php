@@ -17,16 +17,15 @@ class HomeTestController
 {
     public function __construct(private App $app)
     {
-        log_debug(HomeTestController::class . ' started - ' . $app->env);
     }
 
     public function ping()
     {
-        return 'success';
+        return 'success-' . $this->app->env;
     }
 
     public function pingHtml(ResponseInterface $response)
     {
-        return $response->html('success', 200, false);
+        return $response->html('success-' . $this->app->env, 200, false);
     }
 }

@@ -11,6 +11,21 @@ namespace Busarm\PhpMini\Interfaces;
  */
 interface LoaderInterface
 {
+    /**
+     * Load view file
+     *
+     * @param string $path
+     * @param array $params
+     * @param boolean $return
+     * @return string|null
+     */
     public function view(string $path, $params = [], $return = false): ?string;
-    public function config(string $path);
+
+    /**
+     * Load config file
+     *
+     * @param string $path
+     * @return mixed
+     */
+    public function config(string $path): mixed;
 }

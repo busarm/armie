@@ -4,6 +4,7 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Throwable;
 
@@ -15,7 +16,7 @@ use function Busarm\PhpMini\Helpers\app;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class View
+abstract class View implements ResponseHandlerInterface
 {
     /**
      * @param BaseDto|array|null $data
@@ -141,5 +142,15 @@ abstract class View
         $content = $this->end();
 
         return app()->response->addHttpHeaders($this->headers)->html($content, 200, $continue);
+    }
+
+    /**
+     * @param string $format
+     * @param bool $continue
+     * @return self
+     */
+    public function handle($continue = false): ResponseInterface|null
+    {
+        return $this->send($continue);
     }
 }

@@ -27,7 +27,6 @@ use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Busarm\PhpMini\Helpers\env;
 use function Busarm\PhpMini\Helpers\is_cli;
 
 /**
@@ -38,6 +37,9 @@ use function Busarm\PhpMini\Helpers\is_cli;
  */
 class App
 {
+    /** @var static App instance */
+    public static $__instance;
+
     /** @var MiddlewareInterface[] */
     public $middlewares = [];
 
@@ -87,8 +89,8 @@ class App
      */
     public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
-        // Set current app instance
-        Server::$__app = &$this;
+        // Set app instance
+        self::$__instance = &$this;
 
         // Set cli state
         $this->isCli = is_cli();
@@ -101,7 +103,7 @@ class App
 
         // Create request & response objects
         $this->request = Request::fromGlobal();
-        $this->response = new Response();
+        $this->response = new Response($this->config->httpResponseFormat);
 
         // Set router
         $this->router = Router::withRequest($this->request);
@@ -138,6 +140,9 @@ class App
         $this->addResolver(LoggerInterface::class, $this->logger);
         $this->addResolver(Loader::class, $this->loader);
         $this->addResolver(LoaderInterface::class, $this->loader);
+
+        // Load custom configs
+        $this->loadConfigs();
     }
 
     ############################
@@ -145,47 +150,30 @@ class App
     ############################
 
     /**
-     * Get custom config or set if not available
+     * Load custom config file
      * 
-     * @param string $name
-     * @param mixed $value
-     * @return mixed
-     */
-    public function config(string $name, $value = null)
-    {
-        $config = $this->configs[$name] ?? null;
-        if (is_null($config) || !is_null($value)) {
-            $this->configs[$name] = $config = $value;
-        }
-        return $config;
-    }
-
-    /**
-     * Load config file
-     * 
-     * @param string $config Config file name/path relative to Config Path (@see `Config::setConfigPath`)
+     * @param string $config File path relative to app path
      * @return self
      */
-    public function loadConfig(string $config)
+    private function loadConfig(string $config)
     {
         $configs = $this->loader->config($config);
         // Load configs into app
         if ($configs && is_array($configs)) {
             foreach ($configs as $key => $value) {
-                $this->config($key, $value);
+                $this->config->set($key, $value);
             }
         }
         return $this;
     }
 
     /**
-     * Load config file
-     * @param array $configs List of config file name/path relative to Config Path (@see `Config::setConfigPath`)
+     * Load custom configs
      */
-    public function loadConfigs($configs = array())
+    private function loadConfigs()
     {
-        if (!empty($configs)) {
-            foreach ($configs as $config) {
+        if (!empty($this->config->files)) {
+            foreach ($this->config->files as $config) {
                 $this->loadConfig((string) $config);
             }
         }
@@ -224,7 +212,7 @@ class App
     public function run(RequestInterface|null $request = null): ResponseInterface
     {
         // Set current app instance
-        Server::$__app = &$this;
+        self::$__instance = &$this;
 
         // Set request & response & router
         $request = $request ?? (($req = $this->getBinding(RequestInterface::class)) ? $this->make($req, false) : $this->request);
@@ -241,7 +229,7 @@ class App
         register_shutdown_function(function (App $app) {
             if ($app->completeHook) ($app->completeHook)($app);
         }, $this);
-        
+
         // Initiate rerouting
         if ($this->router) {
             if ($this->processMiddleware($this, array_merge($this->middlewares, $this->router->process())) === false) {

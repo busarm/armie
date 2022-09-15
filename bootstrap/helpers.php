@@ -155,32 +155,26 @@ function out($data = null, $responseCode = 500)
     return (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false);
 }
 
-
-/**
- * Get server instance
- * @return \Busarm\PhpMini\Server
- */
-function server(): \Busarm\PhpMini\Server
-{
-    return \Busarm\PhpMini\Server::$__instance ?? throw new SystemError('Failed to get server instance');
-}
-
 /**
  * Get current app instance
  * @return \Busarm\PhpMini\App
  */
 function app(): \Busarm\PhpMini\App
 {
-    return \Busarm\PhpMini\Server::$__app ?? throw new SystemError('Failed to get current app instance');
+    return \Busarm\PhpMini\App::$__instance ?? throw new SystemError('Failed to get current app instance');
 }
 
 /**
+ * 
  * Get or Set config
+ *
+ * @param string $name
+ * @param mixed $value
  * @return mixed
  */
 function config($name, $value = null)
 {
-    return app()->config($name, $value);
+    return app()->config->get($name) ?? ($value ? app()->config->set($name, $value) : null);
 }
 
 /**

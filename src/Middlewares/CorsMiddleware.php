@@ -43,33 +43,34 @@ class CorsMiddleware implements MiddlewareInterface
         // Check for CORS access request
         if ($app->config->httpCheckCors == TRUE) {
 
-            $max_cors_age           =   !empty($this->maxAge) ? $this->maxAge : $app->config->httpCorsMaxAge;
-            $allowed_origins        =   !empty($this->allowedOrigins) ? $this->allowedOrigins : $app->config->httpAllowedCorsOrigins;
-            $allowed_cors_headers   =   !empty($this->allowedHeaders) ? $this->allowedHeaders : $app->config->httpAllowedCorsHeaders;
-            $exposed_cors_headers   =   !empty($this->exposedHeaders) ? $this->exposedHeaders : $app->config->httpExposedCorsHeaders;
-            $allowed_cors_methods   =   !empty($this->allowedMethods) ? $this->allowedMethods : $app->config->httpAllowedCorsMethods;
+            $this->maxAge           =   !empty($this->maxAge) ? $this->maxAge : $app->config->httpCorsMaxAge;
+            $this->allowedOrigins   =   $app->config->httpAllowAnyCorsDomain ? ['*'] : (!empty($this->allowedOrigins) ? $this->allowedOrigins : $app->config->httpAllowedCorsOrigins);
+            $this->allowedHeaders   =   !empty($this->allowedHeaders) ? $this->allowedHeaders : $app->config->httpAllowedCorsHeaders;
+            $this->exposedHeaders   =   !empty($this->exposedHeaders) ? $this->exposedHeaders : $app->config->httpExposedCorsHeaders;
+            $this->allowedMethods   =   !empty($this->allowedMethods) ? $this->allowedMethods : $app->config->httpAllowedCorsMethods;
 
-            // If we want to allow any domain to access the API
-            if ($app->config->httpAllowAnyCorsDomain == TRUE) {
-                $app->response->setHttpHeader('Access-Control-Allow-Origin', '*');
-            } else {
-                // We're going to allow only certain domains access
-                // Store the HTTP Origin header
-                $origin = $app->request->server('HTTP_ORIGIN') ?? $app->request->server('HTTP_REFERER') ?? '';
-                // If the origin domain is in the allowed_cors_origins list, then add the Access Control headers
-                if (is_array($allowed_origins) && in_array(trim($origin, "/"), $allowed_origins)) {
+            $origin = trim($app->request->server('HTTP_ORIGIN') ?? $app->request->server('HTTP_REFERER') ?? '', "/");
+
+            // Allow any domain access
+            if (in_array('*', $this->allowedOrigins)) {
+                $app->response->setHttpHeader('Access-Control-Allow-Origin', $origin);
+            }
+            // Allow only certain domains access
+            else {
+                // If the origin domain is in the allowed cors origins list, then add the Access Control header
+                if (is_array($this->allowedOrigins) && in_array($origin, $this->allowedOrigins)) {
                     $app->response->setHttpHeader('Access-Control-Allow-Origin', $origin);
-                }
+                } else return $app->response->html("Unauthorized", 401, false);
             }
 
-            $app->response->setHttpHeader('Access-Control-Allow-Methods', implode(', ', is_array($allowed_cors_methods) ? $allowed_cors_methods : []));
-            $app->response->setHttpHeader('Access-Control-Allow-Headers', implode(', ', is_array($allowed_cors_headers) ? $allowed_cors_headers : []));
-            $app->response->setHttpHeader('Access-Control-Expose-Headers', implode(', ', is_array($exposed_cors_headers) ? $exposed_cors_headers : []));
-            $app->response->setHttpHeader('Access-Control-Allow-Max-Age', $max_cors_age);
+            $app->response->setHttpHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods));
+            $app->response->setHttpHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders));
+            $app->response->setHttpHeader('Access-Control-Expose-Headers', implode(', ', $this->exposedHeaders));
+            $app->response->setHttpHeader('Access-Control-Allow-Max-Age', $this->maxAge);
 
             // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
             if (strtoupper($app->request->method()) === HttpMethod::OPTIONS) {
-                $app->response->setHttpHeader('Cache-Control', "max-age=$max_cors_age");
+                $app->response->setHttpHeader('Cache-Control', "max-age=" . $this->maxAge);
                 return $app->response->html("Preflight Ok", 200, false);
             }
         } else {

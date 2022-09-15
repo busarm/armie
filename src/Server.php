@@ -15,12 +15,6 @@ use function Busarm\PhpMini\Helpers\is_cli;
  */
 class Server
 {
-    /** @var static Server instance */
-    public static $__instance;
-
-    /** @var App|null Current app instance */
-    public static App|null $__app;
-
     /**
      * @var App[]
      */
@@ -38,13 +32,8 @@ class Server
      */
     private $domainPaths = [];
 
-    public function __construct()
-    {
-        self::$__instance = &$this;
-    }
-
     /**
-     * Map route to a particular app
+     * Map route to a particular app. (Not recommended for production)
      *
      * @param string $route Route path to app. e.g v1
      * @param App $app
@@ -66,16 +55,24 @@ class Server
      */
     public function addRoutePath($route, $path): self
     {
-        $path = is_dir($path) ? $path . '/index.php' : $path;
-        if (!file_exists($path)) {
-            throw new SystemError("App file not found: $path");
-        }
         $this->routePaths[$route] = $path;
         return $this;
     }
 
     /**
-     * Map domain to a particular app
+     * Map list of route to a particular app path
+     *
+     * @param array $list Array of `$route => $path`. see `self::addRoutePath`
+     * @return self
+     */
+    public function addRoutePathList(array $list): self
+    {
+        $this->routePaths = array_merge($this->routePaths, $list);
+        return $this;
+    }
+
+    /**
+     * Map domain to a particular app. (Not recommended for production)
      *
      * @param string $domain Domain name. e.g myap.com, dev.myapp.com
      * @param App $app
@@ -88,7 +85,7 @@ class Server
     }
 
     /**
-     * Map route to a particular app path
+     * Map domain to a particular app path
      *
      * @param string $domain Domain name. e.g myap.com, dev.myapp.com
      * @param string $path Path to app index. e.g ../myapp/public/index.php or ../myapp/public.
@@ -97,11 +94,19 @@ class Server
      */
     public function addDomainPath($domain, $path): self
     {
-        $path = is_dir($path) ? $path . '/index.php' : $path;
-        if (!file_exists($path)) {
-            throw new SystemError("App file not found: $path");
-        }
         $this->domainPaths[$domain] = $path;
+        return $this;
+    }
+
+    /**
+     * Map list of domain to a particular app path
+     *
+     * @param array $list Array of `$domain => $path`. see `self::addDomainPath`
+     * @return self
+     */
+    public function addDomainPathList(array $list): self
+    {
+        $this->domainPaths = array_merge($this->domainPaths, $list);
         return $this;
     }
 
@@ -114,20 +119,21 @@ class Server
     public function run(RequestInterface|null $request = null)
     {
         $request = $request ?? Request::fromGlobal();
-        if ($this->matchRoute($request) !== false) {
+        if ($this->runRoute($request) !== false) {
             return true;
-        } else if ($this->matchDomain($request) !== false) {
+        } else if ($this->runDomain($request) !== false) {
             return true;
         }
         return (new Response())->html(false, 404);
     }
 
     /**
-     * Match route
+     * Run for route
+     * 
      * @param RequestInterface $request
      * @return ResponseInterface|bool|null False if failed
      */
-    public function matchRoute(RequestInterface $request)
+    public function runRoute(RequestInterface $request)
     {
         $segments = $request->segments();
 
@@ -142,10 +148,14 @@ class Server
 
             // Check route paths
             if (array_key_exists($route, $this->routePaths)) {
+                $path = $this->routePaths[$route];
+                $path = is_dir($path) ? $path . '/index.php' : $path;
+                if (!file_exists($path)) {
+                    throw new SystemError("App file not found: $path");
+                }
+
                 $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                $_SERVER['REQUEST_URI']     =   '/' . $uri;
-                $_SERVER['PATH_INFO']       =   '/' . $uri;
-                return include_once($this->routePaths[$route]);
+                return Loader::require($path, ['request' => $request->withUrl($request->scheme(), $request->domain(), $uri)]);
             }
         }
 
@@ -153,11 +163,12 @@ class Server
     }
 
     /**
-     * Match domain
+     * Run for domain
+     * 
      * @param RequestInterface $request
      * @return ResponseInterface|false|null False if failed
      */
-    public function matchDomain(RequestInterface $request)
+    public function runDomain(RequestInterface $request)
     {
         $domain = $request->domain();
 
@@ -168,14 +179,15 @@ class Server
 
         // Check domain paths
         if (array_key_exists($domain, $this->domainPaths)) {
-            if (is_cli()) {
-                $_SERVER['HTTP_HOST']       =   $request->domain();
-                $_SERVER['REQUEST_URI']     =   '/' . $request->uri();
-                $_SERVER['PATH_INFO']       =   '/' . $request->uri();
-                $_SERVER['REQUEST_METHOD']  =   $request->method();
+            $path = $this->domainPaths[$domain];
+            $path = is_dir($path) ? $path . '/index.php' : $path;
+            if (!file_exists($path)) {
+                throw new SystemError("App file not found: $path");
             }
-            return include_once($this->domainPaths[$domain]);
+
+            return Loader::require($path, ['request' => $request]);
         }
+
         return false;
     }
 }

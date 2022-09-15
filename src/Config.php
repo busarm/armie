@@ -2,58 +2,76 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\ResponseFormat;
+use Busarm\PhpMini\Enums\Verbose;
+
 /**
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-final class Config
+class Config
 {
+    /** 
+     * Custom configs
+     * 
+     * @var array 
+     */
+    protected array $custom = [];
+
+    /** 
+     * Custom config files
+     * 
+     * @var array 
+     */
+    public array $files = [];
+
     /**
      * App name
      *
-     * @var string|null
+     * @var string
      */
-    public string|null $name = 'PHP Mini';
+    public string $name = 'PHP Mini';
 
     /**
      * App version
      *
-     * @var string|null
+     * @var string
      */
-    public string|null $version = '1.0.0';
+    public string $version = '1.0.0';
 
     /**
      * Path to app folder - relative to system base path. e.g '/var/www/html/app'
      * (Without leading or trailing slash)
      *
-     * @var string|null
+     * @var string
      */
-    public string|null $appPath;
+    public string $appPath = '';
 
     /**
      * Path to view folder - relative to app folder.
      * (Without leading or trailing slash)
      *
-     * @var string|null
+     * @var string
      */
-    public string|null $viewPath;
+    public string $viewPath = '';
 
     /**
-     * Path to config folder - relative to app folder. 
+     * Path to custom config folder - relative to app folder. 
      * (Without leading or trailing slash)
      *
-     * @var string|null
+     * @var string
      */
-    public string|null $configPath;
+    public string $configPath = '';
 
     /**
      * Logger verbosity
+     * 
      * @see \Busarm\PhpMini\Enums\Verbose
-     * @var int|null
+     * @var int
      */
-    public int|null $loggerVerborsity = \Busarm\PhpMini\Enums\Verbose::DEBUG;
+    public int $loggerVerborsity = Verbose::DEBUG;
 
     /**
      * CORS Check
@@ -61,79 +79,80 @@ final class Config
      * are hosting your API on a different domain from the application that
      * will access it through a browser
      *
-     * @var bool|null
+     * @var bool
      */
-    public bool|null $httpCheckCors = false;
+    public bool $httpCheckCors = false;
 
     /**
      * CORS Allow Any Domain
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
      * source domain
      *
-     * @var bool|null
+     * @var bool
      */
-    public bool|null $httpAllowAnyCorsDomain = false;
+    public bool $httpAllowAnyCorsDomain = false;
 
     /**
      * CORS Allowable Domains
      * Set the allowable domains within the array
      * e.g. ['http://www.example.com', 'https://spa.example.com']
      *
-     * @var array|null
+     * @var array
      */
-    public array|null $httpAllowedCorsOrigins = [];
+    public array $httpAllowedCorsOrigins = [];
 
     /**
      * CORS Allowable Headers
      * If using CORS checks, set the allowable headers here
      *
-     * @var array|null
+     * @var array
      */
-    public array|null $httpAllowedCorsHeaders = [];
+    public array $httpAllowedCorsHeaders = [];
 
     /**
      * CORS Allowable Methods
      * If using CORS checks, you can set the methods you want to be allowed
      *
-     * @var array|null
+     * @var array
      */
-    public array|null $httpAllowedCorsMethods = [];
+    public array $httpAllowedCorsMethods = [];
 
     /**
      * CORS Exposed Headers
      * If using CORS checks, set the headers permitted to be sent to client here
      *
-     * @var array|null
+     * @var array
      */
-    public array|null $httpExposedCorsHeaders = [];
+    public array $httpExposedCorsHeaders = [];
 
     /**
      * CORS Max Age
      * How long in seconds to cache CORS preflight response in browser.
      * -1 for disabling caching.
      *
-     * @var int|null
+     * @var int
      */
-    public int|null $httpCorsMaxAge = -1;
+    public int $httpCorsMaxAge = -1;
 
     /**
      * Send HTTP response without exiting. `json`|`xml`
      * 
-     * @var bool|null
+     * @var bool
      */
-    public bool|null $httpSendAndContinue = false;
+    public bool $httpSendAndContinue = false;
 
     /**
      * HTPP default response format
      * 
-     * @var string|null
+     * @see \Busarm\PhpMini\Enums\ResponseFormat
+     * @var string
      */
-    public string|null $httpResponseFormat = 'json';
+    public string $httpResponseFormat = ResponseFormat::JSON;
 
     /**
      * Set app name
      *
-     * @param  string|null  $name  App name
+     * @param  string  $name  App name
      *
      * @return  self
      */
@@ -147,7 +166,7 @@ final class Config
     /**
      * Set app version
      *
-     * @param  string|null  $version  App version
+     * @param  string  $version  App version
      *
      * @return  self
      */
@@ -161,7 +180,7 @@ final class Config
     /**
      * Path to app folder - relative to system base path. e.g '/var/www/html/app'
      *
-     * @param  string|null  $appPath  (Without leading or trailing slash)
+     * @param  string  $appPath  (Without leading or trailing slash)
      *
      * @return  self
      */
@@ -175,7 +194,7 @@ final class Config
     /**
      * Set path to view folder - relative to app folder
      *
-     * @param  string|null  $viewPath  (Without leading or trailing slash)
+     * @param  string  $viewPath  (Without leading or trailing slash)
      *
      * @return  self
      */
@@ -187,9 +206,9 @@ final class Config
     }
 
     /**
-     * Set path to config files - relative to app folder
+     * Set path to custom config files - relative to app folder
      *
-     * @param  string|null  $configPath  (Without leading or trailing slash)
+     * @param  string  $configPath  (Without leading or trailing slash)
      *
      * @return  self
      */
@@ -204,7 +223,7 @@ final class Config
      * Set logger verbosity
      * 
      * @see \Busarm\PhpMini\Enums\Verbose
-     * @param  int|null  $loggerVerborsity  Logger verbosity
+     * @param  int  $loggerVerborsity  Logger verbosity
      *
      * @return  self
      */
@@ -218,7 +237,7 @@ final class Config
     /**
      * Set will access it through a browser
      *
-     * @param  bool|null  $httpCheckCors  will access it through a browser
+     * @param  bool  $httpCheckCors  will access it through a browser
      *
      * @return  self
      */
@@ -232,7 +251,7 @@ final class Config
     /**
      * Set source domain
      *
-     * @param  bool|null  $httpAllowAnyCorsDomain  source domain
+     * @param  bool  $httpAllowAnyCorsDomain  source domain
      *
      * @return  self
      */
@@ -246,7 +265,7 @@ final class Config
     /**
      * Set e.g. ['http://www.example.com', 'https://spa.example.com']
      *
-     * @param  array|null  $httpAllowedCorsOrigins  e.g. ['http://www.example.com', 'https://spa.example.com']
+     * @param  array  $httpAllowedCorsOrigins  e.g. ['http://www.example.com', 'https://spa.example.com']
      *
      * @return  self
      */
@@ -260,7 +279,7 @@ final class Config
     /**
      * Set if using CORS checks, you can set the methods you want to be allowed
      *
-     * @param  array|null  $httpAllowedCorsMethods  If using CORS checks, you can set the methods you want to be allowed
+     * @param  array  $httpAllowedCorsMethods  If using CORS checks, you can set the methods you want to be allowed
      *
      * @return  self
      */
@@ -274,7 +293,7 @@ final class Config
     /**
      * Set if using CORS checks, set the allowable headers here
      *
-     * @param  array|null  $httpAllowedCorsHeaders  If using CORS checks, set the allowable headers here
+     * @param  array  $httpAllowedCorsHeaders  If using CORS checks, set the allowable headers here
      *
      * @return  self
      */
@@ -288,7 +307,7 @@ final class Config
     /**
      * Set if using CORS checks, set the headers permitted to be sent to client here
      *
-     * @param  array|null  $httpExposedCorsHeaders  If using CORS checks, set the headers permitted to be sent to client here
+     * @param  array  $httpExposedCorsHeaders  If using CORS checks, set the headers permitted to be sent to client here
      *
      * @return  self
      */
@@ -302,7 +321,7 @@ final class Config
     /**
      * Set -1 for disabling caching.
      *
-     * @param  int|null  $httpCorsMaxAge  -1 for disabling caching.
+     * @param  int  $httpCorsMaxAge  -1 for disabling caching.
      *
      * @return  self
      */
@@ -316,7 +335,7 @@ final class Config
     /**
      * Set send HTTP response without exiting
      *
-     * @param  bool|null  $httpSendAndContinue  Send HTTP response without exiting
+     * @param  bool  $httpSendAndContinue  Send HTTP response without exiting
      *
      * @return  self
      */
@@ -330,14 +349,62 @@ final class Config
     /**
      * Set HTPP default response format
      *
-     * @param  string|null  $httpResponseFormat  HTPP default response format. `json`|`xml`
+     * @param  string  $httpResponseFormat  HTPP default response format. `json`|`xml`
      *
      * @return  self
-     */ 
+     */
     public function setHttpResponseFormat($httpResponseFormat)
     {
         $this->httpResponseFormat = $httpResponseFormat;
 
         return $this;
+    }
+
+    /**
+     * Add custom config file
+     * 
+     * @param string $config Config file name/path relative to Config Path (@see `self::setConfigPath`)
+     * @return self
+     */
+    public function addFile(string $config)
+    {
+        $this->files[] = $config;
+        return $this;
+    }
+
+    /**
+     * Add custom config files
+     * 
+     * @param array $configs List of config file name/path relative to Config Path (@see `self::setConfigPath`)
+     * @return self
+     */
+    public function addFiles($configs = array())
+    {
+        $this->files = array_merge($this->files, $configs);
+        return $this;
+    }
+
+    /**
+     * Get custom config
+     * 
+     * @param string $name
+     * @param mixed $default
+     * @return mixed Returns config value or default
+     */
+    public function get(string $name, $default = null)
+    {
+        return $this->custom[$name] ?? $default;
+    }
+
+    /**
+     * Set custom config
+     * 
+     * @param string $name
+     * @param mixed $value
+     * @return mixed Returns value
+     */
+    public function set(string $name, $value = null)
+    {
+        return $this->custom[$name] = $value;
     }
 }

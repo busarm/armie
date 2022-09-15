@@ -71,7 +71,7 @@ final class AppTest extends TestCase
         $this->app->setRouter(Router::withController(HomeTestController::class, 'ping'));
         $response = $this->app->run();
         $this->assertNotNull($response);
-        $this->assertEquals('success', $response->getBody());
+        $this->assertEquals('success-' . $this->app->env, $response->getBody());
     }
 
     /**
@@ -87,7 +87,7 @@ final class AppTest extends TestCase
         $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('success', $response->getBody());
+        $this->assertEquals('success-' . $this->app->env, $response->getBody());
     }
 
     /**
@@ -121,11 +121,18 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $response = $this->app->run(
+            Request::fromUrl(
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+                HttpMethod::OPTIONS
+            )->setServer([
+                'HTTP_ORIGIN' => 'localhost:81'
+            ])->initialize()
+        );
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
-        $this->assertEquals('*', $response->getHttpHeader('Access-Control-Allow-Origin'));
+        $this->assertEquals('localhost:81', $response->getHttpHeader('Access-Control-Allow-Origin'));
     }
 
     /**
@@ -144,17 +151,47 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $response = $this->app->run(Request::fromUrl(
-            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
-            HttpMethod::OPTIONS,
-            [
+        $response = $this->app->run(
+            Request::fromUrl(
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+                HttpMethod::OPTIONS
+            )->setServer([
                 'HTTP_ORIGIN' => 'localhost:81'
-            ]
-        ));
+            ])->initialize()
+        );
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
         $this->assertEquals('localhost:81', $response->getHttpHeader('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Test app run mock HTTP CORS Active with custom origin failed
+     *
+     * @return void
+     */
+    public function testAppRunMockHttpCORSActiveOriginFailed()
+    {
+        $this->app->addMiddleware(new CorsMiddleware());
+        $this->app->config->setHttpCheckCors(true);
+        $this->app->config->setHttpAllowAnyCorsDomain(false);
+        $this->app->config->setHttpAllowedCorsOrigins([
+            'localhost:81'
+        ]);
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(
+            Request::fromUrl(
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+                HttpMethod::OPTIONS
+            )->setServer([
+                'HTTP_ORIGIN' => 'localhost:8181'
+            ])->initialize()
+        );
+        $this->assertNotNull($response);
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('Unauthorized', $response->getBody());
     }
 
     /**

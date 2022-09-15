@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\ResponseFormat;
 use InvalidArgumentException;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -27,6 +28,11 @@ class Response implements ResponseInterface
      * @var string
      */
     protected $version;
+
+    /**
+     * @var string
+     */
+    protected $format;
 
     /**
      * @var int
@@ -61,7 +67,7 @@ class Response implements ResponseInterface
     /**
      * @var array
      */
-    protected static $statusTexts = array(
+    public static $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',
@@ -107,15 +113,17 @@ class Response implements ResponseInterface
     );
 
     /**
+     * @param array $format
      * @param array $parameters
      * @param int   $statusCode
      * @param array $headers
      */
-    public function __construct($parameters = array(), $statusCode = 200, $headers = array())
+    public function __construct($format = ResponseFormat::JSON, $parameters = array(), $statusCode = 200, $headers = array())
     {
         $this->setParameters($parameters);
         $this->setStatusCode($statusCode);
         $this->setHttpHeaders($headers);
+        $this->format = $format;
         $this->version = '1.1';
     }
 
@@ -338,23 +346,23 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param string $format `json`|`xml`|`html`
+     * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function getResponseBody($format = 'json')
+    public function getResponseBody($format = ResponseFormat::JSON)
     {
         switch ($format) {
-            case 'json':
+            case ResponseFormat::JSON:
                 return $this->parameters ? json_encode($this->parameters) : '';
-            case 'xml':
+            case ResponseFormat::XML:
                 // this only works for single-level arrays
                 $xml = new \SimpleXMLElement('<response/>');
                 foreach ($this->parameters as $key => $param) {
                     $xml->addChild($key, $param);
                 }
                 return $xml->asXML();
-            case 'html':
+            case ResponseFormat::HTML:
                 return $this->body;
         }
 
@@ -362,10 +370,10 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param string $format `json`|`xml`|`html`
+     * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
      * @param bool $continue
      */
-    public function send($format = 'json', $continue = false)
+    public function send($format = ResponseFormat::JSON, $continue = false)
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
@@ -383,13 +391,13 @@ class Response implements ResponseInterface
             // start buffer
             ob_start();
             switch ($format) {
-                case 'json':
+                case ResponseFormat::JSON:
                     $this->setHttpHeader('Content-Type', 'application/json');
                     break;
-                case 'xml':
+                case ResponseFormat::XML:
                     $this->setHttpHeader('Content-Type', 'text/xml');
                     break;
-                case 'html':
+                case ResponseFormat::HTML:
                     $this->setHttpHeader('Content-Type', 'text/html');
                     break;
             }
@@ -421,7 +429,7 @@ class Response implements ResponseInterface
     {
         $this->setParameters($data);
         $this->setStatusCode($code);
-        if (!is_cli()) $this->send('json', $continue);
+        if (!is_cli()) $this->send(ResponseFormat::JSON, $continue);
         return $this;
     }
 
@@ -435,7 +443,7 @@ class Response implements ResponseInterface
     {
         $this->setParameters($data);
         $this->setStatusCode($code);
-        if (!is_cli()) $this->send('xml', $continue);
+        if (!is_cli()) $this->send(ResponseFormat::XML, $continue);
         return $this;
     }
 
@@ -449,7 +457,17 @@ class Response implements ResponseInterface
     {
         $this->setBody($data);
         $this->setStatusCode($code);
-        if (!is_cli()) $this->send('html', $continue);
+        if (!is_cli()) $this->send(ResponseFormat::HTML, $continue);
+        return $this;
+    }
+
+    /**
+     * @param bool $continue
+     * @return self
+     */
+    public function handle($continue = false): self|null
+    {
+        $this->send($this->format, $continue);
         return $this;
     }
 

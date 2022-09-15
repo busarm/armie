@@ -2,7 +2,6 @@
 [![License](https://poser.pugx.org/Busarm/php-mini/license)](https://packagist.org/packages/busarm/php-mini)
 [![Latest Stable Version](https://poser.pugx.org/Busarm/php-mini/v)](https://packagist.org/packages/busarm/php-mini)
 
-
 # PHP Mini by Busarm
 
 A micro php framework designed for micro-services
@@ -20,12 +19,14 @@ App folders can be structured in whatever pattern you wish.
 ### Single App
 
 ```php
+
+    # ../myapp/public/index.php
+
     define('APP_START_TIME', floor(microtime(true) * 1000));
     require __DIR__ . '/../vendor/autoload.php';
 
     $config = (new Config())
-            ->setBasePath(dirname(__FILE__))
-            ->setAppPath('myapp')
+            ->setAppPath(dirname(__DIR__))
             ->setConfigPath('Configs')
             ->setViewPath('Views');
     $app = new App($config);
@@ -41,14 +42,35 @@ $ php -S localhost:8181 -t public
 ### Multi Tenancy
 
 ```php
+
+    # ../index.php
     require __DIR__ . '/../vendor/autoload.php';
 
     $server = (new Server())
         // Use `myapp` for requests with path `v1/....`
-        ->addRoutePath('v1', __DIR__ . '/../myapp')
+        ->addRoutePath('v1', __DIR__ . '/myapp/public')
         // Use `mydevapp` for requests with domain name `dev.myapp.com`
-        ->addDomainPath('dev.myapp.com', __DIR__ . '/../mydevapp');
+        ->addDomainPath('dev.myapp.com', __DIR__ . '/mydevapp/public');
     $server->run();
+
+    # ../myapp/public/index.php
+
+    /**
+     * @var Busarm\PhpMini\Interfaces\RequestInterface $request Capture Server request
+     */
+
+    require __DIR__ . '/../vendor/autoload.php';
+
+    $config = (new Config())
+        ->setAppPath(dirname(__DIR__))
+        ->setConfigPath('Configs')
+        ->setViewPath('Views');
+    $app = new App($config);
+    $app->router->addRoutes([
+        Route::get('ping')->to(HomeTestController::class, 'ping'),
+    ]);
+
+    return $app->run($request ?? null);
 ```
 
 ## Configs
@@ -58,25 +80,25 @@ Add config file to your config path. E.g `myapp/Configs/database.php`
 ```php
     # index.php (initialization script)
     ....
+    $config->addFile('database')
     $app = new App($config);
-    $app->loadConfig('database')
     ....
 
     # database.php
     // Use constant
     define("DB_NAME", "my-db-dev");
     define("DB_HOST", "localhost");
-    // Use dynamic variable
+    // Use dynamic configs
     return [
         'db_name'=>'my-db-dev',
         'db_host'=>'localhost',
     ];
 
-    # Access dynamic config in app
-    // Get
-    app()->config('db_name');
+    # Access dynamic configs
     // Set
-    app()->config('db_name', 'my-db-dev-2');
+    app()->config->set('db_name', 'my-db-dev-2');
+    // Get
+    app()->config->get('db_name');
 ```
 
 ## Route

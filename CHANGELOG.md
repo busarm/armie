@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.16]
+
+### Added
+
+-   Custom set functions for Request headers, query, files, cookies, attributes, body
+-   `ResponseHandlerInterface` for custom response handling
+
+### Changed
+
+-   Dynamic config file loading. Moved from `app()->loadConfig(...)` to `app()->config->addFile(...)`
+-   Dynamic config management. Moved from `app()->config(...)` to `app()->config->get()/set()`
+-   Improve multi tenancy support
+-   Strict cors header validation. Fail if not valid
+-   Removed `environmentVars` params from `Request::fromUrl`
+
 ## [1.0.15]
 
 ### Fixed

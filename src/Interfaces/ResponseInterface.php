@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Enums\ResponseFormat;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -11,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface ResponseInterface
+interface ResponseInterface extends ResponseHandlerInterface
 {
     /**
      * @param int $statusCode
@@ -24,7 +25,7 @@ interface ResponseInterface
      * @return int
      */
     public function getStatusCode();
-    
+
     /**
      * @return string
      */
@@ -113,10 +114,10 @@ interface ResponseInterface
     public function redirect($uri, $method = 'auto', $code = NULL): self;
 
     /**
-     * @param string $format 'json' | 'xml'
+     * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
      * @param bool $continue
      */
-    public function send($format = 'json', $continue = false);
+    public function send($format = ResponseFormat::JSON, $continue = false);
 
     /**
      * @param array $data

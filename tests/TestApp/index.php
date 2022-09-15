@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @var Busarm\PhpMini\Interfaces\RequestInterface $request Capture Server request
+ */
+
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Route;
@@ -16,4 +20,4 @@ $app->router->addRoutes([
     Route::get('ping')->to(HomeTestController::class, 'ping'),
     Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
 ]);
-$app->run();
+return $app->run($request ?? null);

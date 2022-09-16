@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Middlewares;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 
@@ -20,17 +21,16 @@ final class ResponseMiddleware implements MiddlewareInterface
     {
         $response = $next ? $next() : null;
         if ($response !== false) {
-            if ($response instanceof ResponseHandlerInterface) {
-                return $response->handle($app->config->httpSendAndContinue);
-            } else if ($response instanceof CollectionBaseDto) {
-                return $app->sendHttpResponse(200, $response->toArray());
-            } else if ($response instanceof BaseDto) {
-                return $app->sendHttpResponse(200, $response->toArray());
-            } else if (is_array($response) || is_object($response)) {
-                return $app->sendHttpResponse(200, $response);
-            } else {
-                return $app->response->html((string) $response, 200, $app->config->httpSendAndContinue);
+            if ($response !== null) {
+                if ($response instanceof ResponseHandlerInterface) {
+                    return $response->handle($app->config->httpSendAndContinue);
+                } else if ($response instanceof Arrayable) {
+                    return $app->sendHttpResponse(200, $response->toArray());
+                } else if (is_array($response) || is_object($response)) {
+                    return $app->sendHttpResponse(200, $response);
+                }
             }
+            return $app->response->html((string) $response, 200, $app->config->httpSendAndContinue);
         }
         return false;
     }

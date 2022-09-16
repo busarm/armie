@@ -150,9 +150,9 @@ function get_server_protocol()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return (new \Busarm\PhpMini\Response())->html($data, $responseCode);
+        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode);
     }
-    return (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false);
+    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false);
 }
 
 /**
@@ -243,9 +243,9 @@ function &router()
 function log_message($level, $message, array $context = [])
 {
     try {
-        return app()->logger->log($level, is_array($message) || is_object($message) ? json_encode($message, JSON_PRETTY_PRINT) : (string) $message, $context);
+        return app()->logger->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     } catch (\Throwable $th) {
-        return (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? json_encode($message, JSON_PRETTY_PRINT) : (string) $message, $context);
+        return (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     }
 }
 

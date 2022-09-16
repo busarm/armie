@@ -52,9 +52,6 @@ class App
     /** @var array */
     public $resolvers = [];
 
-    /** @var array */
-    public $configs = [];
-
     /** @var RequestInterface|mixed */
     public $request;
 
@@ -81,7 +78,9 @@ class App
 
     // SYSTEM HOOKS 
     private Closure|null $startHook = null;
+    private bool $startHookTriggered = false;
     private Closure|null $completeHook = null;
+    private bool $completeHookTriggered = false;
 
     /**
      * @param Config $config App configuration object
@@ -190,9 +189,9 @@ class App
         });
         set_exception_handler(function (Throwable $e) {
             if ($e instanceof SystemError) {
-                $e->handler();
+                $e->handler($this);
             } else if ($e instanceof HttpException) {
-                $e->handler();
+                $e->handler($this);
             } else {
                 $this->reporter->reportException($e);
                 $trace = array_map(function ($instance) {
@@ -223,11 +222,11 @@ class App
         $this->response = ($res = $this->getBinding(ResponseInterface::class)) ? $this->make($res, false) : $this->response;
 
         // Run start hook
-        if ($this->startHook) ($this->startHook)($this);
+        $this->triggerStartHook();
 
         // Set shutdown hook
         register_shutdown_function(function (App $app) {
-            if ($app->completeHook) ($app->completeHook)($app);
+            $app->triggerCompleteHook();
         }, $this);
 
         // Initiate rerouting
@@ -239,6 +238,9 @@ class App
                 throw new NotFoundException("Resource not found");
             }
         } else throw new SystemError("Router not configured. See `setRouter`");
+
+        // Run complete hook
+        $this->triggerCompleteHook();
 
         return $this->response;
     }
@@ -273,6 +275,20 @@ class App
     }
 
     /**
+     * Process on start hook
+     *
+     * @return void
+     */
+    private function triggerStartHook()
+    {
+        if ($this->startHook && !$this->startHookTriggered) {
+            ($this->startHook)($this);
+            $this->startHookTriggered = true;
+            $this->completeHookTriggered = false;
+        }
+    }
+
+    /**
      * Hook to run after processing request.
      * This registers a shutdown handler.
      * @see `register_shutdown_function`
@@ -286,6 +302,20 @@ class App
     }
 
     /**
+     * Process on complete hook
+     *
+     * @return void
+     */
+    public function triggerCompleteHook()
+    {
+        if ($this->completeHook && !$this->completeHookTriggered) {
+            ($this->completeHook)($this);
+            $this->completeHookTriggered = true;
+            $this->startHookTriggered = false;
+        }
+    }
+
+    /**
      * Instantiate class with dependencies
      * 
      * @param string $className
@@ -295,7 +325,11 @@ class App
     public function make($className, $cache = false)
     {
         if ($cache && ($singleton = $this->getSingleton($className))) return $singleton;
-        else $instance = DI::instantiate($this, $className);
+        else $instance = DI::instantiate($this, $className, function (&$param) {
+            if ($param instanceof BaseDto) {
+                $param->load($this->request->getRequestList(), true);
+            }
+        });
         // Add instance as singleton if supported
         if ($cache && ($instance instanceof SingletonInterface)) {
             $this->addSingleton($className, $instance);
@@ -321,9 +355,9 @@ class App
      *
      * @param string $className
      * @param object $default
-     * @return self
+     * @return Closure|null
      */
-    public function getResolver($name)
+    public function getResolver($name): Closure|null
     {
         return $this->resolvers[$name] ?? null;
     }

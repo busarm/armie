@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Dto;
 
 use ArrayIterator;
 use ArrayObject;
+use Busarm\PhpMini\Interfaces\Arrayable;
 use InvalidArgumentException;
 use OutOfRangeException;
 use Traversable;
@@ -16,7 +17,7 @@ use Traversable;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class CollectionBaseDto extends ArrayObject
+class CollectionBaseDto extends ArrayObject implements Arrayable
 {
     /**
      * Define the class that will be used for all items in the array.
@@ -395,7 +396,7 @@ class CollectionBaseDto extends ArrayObject
      * @param bool $trim Remove NULL properties
      * @return array
      */
-    public function toArray($trim = true)
+    public function toArray($trim = true): array
     {
         $result = [];
         foreach ($this as $key => $item) {

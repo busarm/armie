@@ -127,8 +127,8 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
 ```php
     # index.php (initialization script)
     ....
+    $config->addFile('route')
     $app = new App($config);
-    $app->loadConfig('route')
     ....
 
     # route.php

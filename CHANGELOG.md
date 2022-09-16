@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.17]
+
+### Fixed
+
+-   Circular dependencies causing infinite loops
+
+### Added
+
+-   On complete hooks for continious mode
+-   Callback for dependency injection to customise resolution
+-   `Arrayable` interface for custom array response handling
+
+### Changed
+
+-   Improved dependency injection
+
 ## [1.0.16]
 
 ### Added

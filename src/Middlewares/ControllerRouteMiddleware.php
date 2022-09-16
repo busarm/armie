@@ -2,10 +2,15 @@
 
 namespace Busarm\PhpMini\Middlewares;
 
+use ArgumentCountError;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\DI;
+use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Errors\SystemError;
+use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Throwable;
+use TypeError;
 
 /**
  * PHP Mini Framework
@@ -31,10 +36,18 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     && method_exists($object, $this->function)
                     && is_callable(array($object, $this->function))
                 ) {
-                    return call_user_func_array(
-                        array($object, $this->function),
-                        array_merge(DI::resolveMethodDependencies($app, $this->controller, $this->function), $this->params)
-                    );
+                    try {
+                        return call_user_func_array(
+                            array($object, $this->function),
+                            array_merge(DI::resolveMethodDependencies($app, $this->controller, $this->function, function (&$param) use (&$app) {
+                                if ($param instanceof BaseDto) {
+                                    $param->load($app->request->getRequestList(), true);
+                                }
+                            }), $this->params)
+                        );
+                    } catch (TypeError $th) {
+                        throw new BadRequestException("Invalid parameter(s): " . $th->getMessage());
+                    }
                 }
                 throw new SystemError("Function not found or can't be executed: " . $this->controller . '::' . $this->function);
             }

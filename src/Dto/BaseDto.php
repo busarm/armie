@@ -7,6 +7,7 @@ use ReflectionObject;
 use ReflectionType;
 use ReflectionUnionType;
 use Busarm\PhpMini\Errors\DtoError;
+use Busarm\PhpMini\Interfaces\Arrayable;
 
 /**
  * PHP Mini Framework
@@ -14,14 +15,14 @@ use Busarm\PhpMini\Errors\DtoError;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class BaseDto
+class BaseDto implements Arrayable
 {
     /**
      * Load data from array
      *
      * @param object|null $data
      * @param bool $force
-     * @return void
+     * @return self
      */
     public function load(array $data = null, $force = false)
     {
@@ -35,6 +36,7 @@ class BaseDto
                 } else $this->{$property->getName()} = null;
             }
         }
+        return $this;
     }
 
     /**
@@ -42,7 +44,7 @@ class BaseDto
      * @param bool $trim Remove NULL properties
      * @return array
      */
-    public function toArray($trim = true)
+    public function toArray($trim = true): array
     {
         $result = [];
         $reflectClass = new ReflectionObject($this);

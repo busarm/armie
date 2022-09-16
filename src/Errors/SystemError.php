@@ -2,9 +2,8 @@
 
 namespace Busarm\PhpMini\Errors;
 
+use Busarm\PhpMini\App;
 use Error;
-
-use function Busarm\PhpMini\Helpers\app;
 
 /**
  * PHP Mini Framework
@@ -17,12 +16,13 @@ class SystemError extends Error
 
     /**
      * Error handler
-     *
+     * 
+     * @param App $app
      * @return void
      */
-    public function handler()
+    public function handler(App $app)
     {
-        app()->reporter->reportException($this);
+        $app->reporter->reportException($this);
         $trace = array_map(function ($instance) {
             return [
                 'file' => $instance['file'] ?? null,
@@ -31,6 +31,6 @@ class SystemError extends Error
                 'function' => $instance['function'] ?? null,
             ];
         }, $this->getTrace());
-        app()->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+        $app->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
     }
 }

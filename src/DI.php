@@ -7,6 +7,8 @@ use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Errors\DependencyError;
 use ReflectionMethod;
 
+use function Busarm\PhpMini\Helpers\log_debug;
+
 /**
  * PHP Mini Framework
  *
@@ -27,14 +29,16 @@ class DI
      *
      * @param App $app
      * @param string $class
+     * @param Closure|null $callback Custom callback to customize resolution.  e.g fn(&$instance) => $instance->load(...)
      * @return object
      */
-    public static function instantiate(App $app, $class)
+    public static function instantiate(App $app, $class, Closure|null $callback = null)
     {
         if ($resolver = $app->getResolver($class)) $instance = $resolver();
         else if (method_exists($class, '__construct')) {
-            if ((new ReflectionMethod($class, '__construct'))->isPublic()) $instance = new $class(...self::resolveMethodDependencies($app, $class, '__construct'));
-            else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
+            if ((new ReflectionMethod($class, '__construct'))->isPublic()) {
+                $instance = new $class(...self::resolveMethodDependencies($app, $class, '__construct', $callback));
+            } else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
         } else $instance = new $class;
         return $instance;
     }
@@ -45,12 +49,18 @@ class DI
      * @param App $app
      * @param string $class
      * @param string $method
+     * @param Closure|null $callback Custom callback to customize resolution.  e.g fn(&$instance) => $instance->load(...)
      * @return array
      */
-    public static function resolveMethodDependencies(App $app, $class, $method)
+    public static function resolveMethodDependencies(App $app, string $class, string $method, Closure|null $callback = null)
     {
         $reflection = new \ReflectionMethod($class, $method);
-        return self::resolveDependencies($app, $reflection->getParameters());
+        // Detect circular dependencies
+        $params = array_map(fn ($param) => strval($param->getType()) ?: ($param->getType()?->getName()), $reflection->getParameters());
+        if (in_array($class, $params)) {
+            throw new DependencyError("Circular dependency detected in " . $class);
+        }
+        return self::resolveDependencies($app, $reflection->getParameters(), $callback);
     }
 
     /**
@@ -58,12 +68,13 @@ class DI
      *
      * @param App $app
      * @param Closure $callable
+     * @param Closure|null $callback Custom callback to customize resolution. e.g fn(&$instance) => $instance->load(...)
      * @return array
      */
-    public static function resolveCallableDependencies(App $app, Closure $callable)
+    public static function resolveCallableDependencies(App $app, Closure $callable, Closure|null $callback = null)
     {
         $reflection = new \ReflectionFunction($callable);
-        return self::resolveDependencies($app, $reflection->getParameters());
+        return self::resolveDependencies($app, $reflection->getParameters(), $callback);
     }
 
     /**
@@ -71,32 +82,37 @@ class DI
      *
      * @param App $app
      * @param ReflectionParameter[] $parameters
+     * @param Closure|null $callback
      * @return array
      */
-    protected static function resolveDependencies(App $app, array $parameters)
+    protected static function resolveDependencies(App $app, array $parameters, Closure|null $callback = null)
     {
         $params = [];
         foreach ($parameters as $param) {
-            if ($type = $param->getType()) {
-                $instance = NULL;
-                // If type is an interface - Get app interface binding
-                if (interface_exists($type->getName())) {
-                    if ($resolver = $app->getResolver($type->getName())) {
-                        $instance = $resolver();
-                    } else if (!($className = $app->getBinding($type->getName()))) {
-                        throw new DependencyError("No interface binding exists for " . $type->getName());
+            if (($type = $param->getType()) && ($name = strval($type) ?: $type?->getName())) {
+                // Resolve with app resolvers
+                if ($resolver = $app->getResolver($name)) {
+                    $instance = $resolver();
+                }
+                // If type can be instantiated
+                else if (self::instatiatable($type)) {
+                    // Instantiate class for name
+                    $instance = self::instantiate($app, $name, $callback);
+                }
+                // If type is an interface - Resolve with interface bindings
+                else if (interface_exists($name)) {
+                    if ($className = $app->getBinding($name)) {
+                        // Instantiate class for name
+                        $instance = self::instantiate($app, $className, $callback);
                     }
+                    throw new DependencyError("No interface binding exists for " . $name);
+                } else continue;
+
+                // Trigger callback if available
+                if (isset($instance) && $callback) {
+                    $instance = $callback($instance) ?: $instance;
                 }
-                // If type can't be instantiated (e.g scalar types) - skip loop
-                else if (!$type || !self::instatiatable($type)) continue;
-                // Get class name
-                else $className = $type->getName();
-                // Resolve dependencies for type
-                $instance = $instance ?? self::instantiate($app, $className);
-                // If type is an Request Dto - Parse request
-                if ($instance instanceof BaseDto) {
-                    $instance->load($app->request->getRequestList(), true);
-                }
+
                 $params[$param->getName()] = $instance;
             }
         }
@@ -113,6 +129,7 @@ class DI
     {
         // Add conditon if something is leftout.
         // This is to ensure that the type is an existing class.
-        return $type != Closure::class && !is_callable($type) && class_exists($type);
+        $name = strval($type) ?: $type->getName();
+        return $name != Closure::class && !is_callable($name) && class_exists($name);
     }
 }

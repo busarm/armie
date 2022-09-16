@@ -2,9 +2,8 @@
 
 namespace Busarm\PhpMini\Exceptions;
 
+use Busarm\PhpMini\App;
 use Exception;
-
-use function Busarm\PhpMini\Helpers\app;
 
 /**
  * PHP Mini Framework
@@ -35,11 +34,12 @@ class HttpException extends Exception
     /**
      * Exception handler
      *
+     * @param App $app
      * @return void
      */
-    public function handler()
+    public function handler(App $app)
     {
-        if ($this->getStatusCode() >= 500) app()->reporter->reportException($this);
+        if ($this->getStatusCode() >= 500) $app->reporter->reportException($this);
         $trace = array_map(function ($instance) {
             return [
                 'file' => $instance['file'] ?? null,
@@ -48,6 +48,6 @@ class HttpException extends Exception
                 'function' => $instance['function'] ?? null,
             ];
         }, $this->getTrace());
-        app()->showMessage($this->getStatusCode(), $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+        $app->showMessage($this->getStatusCode(), $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
     }
 }

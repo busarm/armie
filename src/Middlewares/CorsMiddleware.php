@@ -49,7 +49,7 @@ class CorsMiddleware implements MiddlewareInterface
             $this->exposedHeaders   =   !empty($this->exposedHeaders) ? $this->exposedHeaders : $app->config->httpExposedCorsHeaders;
             $this->allowedMethods   =   !empty($this->allowedMethods) ? $this->allowedMethods : $app->config->httpAllowedCorsMethods;
 
-            $origin = trim($app->request->server('HTTP_ORIGIN') ?? $app->request->server('HTTP_REFERER') ?? '', "/");
+            $origin = trim($app->request->server('HTTP_ORIGIN') ?: $app->request->server('HTTP_REFERER') ?: '', "/");
 
             // Allow any domain access
             if (in_array('*', $this->allowedOrigins)) {

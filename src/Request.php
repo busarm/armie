@@ -89,7 +89,7 @@ class Request implements RequestInterface
         $request->scheme = (is_https() ? "https" : "http");
         $request->domain = env('HTTP_HOST');
         $request->host = $request->scheme  . "://" . $request->domain;
-        $request->uri = '/' . ltrim(env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO')), '/');
+        $request->uri = '/' . ltrim(env('REQUEST_URI') ?: (env('PATH_INFO') ?: env('ORIG_PATH_INFO') ?: ''), '/');
         $request->uri = rawurldecode(explode('?', $request->uri ?? '', 2)[0]);
         $request->baseUrl = $request->host;
         $request->currentUrl = $request->baseUrl . $request->uri;
@@ -159,7 +159,7 @@ class Request implements RequestInterface
         $request->scheme = $scheme;
         $request->domain = $domain;
         $request->host = $request->scheme  . "://" . $request->domain;
-        $request->uri =  '/' . ltrim($uri, '/');
+        $request->uri =  '/' . ltrim($uri ?: '', '/');
         $request->baseUrl = $request->host;
         $request->currentUrl = $request->baseUrl . $request->uri;
         return $request;
@@ -451,7 +451,7 @@ class Request implements RequestInterface
                 $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
 
                 if (isset($requestHeaders['Authorization'])) {
-                    $authorizationHeader = trim($requestHeaders['Authorization']);
+                    $authorizationHeader = trim($requestHeaders['Authorization'] ?: '');
                 }
             }
 
@@ -479,7 +479,7 @@ class Request implements RequestInterface
      * Set the value of attributes
      *
      * @return  self
-     */ 
+     */
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
@@ -491,7 +491,7 @@ class Request implements RequestInterface
      * Set the value of request
      *
      * @return  self
-     */ 
+     */
     public function setRequest($request)
     {
         $this->request = $request;
@@ -503,7 +503,7 @@ class Request implements RequestInterface
      * Set the value of query
      *
      * @return  self
-     */ 
+     */
     public function setQuery($query)
     {
         $this->query = $query;
@@ -515,7 +515,7 @@ class Request implements RequestInterface
      * Set the value of server
      *
      * @return  self
-     */ 
+     */
     public function setServer($server)
     {
         $this->server = $server;
@@ -527,7 +527,7 @@ class Request implements RequestInterface
      * Set the value of files
      *
      * @return  self
-     */ 
+     */
     public function setFiles($files)
     {
         $this->files = $files;
@@ -539,7 +539,7 @@ class Request implements RequestInterface
      * Set the value of cookies
      *
      * @return  self
-     */ 
+     */
     public function setCookies($cookies)
     {
         $this->cookies = $cookies;
@@ -551,7 +551,7 @@ class Request implements RequestInterface
      * Set the value of headers
      *
      * @return  self
-     */ 
+     */
     public function setHeaders($headers)
     {
         $this->headers = $headers;

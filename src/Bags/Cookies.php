@@ -67,7 +67,7 @@ class Cookies extends Attribute
                 Crypto::encrypt(app()->config->encryptionKey . ($this->id ? md5($this->id) : ''), $value) :
                 $value) :
             "";
-            
+
         parent::set($name, $value);
         return setcookie(
             $name,
@@ -105,7 +105,8 @@ class Cookies extends Attribute
      */
     function remove(string $name)
     {
-        setcookie($this->prefix . '_' . $name, '', 0);
+        $name = $this->prefix . '_' . $name;
+        setcookie($name, '', 0);
         parent::remove($name);
     }
 

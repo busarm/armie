@@ -2,10 +2,14 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\ResponseFormat;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-use function Busarm\PhpMini\Helpers\is_cli;
+use Nyholm\Psr7\Uri;
 
 /**
  * PHP Mini Framework
@@ -113,18 +117,18 @@ class Server
     /**
      * Run server
      *
-     * @param RequestInterface|null $request Custom request object
-     * @return ResponseInterface|bool True if successful. ResponseInterface if failed
+     * @param ServerRequestInterface|null $request
+     * @return \Psr\Http\Message\ResponseInterface|bool True if successful. ResponseInterface if failed
      */
-    public function run(RequestInterface|null $request = null)
+    public function run(ServerRequestInterface|null $psr = null): MessageResponseInterface|bool
     {
-        $request = $request ?? Request::fromGlobal();
+        $request = $psr ? Request::fromPsr($psr) : Request::fromGlobal();
         if ($this->runRoute($request) !== false) {
             return true;
         } else if ($this->runDomain($request) !== false) {
             return true;
         }
-        return (new Response())->html(false, 404);
+        return (new Response())->setStatusCode(404)->toPsr(ResponseFormat::HTML);
     }
 
     /**
@@ -133,7 +137,7 @@ class Server
      * @param RequestInterface $request
      * @return ResponseInterface|bool|null False if failed
      */
-    public function runRoute(RequestInterface $request)
+    protected function runRoute(RequestInterface $request): ResponseInterface|bool|null
     {
         $segments = $request->segments();
 
@@ -143,7 +147,7 @@ class Server
             // Check route apps
             if (array_key_exists($route, $this->routeApps)) {
                 $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                return $this->routeApps[$route]->run($request->withUrl($request->scheme(), $request->domain(), $uri));
+                return $this->routeApps[$route]->run($request->withUri(new Uri($request->baseUrl() . '/' . $uri)));
             }
 
             // Check route paths
@@ -155,7 +159,7 @@ class Server
                 }
 
                 $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                return Loader::require($path, ['request' => $request->withUrl($request->scheme(), $request->domain(), $uri)]);
+                return Loader::require($path, ['request' => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))]);
             }
         }
 
@@ -168,7 +172,7 @@ class Server
      * @param RequestInterface $request
      * @return ResponseInterface|false|null False if failed
      */
-    public function runDomain(RequestInterface $request)
+    protected function runDomain(RequestInterface $request): ResponseInterface|bool|null
     {
         $domain = $request->domain();
 

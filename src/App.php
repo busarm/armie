@@ -17,11 +17,13 @@ use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
+use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
@@ -52,12 +54,6 @@ class App
     /** @var array */
     public $resolvers = [];
 
-    /** @var RequestInterface|mixed */
-    public $request;
-
-    /** @var ResponseInterface|mixed */
-    public $response;
-
     /** @var RouterInterface */
     public $router;
 
@@ -70,6 +66,9 @@ class App
     /** @var ErrorReportingInterface */
     public $reporter;
 
+    /** @var SessionBag */
+    public $sessionManager;
+
     /** @var int Request start time in milliseconds */
     public $startTimeMs;
 
@@ -78,9 +77,7 @@ class App
 
     // SYSTEM HOOKS 
     private Closure|null $startHook = null;
-    private bool $startHookTriggered = false;
     private Closure|null $completeHook = null;
-    private bool $completeHookTriggered = false;
 
     /**
      * @param Config $config App configuration object
@@ -100,12 +97,8 @@ class App
         // Set error reporter
         $this->reporter = new ErrorReporter();
 
-        // Create request & response objects
-        $this->request = Request::fromGlobal();
-        $this->response = new Response($this->config->httpResponseFormat);
-
         // Set router
-        $this->router = Router::withRequest($this->request);
+        $this->router = new Router;
 
         // Set Loader
         $this->loader = Loader::withConfig($this->config);
@@ -127,10 +120,6 @@ class App
 
         // Add app resolvers
         $this->addResolver(self::class, $this);
-        $this->addResolver(Request::class, $this->request);
-        $this->addResolver(RequestInterface::class, $this->request);
-        $this->addResolver(Response::class, $this->response);
-        $this->addResolver(ResponseInterface::class, $this->response);
         $this->addResolver(Router::class, $this->router);
         $this->addResolver(RouterInterface::class, $this->router);
         $this->addResolver(ErrorReporter::class, $this->reporter);
@@ -205,35 +194,34 @@ class App
     /**
      * Run application
      *
-     * @param RequestInterface|null $request Custom request object
+     * @param RequestInterface|RouteInterface|null $request Custom request or route object
      * @return ResponseInterface
      */
-    public function run(RequestInterface|null $request = null): ResponseInterface
+    public function run(RequestInterface|RouteInterface|null $request = null): ResponseInterface
     {
         // Set current app instance
         self::$__instance = &$this;
+        $completed = false;
 
         // Set request & response & router
-        $request = $request ?? (($req = $this->getBinding(RequestInterface::class)) ? $this->make($req, false) : $this->request);
-        if ($request != $this->request) {
-            $this->request = $request;
-            $this->router->setPath($request->uri());
-        }
-        $this->response = ($res = $this->getBinding(ResponseInterface::class)) ? $this->make($res, false) : $this->response;
+        $request = $request ?? Request::fromGlobal();
+        $response = new Response();
 
         // Run start hook
         $this->triggerStartHook();
 
         // Set shutdown hook
-        register_shutdown_function(function (App $app) {
-            $app->triggerCompleteHook();
-        }, $this);
+        register_shutdown_function(function (App $app, $completed) {
+            if (!$completed) {
+                $app->triggerCompleteHook();
+            }
+        }, $this, $completed);
 
         // Initiate rerouting
         if ($this->router) {
-            if ($this->processMiddleware($this, array_merge($this->middlewares, $this->router->process())) === false) {
-                if ($this->router->getIsHttp()) {
-                    throw new NotFoundException("Not found - " . ($this->router->getRequestMethod() . ' ' . $this->router->getRequestPath()));
+            if ($this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request))) === false) {
+                if (!empty($request->uri())) {
+                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
                 }
                 throw new NotFoundException("Resource not found");
             }
@@ -242,22 +230,24 @@ class App
         // Run complete hook
         $this->triggerCompleteHook();
 
-        return $this->response;
+        $completed = true;
+
+        return $response;
     }
 
     /**
-     * 
      * Process middleware
      *
-     * @param self $app
+     * @param RequestInterface|RouteInterface $request
+     * @param ResponseInterface $response
      * @param MiddlewareInterface[] $middlewares
-     * @param int $index
-     * @return boolean|mixed
+     * @param integer $index
+     * @return false|mixed False if failed
      */
-    protected function processMiddleware(self $app, array $middlewares, $index = 0)
+    protected function processMiddleware(RequestInterface|RouteInterface &$request, ResponseInterface &$response, array $middlewares, $index = 0): mixed
     {
         if (isset($middlewares[$index])) {
-            return $middlewares[$index]->handle(app: $app, next: fn () => $this->processMiddleware($app, $middlewares, ++$index));
+            return $middlewares[$index]->handle(request: $request, response: $response, next: fn () => $this->processMiddleware($request, $response, $middlewares, ++$index));
         }
         return false;
     }
@@ -281,10 +271,8 @@ class App
      */
     private function triggerStartHook()
     {
-        if ($this->startHook && !$this->startHookTriggered) {
+        if ($this->startHook) {
             ($this->startHook)($this);
-            $this->startHookTriggered = true;
-            $this->completeHookTriggered = false;
         }
     }
 
@@ -308,10 +296,8 @@ class App
      */
     public function triggerCompleteHook()
     {
-        if ($this->completeHook && !$this->completeHookTriggered) {
+        if ($this->completeHook) {
             ($this->completeHook)($this);
-            $this->completeHookTriggered = true;
-            $this->startHookTriggered = false;
         }
     }
 
@@ -322,14 +308,10 @@ class App
      * @param bool $cache Save as singleton to be reused. Default: false
      * @return object
      */
-    public function make($className, $cache = false)
+    public function make(string $className, $cache = false)
     {
         if ($cache && ($singleton = $this->getSingleton($className))) return $singleton;
-        else $instance = DI::instantiate($this, $className, function (&$param) {
-            if ($param instanceof BaseDto) {
-                $param->load($this->request->getRequestList(), true);
-            }
-        });
+        else $instance = DI::instantiate($className);
         // Add instance as singleton if supported
         if ($cache && ($instance instanceof SingletonInterface)) {
             $this->addSingleton($className, $instance);
@@ -344,7 +326,7 @@ class App
      * @param mixed $result Result of the resolution. e.g Class object
      * @return self
      */
-    public function addResolver($name, &$result)
+    public function addResolver(string $name, &$result)
     {
         $this->resolvers[$name] = fn & () => $result;
         return $this;
@@ -357,7 +339,7 @@ class App
      * @param object $default
      * @return Closure|null
      */
-    public function getResolver($name): Closure|null
+    public function getResolver(string $name): Closure|null
     {
         return $this->resolvers[$name] ?? null;
     }
@@ -369,7 +351,7 @@ class App
      * @param object|null $object
      * @return self
      */
-    public function addSingleton($className, &$object)
+    public function addSingleton(string $className, &$object)
     {
         $this->singletons[$className] = $object;
         return $this;
@@ -382,7 +364,7 @@ class App
      * @param object $default
      * @return self
      */
-    public function getSingleton($className, $default = null)
+    public function getSingleton(string $className, $default = null)
     {
         return $this->singletons[$className] ?? $default;
     }
@@ -394,7 +376,7 @@ class App
      * @param string $className
      * @return self
      */
-    public function addBinding($interfaceName, $className)
+    public function addBinding(string $interfaceName, string $className)
     {
         if (!in_array($interfaceName, class_implements($className))) {
             throw new SystemError("`$className` does not implement `$interfaceName`");
@@ -408,9 +390,9 @@ class App
      *
      * @param string $interfaceName
      * @param string $default
-     * @return self
+     * @return string|null
      */
-    public function getBinding($interfaceName, $default = null)
+    public function getBinding(string $interfaceName, string $default = null): string|null
     {
         return $this->bindings[$interfaceName] ?? $default;
     }
@@ -452,7 +434,7 @@ class App
     }
 
     /**
-     * Add error reporter. Replaces existing
+     * Set error reporter
      * 
      * @param string $config
      * @return self
@@ -463,6 +445,17 @@ class App
         return $this;
     }
 
+    /**
+     * Set Session Manager
+     * 
+     * @param SessionBag $sessionManager
+     * @return self
+     */
+    public function setSessionManager(SessionBag $sessionManager)
+    {
+        $this->sessionManager = $sessionManager;
+        return $this;
+    }
 
     ############################
     # Response
@@ -488,8 +481,7 @@ class App
                         PHP_EOL . "message\t-\t$message" .
                         PHP_EOL . "code\t-\t$errorCode" .
                         PHP_EOL . "version\t-\t" . $this->config->version .
-                        PHP_EOL . "line\t-\t$errorLine" .
-                        PHP_EOL . "path\t-\t$errorFile" .
+                        PHP_EOL . "path\t-\t$errorFile:$errorLine" .
                         PHP_EOL,
                     $errorTrace
                 );
@@ -507,7 +499,6 @@ class App
             $response->message = $message;
             $response->env = $this->env;
             $response->version = $this->config->version;
-            $response->ip = $this->request->ip();
 
             // Show more info if not production
             if (!$response->success && $this->env !== Env::PROD) {
@@ -518,7 +509,7 @@ class App
                 $response->duration = (floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 
-            $this->response->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
+            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
         }
     }
 
@@ -547,7 +538,7 @@ class App
             }
         }
 
-        return $this->response
+        return (new Response)
             ->addHttpHeaders($headers)
             ->json($data, ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
     }

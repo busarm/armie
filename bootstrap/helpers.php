@@ -39,15 +39,17 @@ function env($name, $default = null)
 
 /**
  * Check if https enabled
+ * 
+ * @return array $server Server variable list
  * @return bool
  */
-function is_https()
+function is_https(array $server = [])
 {
-    if (!empty(env('HTTPS')) && strtolower(env('HTTPS')) !== 'off') {
+    if (!empty($server['HTTPS'] ?? env('HTTPS')) && strtolower($server['HTTPS'] ?? env('HTTPS')) !== 'off') {
         return TRUE;
-    } elseif (!empty(env('HTTP_X_FORWARDED_PROTO')) && strtolower(env('HTTP_X_FORWARDED_PROTO')) === 'https') {
+    } elseif (!empty($server['HTTP_X_FORWARDED_PROTO'] ?? env('HTTP_X_FORWARDED_PROTO')) && strtolower($server['HTTP_X_FORWARDED_PROTO'] ?? env('HTTP_X_FORWARDED_PROTO')) === 'https') {
         return TRUE;
-    } elseif (!empty(env('HTTP_FRONT_END_HTTPS')) && strtolower(env('HTTP_FRONT_END_HTTPS')) !== 'off') {
+    } elseif (!empty($server['HTTP_FRONT_END_HTTPS'] ?? env('HTTP_FRONT_END_HTTPS')) && strtolower($server['HTTP_FRONT_END_HTTPS'] ?? env('HTTP_FRONT_END_HTTPS')) !== 'off') {
         return TRUE;
     }
     return FALSE;
@@ -55,43 +57,45 @@ function is_https()
 
 
 /**
- * Get Ip of users
+ * Get Ip
+ * 
+ * @return array $server Server variable list
  * @return string
  */
-function get_ip_address()
+function get_ip_address(array $server = [])
 {
     // check for shared internet/ISP IP
-    if (!empty(env('HTTP_CLIENT_IP')) && validate_ip(env('HTTP_CLIENT_IP'))) {
-        return env('HTTP_CLIENT_IP');
+    if (!empty($server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP')) && validate_ip($server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP'))) {
+        return $server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP');
     }
     // check for IPs passing through proxies
-    if (!empty(env('HTTP_X_FORWARDED_FOR'))) {
+    if (!empty($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR'))) {
         // check if multiple ips exist in var
-        if (strpos(env('HTTP_X_FORWARDED_FOR'), ',') !== false) {
-            $iplist = explode(',', env('HTTP_X_FORWARDED_FOR') ?? '', 20);
+        if (strpos($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR'), ',') !== false) {
+            $iplist = explode(',', $server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR') ?? '', 20);
             foreach ($iplist as $ip) {
                 if (validate_ip($ip))
                     return $ip;
             }
         } else {
-            if (validate_ip(env('HTTP_X_FORWARDED_FOR')))
-                return env('HTTP_X_FORWARDED_FOR');
+            if (validate_ip($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR')))
+                return $server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR');
         }
     }
-    if (!empty(env('HTTP_X_FORWARDED')) && validate_ip(env('HTTP_X_FORWARDED')))
-        return env('HTTP_X_FORWARDED');
+    if (!empty($server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED')) && validate_ip($server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED')))
+        return $server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED');
 
-    if (!empty(env('HTTP_X_CLUSTER_CLIENT_IP')) && validate_ip(env('HTTP_X_CLUSTER_CLIENT_IP')))
-        return env('HTTP_X_CLUSTER_CLIENT_IP');
+    if (!empty($server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP')) && validate_ip($server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP')))
+        return $server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP');
 
-    if (!empty(env('HTTP_FORWARDED_FOR')) && validate_ip(env('HTTP_FORWARDED_FOR')))
-        return env('HTTP_FORWARDED_FOR');
+    if (!empty($server['HTTP_FORWARDED_FOR'] ?? env('HTTP_FORWARDED_FOR')) && $server['HTTP_FORWARDED_FOR'] ?? validate_ip(env('HTTP_FORWARDED_FOR')))
+        return $server['HTTP_FORWARDED_FOR'] ?? env('HTTP_FORWARDED_FOR');
 
-    if (!empty(env('HTTP_FORWARDED')) && validate_ip(env('HTTP_FORWARDED')))
-        return env('HTTP_FORWARDED');
+    if (!empty($server['HTTP_FORWARDED'] ?? env('HTTP_FORWARDED')) && $server['HTTP_FORWARDED'] ?? validate_ip(env('HTTP_FORWARDED')))
+        return $server['HTTP_FORWARDED'] ?? env('HTTP_FORWARDED');
 
     // return unreliable ip since all else failed
-    return env('REMOTE_ADDR');
+    return $server['REMOTE_ADDR'] ?? env('REMOTE_ADDR');
 }
 
 /**
@@ -133,7 +137,8 @@ function validate_ip($ip)
 
 /**
  * Get server protocol or http version
- * @return bool
+ * 
+ * @return string
  */
 function get_server_protocol()
 {
@@ -191,24 +196,6 @@ function view(string $path, $params = [], $return = false)
 }
 
 /**
- * Get app response object
- * @return \Busarm\PhpMini\Interfaces\ResponseInterface|mixed
- */
-function &response()
-{
-    return app()->response;
-}
-
-/**
- * Get app request object
- * @return \Busarm\PhpMini\Interfaces\RequestInterface|mixed
- */
-function &request()
-{
-    return app()->request;
-}
-
-/**
  * Get app loader object
  * @return \Busarm\PhpMini\Interfaces\LoaderInterface
  */
@@ -228,7 +215,7 @@ function &report()
 
 /**
  * Get app router object
- * @return \Busarm\PhpMini\Interfaces\ErrorReportingInterface
+ * @return \Busarm\PhpMini\Interfaces\RouterInterface
  */
 function &router()
 {
@@ -243,9 +230,9 @@ function &router()
 function log_message($level, $message, array $context = [])
 {
     try {
-        return app()->logger->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
+        app()->logger->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     } catch (\Throwable $th) {
-        return (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
+        (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     }
 }
 
@@ -254,7 +241,7 @@ function log_message($level, $message, array $context = [])
  */
 function log_emergency($message)
 {
-    return log_message(\Psr\Log\LogLevel::EMERGENCY, $message);
+    log_message(\Psr\Log\LogLevel::EMERGENCY, $message);
 }
 
 /**
@@ -262,15 +249,15 @@ function log_emergency($message)
  */
 function log_error($message)
 {
-    return log_message(\Psr\Log\LogLevel::ERROR, $message);
+    log_message(\Psr\Log\LogLevel::ERROR, $message);
 }
 
 /**
- * @param Exception $exception
+ * @param \Exception $exception
  */
 function log_exception($exception)
 {
-    return log_message(\Psr\Log\LogLevel::ERROR, $exception->getMessage(), $exception->getTrace());
+    log_message(\Psr\Log\LogLevel::ERROR, $exception->getMessage(), $exception->getTrace());
 }
 
 /**
@@ -278,7 +265,7 @@ function log_exception($exception)
  */
 function log_info($message)
 {
-    return log_message(\Psr\Log\LogLevel::INFO, $message);
+    log_message(\Psr\Log\LogLevel::INFO, $message);
 }
 
 /**
@@ -286,7 +273,7 @@ function log_info($message)
  */
 function log_debug($message)
 {
-    return log_message(\Psr\Log\LogLevel::DEBUG, $message);
+    log_message(\Psr\Log\LogLevel::DEBUG, $message);
 }
 
 /**
@@ -294,7 +281,7 @@ function log_debug($message)
  */
 function log_warning($message)
 {
-    return log_message(\Psr\Log\LogLevel::WARNING, $message);
+    log_message(\Psr\Log\LogLevel::WARNING, $message);
 }
 
 /**
@@ -305,7 +292,7 @@ function log_warning($message)
  * @param \Symfony\Component\Console\Output\OutputInterface $output
  * @param int $timeout Default = 600 seconds
  * @param boolean $wait Default = true
- * @return Symfony\Component\Process\Process
+ * @return \Symfony\Component\Process\Process
  */
 function run(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600, $wait = true)
 {
@@ -342,9 +329,21 @@ function run(string $command, array $params, \Symfony\Component\Console\Output\O
  * @param array $params
  * @param \Symfony\Component\Console\Output\OutputInterface $output
  * @param int $timeout Default = 600 seconds
- * @return Symfony\Component\Process\Process
+ * @return \Symfony\Component\Process\Process
  */
 function run_async(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600)
 {
     return run($command, $params, $output, $timeout, false);
+}
+
+/**
+ * Convert to proper unit
+ * @param int|float $size
+ * @return string
+ */
+function unit_convert($size)
+{
+    $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+    $index = floor(log($size, 1024));
+    return (round($size / pow(1024, ($index)), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
 }

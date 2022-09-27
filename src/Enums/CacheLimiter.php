@@ -9,10 +9,10 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class ResponseFormat
+class CacheLimiter
 {
-    const JSON  =   'json';
-    const HTML  =   'html';
-    const XML   =   'xml';
-    const BIN   =   'bin';
+    const NO_CACHE          =   'nocache';
+    const PUBLIC            =   'public';
+    const PRIVATE           =   'private';
+    const PRIVATE_NO_EXPIRE =   'private_no_expire';
 }

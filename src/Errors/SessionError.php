@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Enums;
+namespace Busarm\PhpMini\Errors;
 
 /**
  * PHP Mini Framework
@@ -9,10 +9,6 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class ResponseFormat
+class SessionError extends SystemError
 {
-    const JSON  =   'json';
-    const HTML  =   'html';
-    const XML   =   'xml';
-    const BIN   =   'bin';
 }

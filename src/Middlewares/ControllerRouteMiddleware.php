@@ -2,15 +2,21 @@
 
 namespace Busarm\PhpMini\Middlewares;
 
-use ArgumentCountError;
-use Busarm\PhpMini\App;
 use Busarm\PhpMini\DI;
 use Busarm\PhpMini\Dto\BaseDto;
+use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Throwable;
+use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Interfaces\RouteInterface;
+use Busarm\PhpMini\Request;
+use Busarm\PhpMini\Response;
+use Busarm\PhpMini\Route;
 use TypeError;
+
+use function Busarm\PhpMini\Helpers\app;
 
 /**
  * PHP Mini Framework
@@ -24,11 +30,11 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     {
     }
 
-    public function handle(App $app, callable $next = null): mixed
+    public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, callable $next = null): mixed
     {
         if (class_exists($this->controller)) {
             // Load controller
-            $object = $app->make($this->controller);
+            $object = app()->make($this->controller);
             if ($object) {
                 // Load method
                 if (
@@ -39,11 +45,37 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     try {
                         return call_user_func_array(
                             array($object, $this->function),
-                            array_merge(DI::resolveMethodDependencies($app, $this->controller, $this->function, function (&$param) use (&$app) {
-                                if ($param instanceof BaseDto) {
-                                    $param->load($app->request->getRequestList(), true);
+                            array_merge(DI::resolveMethodDependencies(
+                                $this->controller,
+                                $this->function,
+                                // Resolver
+                                function ($class) use (&$request, &$response) {
+                                    if (($class == Request::class || $class == RequestInterface::class) && $request instanceof RequestInterface) {
+                                        return $request;
+                                    } else if (($class == Route::class || $class == RouteInterface::class) && $request instanceof RouteInterface) {
+                                        return $request;
+                                    } else if ($class == Response::class || $class == ResponseInterface::class) {
+                                        return $response;
+                                    }
+                                    return null;
+                                },
+                                // Callback
+                                function (&$param) use (&$request) {
+                                    if ($param instanceof BaseDto) {
+                                        if ($request instanceof RequestInterface) {
+                                            $param->load($request->getRequestList(), true);
+                                        } else if ($request instanceof RouteInterface) {
+                                            $param->load($request->getParams(), true);
+                                        }
+                                    } else if ($param instanceof CollectionBaseDto) {
+                                        if ($request instanceof RequestInterface) {
+                                            $param->load($request->getRequestList(), true);
+                                        } else if ($request instanceof RouteInterface) {
+                                            $param->load($request->getParams());
+                                        }
+                                    }
                                 }
-                            }), $this->params)
+                            ), $this->params)
                         );
                     } catch (TypeError $th) {
                         throw new BadRequestException("Invalid parameter(s): " . $th->getMessage());

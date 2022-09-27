@@ -5,10 +5,13 @@ namespace Busarm\PhpMini\Test;
 use PHPUnit\Framework\TestCase;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Server;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Request;
+use Busarm\PhpMini\Interfaces\RouterInterface;
+use Nyholm\Psr7\Request;
+use Nyholm\Psr7\ServerRequest;
+use Psr\Log\LoggerInterface;
 
 /**
  * PHP Mini Framework
@@ -53,10 +56,12 @@ final class ServerTest extends TestCase
     {
         $this->assertNotNull($this->server);
         $this->assertNotNull($this->app);
-        $this->assertNotNull($this->app->request);
-        $this->assertNotNull($this->app->response);
-        $this->assertInstanceOf(RequestInterface::class, $this->app->request);
-        $this->assertInstanceOf(ResponseInterface::class, $this->app->response);
+        $this->assertNotNull($this->app->router);
+        $this->assertNotNull($this->app->loader);
+        $this->assertNotNull($this->app->logger);
+        $this->assertInstanceOf(RouterInterface::class, $this->app->router);
+        $this->assertInstanceOf(LoaderInterface::class, $this->app->loader);
+        $this->assertInstanceOf(LoggerInterface::class, $this->app->logger);
     }
 
     /**
@@ -67,7 +72,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForRoute()
     {
         $this->server->addRoutePath('v1', __DIR__ . '/TestApp');
-        $response = $this->server->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/pingHtml'));
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(true, $response);
     }
@@ -81,7 +86,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForDomain()
     {
         $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/TestApp');
-        $response = $this->server->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(true, $response);
     }

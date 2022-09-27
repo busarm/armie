@@ -2,8 +2,6 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\App;
-
 /**
  * PHP Mini Framework
  *
@@ -16,9 +14,10 @@ interface MiddlewareInterface
     /**
      * Middleware handler
      *
-     * @param App $app
-     * @param Callable|null $next
-     * @return boolean|mixed Return `false` if failed
+     * @param RequestInterface|RouteInterface $request
+     * @param ResponseInterface $response
+     * @param callable|null $next
+     * @return false|mixed Return `false` if failed
      */
-    public function handle(App $app, callable $next = null): mixed;
+    public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, callable $next = null): mixed;
 }

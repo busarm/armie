@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0]
+
+### Changed
+
+-   Restructure Request Interface to support attributes bag
+-   Use Request & Response in Middleware instead of App instance to allow for stateless request
+
+### Added
+
+-   Caching Interface
+-   Session Interface
+-   PHP Session Manager
+-   Cookie Manager
+-   Attributes bags for request attributes
+-   Support for PSR7 request and response
+-   Support for stateless request
+-   Support for CLI routing
+
 ## [1.0.17]
 
 ### Fixed

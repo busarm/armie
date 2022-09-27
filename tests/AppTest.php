@@ -3,16 +3,17 @@
 namespace Busarm\PhpMini\Test;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Interfaces\LoaderInterface;
+use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
-use Busarm\PhpMini\Router;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
+use Busarm\PhpMini\Bags\Attribute;
 
 /**
  * PHP Mini Framework
@@ -32,6 +33,10 @@ final class AppTest extends TestCase
     {
         ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
+    }
+
+    public static function tearDownAfterClass(): void
+    {
     }
 
     /**
@@ -54,10 +59,12 @@ final class AppTest extends TestCase
     public function testInitializeApp()
     {
         $this->assertNotNull($this->app);
-        $this->assertNotNull($this->app->request);
-        $this->assertNotNull($this->app->response);
-        $this->assertInstanceOf(RequestInterface::class, $this->app->request);
-        $this->assertInstanceOf(ResponseInterface::class, $this->app->response);
+        $this->assertNotNull($this->app->router);
+        $this->assertNotNull($this->app->loader);
+        $this->assertNotNull($this->app->logger);
+        $this->assertInstanceOf(RouterInterface::class, $this->app->router);
+        $this->assertInstanceOf(LoaderInterface::class, $this->app->loader);
+        $this->assertInstanceOf(LoggerInterface::class, $this->app->logger);
     }
 
     /**
@@ -68,8 +75,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunCLI()
     {
-        $this->app->setRouter(Router::withController(HomeTestController::class, 'ping'));
-        $response = $this->app->run();
+        $response = $this->app->run(Route::cli(HomeTestController::class, 'ping'));
         $this->assertNotNull($response);
         $this->assertEquals('success-' . $this->app->env, $response->getBody());
     }
@@ -125,9 +131,9 @@ final class AppTest extends TestCase
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS
-            )->setServer([
+            )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:81'
-            ])->initialize()
+            ])))->initialize()
         );
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -155,9 +161,9 @@ final class AppTest extends TestCase
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS
-            )->setServer([
+            )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:81'
-            ])->initialize()
+            ])))->initialize()
         );
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -185,9 +191,9 @@ final class AppTest extends TestCase
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS
-            )->setServer([
+            )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:8181'
-            ])->initialize()
+            ])))->initialize()
         );
         $this->assertNotNull($response);
         $this->assertEquals(401, $response->getStatusCode());

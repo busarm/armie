@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Busarm\PhpMini\Route;
 
 /**
  * PHP Mini Framework
@@ -14,47 +15,6 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 interface RouterInterface
 {
     /**
-     * @return self
-     */
-    public function setPath(string $path): self;
-
-    /**
-     * @return boolean
-     */ 
-    public function getIsHttp();
-
-    /**
-     * @return string|null
-     */
-    public function getRequestHost(): string|null;
-
-    /**
-     * @return string|null
-     */
-    public function getRequestMethod(): string|null;
-
-    /**
-     * @return string|null
-     */
-    public function getRequestPath(): string|null;
-
-    /**
-     * @return RouteInterface|null
-     */
-    public function getCurrentRoute(): RouteInterface|null;
-
-    /**
-     * @return RouteInterface[]
-     */
-    public function getRoutes(): array;
-
-    /**
-     * Process routing
-     * @return MiddlewareInterface[]
-     */
-    public function process(): array;
-
-    /**
      * @param Route $route 
      * @return self
      */
@@ -65,6 +25,20 @@ interface RouterInterface
      * @return self
      */
     public function addRoutes(array $routes): self;
+
+    /**
+     * @return RouteInterface[]
+     */
+    public function getRoutes(): array;
+
+    /**
+     * 
+     * Process routing
+     *
+     * @param RequestInterface|RouteInterface|null $request
+     * @return MiddlewareInterface[]
+     */
+    public function process(RequestInterface|RouteInterface|null $request = null): array;
 
     /**
      * Check if path matches

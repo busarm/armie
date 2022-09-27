@@ -5,11 +5,12 @@ namespace Busarm\PhpMini;
 use Busarm\PhpMini\Enums\ResponseFormat;
 use InvalidArgumentException;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Throwable;
 
 use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\request;
+use Nyholm\Psr7\Stream;
 
 /**
  * PHP Mini Framework
@@ -30,11 +31,6 @@ class Response implements ResponseInterface
     protected $version;
 
     /**
-     * @var string
-     */
-    protected $format;
-
-    /**
      * @var int
      */
     protected $statusCode = 200;
@@ -45,7 +41,7 @@ class Response implements ResponseInterface
     protected $statusText;
 
     /**
-     * @var StreamInterface|string
+     * @var StreamInterface|resource|string|null
      */
     protected $body = NULL;
 
@@ -113,17 +109,15 @@ class Response implements ResponseInterface
     );
 
     /**
-     * @param array $format
      * @param array $parameters
      * @param int   $statusCode
      * @param array $headers
      */
-    public function __construct($format = ResponseFormat::JSON, $parameters = array(), $statusCode = 200, $headers = array())
+    public function __construct($parameters = array(), $statusCode = 200, $headers = array())
     {
         $this->setParameters($parameters);
         $this->setStatusCode($statusCode);
         $this->setHttpHeaders($headers);
-        $this->format = $format;
         $this->version = '1.1';
     }
 
@@ -310,14 +304,15 @@ class Response implements ResponseInterface
      * Header Redirect
      *
      * @param string $uri URL
-     * @param string $method Redirect method 'auto', 'location' or 'refresh'
-     * @param int $code	HTTP Response status code
+     * @param string $method Redirect method. Eg. 'auto', 'location' or 'refresh'
+     * @param int $code	HTTP Response status code. E.g 307 or 302
+     * @throws InvalidArgumentException
      * @return self
      */
-    public function redirect($uri, $method = 'auto', $code = NULL): self
+    public function redirect($uri, $method = 'auto', $code = 307): self
     {
         if (!preg_match('#^(\w+:)?//#i', $uri)) {
-            $uri = request()->baseUrl() . $uri;
+            throw new InvalidArgumentException("Invalid redirect uri: $uri");
         }
 
         // IIS environment likely? Use 'refresh' for better compatibility
@@ -347,7 +342,7 @@ class Response implements ResponseInterface
 
     /**
      * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
-     * @return mixed
+     * @return StreamInterface|string|null
      * @throws InvalidArgumentException
      */
     public function getResponseBody($format = ResponseFormat::JSON)
@@ -364,9 +359,9 @@ class Response implements ResponseInterface
                 return $xml->asXML();
             case ResponseFormat::HTML:
                 return $this->body;
+            default:
+                return is_string($this->body) ? $this->body : Stream::create($this->body);
         }
-
-        throw new InvalidArgumentException(sprintf('The format %s is not supported', $format));
     }
 
     /**
@@ -400,6 +395,8 @@ class Response implements ResponseInterface
                 case ResponseFormat::HTML:
                     $this->setHttpHeader('Content-Type', 'text/html');
                     break;
+                default:
+                    $this->setHttpHeader('Content-Type', 'application/octet-stream');
             }
 
             // status
@@ -462,13 +459,23 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param bool $continue
-     * @return self
+     * Create PSR7 Server response
+     * 
+     * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle($continue = false): self|null
+    public function toPsr($format = ResponseFormat::JSON): MessageResponseInterface
     {
-        $this->send($this->format, $continue);
-        return $this;
+        $response = new \Nyholm\Psr7\Response(
+            $this->statusCode,
+            $this->httpHeaders,
+            ($this->body instanceof StreamInterface || is_resource($this->body)) ?
+                $this->body :
+                $this->getResponseBody($format),
+            $this->version,
+            $this->statusText
+        );
+        return $response;
     }
 
     /**

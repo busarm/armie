@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface ResponseInterface extends ResponseHandlerInterface
+interface ResponseInterface
 {
     /**
      * @param int $statusCode

@@ -4,7 +4,7 @@
 
 # PHP Mini by Busarm
 
-A micro php framework designed for micro-services
+A micro php framework designed for micro-services. **(Still under development)**
 
 ## Installation
 
@@ -149,7 +149,7 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
     # AuthenticateMiddleware.php
     class AuthenticateMiddleware implements MiddlewareInterface
     {
-        public function handle(App $app, Callable $next = null): mixed
+        public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, Callable $next = null): mixed
         {
             // Perform action
             return $next ? $next() : true;

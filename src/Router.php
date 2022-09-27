@@ -39,160 +39,8 @@ class Router implements RouterInterface
         "/\{\w*\}/" => "([a-zA-Z0-9-_]+)"
     ];
 
-    /** @var string Request Controller */
-    protected string|null $controller = null;
-
-    /** @var string Request Function */
-    protected string|null $function = null;
-
-    /** @var string Request Params */
-    protected array|null $params = [];
-
-    /** @var string HTTP request host */
-    protected string|null $requestHost = null;
-
-    /** @var string HTTP request method */
-    protected string|null $requestMethod = null;
-
-    /** @var string HTTP request route */
-    protected string|null $requestPath = null;
-
-    /** @var bool If router is for HTTP request*/
-    protected bool $isHttp = false;
-
-    /** @var RouteInterface Current HTTP route */
-    protected RouteInterface|null $currentRoute = null;
-
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
-
-    protected function __construct()
-    {
-    }
-
-    /**
-     * @return self
-     */
-    public static function withRequest(RequestInterface $request): self
-    {
-        $router = new self;
-        $router->requestMethod = $request->method();
-        $router->requestPath = $request->uri();
-        $router->isHttp = true;
-        return $router;
-    }
-
-    /**
-     * @param string $controller
-     * @param string $function
-     * @param array $params
-     * @return self
-     */
-    public static function withController($controller, $function, $params = []): self
-    {
-        $router = new self;
-        $router->controller = $controller;
-        $router->function = $function;
-        $router->params = $params;
-        $router->isHttp = false;
-        return $router;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRequestHost(): string|null
-    {
-        return $this->requestHost;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRequestMethod(): string|null
-    {
-        return $this->requestMethod;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRequestPath(): string|null
-    {
-        return $this->requestPath;
-    }
-
-    /**
-     * @return RouteInterface[]
-     */
-    public function getRoutes(): array
-    {
-        return $this->routes;
-    }
-
-    /**
-     * @return RouteInterface|null
-     */
-    public function getCurrentRoute(): RouteInterface|null
-    {
-        return $this->currentRoute;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getIsHttp()
-    {
-        return $this->isHttp;
-    }
-
-    /**
-     * @return self
-     */
-    public function setPath(string $path): self
-    {
-        $this->requestPath = $path;
-        return $this;
-    }
-
-    /**
-     * Process routing
-     * @return MiddlewareInterface[]
-     */
-    public function process(): array
-    {
-        // If custom routes
-        if ($this->controller && $this->function) {
-            $routeMiddleware[] = new ControllerRouteMiddleware($this->controller, $this->function, $this->params);
-            return $routeMiddleware;
-        }
-        // If http routes
-        else {
-            foreach ($this->routes as $route) {
-                // Find route
-                if (
-                    strtoupper($route->getMethod()) == strtoupper($this->requestMethod) &&
-                    ($params = $this->isMatch($this->requestPath, $route->getPath()))
-                ) {
-                    // Set current route
-                    $this->currentRoute = is_array($params) ? $route->withParams($params) : $route;
-                    // Callable
-                    if ($callable = $this->currentRoute->getCallable()) {
-                        $routeMiddleware = $this->currentRoute->getMiddlewares() ?? [];
-                        $routeMiddleware[] = new CallableRouteMiddleware($callable, $this->currentRoute->getParams());
-                        return $routeMiddleware;
-                    }
-                    // Controller
-                    else {
-                        $routeMiddleware = $route->getMiddlewares() ?? [];
-                        $routeMiddleware[] = new ControllerRouteMiddleware($this->currentRoute->getController(), $this->currentRoute->getFunction(), $this->currentRoute->getParams());
-                        return $routeMiddleware;
-                    }
-                }
-            }
-        }
-        return [];
-    }
 
     /**
      * @param Route $route 
@@ -212,6 +60,70 @@ class Router implements RouterInterface
     {
         $this->routes = array_merge($this->routes, $routes);
         return $this;
+    }
+
+    /**
+     * @return RouteInterface[]
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    /**
+     * 
+     * Process routing
+     *
+     * @param RequestInterface|RouteInterface|null $request
+     * @return MiddlewareInterface[]
+     */
+    public function process(RequestInterface|RouteInterface|null $request = null): array
+    {
+        // If custom routes
+        if ($request instanceof RouteInterface) {
+
+            // Callable
+            if ($callable = $request->getCallable()) {
+                $routeMiddleware = $request->getMiddlewares() ?? [];
+                $routeMiddleware[] = new CallableRouteMiddleware($callable, $request->getParams());
+                return $routeMiddleware;
+            }
+            // Controller
+            else {
+                $routeMiddleware = $request->getMiddlewares() ?? [];
+                $routeMiddleware[] = new ControllerRouteMiddleware($request->getController(), $request->getFunction(), $request->getParams());
+                return $routeMiddleware;
+            }
+        }
+
+        // If http request
+        else if ($request instanceof RequestInterface) {
+            foreach ($this->routes as $route) {
+                // Find route
+                if (
+                    strtoupper($route->getMethod()) == strtoupper($request->method()) &&
+                    ($params = $this->isMatch($request->uri(), $route->getPath()))
+                ) {
+                    // Set current route
+                    $route->params(is_array($params) ? $params : []);
+
+                    // Callable
+                    if ($callable = $route->getCallable()) {
+                        $routeMiddleware = $route->getMiddlewares() ?? [];
+                        $routeMiddleware[] = new CallableRouteMiddleware($callable, $route->getParams());
+                        return $routeMiddleware;
+                    }
+                    // Controller
+                    else {
+                        $routeMiddleware = $route->getMiddlewares() ?? [];
+                        $routeMiddleware[] = new ControllerRouteMiddleware($route->getController(), $route->getFunction(), $route->getParams());
+                        return $routeMiddleware;
+                    }
+                }
+            }
+        }
+
+        return [];
     }
 
     /**

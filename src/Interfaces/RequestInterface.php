@@ -2,6 +2,10 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
+use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Psr\Http\Message\UriInterface;
+
 /**
  * PHP Mini Framework
  *
@@ -12,12 +16,10 @@ namespace Busarm\PhpMini\Interfaces;
 interface RequestInterface
 {
     /**
-     * @param string $scheme
-     * @param string $domain
-     * @param string $uri
+     * @param UriInterface $uri
      * @return self
      */
-    public function withUrl(string $scheme, string $domain, string $uri): self;
+    public function withUri(UriInterface $uri): self;
 
     /**
      * @return string
@@ -70,80 +72,37 @@ interface RequestInterface
     public function contentType();
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function file($name, $default = null);
+    public function file(): AttributeBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return SessionBag
      */
-    public function attribute($name, $default = null);
+    public function session(): SessionBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function cookie($name, $default = null);
+    public function cookie(): AttributeBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function query($name, $default = null);
+    public function query(): AttributeBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function request($name, $default = null);
+    public function request(): AttributeBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function server($name, $default = null);
+    public function server(): AttributeBag;
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     * @return mixed
+     * @return AttributeBag
      */
-    public function header($name, $default = null);
-
-    /**
-     * @return array
-     */
-    public function getFileList();
-    /**
-     * @return array
-     */
-    public function getCookieList();
-    /**
-     * @return array
-     */
-    public function getAttributeList();
-    /**
-     * @return array
-     */
-    public function getQueryList();
-    /**
-     * @return array
-     */
-    public function getRequestList();
-    /**
-     * @return array
-     */
-    public function getServerList();
-    /**
-     * @return array
-     */
-    public function getHeaderList();
+    public function header(): AttributeBag;
 }

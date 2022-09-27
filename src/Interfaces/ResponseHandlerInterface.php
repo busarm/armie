@@ -11,5 +11,5 @@ namespace Busarm\PhpMini\Interfaces;
  */
 interface ResponseHandlerInterface
 {
-    public function handle($continue = false): ResponseInterface|null;
+    public function handle(ResponseInterface $response, $continue = false): ResponseInterface|null;
 }

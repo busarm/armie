@@ -38,22 +38,37 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      */
     protected function __construct($input = [], $flags = 0, $iteratorClass = ArrayIterator::class)
     {
-        // Validate that the input is an array or an object with an Traversable interface.
-        if (!(is_array($input) || (is_object($input) && in_array(Traversable::class, class_implements($input))))) {
-            throw new InvalidArgumentException('$input must be an array or an object that implements \Traversable.');
-        }
-
         // Create an empty array.
         parent::__construct([], $flags, $iteratorClass);
 
+        // Load data
+        $this->load($input);
+    }
+
+    /**
+     * Load data
+     *
+     * @param array|Traversable $data
+     * @param bool $force
+     * @return self
+     */
+    public function load(array|Traversable $data): self
+    {
+        // Validate that the input is an array or an object with an Traversable interface.
+        if (!(is_array($data) || (is_object($data) && in_array(Traversable::class, class_implements($data))))) {
+            throw new InvalidArgumentException('$input must be an array or an object that implements \Traversable.');
+        }
+
         // Append each item so to validate it's type.
-        foreach ($input as $key => $value) {
+        foreach ($data as $key => $value) {
             // Validate Item type if available
             if (!empty(static::ITEM_CLASS) && !($value instanceof (self::ITEM_CLASS))) {
                 throw new InvalidArgumentException('Items of $input must be an instance of ' . self::ITEM_CLASS);
             }
             $this[$key] = $value;
         }
+
+        return $this;
     }
 
     /**

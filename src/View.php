@@ -122,9 +122,10 @@ abstract class View implements ResponseHandlerInterface
 
     /**
      * @param bool $continue
+     * @param ResponseInterface|null $response
      * @return ResponseInterface|null
      */
-    public function send($continue = false): ResponseInterface|null
+    public function send($continue = false, ResponseInterface $response = null): ResponseInterface|null
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
@@ -141,16 +142,16 @@ abstract class View implements ResponseHandlerInterface
         $this->render();
         $content = $this->end();
 
-        return app()->response->addHttpHeaders($this->headers)->html($content, 200, $continue);
+        return ($response ?? (new Response))->addHttpHeaders($this->headers)->html($content, 200, $continue);
     }
 
     /**
-     * @param string $format
+     * @param ResponseInterface $response
      * @param bool $continue
      * @return self
      */
-    public function handle($continue = false): ResponseInterface|null
+    public function handle(ResponseInterface $response, $continue = false): ResponseInterface|null
     {
-        return $this->send($continue);
+        return $this->send($continue, $response);
     }
 }

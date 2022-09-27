@@ -20,22 +20,15 @@ interface RouteInterface
     public function getController(): string|null;
     /**  @return string */
     public function getFunction(): string|null;
-    /**  @return string */
+    /**  @return array|null */
     public function getParams(): array|null;
-    /**  @return string */
+    /**  @return string|null */
     public function getMethod(): string|null;
-    /**  @return string */
+    /**  @return string|null */
     public function getPath(): string|null;
     /**  @return MiddlewareInterface[] */
     public function getMiddlewares(): array;
     
-    /**
-     * Set route params 
-     * 
-     * @return self 
-     */
-    public function withParams(array $params): self;
-
     /**
      * Set callable route destination
      * 
@@ -68,6 +61,17 @@ interface RouteInterface
      * @return self
      */
     public function middleware(MiddlewareInterface $middleware): self;
+
+    /**
+     * Add route params.
+     * List of key => value params. 
+     * Where:
+     * - `key` = function paramater name 
+     * - `value` =  function paramater value
+     * 
+     * @return self 
+     */
+    public function params(array $params): self;
 
     /**
      * Set HTTP GET routes

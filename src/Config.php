@@ -2,7 +2,9 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\CacheLimiter;
 use Busarm\PhpMini\Enums\ResponseFormat;
+use Busarm\PhpMini\Enums\SameSite;
 use Busarm\PhpMini\Enums\Verbose;
 
 /**
@@ -42,6 +44,38 @@ class Config
     public string $version = '1.0.0';
 
     /**
+     * Path to temporary folder
+     * (Without trailing slash)
+     *
+     * @var string
+     */
+    public string $tempPath = '';
+
+    /**
+     * Path to cache folder
+     * (Without trailing slash)
+     *
+     * @var string
+     */
+    public string $cachePath = '';
+
+    /**
+     * Path to upload folder
+     * (Without trailing slash)
+     *
+     * @var string
+     */
+    public string $uploadPath = '';
+
+    /**
+     * Path to session folder
+     * (Without trailing slash)
+     *
+     * @var string
+     */
+    public string $sessionPath = '';
+
+    /**
      * Path to app folder - relative to system base path. e.g '/var/www/html/app'
      * (Without leading or trailing slash)
      *
@@ -64,6 +98,72 @@ class Config
      * @var string
      */
     public string $configPath = '';
+
+    /**
+     * App encryption Key
+     *
+     * @var string|null
+     */
+    public string|null $encryptionKey = NULL;
+
+    /**
+     * Cookie Prefix
+     *
+     * @var string|null
+     */
+    public string|null $cookiePrefix = NULL;
+    /**
+     * Cookie Duration in seconds
+     *
+     * @var int
+     */
+    public int $cookieDuration = 3600;
+    /**
+     * Cookie Path
+     *
+     * @var string
+     */
+    public string $cookiePath = '/';
+    /**
+     * Cookie Domain
+     *
+     * @var string
+     */
+    public string $cookieDomain = '';
+    /**
+     * Cookie Secure: Use with secure HTTPS connections only
+     *
+     * @var bool
+     */
+    public bool $cookieSecure = false;
+    /**
+     * Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     *
+     * @var bool
+     */
+
+    public bool $cookieHttpOnly = false;
+    /**
+     * Cookie should be encyrpted
+     *
+     * @var bool
+     */
+    public bool $cookieEncrypt = true;
+    /**
+     * Cookie Same Site Policy
+     * 
+     * @see \Busarm\PhpMini\Enums\SameSite
+     * @var string
+     */
+    public string $cookieSameSite = SameSite::LAX;
+
+    /**
+     * Cache Limiter
+     *
+     * @see \Busarm\PhpMini\Enums\CacheLimiter
+     * @var string
+     */
+    public string $cacheLimiter = CacheLimiter::NO_CACHE;
 
     /**
      * Logger verbosity
@@ -148,6 +248,23 @@ class Config
      * @var string
      */
     public string $httpResponseFormat = ResponseFormat::JSON;
+    
+    /**
+     * Auto start session for  HTTP request
+     *
+     * @var bool
+     */
+    public bool $httpSessionAutoStart = true;
+
+
+    function __construct()
+    {
+        $prefix =  str_replace(' ', '_', strtolower($this->name));
+        $this->setTempPath(sys_get_temp_dir() . "/$prefix");
+        $this->setCachePath($this->tempPath . '/cache');
+        $this->setSessionPath($this->tempPath . '/session');
+        $this->setUploadPath($this->tempPath . '/upload');
+    }
 
     /**
      * Set app name
@@ -173,6 +290,74 @@ class Config
     public function setVersion($version)
     {
         $this->version = $version;
+
+        return $this;
+    }
+
+    /**
+     * Set (Without trailing slash)
+     *
+     * @param  string  $tempPath  (Without trailing slash)
+     *
+     * @return  self
+     */
+    public function setTempPath(string $tempPath)
+    {
+        $this->tempPath = $tempPath;
+        if (!is_dir($this->tempPath)) {
+            mkdir($this->tempPath, 0755, true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set (Without trailing slash)
+     *
+     * @param  string  $cachePath  (Without trailing slash)
+     *
+     * @return  self
+     */
+    public function setCachePath(string $cachePath)
+    {
+        $this->cachePath = $cachePath;
+        if (!is_dir($this->cachePath)) {
+            mkdir($this->cachePath, 0755, true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set (Without trailing slash)
+     *
+     * @param  string  $sessionPath  (Without trailing slash)
+     *
+     * @return  self
+     */
+    public function setSessionPath(string $sessionPath)
+    {
+        $this->sessionPath = $sessionPath;
+        if (!is_dir($this->sessionPath)) {
+            mkdir($this->sessionPath, 0755, true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set (Without trailing slash)
+     *
+     * @param  string  $uploadPath  (Without trailing slash)
+     *
+     * @return  self
+     */
+    public function setUploadPath(string $uploadPath)
+    {
+        $this->uploadPath = $uploadPath;
+        if (!is_dir($this->uploadPath)) {
+            mkdir($this->uploadPath, 0755, true);
+        }
 
         return $this;
     }
@@ -215,6 +400,146 @@ class Config
     public function setConfigPath($configPath)
     {
         $this->configPath = $configPath;
+
+        return $this;
+    }
+
+    /**
+     * Set encryption Key
+     *
+     * @param  string  $encryptionKey
+     *
+     * @return  self
+     */
+    public function setEncryptionKey($encryptionKey)
+    {
+        $this->encryptionKey = $encryptionKey;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie prefix
+     *
+     * @param  string  $cookiePrefix
+     *
+     * @return  self
+     */
+    public function setCookiePrefix($cookiePrefix)
+    {
+        $this->cookiePrefix = $cookiePrefix;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie duration
+     *
+     * @param  string  $cookieDuration
+     *
+     * @return  self
+     */
+    public function setCookieDuration($cookieDuration)
+    {
+        $this->cookieDuration = $cookieDuration;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie path
+     *
+     * @param  string  $cookiePrefix
+     *
+     * @return  self
+     */
+    public function setCookiePath($cookiePath)
+    {
+        $this->cookiePath = $cookiePath;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie domain
+     *
+     * @param  string  $cookieDomain
+     *
+     * @return  self
+     */
+    public function setCookieDomain($cookieDomain)
+    {
+        $this->cookieDomain = $cookieDomain;
+
+        return $this;
+    }
+
+    /**
+     * Cookie Secure: Use with secure HTTPS connections only
+     *
+     * @param  bool  $cookieSecure  Cookie Secure: Use with secure HTTPS connections only
+     *
+     * @return  self
+     */
+    public function setCookieSecure(bool $cookieSecure)
+    {
+        $this->cookieSecure = $cookieSecure;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     *
+     * @param  bool  $cookieHttpOnly  Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     *
+     * @return  self
+     */
+    public function setCookieHttpOnly(bool $cookieHttpOnly)
+    {
+        $this->cookieHttpOnly = $cookieHttpOnly;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie should be encyrpted
+     *
+     * @param  bool  $cookieEncrypt  Cookie should be encyrpted
+     *
+     * @return  self
+     */
+    public function setCookieEncrypt(bool $cookieEncrypt)
+    {
+        $this->cookieEncrypt = $cookieEncrypt;
+
+        return $this;
+    }
+
+    /**
+     * Set cookie Same Site Policy
+     *
+     * @param  string  $cookieSameSite  Cookie Same Site Policy
+     *
+     * @return  self
+     */
+    public function setCookieSameSite(string $cookieSameSite)
+    {
+        $this->cookieSameSite = $cookieSameSite;
+
+        return $this;
+    }
+
+    /**
+     * Set cache Limiter
+     *
+     * @param  string  $cacheLimiter  Cache Limiter
+     *
+     * @return  self
+     */
+    public function setCacheLimiter(string $cacheLimiter)
+    {
+        $this->cacheLimiter = $cacheLimiter;
 
         return $this;
     }
@@ -360,6 +685,20 @@ class Config
         return $this;
     }
 
+    /**
+     * Set auto start session for HTTP request
+     *
+     * @param  bool  $httpSessionAutoStart  Auto start session for HTTP request
+     *
+     * @return  self
+     */ 
+    public function setHttpSessionAutoStart(bool $httpSessionAutoStart)
+    {
+        $this->httpSessionAutoStart = $httpSessionAutoStart;
+
+        return $this;
+    }
+    
     /**
      * Add custom config file
      * 

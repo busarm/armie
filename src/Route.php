@@ -37,14 +37,8 @@ class Route implements RouteInterface
     /** @var MiddlewareInterface[] */
     protected array $middlewares = [];
 
-    /**
-     * @param string $method
-     * @param string $path
-     */
-    private function __construct($method, $path)
+    private function __construct()
     {
-        $this->method = $method;
-        $this->path = $path;
     }
 
     /**  @return Closure|null */
@@ -84,17 +78,19 @@ class Route implements RouteInterface
     }
 
     /**
-     * Set route params 
+     * Add route params.
+     * List of key => value params. 
+     * Where:
+     * - `key` = function paramater name 
+     * - `value` =  function paramater value
      * 
-     * @return RouteInterface 
+     * @return self 
      */
-    public function withParams(array $params): RouteInterface
+    public function params(array $params): RouteInterface
     {
-        $clone = clone $this;
-        $clone->params = $params;
-        return $clone;
+        $this->params = $params;
+        return $this;
     }
-
 
     /**
      * Set callable route destination
@@ -150,62 +146,89 @@ class Route implements RouteInterface
     }
 
     /**
-     * Set HTTP GET routes
+     * Set CLI route
+     *
+     * @param string $controller
+     * @param string $function
+     * @param array $param
+     * @return RouteInterface
+     */
+    public static function cli(string $controller, string $function, array $params = []): static
+    {
+        $route = new Route;
+        $route->controller = $controller;
+        $route->function = $function;
+        $route->params = $params;
+        return $route;
+    }
+
+    /**
+     * Set HTTP GET route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return RouteInterface
      */
     public static function get(string $path): static
     {
-        $route = new Route(HttpMethod::GET, $path);
+        $route = new Route;
+        $route->method = HttpMethod::GET;
+        $route->path = $path;
         return $route;
     }
 
     /**
-     * Set HTTP POST routes
+     * Set HTTP POST route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
     public static function post(string $path): static
     {
-        $route = new Route(HttpMethod::POST, $path);
+        $route = new Route;
+        $route->method = HttpMethod::POST;
+        $route->path = $path;
         return $route;
     }
 
     /**
-     * Set HTTP PUT routes
+     * Set HTTP PUT route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
     public static function put(string $path): static
     {
-        $route = new Route(HttpMethod::PUT, $path);
+        $route = new Route;
+        $route->method = HttpMethod::PUT;
+        $route->path = $path;
         return $route;
     }
 
     /**
-     * Set HTTP PATCH routes
+     * Set HTTP PATCH route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
     public static function patch(string $path): static
     {
-        $route = new Route(HttpMethod::PATCH, $path);
+        $route = new Route;
+        $route->method = HttpMethod::PATCH;
+        $route->path = $path;
         return $route;
     }
 
     /**
-     * Set HTTP DELETE routes
+     * Set HTTP DELETE route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return static
      */
     public static function delete(string $path): static
     {
-        $route = new Route(HttpMethod::DELETE, $path);
+        $route = new Route;
+        $route->method = HttpMethod::DELETE;
+        $route->path = $path;
         return $route;
     }
 }

@@ -5,9 +5,6 @@ namespace Busarm\PhpMini\Test\TestApp\Controllers;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-use function Busarm\PhpMini\Helpers\out;
-
 /**
  * PHP Mini Framework
  *

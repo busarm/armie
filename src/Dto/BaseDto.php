@@ -20,11 +20,11 @@ class BaseDto implements Arrayable
     /**
      * Load data from array
      *
-     * @param object|null $data
+     * @param array $data
      * @param bool $force
      * @return self
      */
-    public function load(array $data = null, $force = false)
+    public function load(array $data, $force = false): self
     {
         if ($data) {
             $reflectClass = new ReflectionObject($this);
@@ -112,7 +112,7 @@ class BaseDto implements Arrayable
     /**
      * Resolve data type
      *
-     * @param interger $data
+     * @param mixed $data
      * @param ReflectionNamedType[] $types
      * @return string
      */

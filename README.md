@@ -3,7 +3,7 @@
 [![Latest Stable Version](https://poser.pugx.org/Busarm/php-mini/v)](https://packagist.org/packages/busarm/php-mini)
 [![PHP Version Require](https://poser.pugx.org/Busarm/php-mini/require/php)](https://packagist.org/packages/busarm/php-mini)
 
-# PHP Mini by Busarm
+# PHP Mini
 
 A micro php framework designed for micro-services. **(Still under development)**
 

@@ -10,6 +10,7 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
 use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
+use Busarm\PhpMini\Enums\HttpMethod;
 
 /**
  * PHP Mini Framework
@@ -43,7 +44,26 @@ class Router implements RouterInterface
     protected array $routes = [];
 
     /**
-     * @param Route $route 
+     * @param string $method @see \Busarm\PhpMini\Enums\HttpMethod
+     * @param string $path
+     * @return RouteInterface
+     */
+    public function createRoute(string $method, string $path): RouteInterface
+    {
+        $route = match ($method) {
+            HttpMethod::GET     =>  Route::get($path),
+            HttpMethod::POST    =>  Route::post($path),
+            HttpMethod::PUT     =>  Route::put($path),
+            HttpMethod::PATCH   =>  Route::patch($path),
+            HttpMethod::DELETE  =>  Route::delete($path),
+            HttpMethod::HEAD    =>  Route::head($path),
+        };
+        $this->routes[] = &$route;
+        return $route;
+    }
+
+    /**
+     * @param RouteInterface $route 
      * @return RouterInterface
      */
     public function addRoute(RouteInterface $route): RouterInterface
@@ -53,7 +73,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * @param Route[] $route 
+     * @param RouteInterface[] $route 
      * @return RouterInterface
      */
     public function addRoutes(array $routes): RouterInterface

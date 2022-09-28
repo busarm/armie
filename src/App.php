@@ -13,12 +13,14 @@ use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ErrorTraceDto;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
+use Busarm\PhpMini\Interfaces\HttpServerInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -37,22 +39,10 @@ use function Busarm\PhpMini\Helpers\is_cli;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class App
+class App implements HttpServerInterface
 {
     /** @var static App instance */
     public static $__instance;
-
-    /** @var MiddlewareInterface[] */
-    public $middlewares = [];
-
-    /** @var array */
-    public $singletons = [];
-
-    /** @var array */
-    public $bindings = [];
-
-    /** @var array */
-    public $resolvers = [];
 
     /** @var RouterInterface */
     public $router;
@@ -69,15 +59,30 @@ class App
     /** @var SessionBag */
     public $sessionManager;
 
+
     /** @var int Request start time in milliseconds */
     public $startTimeMs;
 
     /** @var bool */
     public $isCli;
 
+
+    /** @var MiddlewareInterface[] */
+    protected $middlewares = [];
+
+    /** @var array */
+    protected $singletons = [];
+
+    /** @var array */
+    protected $bindings = [];
+
+    /** @var array */
+    protected $resolvers = [];
+
+
     // SYSTEM HOOKS 
-    private Closure|null $startHook = null;
-    private Closure|null $completeHook = null;
+    protected Closure|null $startHook = null;
+    protected Closure|null $completeHook = null;
 
     /**
      * @param Config $config App configuration object
@@ -231,6 +236,7 @@ class App
         $this->triggerCompleteHook();
 
         $completed = true;
+        $request = NULL;
 
         return $response;
     }
@@ -458,6 +464,82 @@ class App
     }
 
     ############################
+    # HTTP Server Endpoints
+    ############################
+
+    /**
+     * Set HTTP GET routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function get(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::GET, $path);
+    }
+
+    /**
+     * Set HTTP POST routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function post(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::POST, $path);
+    }
+
+    /**
+     * Set HTTP PUT routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function put(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::PUT, $path);
+    }
+
+    /**
+     * Set HTTP PATCH routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function patch(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::PATCH, $path);
+    }
+
+    /**
+     * Set HTTP DELETE routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function delete(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::DELETE, $path);
+    }
+
+    /**
+     * Set HTTP HEAD routes
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
+     * @return RouteInterface
+     */
+    public function head(string $path): RouteInterface
+    {
+        return $this->router->createRoute(HttpMethod::HEAD, $path);
+    }
+
+    ############################
     # Response
     ############################
 
@@ -477,8 +559,7 @@ class App
         if ($this->isCli) {
             if ($status !== 200 || $status !== 201) {
                 $this->logger->error(
-                    PHP_EOL . "success\t-\tfalse" .
-                        PHP_EOL . "message\t-\t$message" .
+                    PHP_EOL . "message\t-\t$message" .
                         PHP_EOL . "code\t-\t$errorCode" .
                         PHP_EOL . "version\t-\t" . $this->config->version .
                         PHP_EOL . "path\t-\t$errorFile:$errorLine" .
@@ -487,8 +568,7 @@ class App
                 );
             } else {
                 $this->logger->info(
-                    PHP_EOL . "success\t-\ttrue" .
-                        PHP_EOL . "message\t-\t$message" .
+                    PHP_EOL . "message\t-\t$message" .
                         PHP_EOL . "version\t-\t" . $this->config->version .
                         PHP_EOL
                 );

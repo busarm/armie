@@ -2,8 +2,9 @@
 
 namespace Busarm\PhpMini;
 
-use Busarm\PhpMini\Enums\HttpMethod;
 use Closure;
+use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Interfaces\HttpClientInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 
@@ -168,7 +169,7 @@ class Route implements RouteInterface
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @return RouteInterface
      */
-    public static function get(string $path): static
+    public static function get(string $path): RouteInterface
     {
         $route = new Route;
         $route->method = HttpMethod::GET;
@@ -180,9 +181,9 @@ class Route implements RouteInterface
      * Set HTTP POST route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @return static
+     * @return RouteInterface
      */
-    public static function post(string $path): static
+    public static function post(string $path): RouteInterface
     {
         $route = new Route;
         $route->method = HttpMethod::POST;
@@ -194,9 +195,9 @@ class Route implements RouteInterface
      * Set HTTP PUT route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @return static
+     * @return RouteInterface
      */
-    public static function put(string $path): static
+    public static function put(string $path): RouteInterface
     {
         $route = new Route;
         $route->method = HttpMethod::PUT;
@@ -208,9 +209,9 @@ class Route implements RouteInterface
      * Set HTTP PATCH route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @return static
+     * @return RouteInterface
      */
-    public static function patch(string $path): static
+    public static function patch(string $path): RouteInterface
     {
         $route = new Route;
         $route->method = HttpMethod::PATCH;
@@ -222,12 +223,26 @@ class Route implements RouteInterface
      * Set HTTP DELETE route
      * 
      * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @return static
+     * @return RouteInterface
      */
-    public static function delete(string $path): static
+    public static function delete(string $path): RouteInterface
     {
         $route = new Route;
         $route->method = HttpMethod::DELETE;
+        $route->path = $path;
+        return $route;
+    }
+
+    /**
+     * Set HTTP HEAD route
+     * 
+     * @param string $path HTTP path. e.g /user. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     * @return RouteInterface
+     */
+    public static function head(string $path): RouteInterface
+    {
+        $route = new Route;
+        $route->method = HttpMethod::HEAD;
         $route->path = $path;
         return $route;
     }

@@ -86,7 +86,7 @@ class Loader implements LoaderInterface
     {
         $path = $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {
-            $content = $this->load($path, $vars);
+            $content = self::load($path, $vars);
             if ($return) return $content;
             else echo $content;
         } else {

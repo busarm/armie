@@ -23,7 +23,8 @@
     },
     "keywords": [
         "php",
-        "framework"
+        "framework",
+        "microservice"
     ],
     "minimum-stability": "stable",
     "require": {

@@ -63,13 +63,13 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                                 function (&$param) use (&$request) {
                                     if ($param instanceof BaseDto) {
                                         if ($request instanceof RequestInterface) {
-                                            $param->load($request->getRequestList(), true);
+                                            $param->load($request->request()->all(), true);
                                         } else if ($request instanceof RouteInterface) {
                                             $param->load($request->getParams(), true);
                                         }
                                     } else if ($param instanceof CollectionBaseDto) {
                                         if ($request instanceof RequestInterface) {
-                                            $param->load($request->getRequestList(), true);
+                                            $param->load($request->request()->all(), true);
                                         } else if ($request instanceof RouteInterface) {
                                             $param->load($request->getParams());
                                         }

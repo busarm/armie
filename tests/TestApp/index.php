@@ -19,8 +19,8 @@ $config = (new Config())
     ->setCookieEncrypt(true)
     ->setHttpSessionAutoStart(true);
 $app = new App($config);
-$app->router->addRoutes([
-    Route::get('ping')->to(HomeTestController::class, 'ping'),
-    Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
-]);
+$app->get('ping')->to(HomeTestController::class, 'ping');
+$app->get('pingHtml')->call(function (App $app) {
+    return 'success-callable-'.$app->env;
+});
 return $app->run($request ?? null);

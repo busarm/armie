@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2]
+
+### Fixed
+
+-   Middleware request bugs
+
+### Added
+
+-   HttpServerInterface Interface
+-   Attach HttpServerInterface to App to allow adding routes directly on App instance
+
 ## [1.1.0]
 
 ### Changed

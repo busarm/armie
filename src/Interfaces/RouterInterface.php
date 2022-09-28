@@ -15,13 +15,20 @@ use Busarm\PhpMini\Route;
 interface RouterInterface
 {
     /**
-     * @param Route $route 
+     * @param string $method
+     * @param string $path
+     * @return RouteInterface
+     */
+    public function createRoute(string $method, string $path): RouteInterface;
+
+    /**
+     * @param RouteInterface $route 
      * @return self
      */
     public function addRoute(RouteInterface $route): self;
 
     /**
-     * @param Route[] $route 
+     * @param RouteInterface[] $route 
      * @return self
      */
     public function addRoutes(array $routes): self;

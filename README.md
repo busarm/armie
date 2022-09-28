@@ -67,10 +67,6 @@ $ php -S localhost:8181 -t public
         ->setConfigPath('Configs')
         ->setViewPath('Views');
     $app = new App($config);
-    $app->router->addRoutes([
-        Route::get('ping')->to(HomeTestController::class, 'ping'),
-    ]);
-
     return $app->run($request ?? null);
 ```
 
@@ -109,14 +105,26 @@ Add config file to your config path. E.g `myapp/Configs/database.php`
 ```php
     ....
     $app = new App($config);
-    // Single
-    $app->router->addRoute(Route::get('/user/{id}')->to(UserController::class, 'get'));
-    // List
+    // Controller Route
+    $app->get('/user/{id}')->to(UserController::class, 'get');
+    $app->get('/user/{id}')->to(UserController::class, 'get');
+    $app->post('/user/{id}')->to(UserController::class, 'create');
+    $app->put('/user/{id}')->to(UserController::class, 'update'),
+    $app->delete('/user/{id}')->to(UserController::class, 'delete'),
+    // Anonymous Route
+    $app->get('/user/{id}')->call(function (RequestInterface $request, string $id) {
+        // Perform action ...
+    });
+
+
+    // Using Custom Route Class - Single
+    $app->router->addRoute(MyRoute::get('/user/{id}')->to(UserController::class, 'get'));
+    // Using Custom Route Class - List
     $app->router->addRoutes([
-        Route::get('/user/{id}')->to(UserController::class, 'get'),
-        Route::post('/user')->to(UserController::class, 'create'),
-        Route::put('/user/{id}')->to(UserController::class, 'update'),
-        Route::delete('/user/{id}')->to(UserController::class, 'delete'),
+        MyRoute::get('/user/{id}')->to(UserController::class, 'get'),
+        MyRoute::post('/user')->to(UserController::class, 'create'),
+        MyRoute::put('/user/{id}')->to(UserController::class, 'update'),
+        MyRoute::delete('/user/{id}')->to(UserController::class, 'delete'),
     ]);
     $app->run();
 ```
@@ -133,15 +141,10 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
     ....
 
     # route.php
-    // Single
-    app()->router->addRoute(Route::get('/user/{id}')->to(UserController::class, 'get'));
-    // List
-    app()->router->addRoutes([
-        Route::get('/user/{id}')->to(UserController::class, 'get'),
-        Route::post('/user')->to(UserController::class, 'create'),
-        Route::put('/user/{id}')->to(UserController::class, 'update'),
-        Route::delete('/user/{id}')->to(UserController::class, 'delete'),
-    ]);
+    app()->get('/user/{id}')->to(UserController::class, 'get');
+    app()->post('/user/{id}')->to(UserController::class, 'create');
+    app()->put('/user/{id}')->to(UserController::class, 'update'),
+    app()->delete('/user/{id}')->to(UserController::class, 'delete'),
 ```
 
 ## Middleware
@@ -165,6 +168,9 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
 
     # Attach middleware to specific route
     ....
+    $app->put('/user/{id}')->to(UserController::class, 'update')->middlewares([
+        new AuthenticateMiddleware()
+    ]);
     $app->router->addRoute(
         Route::put('/user/{id}')->to(UserController::class, 'update')->middlewares([
             new AuthenticateMiddleware()

@@ -84,7 +84,7 @@ class Loader implements LoaderInterface
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
-        $path = $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = (str_starts_with($this->viewPath, $this->appPath) ? $this->viewPath : $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath) . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {
             $content = self::load($path, $vars);
             if ($return) return $content;
@@ -105,7 +105,7 @@ class Loader implements LoaderInterface
      */
     public function config($path): mixed
     {
-        $path = $this->appPath . DIRECTORY_SEPARATOR . $this->configPath . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = (str_starts_with($this->configPath, $this->appPath) ? $this->configPath : $this->appPath . DIRECTORY_SEPARATOR . $this->configPath) . DIRECTORY_SEPARATOR . $path . '.php';
         if (file_exists($path)) {
             return require_once $path;
         } else {

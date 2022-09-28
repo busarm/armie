@@ -4,7 +4,6 @@ namespace Busarm\PhpMini\Dto;
 
 use ReflectionNamedType;
 use ReflectionObject;
-use ReflectionType;
 use ReflectionUnionType;
 use Busarm\PhpMini\Errors\DtoError;
 use Busarm\PhpMini\Interfaces\Arrayable;

@@ -84,7 +84,7 @@ class Config
     public string $appPath = '';
 
     /**
-     * Path to view folder - relative to app folder.
+     * Path to view folder - relative to system base path or app folder.
      * (Without leading or trailing slash)
      *
      * @var string
@@ -92,7 +92,7 @@ class Config
     public string $viewPath = '';
 
     /**
-     * Path to custom config folder - relative to app folder. 
+     * Path to custom config folder - relative to system base path or app folder.
      * (Without leading or trailing slash)
      *
      * @var string
@@ -250,7 +250,7 @@ class Config
     public string $httpResponseFormat = ResponseFormat::JSON;
     
     /**
-     * Auto start session for  HTTP request
+     * Auto start session for HTTP request
      *
      * @var bool
      */

@@ -4,11 +4,11 @@ namespace Busarm\PhpMini\Dto;
 
 use ArrayIterator;
 use ArrayObject;
-use Busarm\PhpMini\Interfaces\Arrayable;
 use InvalidArgumentException;
 use OutOfRangeException;
 use Traversable;
 
+use Busarm\PhpMini\Interfaces\Arrayable;
 /**
  * PHP Mini Framework
  *

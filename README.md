@@ -1,6 +1,7 @@
 [![Test](https://github.com/Busarm/php-mini/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/Busarm/php-mini/actions/workflows/php.yml)
 [![License](https://poser.pugx.org/Busarm/php-mini/license)](https://packagist.org/packages/busarm/php-mini)
 [![Latest Stable Version](https://poser.pugx.org/Busarm/php-mini/v)](https://packagist.org/packages/busarm/php-mini)
+[![PHP Version Require](https://poser.pugx.org/Busarm/php-mini/require/php)](https://packagist.org/packages/busarm/php-mini)
 
 # PHP Mini by Busarm
 

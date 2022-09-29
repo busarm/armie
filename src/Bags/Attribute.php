@@ -55,16 +55,17 @@ class Attribute implements AttributeBag
 		return $this;
 	}
 
-	/**
-	 * Set attribute
-	 *
-	 * @param string $name
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	function set(string $name, mixed $value): bool
-	{
+    /**
+     * Set attribute
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param mixed $options
+     *
+     * @return bool
+     */
+    public function set(string $name, mixed $value, $options = NULL): bool
+    {
 		$this->attributes[$name] = $value;
 		if ($this->onChange) ($this->onChange)($name, $value);
 		return true;
@@ -77,7 +78,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return bool
 	 */
-	function has(string $name): bool
+	public function has(string $name): bool
 	{
 		return isset($this->attributes[$name]);
 	}
@@ -90,7 +91,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return mixed
 	 */
-	function get(string $name, $default = null): mixed
+	public function get(string $name, $default = null): mixed
 	{
 		return $this->has($name) ? $this->attributes[$name] : $default;
 	}
@@ -114,7 +115,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return array
 	 */
-	function all(): array
+	public function all(): array
 	{
 		return $this->attributes;
 	}
@@ -126,7 +127,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return void
 	 */
-	function replace(array $data)
+	public function replace(array $data)
 	{
 		$this->attributes = array_merge($this->attributes, $data);
 		if ($this->onChange) foreach ($data as $name => $value) ($this->onChange)($name, $value);
@@ -139,7 +140,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return void
 	 */
-	function remove(string $name)
+	public function remove(string $name)
 	{
 		if ($this->has($name)) unset($this->attributes[$name]);
 		if ($this->onDelete) ($this->onDelete)($name);
@@ -150,7 +151,7 @@ class Attribute implements AttributeBag
 	 *
 	 * @return void
 	 */
-	function clear()
+	public function clear()
 	{
 		$data = $this->attributes;
 		$this->attributes = [];

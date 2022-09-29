@@ -149,11 +149,12 @@ class PHPSession implements SessionBag
      *
      * @param string $name
      * @param mixed $value
+     * @param mixed $options
      *
      * @throws SessionError
      * @return bool
      */
-    function set(string $name, mixed $value): bool
+    function set(string $name, mixed $value, $options = NULL): bool
     {
         $this->throwIfNotStarted();
 

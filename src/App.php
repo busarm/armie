@@ -546,7 +546,7 @@ class App implements HttpServerInterface
 
     /**
      * Show Message
-     * @param string $status Status Code
+     * @param int $status Status Code
      * @param string $message Message
      * @param string $errorCode 
      * @param string $errorLine 
@@ -595,7 +595,7 @@ class App implements HttpServerInterface
 
     /**
      * Send HTTP JSON Response
-     * @param string $status Status Code
+     * @param int $status Status Code
      * @param BaseDto|array|object|string $data Data
      * @param array $headers Headers
      * @return ResponseInterface|null

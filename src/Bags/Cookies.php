@@ -55,10 +55,11 @@ class Cookies extends Attribute
      *
      * @param string $name
      * @param mixed $value
+     * @param mixed $options
      *
      * @return bool
      */
-    function set(string $name, mixed $value): bool
+    public function set(string $name, mixed $value, $options = NULL): bool
     {
         $name = $this->prefix . '_' . $name;
         $value = !empty($value) ?
@@ -66,12 +67,14 @@ class Cookies extends Attribute
                 Crypto::encrypt(app()->config->encryptionKey . ($this->id ? md5($this->id) : ''), $value) :
                 $value) :
             "";
+        $options = is_int($options) ?
+            array_merge($this->options, ['expires' => time() + $options]) : (is_array($options) ? array_merge($this->options, $options) : $this->options);
 
         parent::set($name, $value);
         return setcookie(
             $name,
             $value,
-            $this->options
+            $options
         );
     }
 
@@ -83,7 +86,7 @@ class Cookies extends Attribute
      *
      * @return mixed
      */
-    function get(string $name, $default = null): mixed
+    public function get(string $name, $default = null): mixed
     {
         $name = $this->prefix . '_' . $name;
         $value = $this->has($name) ? $this->attributes[$name] : null;
@@ -102,7 +105,7 @@ class Cookies extends Attribute
      *
      * @return void
      */
-    function remove(string $name)
+    public function remove(string $name)
     {
         $name = $this->prefix . '_' . $name;
         setcookie($name, '', 0);
@@ -114,7 +117,7 @@ class Cookies extends Attribute
      *
      * @return void
      */
-    function clear()
+    public function clear()
     {
         foreach (array_keys($this->attributes) as $name) $this->remove($name);
     }

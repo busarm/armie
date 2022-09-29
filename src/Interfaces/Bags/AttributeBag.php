@@ -16,9 +16,10 @@ interface AttributeBag
      *
      * @param string $name
      * @param mixed $value
+     * @param mixed $options
      * @return bool
      */
-    public function set(string $name, mixed $value): bool;
+    public function set(string $name, mixed $value, $options = NULL): bool;
     /**
      * 
      * Checks if an attribute exists

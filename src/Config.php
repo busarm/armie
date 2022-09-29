@@ -76,7 +76,7 @@ class Config
     public string $sessionPath = '';
 
     /**
-     * Path to app folder - relative to system base path. e.g '/var/www/html/app'
+     * Path to app folder - relative to system base path. e.g `/var/www/html/app`
      * (Without leading or trailing slash)
      *
      * @var string
@@ -363,7 +363,7 @@ class Config
     }
 
     /**
-     * Path to app folder - relative to system base path. e.g '/var/www/html/app'
+     * Set path to app folder - relative to system base path. e.g `/var/www/html/app`
      *
      * @param  string  $appPath  (Without leading or trailing slash)
      *
@@ -377,7 +377,7 @@ class Config
     }
 
     /**
-     * Set path to view folder - relative to app folder
+     * Set path to view folder - relative to system base path or app folder. e.g `/var/www/html/view` or `view` ('/var/www/html/app/view')
      *
      * @param  string  $viewPath  (Without leading or trailing slash)
      *
@@ -391,7 +391,7 @@ class Config
     }
 
     /**
-     * Set path to custom config files - relative to app folder
+     * Set path to custom config files - relative to system base path or app folder. e.g `/var/www/html/config` or `config` ('/var/www/html/app/config')
      *
      * @param  string  $configPath  (Without leading or trailing slash)
      *

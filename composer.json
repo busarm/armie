@@ -20,9 +20,10 @@
     },
     "archive": {
         "exclude": [
-            "/docs",
-            "/tests",
-            "/.github"
+          "*",
+          ".*",
+          "!/bootstrap/*",
+          "!/src/*"
         ]
     },
     "scripts": {

@@ -13,10 +13,13 @@ use function Busarm\PhpMini\Helpers\app;
 trait Singleton
 {
     /**
+     * Create / Retrieve singleton instance 
+     *
+     * @param array $params
      * @return static
      */
-    public static function getInstance(): static
+    public static function make(array $params = []): static
     {
-        return app()->make(static::class, true);
+        return app()->make(static::class, true, $params);
     }
 }

@@ -11,5 +11,11 @@ namespace Busarm\PhpMini\Interfaces;
  */
 interface SingletonInterface
 {
-    public static function getInstance(): static;
+    /**
+     * Create / Retrieve singleton instance 
+     *
+     * @param array $params
+     * @return static
+     */
+    public static function make(array $params = []): static;
 }

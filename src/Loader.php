@@ -7,6 +7,8 @@ use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Throwable;
 
 /**
+ * File or Class Loader
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

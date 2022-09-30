@@ -5,7 +5,7 @@
 
 # PHP Mini
 
-A micro php framework designed for micro-services. **(Still under development)**
+A micro php framework designed for simple and quick applications or microservices. **(Still under development)**
 
 ## Installation
 

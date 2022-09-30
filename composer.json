@@ -18,6 +18,13 @@
             "Busarm\\PhpMini\\Test\\": "tests/"
         }
     },
+    "archive": {
+        "exclude": [
+            "/docs",
+            "/tests",
+            "/.github"
+        ]
+    },
     "scripts": {
         "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
     },

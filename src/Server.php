@@ -12,6 +12,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Uri;
 
 /**
+ * Server Instance for handling multi tenancy
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

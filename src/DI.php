@@ -7,11 +7,10 @@ use Busarm\PhpMini\Errors\DependencyError;
 use ReflectionMethod;
 
 use function Busarm\PhpMini\Helpers\app;
-
 /**
- * PHP Mini Framework
- *
  * Dependency Injector
+ * 
+ * PHP Mini Framework
  * 
  * @source https://www.php.net/manual/en/reflectionnamedtype.getname.php#122909
  * @copyright busarm.com
@@ -29,9 +28,10 @@ class DI
      * @param string $class
      * @param Closure|null $resolver Custom resolver to extend class resolution.  e.g `fn($class) => $class == MyCustomClass::class ? MyCustomClass::init() : null`
      * @param Closure|null $callback Custom callback to customize resolution.  e.g 'fn(&$instance) => $instance->load(...)`
+     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return object
      */
-    public static function instantiate(string $class, Closure|null $resolver = null, Closure|null $callback = null)
+    public static function instantiate(string $class, Closure|null $resolver = null, Closure|null $callback = null, array $params = [])
     {
         // Resolve with custom resolver
         if (!$resolver || !($instance = $resolver($class))) {
@@ -39,7 +39,7 @@ class DI
             if ($resolver = app()->getResolver($class)) $instance = $resolver();
             else if (method_exists($class, '__construct')) {
                 if ((new ReflectionMethod($class, '__construct'))->isPublic()) {
-                    $instance = new $class(...self::resolveMethodDependencies($class, '__construct', $resolver, $callback));
+                    $instance = new $class(...self::resolveMethodDependencies($class, '__construct', $resolver, $callback, $params));
                 } else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
             } else $instance = new $class;
         }
@@ -53,17 +53,18 @@ class DI
      * @param string $method
      * @param Closure|null $resolver Custom resolver to extend class resolution.  e.g `fn($class) => $class == MyCustomClass::class ? MyCustomClass::init() : null`
      * @param Closure|null $callback Custom callback to customize resolution.  e.g 'fn(&$instance) => $instance->load(...)`
+     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
-    public static function resolveMethodDependencies(string $class, string $method, Closure|null $resolver = null, Closure|null $callback = null)
+    public static function resolveMethodDependencies(string $class, string $method, Closure|null $resolver = null, Closure|null $callback = null, array $params = [])
     {
         $reflection = new ReflectionMethod($class, $method);
         // Detect circular dependencies
-        $params = array_map(fn ($param) => strval($param->getType()) ?: ($param->getType()?->getName()), $reflection->getParameters());
-        if (in_array($class, $params)) {
+        $parameters = array_map(fn ($param) => strval($param->getType()) ?: ($param->getType()?->getName()), $reflection->getParameters());
+        if (in_array($class, $parameters)) {
             throw new DependencyError("Circular dependency detected in " . $class);
         }
-        return self::resolveDependencies($reflection->getParameters(), $resolver, $callback);
+        return self::resolveDependencies($reflection->getParameters(), $resolver, $callback, $params);
     }
 
     /**
@@ -72,27 +73,31 @@ class DI
      * @param Closure $callable
      * @param Closure|null $resolver Custom resolver to extend class resolution.  e.g `fn($class) => $class == MyCustomClass::class ? MyCustomClass::init() : null`
      * @param Closure|null $callback Custom callback to customize resolution.  e.g 'fn(&$instance) => $instance->load(...)`
+     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
-    public static function resolveCallableDependencies(Closure $callable, Closure|null $resolver = null, Closure|null $callback = null)
+    public static function resolveCallableDependencies(Closure $callable, Closure|null $resolver = null, Closure|null $callback = null, array $params = [])
     {
         $reflection = new \ReflectionFunction($callable);
-        return self::resolveDependencies($reflection->getParameters(), $resolver, $callback);
+        return self::resolveDependencies($reflection->getParameters(), $resolver, $callback, $params);
     }
 
     /**
      * Resolve dependendies
      *
-     * @param ReflectionParameter[] $parameters
+     * @param \ReflectionParameter $parameters
      * @param Closure|null $resolver
      * @param Closure|null $callback
+     * @param array $params
      * @return array
      */
-    protected static function resolveDependencies(array $parameters, Closure|null $resolver = null, Closure|null $callback = null)
+    protected static function resolveDependencies(array $parameters, Closure|null $resolver = null, Closure|null $callback = null, array $params = [])
     {
-        $params = [];
+        $params = $params ?? [];
+        $paramKeys = array_keys($params);
+
         foreach ($parameters as $param) {
-            if (($type = $param->getType()) && ($name = strval($type) ?: $type?->getName())) {
+            if (!in_array($param->getName(), $paramKeys) && ($type = $param->getType()) && ($name = strval($type) ?: $type?->getName())) {
 
                 // Resolve with custom resolver
                 if (!$resolver || !($instance = $resolver($name))) {
@@ -130,7 +135,7 @@ class DI
     /**
      * Check if type can be instantiated
      *
-     * @param ReflectionType|ReflectionNamedType|string $type
+     * @param \ReflectionType|\ReflectionNamedType|string $type
      * @return bool
      */
     protected static function instatiatable($type)

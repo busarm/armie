@@ -34,6 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Busarm\PhpMini\Helpers\is_cli;
 
 /**
+ * Application Factory
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com
@@ -285,7 +287,7 @@ class App implements HttpServerInterface
     /**
      * Hook to run after processing request.
      * This registers a shutdown handler.
-     * @see `register_shutdown_function`
+     * @see \register_shutdown_function
      *
      * @param Closure $completeHook
      * @return void
@@ -312,12 +314,13 @@ class App implements HttpServerInterface
      * 
      * @param string $className
      * @param bool $cache Save as singleton to be reused. Default: false
+     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return object
      */
-    public function make(string $className, $cache = false)
+    public function make(string $className, bool $cache = false, array $params = [])
     {
         if ($cache && ($singleton = $this->getSingleton($className))) return $singleton;
-        else $instance = DI::instantiate($className);
+        else $instance = DI::instantiate($className, null, null, $params);
         // Add instance as singleton if supported
         if ($cache && ($instance instanceof SingletonInterface)) {
             $this->addSingleton($className, $instance);

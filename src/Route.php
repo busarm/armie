@@ -4,11 +4,12 @@ namespace Busarm\PhpMini;
 
 use Closure;
 use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\HttpClientInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 
 /**
+ * Application Routes Provider
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

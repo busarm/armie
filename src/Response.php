@@ -13,6 +13,8 @@ use function Busarm\PhpMini\Helpers\is_cli;
 use Nyholm\Psr7\Stream;
 
 /**
+ * HTTP Response Provider
+ * 
  * PHP Mini Framework
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the symfony package

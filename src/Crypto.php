@@ -3,6 +3,8 @@
 namespace Busarm\PhpMini;
 
 /**
+ * Encryption, Decription and Hashing
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

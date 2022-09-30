@@ -13,6 +13,8 @@ use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
 use Busarm\PhpMini\Enums\HttpMethod;
 
 /**
+ * Application Router
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

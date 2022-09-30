@@ -8,6 +8,8 @@ use Busarm\PhpMini\Enums\SameSite;
 use Busarm\PhpMini\Enums\Verbose;
 
 /**
+ * Application Configuration
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

@@ -10,6 +10,8 @@ use function Busarm\PhpMini\Helpers\log_error;
 use function Busarm\PhpMini\Helpers\log_exception;
 
 /**
+ * Error Reporting
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

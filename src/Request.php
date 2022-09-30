@@ -21,6 +21,8 @@ use function Busarm\PhpMini\Helpers\is_cli;
 use function Busarm\PhpMini\Helpers\is_https;
 
 /**
+ * HTTP Request Provider
+ * 
  * PHP Mini Framework
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the Symfony package.
@@ -40,7 +42,7 @@ class Request implements RequestInterface
     protected string|null $currentUrl   =   NULL;
     protected string|null $method       =   NULL;
     protected string|null $contentType  =   NULL;
-    protected mixed $content    =   NUll;
+    protected mixed $content  =   NUll;
     protected SessionBag|null $session      =   null;
     protected AttributeBag|null $request    =   null;
     protected AttributeBag|null $query      =   null;
@@ -428,6 +430,14 @@ class Request implements RequestInterface
     public function contentType()
     {
         return $this->contentType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function content()
+    {
+        return $this->content;
     }
 
     /**

@@ -72,6 +72,12 @@ interface RequestInterface
     public function contentType();
 
     /**
+     * @return mixed
+     */
+    public function content();
+
+
+    /**
      * @return AttributeBag
      */
     public function file(): AttributeBag;
@@ -105,4 +111,5 @@ interface RequestInterface
      * @return AttributeBag
      */
     public function header(): AttributeBag;
+
 }

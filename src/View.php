@@ -11,6 +11,8 @@ use Throwable;
 use function Busarm\PhpMini\Helpers\app;
 
 /**
+ * Application View Provider 
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

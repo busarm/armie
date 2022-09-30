@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4]
+
+### Fixed
+
+-   Minor bugs
+
+### Added
+
+-   phpDocs generator
+-   Support for custom parameters for Dependency Injector
+
 ## [1.1.2]
 
 ### Fixed

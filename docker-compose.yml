@@ -1,0 +1,11 @@
+version: '3.7'
+
+volumes:
+  build-volume:
+    name: php-mini-build-volume
+    
+services:
+  phpdoc:
+    image: phpdoc/phpdoc
+    volumes:
+        - ./:/data:rw

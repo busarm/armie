@@ -110,13 +110,13 @@ class DI
                         // If type can be instantiated
                         if (self::instatiatable($type)) {
                             // Instantiate class for name
-                            $instance = self::instantiate($name, $callback);
+                            $instance = self::instantiate($name, $resolver, $callback);
                         }
                         // If type is an interface - Resolve with interface bindings
                         else if (interface_exists($name)) {
                             if ($className = app()->getBinding($name)) {
                                 // Instantiate class for name
-                                $instance = self::instantiate($className, $callback);
+                                $instance = self::instantiate($className, $resolver, $callback);
                             }
                             ($param->isOptional() || $param->isDefaultValueAvailable()) or
                                 throw new DependencyError("No interface binding exists for " . $name);

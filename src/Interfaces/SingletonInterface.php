@@ -3,6 +3,8 @@
 namespace Busarm\PhpMini\Interfaces;
 
 /**
+ * Add support for app-wide singleton
+ * 
  * PHP Mini Framework
  *
  * @copyright busarm.com

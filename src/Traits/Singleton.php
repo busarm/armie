@@ -20,6 +20,6 @@ trait Singleton
      */
     public static function make(array $params = []): static
     {
-        return app()->make(static::class, true, $params);
+        return app()->make(static::class, $params);
     }
 }

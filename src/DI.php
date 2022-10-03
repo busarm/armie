@@ -7,6 +7,7 @@ use Busarm\PhpMini\Errors\DependencyError;
 use ReflectionMethod;
 
 use function Busarm\PhpMini\Helpers\app;
+
 /**
  * Dependency Injector
  * 
@@ -35,13 +36,14 @@ class DI
     {
         // Resolve with custom resolver
         if (!$resolver || !($instance = $resolver($class))) {
-            // Resolve with app resolver
-            if ($resolver = app()->getResolver($class)) $instance = $resolver();
-            else if (method_exists($class, '__construct')) {
-                if ((new ReflectionMethod($class, '__construct'))->isPublic()) {
-                    $instance = new $class(...self::resolveMethodDependencies($class, '__construct', $resolver, $callback, $params));
-                } else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
-            } else $instance = new $class;
+            // Resolve with app singletons
+            if (!($instance = app()->getSingleton($class))) {
+                if (method_exists($class, '__construct')) {
+                    if ((new ReflectionMethod($class, '__construct'))->isPublic()) {
+                        $instance = new $class(...self::resolveMethodDependencies($class, '__construct', $resolver, $callback, $params));
+                    } else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
+                } else $instance = new $class;
+            }
         }
         return $instance;
     }
@@ -102,23 +104,23 @@ class DI
                 // Resolve with custom resolver
                 if (!$resolver || !($instance = $resolver($name))) {
 
-                    // Resolve with app resolvers
-                    if ($resolver = app()->getResolver($name)) {
-                        $instance = $resolver();
-                    }
-                    // If type can be instantiated
-                    else if (self::instatiatable($type)) {
-                        // Instantiate class for name
-                        $instance = self::instantiate($name, $callback);
-                    }
-                    // If type is an interface - Resolve with interface bindings
-                    else if (interface_exists($name)) {
-                        if ($className = app()->getBinding($name)) {
+                    // Resolve with app singletons
+                    if ((!$instance = app()->getSingleton($name))) {
+
+                        // If type can be instantiated
+                        if (self::instatiatable($type)) {
                             // Instantiate class for name
-                            $instance = self::instantiate($className, $callback);
+                            $instance = self::instantiate($name, $callback);
                         }
-                        throw new DependencyError("No interface binding exists for " . $name);
-                    } else continue;
+                        // If type is an interface - Resolve with interface bindings
+                        else if (interface_exists($name)) {
+                            if ($className = app()->getBinding($name)) {
+                                // Instantiate class for name
+                                $instance = self::instantiate($className, $callback);
+                            }
+                            throw new DependencyError("No interface binding exists for " . $name);
+                        } else continue;
+                    }
                 }
 
                 // Trigger callback if available

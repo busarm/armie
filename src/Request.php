@@ -12,6 +12,7 @@ use Busarm\PhpMini\Session\PHPSession;
 use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -53,8 +54,9 @@ class Request implements RequestInterface
 
     protected ServerRequestInterface|null $psr   =   NUll;
 
-    private array $sessionOptions    =   [];
+    private array $sessionOptions   =   [];
     private array $cookieOptions    =   [];
+    private array $singletons       =   [];
 
     /**
      * Constructor.
@@ -598,5 +600,30 @@ class Request implements RequestInterface
         $this->headers = $headers;
 
         return $this;
+    }
+
+    /**
+     * Add singleton
+     * 
+     * @param string $className
+     * @param object|null $object
+     * @return self
+     */
+    public function addSingleton(string $className, &$object)
+    {
+        $this->singletons[$className] = $object;
+        return $this;
+    }
+
+    /**
+     * Get singleton
+     *
+     * @param string $className
+     * @param object $default
+     * @return self
+     */
+    public function getSingleton(string $className, $default = null)
+    {
+        return $this->singletons[$className] ?? $default;
     }
 }

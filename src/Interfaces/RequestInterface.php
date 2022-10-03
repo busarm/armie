@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Closure;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -112,4 +113,21 @@ interface RequestInterface
      */
     public function header(): AttributeBag;
 
+    /**
+     * Add singleton
+     * 
+     * @param string $className
+     * @param object|null $object
+     * @return self
+     */
+    public function addSingleton(string $className, &$object);
+
+    /**
+     * Get singleton
+     *
+     * @param string $className
+     * @param object $default
+     * @return self
+     */
+    public function getSingleton(string $className, $default = null);
 }

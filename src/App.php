@@ -12,6 +12,7 @@ use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ErrorTraceDto;
 use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Enums\AppStatus;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
@@ -32,6 +33,7 @@ use Busarm\PhpMini\Middlewares\ResponseMiddleware;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Busarm\PhpMini\Helpers\is_cli;
+use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
 
 /**
  * Application Factory
@@ -78,9 +80,12 @@ class App implements HttpServerInterface
     /** @var array */
     protected $bindings = [];
 
-    /** @var array */
-    protected $resolvers = [];
-
+    /**
+     * App current status
+     *
+     * @var int @see \Busarm\PhpMini\Enums\AppStatus
+     */
+    protected int $status = AppStatus::INITIALIZING;
 
     // SYSTEM HOOKS 
     protected Closure|null $startHook = null;
@@ -89,8 +94,13 @@ class App implements HttpServerInterface
     /**
      * @param Config $config App configuration object
      * @param string $env App environment. @see Busarm\PhpMini\Enums\Env
+     * @param bool $stateless If app is running in stateless mode. E.g Using Swoole. 
+     * Do not use static variables for user specific data when runing on stateless mode.
+     * 
+     * Stateless mode does not support adding:
+     * - Application-wide Singletons
      */
-    public function __construct(public Config $config, public string $env = Env::LOCAL)
+    public function __construct(public Config $config, public string $env = Env::LOCAL, public bool $stateless = false)
     {
         // Set app instance
         self::$__instance = &$this;
@@ -125,16 +135,16 @@ class App implements HttpServerInterface
         // Add response middleware as the first in the chain
         $this->addMiddleware(new ResponseMiddleware());
 
-        // Add app resolvers
-        $this->addResolver(self::class, $this);
-        $this->addResolver(Router::class, $this->router);
-        $this->addResolver(RouterInterface::class, $this->router);
-        $this->addResolver(ErrorReporter::class, $this->reporter);
-        $this->addResolver(ErrorReportingInterface::class, $this->reporter);
-        $this->addResolver(ConsoleLogger::class, $this->logger);
-        $this->addResolver(LoggerInterface::class, $this->logger);
-        $this->addResolver(Loader::class, $this->loader);
-        $this->addResolver(LoaderInterface::class, $this->loader);
+        // Add app-wide singletons
+        $this->addSingleton(self::class, $this);
+        $this->addSingleton(Router::class, $this->router);
+        $this->addSingleton(RouterInterface::class, $this->router);
+        $this->addSingleton(ErrorReporter::class, $this->reporter);
+        $this->addSingleton(ErrorReportingInterface::class, $this->reporter);
+        $this->addSingleton(ConsoleLogger::class, $this->logger);
+        $this->addSingleton(LoggerInterface::class, $this->logger);
+        $this->addSingleton(Loader::class, $this->loader);
+        $this->addSingleton(LoaderInterface::class, $this->loader);
 
         // Load custom configs
         $this->loadConfigs();
@@ -208,21 +218,21 @@ class App implements HttpServerInterface
     {
         // Set current app instance
         self::$__instance = &$this;
-        $completed = false;
+        $this->status = AppStatus::RUNNNIG;
 
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
         $response = new Response();
 
         // Run start hook
-        $this->triggerStartHook();
+        $this->triggerStartHook($request, $response);
 
         // Set shutdown hook
-        register_shutdown_function(function (App $app, $completed) {
-            if (!$completed) {
-                $app->triggerCompleteHook();
+        register_shutdown_function(function (App $app, $response) {
+            if ($app->status !== AppStatus::STOPPED) {
+                $app->triggerCompleteHook($response);
             }
-        }, $this, $completed);
+        }, $this, $response);
 
         // Initiate rerouting
         if ($this->router) {
@@ -235,9 +245,9 @@ class App implements HttpServerInterface
         } else throw new SystemError("Router not configured. See `setRouter`");
 
         // Run complete hook
-        $this->triggerCompleteHook();
+        $this->triggerCompleteHook($response);
 
-        $completed = true;
+        $this->status = AppStatus::STOPPED;
         $request = NULL;
 
         return $response;
@@ -264,7 +274,7 @@ class App implements HttpServerInterface
      * Hook to run before processing request.
      * Use this do perform any pre-validations such as maintainence mode checkings.
      *
-     * @param Closure $startHook
+     * @param Closure $startHook. E.g fn (App $app, RequestInterface|RouteInterface $request, ResponseInterface $response)
      * @return void
      */
     public function beforeStart(Closure $startHook)
@@ -273,23 +283,28 @@ class App implements HttpServerInterface
     }
 
     /**
-     * Process on start hook
+     * 
+     * Process on start request hook
      *
+     * @param RequestInterface|RouteInterface $request
+     * @param ResponseInterface $response
      * @return void
      */
-    private function triggerStartHook()
+    private function triggerStartHook(RequestInterface|RouteInterface &$request, ResponseInterface &$response)
     {
         if ($this->startHook) {
-            ($this->startHook)($this);
+            ($this->startHook)($this, $request, $response);
         }
     }
 
     /**
      * Hook to run after processing request.
-     * This registers a shutdown handler.
+     * Use this to perform any custom post-request processing
+     * 
+     * This also registers a shutdown handler.
      * @see \register_shutdown_function
      *
-     * @param Closure $completeHook
+     * @param Closure $completeHook. E.g fn (App $app, ResponseInterface $response)
      * @return void
      */
     public function afterComplete(Closure $completeHook)
@@ -300,57 +315,73 @@ class App implements HttpServerInterface
     /**
      * Process on complete hook
      *
+     * @param ResponseInterface $response
      * @return void
      */
-    public function triggerCompleteHook()
+    public function triggerCompleteHook(ResponseInterface &$response)
     {
         if ($this->completeHook) {
-            ($this->completeHook)($this);
+            ($this->completeHook)($this, $response);
         }
     }
 
     /**
      * Instantiate class with dependencies
      * 
-     * @param string $className
-     * @param bool $cache Save as singleton to be reused. Default: false
+     * @param string $name
      * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param RequestInterface|RouteInterface|null $request HTTP request/route instance
+     * @param ResponseInterface|null $response HTTP response instance
      * @return object
      */
-    public function make(string $className, bool $cache = false, array $params = [])
+    public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null, ResponseInterface|null $response = null)
     {
-        if ($cache && ($singleton = $this->getSingleton($className))) return $singleton;
-        else $instance = DI::instantiate($className, null, null, $params);
+        // Resolve class with request singleton
+        if ($request && ($instance = $request->getSingleton($className))) return $instance;
+
+        // Resolve class with app singleton
+        if ($instance = $this->getSingleton($className)) return $instance;
+
+        // Instantiate class
+        $instance = DI::instantiate(
+            $className,
+            // Resolver
+            $request || $response ? function ($class) use (&$request, &$response) {
+                if ($request && ($class == Request::class || $class == RequestInterface::class) && $request instanceof RequestInterface) {
+                    return $request;
+                } else if ($request && ($class == Route::class || $class == RouteInterface::class) && $request instanceof RouteInterface) {
+                    return $request;
+                } else if ($response && ($class == Response::class || $class == ResponseInterface::class)) {
+                    return $response;
+                }
+                return null;
+            } : null,
+            // Callback
+            $request ? function (&$param) use (&$request) {
+                if ($param instanceof BaseDto) {
+                    if ($request instanceof RequestInterface) {
+                        $param->load($request->request()->all(), true);
+                    } else if ($request instanceof RouteInterface) {
+                        $param->load($request->getParams(), true);
+                    }
+                } else if ($param instanceof CollectionBaseDto) {
+                    if ($request instanceof RequestInterface) {
+                        $param->load($request->request()->all(), true);
+                    } else if ($request instanceof RouteInterface) {
+                        $param->load($request->getParams());
+                    }
+                }
+            } : null,
+            $params
+        );
+
         // Add instance as singleton if supported
-        if ($cache && ($instance instanceof SingletonInterface)) {
+        if ($request && $instance instanceof SingletonStatelessInterface) {
+            $request->addSingleton($className, $instance);
+        } else if ($instance instanceof SingletonInterface) {
             $this->addSingleton($className, $instance);
         }
         return $instance;
-    }
-
-    /**
-     * Add resolver
-     *
-     * @param string $name Class name, Interface name or Unique name of resolver
-     * @param mixed $result Result of the resolution. e.g Class object
-     * @return self
-     */
-    public function addResolver(string $name, &$result)
-    {
-        $this->resolvers[$name] = fn & () => $result;
-        return $this;
-    }
-
-    /**
-     * Get resolver
-     *
-     * @param string $className
-     * @param object $default
-     * @return Closure|null
-     */
-    public function getResolver(string $name): Closure|null
-    {
-        return $this->resolvers[$name] ?? null;
     }
 
     /**
@@ -362,6 +393,7 @@ class App implements HttpServerInterface
      */
     public function addSingleton(string $className, &$object)
     {
+        if ($this->status === AppStatus::RUNNNIG && $this->stateless) return $this;
         $this->singletons[$className] = $object;
         return $this;
     }
@@ -371,7 +403,7 @@ class App implements HttpServerInterface
      *
      * @param string $className
      * @param object $default
-     * @return self
+     * @return mixed
      */
     public function getSingleton(string $className, $default = null)
     {
@@ -407,18 +439,6 @@ class App implements HttpServerInterface
     }
 
     /**
-     * Add Logger. Replaces existing
-     *
-     * @param LoggerInterface $logger
-     * @return self
-     */
-    public function addLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-        return $this;
-    }
-
-    /**
      * Add middleware
      *
      * @param MiddlewareInterface $middleware
@@ -427,6 +447,18 @@ class App implements HttpServerInterface
     public function addMiddleware(MiddlewareInterface $middleware)
     {
         $this->middlewares[] = $middleware;
+        return $this;
+    }
+
+    /**
+     * Set Logger
+     *
+     * @param LoggerInterface $logger
+     * @return self
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
         return $this;
     }
 

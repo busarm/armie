@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Test;
 
+use Busarm\PhpMini\Test\TestApp\Services\MockService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Busarm\PhpMini\App;
@@ -14,6 +15,7 @@ use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
 
 /**
  * PHP Mini Framework
@@ -218,5 +220,72 @@ final class AppTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
         $this->assertEmpty($response->getHttpHeader('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Test app singletons
+     *
+     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
+     * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
+     * @covers \Busarm\PhpMini\Traits\Singleton
+     * @return void
+     */
+    public function testAppSingleton()
+    {
+        $mockService = MockService::make(['id' => uniqid()]);
+        $newMockService = MockService::make(['id' => uniqid()]);
+        $this->assertNotNull($mockService);
+        $this->assertNotNull($newMockService);
+        $this->assertEquals($mockService->id, $newMockService->id);
+    }
+
+    /**
+     * Test app singletons on stateless requests - should not be sopported
+     *
+     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
+     * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
+     * @covers \Busarm\PhpMini\Traits\Singleton
+     * @return void
+     */
+    public function testAppSingletonNotSupportedOnStatelessRequest()
+    {
+        $this->app->stateless = true;
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $this->app->beforeStart(function () {
+            $mockService = MockService::make(['id' => uniqid()]);
+            $newMockService = MockService::make(['id' => uniqid()]);
+            $this->assertNotNull($mockService);
+            $this->assertNotNull($newMockService);
+            $this->assertNotEquals($mockService->id, $newMockService->id);
+        });
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+    }
+
+    /**
+     * Test stateless singletons
+     *
+     *
+     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockStatelessService
+     * @covers \Busarm\PhpMini\Interfaces\SingletonStatelessInterface
+     * @covers \Busarm\PhpMini\Traits\SingletonStateless
+     * @return void
+     */
+    public function testStatelessSingleton()
+    {
+        $this->app->stateless = true;
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $this->app->beforeStart(function (App $app, $req, $res) {
+            $mockService = MockStatelessService::make($req, $res, ['id' => uniqid()]);
+            $newMockService = MockStatelessService::make($req, $res, ['id' => uniqid()]);
+            $this->assertNull($app->getSingleton(MockStatelessService::class));
+            $this->assertNotNull($mockService);
+            $this->assertNotNull($newMockService);
+            $this->assertEquals($mockService->id, $newMockService->id);
+        });
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
     }
 }

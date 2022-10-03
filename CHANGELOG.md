@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.6]
+
+### Changed
+
+-   Removed App-Wide Resolvers
+-   Prevent adding app-wide singletons on stateless mode
+
+### Added
+
+-   Improve support for stateless mode
+-   Added support for stateless singletons in Request. Use `SingletonStatelessInterface` interface and `SingletonStateless` trait.
+
 ## [1.1.5]
 
 ### Changed

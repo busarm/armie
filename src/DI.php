@@ -118,7 +118,8 @@ class DI
                                 // Instantiate class for name
                                 $instance = self::instantiate($className, $callback);
                             }
-                            throw new DependencyError("No interface binding exists for " . $name);
+                            ($param->isOptional() || $param->isDefaultValueAvailable()) or
+                                throw new DependencyError("No interface binding exists for " . $name);
                         } else continue;
                     }
                 }

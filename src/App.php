@@ -7,6 +7,7 @@ use Throwable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
@@ -20,6 +21,7 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Busarm\PhpMini\Interfaces\ContainerInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
@@ -29,11 +31,14 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
+use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
+
 use Busarm\PhpMini\Middlewares\ResponseMiddleware;
-use Symfony\Component\Console\Output\OutputInterface;
+
+use Busarm\PhpMini\Traits\Container;
 
 use function Busarm\PhpMini\Helpers\is_cli;
-use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * Application Factory
@@ -43,8 +48,10 @@ use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class App implements HttpServerInterface
+class App implements HttpServerInterface, ContainerInterface
 {
+    use Container;
+
     /** @var static App instance */
     public static $__instance;
 
@@ -73,9 +80,6 @@ class App implements HttpServerInterface
 
     /** @var MiddlewareInterface[] */
     protected $middlewares = [];
-
-    /** @var array */
-    protected $singletons = [];
 
     /** @var array */
     protected $bindings = [];
@@ -396,18 +400,6 @@ class App implements HttpServerInterface
         if ($this->status === AppStatus::RUNNNIG && $this->stateless) return $this;
         $this->singletons[$className] = $object;
         return $this;
-    }
-
-    /**
-     * Get singleton
-     *
-     * @param string $className
-     * @param object $default
-     * @return mixed
-     */
-    public function getSingleton(string $className, $default = null)
-    {
-        return $this->singletons[$className] ?? $default;
     }
 
     /**

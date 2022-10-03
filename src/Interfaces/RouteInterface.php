@@ -12,7 +12,7 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface RouteInterface
+interface RouteInterface extends ContainerInterface
 {
     /**  @return Closure|null */
     public function getCallable(): Closure|null;

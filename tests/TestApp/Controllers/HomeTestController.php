@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Test\TestApp\Controllers;
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
 /**
@@ -13,7 +14,7 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
  */
 class HomeTestController
 {
-    public function __construct(private App $app)
+    public function __construct(private App $app, ResponseInterface $res, RequestInterface $req = null)
     {
     }
 

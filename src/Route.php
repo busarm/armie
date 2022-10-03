@@ -6,6 +6,7 @@ use Closure;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
+use Busarm\PhpMini\Traits\Container;
 
 /**
  * Application Routes Provider
@@ -17,6 +18,7 @@ use Busarm\PhpMini\Interfaces\RouteInterface;
  */
 class Route implements RouteInterface
 {
+    use Container;
 
     /** @var Closure Request executable function */
     protected Closure|null $callable = null;

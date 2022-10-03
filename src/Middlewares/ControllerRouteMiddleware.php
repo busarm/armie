@@ -34,7 +34,7 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     {
         if (class_exists($this->controller)) {
             // Load controller
-            $object = app()->make($this->controller);
+            $object = app()->make($this->controller, [], $request, $response);
             if ($object) {
                 // Load method
                 if (

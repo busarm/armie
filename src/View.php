@@ -149,6 +149,6 @@ abstract class View implements ResponseHandlerInterface
         $this->start();
         $this->render();
         $content = $this->end();
-        return (new Response)->setStatusCode(200)->addHttpHeaders($this->headers)->setBody($content);
+        return (new Response)->addHttpHeaders($this->headers)->html($content, 200);
     }
 }

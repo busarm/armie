@@ -3,12 +3,12 @@
 namespace Busarm\PhpMini\Handlers;
 
 use Busarm\PhpMini\Enums\ResponseFormat;
-use Nyholm\Psr7\Stream;
-use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Response;
+use Nyholm\Psr7\Stream;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 
 /**
  * PHP Mini Framework
@@ -39,7 +39,7 @@ final class ResponseHandler implements ResponseHandlerInterface
                     } elseif (is_array($this->data) || is_object($this->data)) {
                         $response->setBody(Stream::create(json_encode($this->data)));
                     } else {
-                        $response->setBody(Stream::create($this->data));
+                        $response->html(Stream::create($this->data), 200);
                     }
                 }
             }

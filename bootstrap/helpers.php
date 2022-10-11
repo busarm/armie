@@ -89,6 +89,19 @@ function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUER
 }
 
 /**
+ * Get Server Variable
+ *
+ * @param string $name
+ * @param string $default
+ * @return string
+ */
+function env($name, $default = null)
+{
+    $data = getenv($name) ?? false;
+    return $data !== false ? $data : $default;
+}
+
+/**
  * Is CLI?
  *
  * Test to see if a request was made from the command line.

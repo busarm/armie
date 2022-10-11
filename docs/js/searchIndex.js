@@ -3351,6 +3351,11 @@ Search.appendIndex(
             "summary": "Parses\u0020http\u0020query\u0020string\u0020into\u0020an\u0020array",
             "url": "namespaces/busarm-phpmini-helpers.html#function_http_parse_query"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\env\u0028\u0029",
+            "name": "env",
+            "summary": "Get\u0020Server\u0020Variable",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_env"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Helpers\\is_cli\u0028\u0029",
             "name": "is_cli",
             "summary": "Is\u0020CLI\u003F",

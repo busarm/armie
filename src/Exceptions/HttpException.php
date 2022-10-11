@@ -48,6 +48,6 @@ class HttpException extends Exception
                 'function' => $instance['function'] ?? null,
             ];
         }, $this->getTrace());
-        !$app->isCli && $app->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+        !$app->isCli && $app->showMessage($this->getStatusCode(), $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
     }
 }

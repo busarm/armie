@@ -126,7 +126,7 @@ abstract class View implements ResponseHandlerInterface
      * @param bool $continue
      * @return void
      */
-    public function send($continue = false): void
+    public function send($continue = false)
     {
         // headers have already been sent by the developer
         if (headers_sent()) {

@@ -5,6 +5,7 @@
         <api format="php">
             <source>
                 <path>src/</path>
+                <path>bootstrap/</path>
             </source>
         </api>
     </version>

@@ -149,14 +149,16 @@ Add route file to your config path. E.g `myapp/Configs/route.php`
 
 ## Middleware
 
+PSR Middleware supported.
+
 ```php
     # AuthenticateMiddleware.php
     class AuthenticateMiddleware implements MiddlewareInterface
     {
-        public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, Callable $next = null): mixed
-        {
-            // Perform action
-            return $next ? $next() : true;
+        public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface {
+            // Perform custom action....
+            // Or forward to next request handler
+            return $handler->handle($request);
         }
     }
 

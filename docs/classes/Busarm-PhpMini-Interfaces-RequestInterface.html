@@ -97,6 +97,9 @@
     <article class="phpdocumentor-element -interface">
         <h2 class="phpdocumentor-content__title">
     RequestInterface
+            <span class="phpdocumentor-element__extends">
+            extends
+                            <a href="classes/Busarm-PhpMini-Interfaces-ContainerInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ContainerInterface">ContainerInterface</abbr></a>                    </span>
                 <div class="phpdocumentor-element__package">
             in
             <ul class="phpdocumentor-breadcrumbs">
@@ -108,7 +111,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">16</span>
+    <span class="phpdocumentor-element-found-in__line">17</span>
 
     </aside>
 
@@ -160,6 +163,13 @@
 
 <dl class="phpdocumentor-table-of-contents">
                         <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_addSingleton">addSingleton()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Add singleton</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_baseUrl">baseUrl()</a>
     <span>
                                 &nbsp;: string    </span>
@@ -207,6 +217,13 @@
                                 &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
 </dt>
 <dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_getSingleton">getSingleton()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Get singleton</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_header">header()</a>
@@ -279,7 +296,21 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_toPsr">toPsr()</a>
+    <span>
+                                &nbsp;: <abbr title="\Psr\Http\Message\ServerRequestInterface">ServerRequestInterface</abbr>    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_uri">uri()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_version">version()</a>
     <span>
                                 &nbsp;: string    </span>
 </dt>
@@ -309,6 +340,62 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_addSingleton">
+        addSingleton()
+        <a href="classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_addSingleton" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/ContainerInterface.php"><a href="files/src-interfaces-containerinterface.html"><abbr title="src/Interfaces/ContainerInterface.php">ContainerInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">26</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Add singleton</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addSingleton</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$className</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">object|null&nbsp;</span><span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$object</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$className</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$object</span>
+                : <span class="phpdocumentor-signature__argument__return-type">object|null</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_baseUrl">
         baseUrl()
         <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_baseUrl" class="headerlink"><i class="fas fa-link"></i></a>
@@ -316,7 +403,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">47</span>
+    <span class="phpdocumentor-element-found-in__line">48</span>
 
     </aside>
 
@@ -354,7 +441,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">77</span>
+    <span class="phpdocumentor-element-found-in__line">78</span>
 
     </aside>
 
@@ -392,7 +479,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">72</span>
+    <span class="phpdocumentor-element-found-in__line">73</span>
 
     </aside>
 
@@ -430,7 +517,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">93</span>
+    <span class="phpdocumentor-element-found-in__line">98</span>
 
     </aside>
 
@@ -468,7 +555,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">62</span>
+    <span class="phpdocumentor-element-found-in__line">63</span>
 
     </aside>
 
@@ -506,7 +593,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">37</span>
+    <span class="phpdocumentor-element-found-in__line">38</span>
 
     </aside>
 
@@ -544,7 +631,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">83</span>
+    <span class="phpdocumentor-element-found-in__line">88</span>
 
     </aside>
 
@@ -575,6 +662,62 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_getSingleton">
+        getSingleton()
+        <a href="classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_getSingleton" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/ContainerInterface.php"><a href="files/src-interfaces-containerinterface.html"><abbr title="src/Interfaces/ContainerInterface.php">ContainerInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">35</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get singleton</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getSingleton</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$className</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$default</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$className</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$default</span>
+                : <span class="phpdocumentor-signature__argument__return-type">object</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_header">
         header()
         <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_header" class="headerlink"><i class="fas fa-link"></i></a>
@@ -582,7 +725,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">113</span>
+    <span class="phpdocumentor-element-found-in__line">118</span>
 
     </aside>
 
@@ -620,7 +763,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">42</span>
+    <span class="phpdocumentor-element-found-in__line">43</span>
 
     </aside>
 
@@ -658,7 +801,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">28</span>
 
     </aside>
 
@@ -696,7 +839,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">67</span>
+    <span class="phpdocumentor-element-found-in__line">68</span>
 
     </aside>
 
@@ -734,7 +877,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">98</span>
+    <span class="phpdocumentor-element-found-in__line">103</span>
 
     </aside>
 
@@ -772,7 +915,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">103</span>
+    <span class="phpdocumentor-element-found-in__line">108</span>
 
     </aside>
 
@@ -810,7 +953,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">32</span>
+    <span class="phpdocumentor-element-found-in__line">33</span>
 
     </aside>
 
@@ -848,7 +991,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">57</span>
+    <span class="phpdocumentor-element-found-in__line">58</span>
 
     </aside>
 
@@ -886,7 +1029,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">108</span>
+    <span class="phpdocumentor-element-found-in__line">113</span>
 
     </aside>
 
@@ -924,7 +1067,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">88</span>
+    <span class="phpdocumentor-element-found-in__line">93</span>
 
     </aside>
 
@@ -955,6 +1098,44 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_toPsr">
+        toPsr()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_toPsr" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">123</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">toPsr</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Psr\Http\Message\ServerRequestInterface">ServerRequestInterface</abbr></span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><abbr title="\Psr\Http\Message\ServerRequestInterface">ServerRequestInterface</abbr></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_uri">
         uri()
         <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_uri" class="headerlink"><i class="fas fa-link"></i></a>
@@ -962,7 +1143,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">52</span>
+    <span class="phpdocumentor-element-found-in__line">53</span>
 
     </aside>
 
@@ -993,6 +1174,44 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_version">
+        version()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_version" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">83</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">version</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_withUri">
         withUri()
         <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_withUri" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1000,7 +1219,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">22</span>
+    <span class="phpdocumentor-element-found-in__line">23</span>
 
     </aside>
 

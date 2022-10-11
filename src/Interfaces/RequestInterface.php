@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -75,7 +76,11 @@ interface RequestInterface extends ContainerInterface
      * @return mixed
      */
     public function content();
-
+    
+    /**
+     * @return string
+     */
+    public function version();
 
     /**
      * @return AttributeBag
@@ -111,4 +116,9 @@ interface RequestInterface extends ContainerInterface
      * @return AttributeBag
      */
     public function header(): AttributeBag;
+
+    /**
+     * @return ServerRequestInterface
+     */
+    public function toPsr(): ServerRequestInterface;
 }

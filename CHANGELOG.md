@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0]
+
+### Changed
+
+-   Refactored Middleware Interface
+-   Refactored Dependency Management
+
+### Added
+
+-   Support for PSR-15 Middlewares
+-   Custom extensible dependency resolver
+
 ## [1.1.7]
 
 ### Fixed

@@ -15,9 +15,8 @@ interface MiddlewareInterface
      * Middleware handler
      *
      * @param RequestInterface|RouteInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return false|mixed Return `false` if failed
+     * @param RequestHandlerInterface $handle
+     * @return ResponseInterface
      */
-    public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, callable $next = null): mixed;
+    public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface;
 }

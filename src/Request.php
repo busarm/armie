@@ -8,6 +8,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Bags\Cookies;
+use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Session\PHPSession;
 use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
@@ -17,9 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\get_ip_address;
 use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\is_https;
 
 /**
  * HTTP Request Provider
@@ -35,7 +34,7 @@ use function Busarm\PhpMini\Helpers\is_https;
 class Request implements RequestInterface
 {
     use Container;
-    
+
     protected string|null $ip           =   NULL;
     protected string|null $scheme       =   NULL;
     protected string|null $domain       =   NULL;
@@ -45,6 +44,7 @@ class Request implements RequestInterface
     protected string|null $currentUrl   =   NULL;
     protected string|null $method       =   NULL;
     protected string|null $contentType  =   NULL;
+    protected string|null $protocol     =   NULL;
     protected mixed $content  =   NUll;
     protected SessionBag|null $session      =   null;
     protected AttributeBag|null $request    =   null;
@@ -100,7 +100,7 @@ class Request implements RequestInterface
             $uri = new Uri($validUrl);
             $request = new self();
             $request->initialize(
-                (new Attribute),
+                (new Query)->setQuery($uri->getQuery()),
                 (new Attribute),
                 (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? '')),
                 app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
@@ -130,7 +130,7 @@ class Request implements RequestInterface
     {
         $request = new self;
         $request->initialize(
-            (new Attribute)->mirror($_GET),
+            (new Query)->mirror($_GET),
             (new Attribute)->mirror($_POST),
             (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->mirror($_COOKIE),
             app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
@@ -150,12 +150,12 @@ class Request implements RequestInterface
         $request = new self;
         $request->psr = $psr;
         $request->initialize(
-            new Attribute($psr->getQueryParams() ?? []),
-            new Attribute($psr->getParsedBody() ?? []),
+            (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
+            new Attribute((array)($psr->getParsedBody() ?? [])),
             (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
             app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
-            new Attribute($psr->getUploadedFiles() ?? []),
-            new Attribute($psr->getServerParams() ?? [])
+            new Attribute($psr->getUploadedFiles()),
+            new Attribute($psr->getServerParams())
         );
 
         $request->scheme = $psr->getUri()->getScheme();
@@ -209,6 +209,7 @@ class Request implements RequestInterface
 
             $this->contentType  = $this->contentType ?: $this->server->get('CONTENT_TYPE', '');
             $this->method       = $this->method ?: $this->server->get('REQUEST_METHOD', HttpMethod::GET);
+            $this->protocol     = $this->protocol ?: $this->getServerPotocol();
 
             // Load request body
             if (
@@ -227,8 +228,8 @@ class Request implements RequestInterface
                 $this->request = new Attribute($data);
             }
 
-            $this->scheme = $this->scheme ?: (is_https($this->server->all()) ? "https" : "http");
-            $this->ip = $this->ip ?: get_ip_address($this->server->all());
+            $this->scheme = $this->scheme ?: ($this->isHttps() ? "https" : "http");
+            $this->ip = $this->ip ?: $this->getIpAddress();
             $this->domain = $this->domain ?: $this->server->get('HTTP_HOST');
             $this->host = $this->host ?: $this->scheme  . "://" . $this->domain;
             if (!$this->uri) {
@@ -290,6 +291,111 @@ class Request implements RequestInterface
         }
 
         return $this->content;
+    }
+
+    /**
+     * Get server protocol or http version
+     * 
+     * @return string
+     */
+    private function getServerPotocol()
+    {
+        return (!empty($this->server->get('SERVER_PROTOCOL')) && in_array($this->server->get('SERVER_PROTOCOL'), array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'), TRUE))
+            ? $this->server->get('SERVER_PROTOCOL') : 'HTTP/1.1';
+    }
+
+    /**
+     * Check if https enabled
+     * 
+     * @return bool
+     */
+    protected function isHttps()
+    {
+        if (!empty($this->server->get('HTTPS')) && strtolower($this->server->get('HTTPS')) !== 'off') {
+            return TRUE;
+        } elseif (!empty($this->server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
+            return TRUE;
+        } elseif (!empty($this->server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /**
+     * Get Ip
+     * 
+     * @return string
+     */
+    protected function getIpAddress()
+    {
+        // check for shared internet/ISP IP
+        if (!empty($this->server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->server->get('HTTP_CLIENT_IP'))) {
+            return $this->server->get('HTTP_CLIENT_IP');
+        }
+        // check for IPs passing through proxies
+        if (!empty($this->server->get('HTTP_X_FORWARDED_FOR'))) {
+            // check if multiple ips exist in var
+            if (strpos($this->server->get('HTTP_X_FORWARDED_FOR'), ',') !== false) {
+                $iplist = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR') ?? '', 20);
+                foreach ($iplist as $ip) {
+                    if ($this->validateIpAddress($ip))
+                        return $ip;
+                }
+            } else {
+                if ($this->validateIpAddress($this->server->get('HTTP_X_FORWARDED_FOR')))
+                    return $this->server->get('HTTP_X_FORWARDED_FOR');
+            }
+        }
+        if (!empty($this->server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($this->server->get('HTTP_X_FORWARDED')))
+            return $this->server->get('HTTP_X_FORWARDED');
+
+        if (!empty($this->server->get('HTTP_X_CLUSTER_CLIENT_IP')) && $this->validateIpAddress($this->server->get('HTTP_X_CLUSTER_CLIENT_IP')))
+            return $this->server->get('HTTP_X_CLUSTER_CLIENT_IP');
+
+        if (!empty($this->server->get('HTTP_FORWARDED_FOR')) && $this->validateIpAddress($this->server->get('HTTP_FORWARDED_FOR')))
+            return $this->server->get('HTTP_FORWARDED_FOR');
+
+        if (!empty($this->server->get('HTTP_FORWARDED')) && $this->validateIpAddress($this->server->get('HTTP_FORWARDED')))
+            return $this->server->get('HTTP_FORWARDED');
+
+        // return unreliable ip since all else failed
+        return $this->server->get('REMOTE_ADDR');
+    }
+
+    /**
+     * Ensures an ip address is both a valid IP and does not fall within
+     * a private network range.
+     * 
+     * @param $ip
+     * @return bool
+     */
+    protected function validateIpAddress($ip)
+    {
+        if (strtolower($ip) === 'unknown') return false;
+
+        // generate ipv4 network address
+        $ip = ip2long($ip);
+
+        // if the ip is set and not equivalent to 255.255.255.255
+        if ($ip !== false && $ip !== -1) {
+
+            // make sure to get unsigned long representation of ip
+            // due to discrepancies between 32 and 64 bit OSes and
+            // signed numbers (ints default to signed in PHP)
+            $ip = sprintf('%u', $ip);
+
+            // do private network range checking
+            if ($ip >= 0 && $ip <= 50331647) return false;
+            if ($ip >= 167772160 && $ip <= 184549375) return false;
+            if ($ip >= 2130706432 && $ip <= 2147483647) return false;
+            if ($ip >= 2851995648 && $ip <= 2852061183) return false;
+            if ($ip >= 2886729728 && $ip <= 2887778303) return false;
+            if ($ip >= 3221225984 && $ip <= 3221226239) return false;
+            if ($ip >= 3232235520 && $ip <= 3232301055) return false;
+            if ($ip >= 4294967040) return false;
+        }
+
+        return true;
     }
 
     /**
@@ -520,6 +626,14 @@ class Request implements RequestInterface
     }
 
     /**
+     * @return string
+     */
+    public function version()
+    {
+        return $this->protocol ? str_replace('HTTP/', '', $this->protocol) : '1.1';
+    }
+
+    /**
      * Set the value of session
      *
      * @return  self
@@ -601,5 +715,23 @@ class Request implements RequestInterface
         $this->headers = $headers;
 
         return $this;
+    }
+
+    /**
+     * Get PSR7 Server request
+     * 
+     * @return ServerRequestInterface
+     */
+    function toPsr(): ServerRequestInterface
+    {
+        $request = $this->psr ?? new \Nyholm\Psr7\ServerRequest(
+            $this->method,
+            (new Uri($this->currentUrl))->withQuery(strval($this->query)),
+            $this->headers ? $this->headers->all() : [],
+            $this->content ?: strval($this->request),
+            $this->version(),
+            $this->server ? $this->server->all() : [],
+        );
+        return $request;
     }
 }

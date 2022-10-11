@@ -16,6 +16,9 @@ use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
+use Middlewares\Firewall;
+
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -79,7 +82,7 @@ final class AppTest extends TestCase
     {
         $response = $this->app->run(Route::cli(HomeTestController::class, 'ping'));
         $this->assertNotNull($response);
-        $this->assertEquals('success-' . $this->app->env, $response->getBody());
+        $this->assertEquals('success-' . $this->app->env, strval($response->getBody()));
     }
 
     /**
@@ -194,7 +197,7 @@ final class AppTest extends TestCase
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS
             )->setServer((new Attribute([
-                'HTTP_ORIGIN' => 'localhost:8181'
+                'HTTP_ORIGIN' => 'localhost:8080'
             ])))->initialize()
         );
         $this->assertNotNull($response);
@@ -278,14 +281,37 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $this->app->beforeStart(function (App $app, $req, $res) {
-            $mockService = MockStatelessService::make($req, $res, ['id' => uniqid()]);
-            $newMockService = MockStatelessService::make($req, $res, ['id' => uniqid()]);
+        $this->app->beforeStart(function (App $app, $req) {
+            $mockService = MockStatelessService::make($req, ['id' => uniqid()]);
+            $newMockService = MockStatelessService::make($req, ['id' => uniqid()]);
             $this->assertNull($app->getSingleton(MockStatelessService::class));
             $this->assertNotNull($mockService);
             $this->assertNotNull($newMockService);
             $this->assertEquals($mockService->id, $newMockService->id);
         });
         $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+    }
+
+    /**
+     * Test app run mock HTTP PSR Middlleware (Firewall)
+     *
+     * @return void
+     */
+    public function testAppRunMockHttpPSRMiddleware()
+    {
+        $this->app->addMiddleware((new Firewall(['127.0.0.1'])));
+        $this->app->router->addRoutes([
+            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+        ]);
+        $response = $this->app->run(
+            Request::fromUrl(
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+                HttpMethod::GET
+            )->setServer((new Attribute([
+                'REMOTE_ADDR' => '127.0.0.2'
+            ])))->initialize()
+        );
+        $this->assertNotNull($response);
+        $this->assertEquals(403, $response->getStatusCode());
     }
 }

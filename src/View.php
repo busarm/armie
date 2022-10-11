@@ -124,14 +124,13 @@ abstract class View implements ResponseHandlerInterface
 
     /**
      * @param bool $continue
-     * @param ResponseInterface|null $response
-     * @return ResponseInterface|null
+     * @return void
      */
-    public function send($continue = false, ResponseInterface $response = null): ResponseInterface|null
+    public function send($continue = false): void
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
-            return null;
+            return;
         }
 
         // clean buffer
@@ -139,21 +138,17 @@ abstract class View implements ResponseHandlerInterface
             ob_end_clean();
         }
 
-        // start buffer
-        $this->start();
-        $this->render();
-        $content = $this->end();
-
-        return ($response ?? (new Response))->addHttpHeaders($this->headers)->html($content, 200, $continue);
+        return $this->handle($continue)->send($continue);
     }
 
     /**
-     * @param ResponseInterface $response
-     * @param bool $continue
-     * @return self
+     * @return ResponseInterface
      */
-    public function handle(ResponseInterface $response, $continue = false): ResponseInterface|null
+    public function handle(): ResponseInterface
     {
-        return $this->send($continue, $response);
+        $this->start();
+        $this->render();
+        $content = $this->end();
+        return (new Response)->setStatusCode(200)->addHttpHeaders($this->headers)->setBody($content);
     }
 }

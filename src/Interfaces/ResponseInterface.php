@@ -3,7 +3,9 @@
 namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Enums\ResponseFormat;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Stringable;
 
 /**
  * PHP Mini Framework
@@ -15,8 +17,18 @@ use Psr\Http\Message\StreamInterface;
 interface ResponseInterface
 {
     /**
-     * @param int $statusCode
-     * @param string $text
+     * @param string $format
+     * @return self
+     */
+    public function setFormat($format = ResponseFormat::JSON): self;
+
+    /**
+     * @return string
+     */
+    public function getFormat(): string;
+
+    /**
+     * @param string $format
      * @return self
      */
     public function setStatusCode($statusCode, $text = null): self;
@@ -24,23 +36,23 @@ interface ResponseInterface
     /**
      * @return int
      */
-    public function getStatusCode();
+    public function getStatusCode(): int;
 
     /**
      * @return string
      */
-    public function getStatusText();
+    public function getStatusText(): string;
 
     /**
-     * @param StreamInterface|string $body
+     * @param StreamInterface|Stringable|resource|string|null $body
      * @return self
      */
-    public function setBody(StreamInterface|string|null $body);
+    public function setBody(mixed $body): self;
 
     /**
-     * @return StreamInterface|string
+     * @return StreamInterface|Stringable|resource|string|null
      */
-    public function getBody(): StreamInterface|string;
+    public function getBody(): mixed;
 
     /**
      * @param array $parameters
@@ -104,44 +116,49 @@ interface ResponseInterface
     public function getHttpHeaders(): array;
 
     /**
-     * Header Redirect
+     * Set Redirect Headers
      *
      * @param string $uri URL
-     * @param string $method Redirect method 'auto', 'location' or 'refresh'
-     * @param int $code	HTTP Response status code
+     * @param int|false $refresh Refresh page timeout. False to disable refresh redirect
+     * 
      * @return self
      */
-    public function redirect($uri, $method = 'auto', $code = NULL): self;
+    public function redirect($uri, $refresh = false): self;
 
     /**
-     * @param string $format @see \Busarm\PhpMini\Enums\ResponseFormat
      * @param bool $continue
      */
-    public function send($format = ResponseFormat::JSON, $continue = false);
-
-    /**
-     * @param array $data
-     * @param int $code response code
-     * @param bool $continue
-     * @return self|null
-     */
-    public function json($data, $code = 200, $continue = false): self|null;
+    public function send($continue = false);
 
     /**
      * @param array $data
      * @param int $code response code
-     * @param bool $continue
-     * @return self|null
+     * @return self
      */
-    public function xml($data, $code = 200, $continue = false): self|null;
+    public function json($data, $code = 200): self;
+
+    /**
+     * @param array $data
+     * @param int $code response code
+     * @return self
+     */
+    public function xml($data, $code = 200): self;
 
     /**
      * @param StreamInterface|string|null $data
      * @param int $code response code
-     * @param bool $continue
-     * @return self|null
+     * @return self
      */
-    public function html($data, $code = 200, $continue = false): self|null;
+    public function html($data, $code = 200): self;
+
+    /**
+     * @param StreamInterface|string|null $data
+     * @param string $name
+     * @param bool $inline
+     * @param string $contentType
+     * @return self
+     */
+    public function download($data, $name = null, $inline = false, $contentType = null): self;
 
     /**
      * @return Boolean
@@ -186,4 +203,9 @@ interface ResponseInterface
      * @api
      */
     public function isServerError();
+
+    /**
+     * @return MessageResponseInterface
+     */
+    public function toPsr(): MessageResponseInterface;
 }

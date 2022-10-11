@@ -43,7 +43,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AtriggerStartHook\u0028\u0029",
             "name": "triggerStartHook",
-            "summary": "Process\u0020on\u0020start\u0020hook",
+            "summary": "Process\u0020on\u0020start\u0020request\u0020hook",
             "url": "classes/Busarm-PhpMini-App.html#method_triggerStartHook"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AafterComplete\u0028\u0029",
@@ -61,25 +61,10 @@ Search.appendIndex(
             "summary": "Instantiate\u0020class\u0020with\u0020dependencies",
             "url": "classes/Busarm-PhpMini-App.html#method_make"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AaddResolver\u0028\u0029",
-            "name": "addResolver",
-            "summary": "Add\u0020resolver",
-            "url": "classes/Busarm-PhpMini-App.html#method_addResolver"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AgetResolver\u0028\u0029",
-            "name": "getResolver",
-            "summary": "Get\u0020resolver",
-            "url": "classes/Busarm-PhpMini-App.html#method_getResolver"
-        },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AaddSingleton\u0028\u0029",
             "name": "addSingleton",
             "summary": "Add\u0020singleton",
             "url": "classes/Busarm-PhpMini-App.html#method_addSingleton"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AgetSingleton\u0028\u0029",
-            "name": "getSingleton",
-            "summary": "Get\u0020singleton",
-            "url": "classes/Busarm-PhpMini-App.html#method_getSingleton"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AaddBinding\u0028\u0029",
             "name": "addBinding",
@@ -91,15 +76,15 @@ Search.appendIndex(
             "summary": "Get\u0020interface\u0020binding",
             "url": "classes/Busarm-PhpMini-App.html#method_getBinding"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AaddLogger\u0028\u0029",
-            "name": "addLogger",
-            "summary": "Add\u0020Logger.\u0020Replaces\u0020existing",
-            "url": "classes/Busarm-PhpMini-App.html#method_addLogger"
-        },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AaddMiddleware\u0028\u0029",
             "name": "addMiddleware",
             "summary": "Add\u0020middleware",
             "url": "classes/Busarm-PhpMini-App.html#method_addMiddleware"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AsetLogger\u0028\u0029",
+            "name": "setLogger",
+            "summary": "Set\u0020Logger",
+            "url": "classes/Busarm-PhpMini-App.html#method_setLogger"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AsetRouter\u0028\u0029",
             "name": "setRouter",
@@ -201,20 +186,15 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-App.html#property_middlewares"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024singletons",
-            "name": "singletons",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-App.html#property_singletons"
-        },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024bindings",
             "name": "bindings",
             "summary": "",
             "url": "classes/Busarm-PhpMini-App.html#property_bindings"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024resolvers",
-            "name": "resolvers",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-App.html#property_resolvers"
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024status",
+            "name": "status",
+            "summary": "App\u0020current\u0020status",
+            "url": "classes/Busarm-PhpMini-App.html#property_status"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024startHook",
             "name": "startHook",
@@ -235,6 +215,11 @@ Search.appendIndex(
             "name": "env",
             "summary": "",
             "url": "classes/Busarm-PhpMini-App.html#property_env"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024stateless",
+            "name": "stateless",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-App.html#property_stateless"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Bags\\Attribute",
             "name": "Attribute",
@@ -300,6 +285,11 @@ Search.appendIndex(
             "name": "clear",
             "summary": "Remove\u0020all\u0020attribute",
             "url": "classes/Busarm-PhpMini-Bags-Attribute.html#method_clear"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Attribute\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
+            "url": "classes/Busarm-PhpMini-Bags-Attribute.html#method___toString"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Bags\\Attribute\u003A\u003A\u0024attributes",
             "name": "attributes",
@@ -785,6 +775,11 @@ Search.appendIndex(
             "name": "resolveDependencies",
             "summary": "Resolve\u0020dependendies",
             "url": "classes/Busarm-PhpMini-DI.html#method_resolveDependencies"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\DI\u003A\u003AprocessResolver\u0028\u0029",
+            "name": "processResolver",
+            "summary": "Process\u0020dependecy\u0020resolver",
+            "url": "classes/Busarm-PhpMini-DI.html#method_processResolver"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\DI\u003A\u003Ainstatiatable\u0028\u0029",
             "name": "instatiatable",
@@ -1316,6 +1311,11 @@ Search.appendIndex(
             "summary": "Report\u0020Exception",
             "url": "classes/Busarm-PhpMini-ErrorReporter.html#method_reportException"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\ErrorReporter\u003A\u003AtoString\u0028\u0029",
+            "name": "toString",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-ErrorReporter.html#method_toString"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\ErrorReporter\u003A\u003A\u0024breadCrumbs",
             "name": "breadCrumbs",
             "summary": "",
@@ -1611,10 +1611,10 @@ Search.appendIndex(
             "summary": "PHP\u0020Mini\u0020Framework",
             "url": "classes/Busarm-PhpMini-Interfaces-MiddlewareInterface.html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\MiddlewareInterface\u003A\u003Ahandle\u0028\u0029",
-            "name": "handle",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\MiddlewareInterface\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
             "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Interfaces-MiddlewareInterface.html#method_handle"
+            "url": "classes/Busarm-PhpMini-Interfaces-MiddlewareInterface.html#method_process"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface",
             "name": "RequestInterface",
@@ -1681,6 +1681,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_content"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Aversion\u0028\u0029",
+            "name": "version",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_version"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Afile\u0028\u0029",
             "name": "file",
             "summary": "",
@@ -1716,6 +1721,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_header"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003AtoPsr\u0028\u0029",
+            "name": "toPsr",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_toPsr"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseHandlerInterface",
             "name": "ResponseHandlerInterface",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -1730,6 +1740,16 @@ Search.appendIndex(
             "name": "ResponseInterface",
             "summary": "PHP\u0020Mini\u0020Framework",
             "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003AsetFormat\u0028\u0029",
+            "name": "setFormat",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_setFormat"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003AgetFormat\u0028\u0029",
+            "name": "getFormat",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_getFormat"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003AsetStatusCode\u0028\u0029",
             "name": "setStatusCode",
@@ -1808,7 +1828,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003Aredirect\u0028\u0029",
             "name": "redirect",
-            "summary": "Header\u0020Redirect",
+            "summary": "Set\u0020Redirect\u0020Headers",
             "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_redirect"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003Asend\u0028\u0029",
@@ -1830,6 +1850,11 @@ Search.appendIndex(
             "name": "html",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003Adownload\u0028\u0029",
+            "name": "download",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_download"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003AisInvalid\u0028\u0029",
             "name": "isInvalid",
@@ -1860,6 +1885,11 @@ Search.appendIndex(
             "name": "isServerError",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_isServerError"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ResponseInterface\u003A\u003AtoPsr\u0028\u0029",
+            "name": "toPsr",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-ResponseInterface.html#method_toPsr"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouteInterface",
             "name": "RouteInterface",
@@ -1993,13 +2023,13 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonInterface",
             "name": "SingletonInterface",
-            "summary": "PHP\u0020Mini\u0020Framework",
+            "summary": "Add\u0020support\u0020for\u0020app\u002Dwide\u0020singleton",
             "url": "classes/Busarm-PhpMini-Interfaces-SingletonInterface.html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonInterface\u003A\u003AgetInstance\u0028\u0029",
-            "name": "getInstance",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Interfaces-SingletonInterface.html#method_getInstance"
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonInterface\u003A\u003Amake\u0028\u0029",
+            "name": "make",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020singleton\u0020instance",
+            "url": "classes/Busarm-PhpMini-Interfaces-SingletonInterface.html#method_make"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Loader",
             "name": "Loader",
@@ -2061,10 +2091,10 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-CallableRouteMiddleware.html#method___construct"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CallableRouteMiddleware\u003A\u003Ahandle\u0028\u0029",
-            "name": "handle",
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CallableRouteMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
             "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-CallableRouteMiddleware.html#method_handle"
+            "url": "classes/Busarm-PhpMini-Middlewares-CallableRouteMiddleware.html#method_process"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CallableRouteMiddleware\u003A\u003A\u0024callable",
             "name": "callable",
@@ -2086,10 +2116,10 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-ControllerRouteMiddleware.html#method___construct"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ControllerRouteMiddleware\u003A\u003Ahandle\u0028\u0029",
-            "name": "handle",
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ControllerRouteMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
             "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-ControllerRouteMiddleware.html#method_handle"
+            "url": "classes/Busarm-PhpMini-Middlewares-ControllerRouteMiddleware.html#method_process"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ControllerRouteMiddleware\u003A\u003A\u0024controller",
             "name": "controller",
@@ -2116,15 +2146,20 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#method___construct"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CorsMiddleware\u003A\u003Ahandle\u0028\u0029",
-            "name": "handle",
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CorsMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
             "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#method_handle"
+            "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#method_process"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CorsMiddleware\u003A\u003Apreflight\u0028\u0029",
             "name": "preflight",
             "summary": "Preflight\u0020Check",
             "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#method_preflight"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CorsMiddleware\u003A\u003Ahandle\u0028\u0029",
+            "name": "handle",
+            "summary": "Handle\u0020CORS\u0020process",
+            "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#method_handle"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Middlewares\\CorsMiddleware\u003A\u003A\u0024allowedOrigins",
             "name": "allowedOrigins",
@@ -2150,16 +2185,6 @@ Search.appendIndex(
             "name": "maxAge",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-CorsMiddleware.html#property_maxAge"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ResponseMiddleware",
-            "name": "ResponseMiddleware",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Middlewares-ResponseMiddleware.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ResponseMiddleware\u003A\u003Ahandle\u0028\u0029",
-            "name": "handle",
-            "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-ResponseMiddleware.html#method_handle"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request",
             "name": "Request",
@@ -2200,6 +2225,26 @@ Search.appendIndex(
             "name": "getContent",
             "summary": "Returns\u0020the\u0020request\u0020body\u0020content.",
             "url": "classes/Busarm-PhpMini-Request.html#method_getContent"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AgetServerPotocol\u0028\u0029",
+            "name": "getServerPotocol",
+            "summary": "Get\u0020server\u0020protocol\u0020or\u0020http\u0020version",
+            "url": "classes/Busarm-PhpMini-Request.html#method_getServerPotocol"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AisHttps\u0028\u0029",
+            "name": "isHttps",
+            "summary": "Check\u0020if\u0020https\u0020enabled",
+            "url": "classes/Busarm-PhpMini-Request.html#method_isHttps"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AgetIpAddress\u0028\u0029",
+            "name": "getIpAddress",
+            "summary": "Get\u0020Ip",
+            "url": "classes/Busarm-PhpMini-Request.html#method_getIpAddress"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AvalidateIpAddress\u0028\u0029",
+            "name": "validateIpAddress",
+            "summary": "Ensures\u0020an\u0020ip\u0020address\u0020is\u0020both\u0020a\u0020valid\u0020IP\u0020and\u0020does\u0020not\u0020fall\u0020within\na\u0020private\u0020network\u0020range.",
+            "url": "classes/Busarm-PhpMini-Request.html#method_validateIpAddress"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AgetHeadersFromServer\u0028\u0029",
             "name": "getHeadersFromServer",
@@ -2296,6 +2341,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Request.html#method_header"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Aversion\u0028\u0029",
+            "name": "version",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#method_version"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AsetSession\u0028\u0029",
             "name": "setSession",
             "summary": "Set\u0020the\u0020value\u0020of\u0020session",
@@ -2330,6 +2380,16 @@ Search.appendIndex(
             "name": "setHeaders",
             "summary": "Set\u0020the\u0020value\u0020of\u0020headers",
             "url": "classes/Busarm-PhpMini-Request.html#method_setHeaders"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AtoPsr\u0028\u0029",
+            "name": "toPsr",
+            "summary": "Get\u0020PSR7\u0020Server\u0020request",
+            "url": "classes/Busarm-PhpMini-Request.html#method_toPsr"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024protocol",
+            "name": "protocol",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property_protocol"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024files",
             "name": "files",
@@ -2371,6 +2431,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Response.html#method___construct"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AfromPsr\u0028\u0029",
+            "name": "fromPsr",
+            "summary": "Create\u0020response\u0020object\u0020from\u0020PSR7\u0020response",
+            "url": "classes/Busarm-PhpMini-Response.html#method_fromPsr"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003A__toString\u0028\u0029",
             "name": "__toString",
             "summary": "Converts\u0020the\u0020response\u0020object\u0020to\u0020string\u0020containing\u0020all\u0020headers\u0020and\u0020the\u0020response\u0020content.",
@@ -2380,6 +2445,16 @@ Search.appendIndex(
             "name": "buildHeader",
             "summary": "Returns\u0020the\u0020build\u0020header\u0020line.",
             "url": "classes/Busarm-PhpMini-Response.html#method_buildHeader"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AgetFormat\u0028\u0029",
+            "name": "getFormat",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Response.html#method_getFormat"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AsetFormat\u0028\u0029",
+            "name": "setFormat",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Response.html#method_setFormat"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AgetStatusCode\u0028\u0029",
             "name": "getStatusCode",
@@ -2458,7 +2533,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003Aredirect\u0028\u0029",
             "name": "redirect",
-            "summary": "Header\u0020Redirect",
+            "summary": "Set\u0020Redirect\u0020Headers",
             "url": "classes/Busarm-PhpMini-Response.html#method_redirect"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AgetResponseBody\u0028\u0029",
@@ -2486,10 +2561,10 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Response.html#method_html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AtoPsr\u0028\u0029",
-            "name": "toPsr",
-            "summary": "Create\u0020PSR7\u0020Server\u0020response",
-            "url": "classes/Busarm-PhpMini-Response.html#method_toPsr"
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003Adownload\u0028\u0029",
+            "name": "download",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Response.html#method_download"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AisInvalid\u0028\u0029",
             "name": "isInvalid",
@@ -2536,10 +2611,20 @@ Search.appendIndex(
             "summary": "Function\u0020from\u0020Symfony2\u0020HttpFoundation\u0020\u002D\u0020output\u0020pretty\u0020header",
             "url": "classes/Busarm-PhpMini-Response.html#method_beautifyCallback"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003AtoPsr\u0028\u0029",
+            "name": "toPsr",
+            "summary": "Get\u0020PSR7\u0020response",
+            "url": "classes/Busarm-PhpMini-Response.html#method_toPsr"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003A\u0024version",
             "name": "version",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Response.html#property_version"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003A\u0024format",
+            "name": "format",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Response.html#property_format"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response\u003A\u003A\u0024statusCode",
             "name": "statusCode",
@@ -2951,6 +3036,11 @@ Search.appendIndex(
             "summary": "Throw\u0020exception\u0020if\u0020the\u0020session\u0020was\u0020not\u0020started.",
             "url": "classes/Busarm-PhpMini-Session-PHPSession.html#method_throwIfNotStarted"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Session\\PHPSession\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
+            "url": "classes/Busarm-PhpMini-Session-PHPSession.html#method___toString"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Session\\PHPSession\u003A\u003A\u0024options",
             "name": "options",
             "summary": "",
@@ -2958,13 +3048,13 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Traits\\Singleton",
             "name": "Singleton",
-            "summary": "Created\u0020by\u0020VSCODE.",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020Singletons",
             "url": "classes/Busarm-PhpMini-Traits-Singleton.html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Traits\\Singleton\u003A\u003AgetInstance\u0028\u0029",
-            "name": "getInstance",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Traits-Singleton.html#method_getInstance"
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\Singleton\u003A\u003Amake\u0028\u0029",
+            "name": "make",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020singleton\u0020instance",
+            "url": "classes/Busarm-PhpMini-Traits-Singleton.html#method_make"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\View",
             "name": "View",
@@ -3026,10 +3116,340 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-View.html#property_headers"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Query",
+            "name": "Query",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Bags-Query.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Query\u003A\u003AsetQuery\u0028\u0029",
+            "name": "setQuery",
+            "summary": "Set\u0020attributes\u0020from\u0020query\u0020string",
+            "url": "classes/Busarm-PhpMini-Bags-Query.html#method_setQuery"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Query\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
+            "url": "classes/Busarm-PhpMini-Bags-Query.html#method___toString"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\AppStatus",
+            "name": "AppStatus",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Enums-AppStatus.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\AppStatus\u003A\u003AINITIALIZING",
+            "name": "INITIALIZING",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-AppStatus.html#constant_INITIALIZING"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\AppStatus\u003A\u003ARUNNNIG",
+            "name": "RUNNNIG",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-AppStatus.html#constant_RUNNNIG"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\AppStatus\u003A\u003ASTOPPED",
+            "name": "STOPPED",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-AppStatus.html#constant_STOPPED"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\DependencyResolver",
+            "name": "DependencyResolver",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Handlers-DependencyResolver.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\DependencyResolver\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\DependencyResolver\u003A\u003AresolveDependency\u0028\u0029",
+            "name": "resolveDependency",
+            "summary": "Resolve\u0020dependency\u0020for\u0020class\u0020name",
+            "url": "classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_resolveDependency"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\DependencyResolver\u003A\u003AcustomizeDependency\u0028\u0029",
+            "name": "customizeDependency",
+            "summary": "Customize\u0020dependency",
+            "url": "classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_customizeDependency"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\DependencyResolver\u003A\u003A\u0024request",
+            "name": "request",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-DependencyResolver.html#property_request"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\RequestHandler",
+            "name": "RequestHandler",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Handlers-RequestHandler.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\RequestHandler\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-RequestHandler.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\RequestHandler\u003A\u003Ahandle\u0028\u0029",
+            "name": "handle",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-RequestHandler.html#method_handle"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\RequestHandler\u003A\u003A\u0024handler",
+            "name": "handler",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-RequestHandler.html#property_handler"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler",
+            "name": "ResponseHandler",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler\u003A\u003Ahandle\u0028\u0029",
+            "name": "handle",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method_handle"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler\u003A\u003A\u0024data",
+            "name": "data",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_data"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler\u003A\u003A\u0024version",
+            "name": "version",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_version"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ResponseHandler\u003A\u003A\u0024format",
+            "name": "format",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_format"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ServerRequestHandler",
+            "name": "ServerRequestHandler",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Handlers-ServerRequestHandler.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ServerRequestHandler\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ServerRequestHandler.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ServerRequestHandler\u003A\u003Ahandle\u0028\u0029",
+            "name": "handle",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ServerRequestHandler.html#method_handle"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers\\ServerRequestHandler\u003A\u003A\u0024next",
+            "name": "next",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Handlers-ServerRequestHandler.html#property_next"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ContainerInterface",
+            "name": "ContainerInterface",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Interfaces-ContainerInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ContainerInterface\u003A\u003AaddSingleton\u0028\u0029",
+            "name": "addSingleton",
+            "summary": "Add\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_addSingleton"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ContainerInterface\u003A\u003AgetSingleton\u0028\u0029",
+            "name": "getSingleton",
+            "summary": "Get\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Interfaces-ContainerInterface.html#method_getSingleton"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\DependencyResolverInterface",
+            "name": "DependencyResolverInterface",
+            "summary": "Add\u0020support\u0020for\u0020app\u002Dwide\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Interfaces-DependencyResolverInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\DependencyResolverInterface\u003A\u003AresolveDependency\u0028\u0029",
+            "name": "resolveDependency",
+            "summary": "Resolve\u0020dependency\u0020for\u0020class\u0020name",
+            "url": "classes/Busarm-PhpMini-Interfaces-DependencyResolverInterface.html#method_resolveDependency"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\DependencyResolverInterface\u003A\u003AcustomizeDependency\u0028\u0029",
+            "name": "customizeDependency",
+            "summary": "Customize\u0020dependency",
+            "url": "classes/Busarm-PhpMini-Interfaces-DependencyResolverInterface.html#method_customizeDependency"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestHandlerInterface",
+            "name": "RequestHandlerInterface",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestHandlerInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestHandlerInterface\u003A\u003Ahandle\u0028\u0029",
+            "name": "handle",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestHandlerInterface.html#method_handle"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonStatelessInterface",
+            "name": "SingletonStatelessInterface",
+            "summary": "Add\u0020support\u0020for\u0020request\u0020only\u0020\u0028stateless\u0029\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Interfaces-SingletonStatelessInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonStatelessInterface\u003A\u003Amake\u0028\u0029",
+            "name": "make",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020stateless\u0020singleton\u0020instance",
+            "url": "classes/Busarm-PhpMini-Interfaces-SingletonStatelessInterface.html#method_make"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\PsrMiddleware",
+            "name": "PsrMiddleware",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Middlewares-PsrMiddleware.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\PsrMiddleware\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-PsrMiddleware.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\PsrMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
+            "summary": "Middleware\u0020handler",
+            "url": "classes/Busarm-PhpMini-Middlewares-PsrMiddleware.html#method_process"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\PsrMiddleware\u003A\u003A\u0024psr",
+            "name": "psr",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-PsrMiddleware.html#property_psr"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\Container",
+            "name": "Container",
+            "summary": "Manage\u0020Singletons",
+            "url": "classes/Busarm-PhpMini-Traits-Container.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\Container\u003A\u003AaddSingleton\u0028\u0029",
+            "name": "addSingleton",
+            "summary": "Add\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Traits-Container.html#method_addSingleton"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\Container\u003A\u003AgetSingleton\u0028\u0029",
+            "name": "getSingleton",
+            "summary": "Get\u0020singleton",
+            "url": "classes/Busarm-PhpMini-Traits-Container.html#method_getSingleton"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\Container\u003A\u003A\u0024singletons",
+            "name": "singletons",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Traits-Container.html#property_singletons"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\SingletonStateless",
+            "name": "SingletonStateless",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020Singletons\u0020for\u0020stateless\u0020requests",
+            "url": "classes/Busarm-PhpMini-Traits-SingletonStateless.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Traits\\SingletonStateless\u003A\u003Amake\u0028\u0029",
+            "name": "make",
+            "summary": "Create\u0020\/\u0020Retrieve\u0020stateless\u0020singleton\u0020instance",
+            "url": "classes/Busarm-PhpMini-Traits-SingletonStateless.html#method_make"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\http_parse_query\u0028\u0029",
+            "name": "http_parse_query",
+            "summary": "Parses\u0020http\u0020query\u0020string\u0020into\u0020an\u0020array",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_http_parse_query"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\is_cli\u0028\u0029",
+            "name": "is_cli",
+            "summary": "Is\u0020CLI\u003F",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_is_cli"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\out\u0028\u0029",
+            "name": "out",
+            "summary": "Print\u0020output\u0020end\u0020exit",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_out"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\app\u0028\u0029",
+            "name": "app",
+            "summary": "Get\u0020current\u0020app\u0020instance",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_app"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\config\u0028\u0029",
+            "name": "config",
+            "summary": "Get\u0020or\u0020Set\u0020config",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_config"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\view\u0028\u0029",
+            "name": "view",
+            "summary": "Load\u0020view\u0020file",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_view"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\load\u0028\u0029",
+            "name": "load",
+            "summary": "Get\u0020app\u0020loader\u0020object",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_load"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\report\u0028\u0029",
+            "name": "report",
+            "summary": "Get\u0020app\u0020reporter\u0020object",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_report"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\router\u0028\u0029",
+            "name": "router",
+            "summary": "Get\u0020app\u0020router\u0020object",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_router"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_message\u0028\u0029",
+            "name": "log_message",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_message"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_emergency\u0028\u0029",
+            "name": "log_emergency",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_emergency"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_error\u0028\u0029",
+            "name": "log_error",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_error"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_exception\u0028\u0029",
+            "name": "log_exception",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_exception"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_info\u0028\u0029",
+            "name": "log_info",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_info"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_debug\u0028\u0029",
+            "name": "log_debug",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_debug"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\log_warning\u0028\u0029",
+            "name": "log_warning",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_log_warning"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\run\u0028\u0029",
+            "name": "run",
+            "summary": "Run\u0020external\u0020command",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_run"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\run_async\u0028\u0029",
+            "name": "run_async",
+            "summary": "Run\u0020external\u0020command\u0020asynchronously",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_run_async"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\unit_convert\u0028\u0029",
+            "name": "unit_convert",
+            "summary": "Convert\u0020to\u0020proper\u0020unit",
+            "url": "namespaces/busarm-phpmini-helpers.html#function_unit_convert"
+        },                {
             "fqsen": "\\",
             "name": "\\",
             "summary": "",
             "url": "namespaces/default.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers",
+            "name": "Helpers",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-helpers.html"
         },                {
             "fqsen": "\\Busarm\\PhpMini",
             "name": "PhpMini",
@@ -3065,6 +3485,11 @@ Search.appendIndex(
             "name": "Exceptions",
             "summary": "",
             "url": "namespaces/busarm-phpmini-exceptions.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Handlers",
+            "name": "Handlers",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-handlers.html"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces",
             "name": "Interfaces",

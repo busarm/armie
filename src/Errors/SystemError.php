@@ -31,6 +31,6 @@ class SystemError extends Error
                 'function' => $instance['function'] ?? null,
             ];
         }, $this->getTrace());
-        $app->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+        !$app->isCli && $app->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
     }
 }

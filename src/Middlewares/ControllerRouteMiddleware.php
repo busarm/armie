@@ -3,17 +3,16 @@
 namespace Busarm\PhpMini\Middlewares;
 
 use Busarm\PhpMini\DI;
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
+use Busarm\PhpMini\Exceptions\NotFoundException;
+use Busarm\PhpMini\Handlers\DependencyResolver;
+use Busarm\PhpMini\Handlers\ResponseHandler;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Route;
 use TypeError;
 
 use function Busarm\PhpMini\Helpers\app;
@@ -30,11 +29,18 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     {
     }
 
-    public function handle(RequestInterface|RouteInterface &$request, ResponseInterface &$response, callable $next = null): mixed
+    /**
+     * Middleware handler
+     *
+     * @param RequestInterface|RouteInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (class_exists($this->controller)) {
             // Load controller
-            $object = app()->make($this->controller, [], $request, $response);
+            $object = DI::instantiate($this->controller, new DependencyResolver($request));
             if ($object) {
                 // Load method
                 if (
@@ -43,40 +49,23 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     && is_callable(array($object, $this->function))
                 ) {
                     try {
-                        return call_user_func_array(
+                        $result = call_user_func_array(
                             array($object, $this->function),
                             array_merge(DI::resolveMethodDependencies(
                                 $this->controller,
                                 $this->function,
-                                // Resolver
-                                function ($class) use (&$request, &$response) {
-                                    if (($class == Request::class || $class == RequestInterface::class) && $request instanceof RequestInterface) {
-                                        return $request;
-                                    } else if (($class == Route::class || $class == RouteInterface::class) && $request instanceof RouteInterface) {
-                                        return $request;
-                                    } else if ($class == Response::class || $class == ResponseInterface::class) {
-                                        return $response;
-                                    }
-                                    return null;
-                                },
-                                // Callback
-                                function (&$param) use (&$request) {
-                                    if ($param instanceof BaseDto) {
-                                        if ($request instanceof RequestInterface) {
-                                            $param->load($request->request()->all(), true);
-                                        } else if ($request instanceof RouteInterface) {
-                                            $param->load($request->getParams(), true);
-                                        }
-                                    } else if ($param instanceof CollectionBaseDto) {
-                                        if ($request instanceof RequestInterface) {
-                                            $param->load($request->request()->all(), true);
-                                        } else if ($request instanceof RouteInterface) {
-                                            $param->load($request->getParams());
-                                        }
-                                    }
-                                }
+                                new DependencyResolver($request)
                             ), $this->params)
                         );
+
+                        if ($request instanceof RequestInterface) {
+                            return $result !== false ?
+                                (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->httpResponseFormat))->handle() :
+                                throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
+                        }
+                        return $result !== false ?
+                            (new ResponseHandler(data: $result, format: app()->config->httpResponseFormat))->handle() :
+                            throw new NotFoundException("Resource not found");
                     } catch (TypeError $th) {
                         throw new BadRequestException("Invalid parameter(s): " . $th->getMessage());
                     }

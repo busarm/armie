@@ -1,6 +1,7 @@
 <?php
 
 namespace Busarm\PhpMini\Interfaces\Bags;
+use Stringable;
 
 /**
  * PHP Mini Framework
@@ -9,7 +10,7 @@ namespace Busarm\PhpMini\Interfaces\Bags;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface AttributeBag
+interface AttributeBag extends Stringable
 {
     /**
      * Set attribute

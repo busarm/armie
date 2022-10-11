@@ -13,6 +13,81 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
 
+
+/**
+ * Parses http query string into an array
+ *
+ * @author Alxcube <alxcube@gmail.com>
+ *
+ * @param string $queryString String to parse
+ * @param string $argSeparator Query arguments separator
+ * @param integer $decType Decoding type
+ * @return array
+ */
+function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUERY_RFC1738)
+{
+    $result             = array();
+    $parts              = explode($argSeparator, $queryString);
+
+    foreach ($parts as $part) {
+        $partList = explode('=', $part, 2);
+        if (count($partList) !== 2) continue;
+        list($paramName, $paramValue)   = $partList;
+
+        switch ($decType) {
+            case PHP_QUERY_RFC3986:
+                $paramName      = rawurldecode($paramName);
+                $paramValue     = rawurldecode($paramValue);
+                break;
+
+            case PHP_QUERY_RFC1738:
+            default:
+                $paramName      = urldecode($paramName);
+                $paramValue     = urldecode($paramValue);
+                break;
+        }
+
+
+        if (preg_match_all('/\[([^\]]*)\]/m', $paramName, $matches)) {
+            $paramName      = substr($paramName, 0, strpos($paramName, '['));
+            $keys           = array_merge(array($paramName), $matches[1]);
+        } else {
+            $keys           = array($paramName);
+        }
+
+        $target         = &$result;
+
+        foreach ($keys as $index) {
+            if ($index === '') {
+                if (isset($target)) {
+                    if (is_array($target)) {
+                        $intKeys        = array_filter(array_keys($target), 'is_int');
+                        $index  = count($intKeys) ? max($intKeys) + 1 : 0;
+                    } else {
+                        $target = array($target);
+                        $index  = 1;
+                    }
+                } else {
+                    $target         = array();
+                    $index          = 0;
+                }
+            } elseif (isset($target[$index]) && !is_array($target[$index])) {
+                $target[$index] = array($target[$index]);
+            }
+
+            $target         = &$target[$index];
+        }
+
+        if (is_array($target)) {
+            $target[]   = $paramValue;
+        } else {
+            $target     = $paramValue;
+        }
+    }
+
+    return $result;
+}
+
 /**
  * Is CLI?
  *
@@ -26,128 +101,6 @@ function is_cli()
 }
 
 /**
- * Get Server Variable
- *
- * @param string $name
- * @param string $default
- * @return string
- */
-function env($name, $default = null)
-{
-    return (!empty($data = @getenv($name)) ? $data : ($_SERVER[$name] ?? $default));
-}
-
-/**
- * Check if https enabled
- * 
- * @return array $server Server variable list
- * @return bool
- */
-function is_https(array $server = [])
-{
-    if (!empty($server['HTTPS'] ?? env('HTTPS')) && strtolower($server['HTTPS'] ?? env('HTTPS')) !== 'off') {
-        return TRUE;
-    } elseif (!empty($server['HTTP_X_FORWARDED_PROTO'] ?? env('HTTP_X_FORWARDED_PROTO')) && strtolower($server['HTTP_X_FORWARDED_PROTO'] ?? env('HTTP_X_FORWARDED_PROTO')) === 'https') {
-        return TRUE;
-    } elseif (!empty($server['HTTP_FRONT_END_HTTPS'] ?? env('HTTP_FRONT_END_HTTPS')) && strtolower($server['HTTP_FRONT_END_HTTPS'] ?? env('HTTP_FRONT_END_HTTPS')) !== 'off') {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-
-/**
- * Get Ip
- * 
- * @return array $server Server variable list
- * @return string
- */
-function get_ip_address(array $server = [])
-{
-    // check for shared internet/ISP IP
-    if (!empty($server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP')) && validate_ip($server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP'))) {
-        return $server['HTTP_CLIENT_IP'] ?? env('HTTP_CLIENT_IP');
-    }
-    // check for IPs passing through proxies
-    if (!empty($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR'))) {
-        // check if multiple ips exist in var
-        if (strpos($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR'), ',') !== false) {
-            $iplist = explode(',', $server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR') ?? '', 20);
-            foreach ($iplist as $ip) {
-                if (validate_ip($ip))
-                    return $ip;
-            }
-        } else {
-            if (validate_ip($server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR')))
-                return $server['HTTP_X_FORWARDED_FOR'] ?? env('HTTP_X_FORWARDED_FOR');
-        }
-    }
-    if (!empty($server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED')) && validate_ip($server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED')))
-        return $server['HTTP_X_FORWARDED'] ?? env('HTTP_X_FORWARDED');
-
-    if (!empty($server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP')) && validate_ip($server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP')))
-        return $server['HTTP_X_CLUSTER_CLIENT_IP'] ?? env('HTTP_X_CLUSTER_CLIENT_IP');
-
-    if (!empty($server['HTTP_FORWARDED_FOR'] ?? env('HTTP_FORWARDED_FOR')) && $server['HTTP_FORWARDED_FOR'] ?? validate_ip(env('HTTP_FORWARDED_FOR')))
-        return $server['HTTP_FORWARDED_FOR'] ?? env('HTTP_FORWARDED_FOR');
-
-    if (!empty($server['HTTP_FORWARDED'] ?? env('HTTP_FORWARDED')) && $server['HTTP_FORWARDED'] ?? validate_ip(env('HTTP_FORWARDED')))
-        return $server['HTTP_FORWARDED'] ?? env('HTTP_FORWARDED');
-
-    // return unreliable ip since all else failed
-    return $server['REMOTE_ADDR'] ?? env('REMOTE_ADDR');
-}
-
-/**
- * Ensures an ip address is both a valid IP and does not fall within
- * a private network range.
- * @param $ip
- * @return bool
- */
-function validate_ip($ip)
-{
-    if (strtolower($ip) === 'unknown') return false;
-
-    // generate ipv4 network address
-    $ip = ip2long($ip);
-
-    // if the ip is set and not equivalent to 255.255.255.255
-    if ($ip !== false && $ip !== -1) {
-
-        // make sure to get unsigned long representation of ip
-        // due to discrepancies between 32 and 64 bit OSes and
-        // signed numbers (ints default to signed in PHP)
-        $ip = sprintf('%u', $ip);
-
-        // do private network range checking
-        if ($ip >= 0 && $ip <= 50331647) return false;
-        if ($ip >= 167772160 && $ip <= 184549375) return false;
-        if ($ip >= 2130706432 && $ip <= 2147483647) return false;
-        if ($ip >= 2851995648 && $ip <= 2852061183) return false;
-        if ($ip >= 2886729728 && $ip <= 2887778303) return false;
-        if ($ip >= 3221225984 && $ip <= 3221226239) return false;
-        if ($ip >= 3232235520 && $ip <= 3232301055) return false;
-        if ($ip >= 4294967040) return false;
-    }
-
-    return true;
-}
-
-
-
-/**
- * Get server protocol or http version
- * 
- * @return string
- */
-function get_server_protocol()
-{
-    return (!empty(env('SERVER_PROTOCOL')) && in_array(env('SERVER_PROTOCOL'), array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'), TRUE))
-        ? env('SERVER_PROTOCOL') : 'HTTP/1.1';
-}
-
-
-/**
  * Print output end exit
  * @param mixed $data
  * @param int $responseCode
@@ -155,9 +108,9 @@ function get_server_protocol()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode);
+        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode)->send(false);
     }
-    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false);
+    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false)->send(false);
 }
 
 /**

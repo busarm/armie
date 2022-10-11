@@ -315,4 +315,14 @@ class PHPSession implements SessionBag
     {
         !$this->isStarted() && throw new SessionError('Session has not been started');
     }
+
+    /**
+     * Gets a string representation of the object
+     *
+     * @return string Returns the `string` representation of the object.
+     */
+    public function __toString()
+    {
+        return json_encode($_SESSION);
+    }
 }

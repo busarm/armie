@@ -4,10 +4,6 @@ namespace Busarm\PhpMini;
 
 use Closure;
 use Throwable;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
@@ -20,6 +16,9 @@ use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
+use Busarm\PhpMini\Handlers\DependencyResolver;
+use Busarm\PhpMini\Handlers\RequestHandler;
+use Busarm\PhpMini\Handlers\ServerRequestHandler;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
@@ -32,13 +31,16 @@ use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
-
-use Busarm\PhpMini\Middlewares\ResponseMiddleware;
-
 use Busarm\PhpMini\Traits\Container;
 
+use Psr\Log\LoggerInterface;
+use Psr\Http\Server\MiddlewareInterface as ServerMiddlewareInterface;
+
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+
 use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * Application Factory
@@ -78,7 +80,7 @@ class App implements HttpServerInterface, ContainerInterface
     public $isCli;
 
 
-    /** @var MiddlewareInterface[] */
+    /** @var MiddlewareInterface[]|ServerMiddlewareInterface[] */
     protected $middlewares = [];
 
     /** @var array */
@@ -136,20 +138,6 @@ class App implements HttpServerInterface, ContainerInterface
         // Set up error reporting
         $this->setUpErrorHandlers();
 
-        // Add response middleware as the first in the chain
-        $this->addMiddleware(new ResponseMiddleware());
-
-        // Add app-wide singletons
-        $this->addSingleton(self::class, $this);
-        $this->addSingleton(Router::class, $this->router);
-        $this->addSingleton(RouterInterface::class, $this->router);
-        $this->addSingleton(ErrorReporter::class, $this->reporter);
-        $this->addSingleton(ErrorReportingInterface::class, $this->reporter);
-        $this->addSingleton(ConsoleLogger::class, $this->logger);
-        $this->addSingleton(LoggerInterface::class, $this->logger);
-        $this->addSingleton(Loader::class, $this->loader);
-        $this->addSingleton(LoaderInterface::class, $this->loader);
-
         // Load custom configs
         $this->loadConfigs();
     }
@@ -195,7 +183,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
             $this->reporter->reportError("Internal Server Error", $errstr, $errfile, $errline);
-            $this->showMessage(500, sprintf("Error: %s", $errstr), $errno, $errline, $errfile);
+            !$this->isCli && $this->showMessage(500, sprintf("Error: %s", $errstr), $errno, $errline, $errfile);
         });
         set_exception_handler(function (Throwable $e) {
             if ($e instanceof SystemError) {
@@ -207,7 +195,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $trace = array_map(function ($instance) {
                     return (new ErrorTraceDto($instance))->toArray();
                 }, $e->getTrace());
-                $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
+                !$this->isCli && $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
             }
         });
     }
@@ -226,35 +214,34 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
-        $response = new Response();
+        $response = ($request instanceof RequestInterface) ? new Response(version: $request->version(), format: $this->config->httpResponseFormat) : new Response(format: $this->config->httpResponseFormat);
 
         // Run start hook
-        $this->triggerStartHook($request, $response);
+        $this->triggerStartHook($request);
 
         // Set shutdown hook
-        register_shutdown_function(function (App $app, $response) {
+        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request, ResponseInterface $response) {
             if ($app->status !== AppStatus::STOPPED) {
-                $app->triggerCompleteHook($response);
+                $app->triggerCompleteHook($request, $response);
             }
-        }, $this, $response);
+        }, $this, $request, $response);
 
         // Initiate rerouting
         if ($this->router) {
-            if ($this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request))) === false) {
-                if (!empty($request->uri())) {
-                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
-                }
-                throw new NotFoundException("Resource not found");
-            }
-        } else throw new SystemError("Router not configured. See `setRouter`");
 
-        // Run complete hook
-        $this->triggerCompleteHook($response);
+            // Process route request
+            $response = $this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request)));
 
-        $this->status = AppStatus::STOPPED;
-        $request = NULL;
+            // Run complete hook
+            $this->triggerCompleteHook($request, $response);
 
-        return $response;
+            $this->status = AppStatus::STOPPED;
+            $request = NULL;
+
+            return $this->isCli ? $response : ($response->send($this->config->httpSendAndContinue) ?? $response);
+        } else {
+            throw new SystemError("Router not configured. See `setRouter`");
+        }
     }
 
     /**
@@ -262,16 +249,27 @@ class App implements HttpServerInterface, ContainerInterface
      *
      * @param RequestInterface|RouteInterface $request
      * @param ResponseInterface $response
-     * @param MiddlewareInterface[] $middlewares
-     * @param integer $index
-     * @return false|mixed False if failed
+     * @param MiddlewareInterface[]|ServerMiddlewareInterface[] $middlewares
+     * @return ResponseInterface
      */
-    protected function processMiddleware(RequestInterface|RouteInterface &$request, ResponseInterface &$response, array $middlewares, $index = 0): mixed
+    protected function processMiddleware(RequestInterface|RouteInterface $request, ResponseInterface $response, array $middlewares): ResponseInterface
     {
-        if (isset($middlewares[$index])) {
-            return $middlewares[$index]->handle(request: $request, response: $response, next: fn () => $this->processMiddleware($request, $response, $middlewares, ++$index));
+        // Add default response handler
+        $action = fn (): ResponseInterface => $request instanceof RequestInterface ?
+            $response->html("Not found - " . ($request->method() . ' ' . $request->uri()), 404) :
+            $response->html("Resource not found", 404);
+
+        foreach (array_reverse($middlewares) as $middleware) {
+            if ($middleware instanceof ServerMiddlewareInterface) {
+                if ($request instanceof RequestInterface) {
+                    $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => Response::fromPsr($middleware->process($request->toPsr(), new ServerRequestHandler(new RequestHandler($action))));
+                }
+            } elseif ($middleware instanceof MiddlewareInterface) {
+                $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
+            }
         }
-        return false;
+
+        return ($action)($request) ?: $response;
     }
 
     /**
@@ -291,13 +289,12 @@ class App implements HttpServerInterface, ContainerInterface
      * Process on start request hook
      *
      * @param RequestInterface|RouteInterface $request
-     * @param ResponseInterface $response
      * @return void
      */
-    private function triggerStartHook(RequestInterface|RouteInterface &$request, ResponseInterface &$response)
+    private function triggerStartHook(RequestInterface|RouteInterface $request)
     {
         if ($this->startHook) {
-            ($this->startHook)($this, $request, $response);
+            ($this->startHook)($this, $request);
         }
     }
 
@@ -319,13 +316,14 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Process on complete hook
      *
+     * @param RequestInterface|RouteInterface $request
      * @param ResponseInterface $response
      * @return void
      */
-    public function triggerCompleteHook(ResponseInterface &$response)
+    public function triggerCompleteHook(RequestInterface|RouteInterface $request, ResponseInterface $response)
     {
         if ($this->completeHook) {
-            ($this->completeHook)($this, $response);
+            ($this->completeHook)($this, $request, $response);
         }
     }
 
@@ -335,55 +333,24 @@ class App implements HttpServerInterface, ContainerInterface
      * @param string $name
      * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @param RequestInterface|RouteInterface|null $request HTTP request/route instance
-     * @param ResponseInterface|null $response HTTP response instance
      * @return object
      */
-    public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null, ResponseInterface|null $response = null)
+    public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null)
     {
-        // Resolve class with request singleton
-        if ($request && ($instance = $request->getSingleton($className))) return $instance;
-
-        // Resolve class with app singleton
-        if ($instance = $this->getSingleton($className)) return $instance;
-
         // Instantiate class
         $instance = DI::instantiate(
             $className,
-            // Resolver
-            $request || $response ? function ($class) use (&$request, &$response) {
-                if ($request && ($class == Request::class || $class == RequestInterface::class) && $request instanceof RequestInterface) {
-                    return $request;
-                } else if ($request && ($class == Route::class || $class == RouteInterface::class) && $request instanceof RouteInterface) {
-                    return $request;
-                } else if ($response && ($class == Response::class || $class == ResponseInterface::class)) {
-                    return $response;
-                }
-                return null;
-            } : null,
-            // Callback
-            $request ? function (&$param) use (&$request) {
-                if ($param instanceof BaseDto) {
-                    if ($request instanceof RequestInterface) {
-                        $param->load($request->request()->all(), true);
-                    } else if ($request instanceof RouteInterface) {
-                        $param->load($request->getParams(), true);
-                    }
-                } else if ($param instanceof CollectionBaseDto) {
-                    if ($request instanceof RequestInterface) {
-                        $param->load($request->request()->all(), true);
-                    } else if ($request instanceof RouteInterface) {
-                        $param->load($request->getParams());
-                    }
-                }
-            } : null,
+            new DependencyResolver($request),
             $params
         );
 
         // Add instance as singleton if supported
-        if ($request && $instance instanceof SingletonStatelessInterface) {
-            $request->addSingleton($className, $instance);
-        } else if ($instance instanceof SingletonInterface) {
-            $this->addSingleton($className, $instance);
+        if ($instance) {
+            if ($request && $instance instanceof SingletonStatelessInterface) {
+                $request->addSingleton($className, $instance);
+            } else if ($instance instanceof SingletonInterface) {
+                $this->addSingleton($className, $instance);
+            }
         }
         return $instance;
     }
@@ -433,10 +400,10 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Add middleware
      *
-     * @param MiddlewareInterface $middleware
+     * @param MiddlewareInterface|ServerMiddlewareInterface $middleware
      * @return self
      */
-    public function addMiddleware(MiddlewareInterface $middleware)
+    public function addMiddleware(MiddlewareInterface|ServerMiddlewareInterface $middleware)
     {
         $this->middlewares[] = $middleware;
         return $this;
@@ -616,7 +583,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $response->duration = (floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 
-            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
+            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->httpSendAndContinue);
         }
     }
 
@@ -625,9 +592,9 @@ class App implements HttpServerInterface, ContainerInterface
      * @param int $status Status Code
      * @param BaseDto|array|object|string $data Data
      * @param array $headers Headers
-     * @return ResponseInterface|null
+     * @return void
      */
-    public function sendHttpResponse($status, $data = null, $headers = []): ResponseInterface|null
+    public function sendHttpResponse($status, $data = null, $headers = [])
     {
         if (!is_array($data)) {
             if ($data instanceof CollectionBaseDto) {
@@ -645,8 +612,9 @@ class App implements HttpServerInterface, ContainerInterface
             }
         }
 
-        return (new Response)
+        (new Response)
             ->addHttpHeaders($headers)
-            ->json($data, ($status >= 100 && $status < 600) ? $status : 500, $this->config->httpSendAndContinue);
+            ->json($data, ($status >= 100 && $status < 600) ? $status : 500)
+            ->send($this->config->httpSendAndContinue);
     }
 }

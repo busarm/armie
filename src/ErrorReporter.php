@@ -60,10 +60,10 @@ class ErrorReporter implements ErrorReportingInterface
         $contexts = [];
         if ($file) $contexts[] = $file . ':' . ($line ?? 0);
         log_error($message);
-        log_debug([
+        log_debug($this->toString([
             'Crumbs' => $this->breadCrumbs,
             'Contexts' => $contexts,
-        ]);
+        ]));
     }
 
     /**
@@ -78,9 +78,16 @@ class ErrorReporter implements ErrorReportingInterface
             return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '0');
         }, $exception->getTrace());
         log_exception($exception);
-        log_debug([
+        log_debug($this->toString([
             'Crumbs' => $this->breadCrumbs,
             'Contexts' => $contexts,
-        ]);
+        ]));
+    }
+    private function toString(array|object|null $msg): string|null
+    {
+        if (is_array($msg) || is_object($msg)) {
+            return json_encode($msg, JSON_PRETTY_PRINT);
+        }
+        return $msg;
     }
 }

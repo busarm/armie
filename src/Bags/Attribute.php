@@ -55,17 +55,17 @@ class Attribute implements AttributeBag
 		return $this;
 	}
 
-    /**
-     * Set attribute
-     *
-     * @param string $name
-     * @param mixed $value
-     * @param mixed $options
-     *
-     * @return bool
-     */
-    public function set(string $name, mixed $value, $options = NULL): bool
-    {
+	/**
+	 * Set attribute
+	 *
+	 * @param string $name
+	 * @param mixed $value
+	 * @param mixed $options
+	 *
+	 * @return bool
+	 */
+	public function set(string $name, mixed $value, $options = NULL): bool
+	{
 		$this->attributes[$name] = $value;
 		if ($this->onChange) ($this->onChange)($name, $value);
 		return true;
@@ -156,5 +156,15 @@ class Attribute implements AttributeBag
 		$data = $this->attributes;
 		$this->attributes = [];
 		if ($this->onDelete) foreach (array_keys($data) as $name) ($this->onDelete)($name);
+	}
+
+	/**
+	 * Gets a string representation of the object
+	 *
+	 * @return string Returns the `string` representation of the object.
+	 */
+	public function __toString()
+	{
+		return json_encode($this->attributes);
 	}
 }

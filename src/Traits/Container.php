@@ -3,10 +3,12 @@
 namespace Busarm\PhpMini\Traits;
 
 /**
- * Created by VSCODE.
- * User: Samuel
- * Date: 03/10/2022
- * Time: 15:38 PM
+ * Manage Singletons
+ *  
+ * PHP Mini Framework
+ *
+ * @copyright busarm.com
+ * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
 trait Container
 {

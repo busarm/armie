@@ -9,10 +9,12 @@ use Busarm\PhpMini\Interfaces\RouteInterface;
 use function Busarm\PhpMini\Helpers\app;
 
 /**
- * Created by VSCODE.
- * User: Samuel
- * Date: 29/7/2022
- * Time: 11:21 AM
+ * Create / Retrieve Singletons for stateless requests
+ *  
+ * PHP Mini Framework
+ *
+ * @copyright busarm.com
+ * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
 trait SingletonStateless
 {
@@ -23,8 +25,8 @@ trait SingletonStateless
      * @param array $params
      * @return static
      */
-    public static function make(RequestInterface|RouteInterface $request, ResponseInterface $response, array $params = []): static
+    public static function make(RequestInterface|RouteInterface $request, array $params = []): static
     {
-        return app()->make(static::class, $params, $request, $response);
+        return app()->make(static::class, $params, $request);
     }
 }

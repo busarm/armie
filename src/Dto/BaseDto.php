@@ -134,11 +134,11 @@ class BaseDto implements Arrayable
      * Load dto with array
      *
      * @param array|object|null $data
-     * @return static
+     * @return self
      */
-    public static function with(array|object|null $data): static
+    public static function with(array|object|null $data): self
     {
-        $response = new self();
+        $response = new self;
         if ($data) $response->load((array)$data);
         return $response;
     }

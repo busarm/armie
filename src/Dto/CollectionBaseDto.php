@@ -9,6 +9,7 @@ use OutOfRangeException;
 use Traversable;
 
 use Busarm\PhpMini\Interfaces\Arrayable;
+
 /**
  * PHP Mini Framework
  *
@@ -106,7 +107,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * @param int|null $length
      * @param null $replacement
      *
-     * @return static
+     * @return self
      */
     public function splice(int $offset, int $length = null, $replacement = null)
     {
@@ -148,7 +149,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * @param int|null $length
      * @param bool $preserveKeys
      *
-     * @return static
+     * @return self
      */
     public function slice(int $offset, int $length = null, bool $preserveKeys = false)
     {
@@ -329,7 +330,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * @param int $flag Use ARRAY_FILTER_USE_KEY to pass key as the only argument to $callback instead of value.
      *                  Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback instead of value.
      *
-     * @return static
+     * @return self
      *
      * @see array_filter
      */
@@ -380,7 +381,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      *
      * @param bool $preserveKeys
      *
-     * @return static
+     * @return self
      */
     public function reverse(bool $preserveKeys = false)
     {
@@ -442,9 +443,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * Load dto with array
      *
      * @param array|object $data
-     * @return static
+     * @return self
      */
-    public static function of(array|object $data): static
+    public static function of(array|object $data): self
     {
         return new self($data);
     }

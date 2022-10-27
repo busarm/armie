@@ -333,7 +333,7 @@ class App implements HttpServerInterface, ContainerInterface
      * @param string $className
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @param RequestInterface|RouteInterface|null $request HTTP request/route instance
-     * @return object
+     * @return mixed
      */
     public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null)
     {
@@ -580,7 +580,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $response->line = !empty($errorLine) ? $errorLine : null;
                 $response->file = !empty($errorFile) ? $errorFile : null;
                 $response->backtrace = !empty($errorTrace) ? $errorTrace : null;
-                $response->duration = (floor(microtime(true) * 1000) - $this->startTimeMs);
+                $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 
             (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->httpSendAndContinue);
@@ -607,7 +607,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $response = new ResponseDto();
                 $response->success = $status < 300;
                 $response->message = $data;
-                $response->duration = (floor(microtime(true) * 1000) - $this->startTimeMs);
+                $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
                 $data = $response->toArray();
             }
         }

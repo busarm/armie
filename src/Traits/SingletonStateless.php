@@ -3,7 +3,6 @@
 namespace Busarm\PhpMini\Traits;
 
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 
 use function Busarm\PhpMini\Helpers\app;
@@ -23,9 +22,9 @@ trait SingletonStateless
      *
      * @param RequestInterface|RouteInterface $request
      * @param array $params
-     * @return static
+     * @return self
      */
-    public static function make(RequestInterface|RouteInterface $request, array $params = []): static
+    public static function make(RequestInterface|RouteInterface $request, array $params = []): self
     {
         return app()->make(static::class, $params, $request);
     }

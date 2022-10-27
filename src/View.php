@@ -65,7 +65,7 @@ class View implements ResponseHandlerInterface
      *
      * @param string $path
      * @param bool $return
-     * @return void 
+     * @return string|null 
      */
     public function include($path, $return = false)
     {
@@ -78,8 +78,10 @@ class View implements ResponseHandlerInterface
 
         $content = app()->loader->view($path, $params, $return);
 
-        if (!$return) echo $content;
-        else return $content;
+        if (!$return) {
+            echo $content;
+            return null;
+        } else return $content;
     }
 
     /**
@@ -128,7 +130,7 @@ class View implements ResponseHandlerInterface
 
     /**
      * @param bool $continue
-     * @return void
+     * @return mixed
      */
     public function send($continue = false)
     {

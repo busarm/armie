@@ -17,8 +17,8 @@ interface SingletonStatelessInterface
      * Create / Retrieve stateless singleton instance
      *
      * @param RequestInterface|RouteInterface $request
-     * @param array $params
-     * @return static
+     * @param array<string, mixed> $params
+     * @return self
      */
-    public static function make(RequestInterface|RouteInterface $request, array $params = []): static;
+    public static function make(RequestInterface|RouteInterface $request, array $params = []): self;
 }

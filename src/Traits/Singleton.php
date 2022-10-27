@@ -18,9 +18,9 @@ trait Singleton
      * Create / Retrieve singleton instance 
      *
      * @param array $params
-     * @return static
+     * @return self
      */
-    public static function make(array $params = []): static
+    public static function make(array $params = []): self
     {
         return app()->make(static::class, $params);
     }

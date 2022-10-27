@@ -27,7 +27,8 @@
         ]
     },
     "scripts": {
-        "test": "./vendor/bin/phpstan analyse --level 2 src tests && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
+        "analyse": "./vendor/bin/phpstan analyse --level 3 src tests",
+        "test": "composer run analyse && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
     },
     "keywords": [
         "php",

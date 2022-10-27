@@ -437,7 +437,7 @@ class Config
     /**
      * Set cookie duration
      *
-     * @param  string  $cookieDuration
+     * @param  int  $cookieDuration
      *
      * @return  self
      */

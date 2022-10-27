@@ -28,7 +28,7 @@ interface ResponseInterface
     public function getFormat(): string;
 
     /**
-     * @param string $statusCode
+     * @param int $statusCode
      * @param string|null $text
      * @return self
      */

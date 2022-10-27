@@ -15,7 +15,7 @@ interface CacheInterface
      * Initalize cache
      *
      * @param string $name Cache name
-     * @param string $size Cache pool size. -1 for unlimited. Optional - Use if cache pooling is supported
+     * @param int $size Cache pool size. -1 for unlimited. Optional - Use if cache pooling is supported
      * @return void
      */
     public function initialize(string $name, $size = -1);

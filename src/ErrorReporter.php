@@ -83,6 +83,13 @@ class ErrorReporter implements ErrorReportingInterface
             'Contexts' => $contexts,
         ]));
     }
+
+    /**
+     * Array/Object to string
+     *
+     * @param array|object|null $msg
+     * @return string|null
+     */
     private function toString(array|object|null $msg): string|null
     {
         if (is_array($msg) || is_object($msg)) {

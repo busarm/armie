@@ -122,15 +122,15 @@ class Server
      * @param ServerRequestInterface|null $request
      * @return \Psr\Http\Message\ResponseInterface|bool True if successful. ResponseInterface if failed
      */
-    public function run(ServerRequestInterface|null $psr = null): MessageResponseInterface|bool
+    public function run(ServerRequestInterface|null $request = null): MessageResponseInterface|bool
     {
-        $request = $psr ? Request::fromPsr($psr) : Request::fromGlobal();
+        $request = $request ? Request::fromPsr($request) : Request::fromGlobal();
         if ($this->runRoute($request) !== false) {
             return true;
         } else if ($this->runDomain($request) !== false) {
             return true;
         }
-        return (new Response())->setStatusCode(404)->toPsr(ResponseFormat::HTML);
+        return (new Response())->setStatusCode(404)->toPsr();
     }
 
     /**

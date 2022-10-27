@@ -4,6 +4,7 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Throwable;
@@ -18,11 +19,11 @@ use function Busarm\PhpMini\Helpers\app;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class View implements ResponseHandlerInterface
+class View implements ResponseHandlerInterface
 {
     /**
      * @param BaseDto|array|null $data
-     * @param array $httpHeaders
+     * @param array $headers
      */
     public function __construct(protected BaseDto|array|null $data = null, protected $headers = array())
     {
@@ -37,7 +38,7 @@ abstract class View implements ResponseHandlerInterface
      */
     public static function load(BaseDto|array|null $data = null, $headers = array())
     {
-        $view = new static($data, $headers);
+        $view = new self($data, $headers);
         try {
             $view->start();
             $view->render();
@@ -87,7 +88,10 @@ abstract class View implements ResponseHandlerInterface
      *
      * @return void
      */
-    public abstract function render();
+    public function render()
+    {
+        throw new SystemError('`render` method not implemented');
+    }
 
     /**
      * 
@@ -138,7 +142,7 @@ abstract class View implements ResponseHandlerInterface
             ob_end_clean();
         }
 
-        return $this->handle($continue)->send($continue);
+        return $this->handle()->send($continue);
     }
 
     /**

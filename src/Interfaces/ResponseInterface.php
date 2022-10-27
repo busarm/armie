@@ -28,7 +28,8 @@ interface ResponseInterface
     public function getFormat(): string;
 
     /**
-     * @param string $format
+     * @param string $statusCode
+     * @param string|null $text
      * @return self
      */
     public function setStatusCode($statusCode, $text = null): self;
@@ -111,7 +112,7 @@ interface ResponseInterface
     public function getHttpHeader($name): mixed;
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getHttpHeaders(): array;
 

@@ -8,7 +8,7 @@ namespace Busarm\PhpMini\Dto;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class PaginatedResponseDto extends ResponseDto
+class PaginatedResponseDto extends BaseDto
 {
     /** @var CollectionBaseDto|array */
     public CollectionBaseDto|array $data;

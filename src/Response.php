@@ -186,7 +186,7 @@ class Response implements ResponseInterface, Stringable
      *
      * @param string $format
      *
-     * @return ResponseInterface
+     * @return self
      */
     public function setFormat($format = ResponseFormat::JSON): self
     {
@@ -407,6 +407,8 @@ class Response implements ResponseInterface, Stringable
                 }
                 return $xml->asXML();
         }
+
+        return null;
     }
 
     /**

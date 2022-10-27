@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var Busarm\PhpMini\Interfaces\RequestInterface $request Capture Server request
+ * @var Busarm\PhpMini\Interfaces\RequestInterface|null $request Capture Server request
  */
 
 use Busarm\PhpMini\App;

@@ -15,7 +15,7 @@ interface MiddlewareInterface
      * Middleware handler
      *
      * @param RequestInterface|RouteInterface $request
-     * @param RequestHandlerInterface $handle
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface
      */
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface;

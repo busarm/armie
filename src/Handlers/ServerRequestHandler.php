@@ -23,6 +23,6 @@ final class ServerRequestHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->next->handle(Request::fromPsr($request))->toPsr(app()->config->httpResponseFormat);
+        return $this->next->handle(Request::fromPsr($request))->toPsr();
     }
 }

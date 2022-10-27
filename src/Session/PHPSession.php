@@ -291,6 +291,7 @@ class PHPSession implements SessionBag
      */
     private function throwIfHeadersSent(): void
     {
+        [$file, $line] = [null, null];
         $headersWereSent = (bool) ini_get('session.use_cookies') && headers_sent($file, $line);
 
         $headersWereSent && throw new SessionError("Header already sent in $file:$line");

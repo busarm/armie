@@ -1313,7 +1313,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\ErrorReporter\u003A\u003AtoString\u0028\u0029",
             "name": "toString",
-            "summary": "",
+            "summary": "Array\/Object\u0020to\u0020string",
             "url": "classes/Busarm-PhpMini-ErrorReporter.html#method_toString"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\ErrorReporter\u003A\u003A\u0024breadCrumbs",

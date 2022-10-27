@@ -27,7 +27,7 @@
         ]
     },
     "scripts": {
-        "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
+        "test": "./vendor/bin/phpstan analyse --level 2 src tests && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
     },
     "keywords": [
         "php",
@@ -47,6 +47,7 @@
     },
     "require-dev": {
         "middlewares/firewall": "^2.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^1.8"
     }
 }

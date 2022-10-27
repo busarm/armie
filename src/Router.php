@@ -6,11 +6,11 @@ use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
 use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
 use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 
 /**
  * Application Router
@@ -75,7 +75,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * @param RouteInterface[] $route 
+     * @param RouteInterface[] $routes
      * @return RouterInterface
      */
     public function addRoutes(array $routes): RouterInterface
@@ -188,7 +188,7 @@ class Router implements RouterInterface
      * Create route to be used for params matching
      *
      * @param string $route
-     * @param array $matches
+     * @param array $paramMatches
      * @return string New route for regexp matching
      */
     protected function createMatchParamsRoute($route, &$paramMatches = [])

@@ -255,7 +255,7 @@ class App implements HttpServerInterface, ContainerInterface
     protected function processMiddleware(RequestInterface|RouteInterface $request, ResponseInterface $response, array $middlewares): ResponseInterface
     {
         // Add default response handler
-        $action = fn (): ResponseInterface => $request instanceof RequestInterface ?
+        $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
             $response->html("Not found - " . ($request->method() . ' ' . $request->uri()), 404) :
             $response->html("Resource not found", 404);
 
@@ -330,8 +330,8 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Instantiate class with dependencies
      * 
-     * @param string $name
-     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param string $className
+     * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @param RequestInterface|RouteInterface|null $request HTTP request/route instance
      * @return object
      */
@@ -436,7 +436,7 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Set error reporter
      * 
-     * @param string $config
+     * @param ErrorReportingInterface $reporter
      * @return self
      */
     public function setErrorReporter(ErrorReportingInterface $reporter)

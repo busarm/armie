@@ -1,6 +1,7 @@
 <?php
 
 namespace Busarm\PhpMini\Interfaces\Bags;
+
 use Stringable;
 
 /**
@@ -54,7 +55,7 @@ interface AttributeBag extends Stringable
     /**
      * Set bulk attributes
      *
-     * @param string $name
+     * @param array $data
      * @return void
      */
     public function replace(array  $data);

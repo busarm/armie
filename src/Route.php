@@ -29,7 +29,7 @@ class Route implements RouteInterface
     /** @var string Request controller function*/
     protected string|null $function = null;
 
-    /** @var array Request controller function params */
+    /** @var array<string, mixed> Request controller function params */
     protected array $params = [];
 
     /** @var string HTTP request method */
@@ -60,8 +60,8 @@ class Route implements RouteInterface
     {
         return $this->function;
     }
-    /**  @return string */
-    public function getParams(): array|null
+    /**  @return array */
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -83,14 +83,14 @@ class Route implements RouteInterface
 
     /**
      * Add route params.
+     * @param array<string, mixed> $params
      * List of key => value params. 
      * Where:
      * - `key` = function paramater name 
      * - `value` =  function paramater value
-     * 
      * @return self 
      */
-    public function params(array $params): RouteInterface
+    public function params(array $params): self
     {
         $this->params = $params;
         return $this;
@@ -99,10 +99,10 @@ class Route implements RouteInterface
     /**
      * Set callable route destination
      * 
-     * @param string $callable Function to execute for route
-     * @return RouteInterface
+     * @param Closure $callable Function to execute for route
+     * @return self
      */
-    public function call(Closure $callable): RouteInterface
+    public function call(Closure $callable): self
     {
         $this->callable = $callable;
         $this->controller = null;
@@ -115,9 +115,9 @@ class Route implements RouteInterface
      * 
      * @param string $controller Application Controller class name e.g Home
      * @param string $function Application Controller (public) function. e.g index
-     * @return RouteInterface
+     * @return self
      */
-    public function to(string $controller, string $function): RouteInterface
+    public function to(string $controller, string $function): self
     {
         $this->controller = $controller;
         $this->function = $function;
@@ -129,9 +129,9 @@ class Route implements RouteInterface
      * Add route middlewares
      * 
      * @param MiddlewareInterface[] $middlewares Array of Middleware Interface.
-     * @return RouteInterface
+     * @return self
      */
-    public function middlewares(array $middlewares = []): RouteInterface
+    public function middlewares(array $middlewares = []): self
     {
         $this->middlewares = array_merge($this->middlewares, $middlewares);
         return $this;
@@ -140,10 +140,10 @@ class Route implements RouteInterface
     /**
      * Add route middleware
      * 
-     * @param MiddlewareInterface $middlewares
-     * @return RouteInterface
+     * @param MiddlewareInterface $middleware
+     * @return self
      */
-    public function middleware(MiddlewareInterface $middleware): RouteInterface
+    public function middleware(MiddlewareInterface $middleware): self
     {
         $this->middlewares[] = $middleware;
         return $this;
@@ -154,10 +154,10 @@ class Route implements RouteInterface
      *
      * @param string $controller
      * @param string $function
-     * @param array $param
-     * @return RouteInterface
+     * @param array<string, mixed> $params
+     * @return self
      */
-    public static function cli(string $controller, string $function, array $params = []): static
+    public static function cli(string $controller, string $function, array $params = []): self
     {
         $route = new Route;
         $route->controller = $controller;

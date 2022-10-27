@@ -49,7 +49,6 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * Load data
      *
      * @param array|Traversable $data
-     * @param bool $force
      * @return self
      */
     public function load(array|Traversable $data): self
@@ -121,7 +120,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
         }
         $this->exchangeArray($data);
 
-        return new static($result);
+        return new self($result);
     }
 
     /**
@@ -153,7 +152,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      */
     public function slice(int $offset, int $length = null, bool $preserveKeys = false)
     {
-        return new static(array_slice($this->getArrayCopy(), $offset, $length, $preserveKeys));
+        return new self(array_slice($this->getArrayCopy(), $offset, $length, $preserveKeys));
     }
 
     /**
@@ -339,7 +338,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
         $data = $this->getArrayCopy();
         $result = array_filter($data, $callback, $flag);
 
-        return new static($result);
+        return new self($result);
     }
 
     /**
@@ -385,7 +384,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      */
     public function reverse(bool $preserveKeys = false)
     {
-        return new static(array_reverse($this->getArrayCopy(), $preserveKeys));
+        return new self(array_reverse($this->getArrayCopy(), $preserveKeys));
     }
 
     public function keys(): array
@@ -447,6 +446,6 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      */
     public static function of(array|object $data): static
     {
-        return new static($data);
+        return new self($data);
     }
 }

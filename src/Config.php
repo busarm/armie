@@ -250,7 +250,7 @@ class Config
      * @var string
      */
     public string $httpResponseFormat = ResponseFormat::JSON;
-    
+
     /**
      * Auto start session for HTTP request
      *
@@ -451,7 +451,7 @@ class Config
     /**
      * Set cookie path
      *
-     * @param  string  $cookiePrefix
+     * @param  string  $cookiePath
      *
      * @return  self
      */
@@ -693,14 +693,14 @@ class Config
      * @param  bool  $httpSessionAutoStart  Auto start session for HTTP request
      *
      * @return  self
-     */ 
+     */
     public function setHttpSessionAutoStart(bool $httpSessionAutoStart)
     {
         $this->httpSessionAutoStart = $httpSessionAutoStart;
 
         return $this;
     }
-    
+
     /**
      * Add custom config file
      * 

@@ -6,17 +6,26 @@ use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\ErrorReporter;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
+use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
+use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
+use Busarm\PhpMini\Interfaces\RouterInterface;
+use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
+use Busarm\PhpMini\Route;
+use Busarm\PhpMini\Router;
 use Nyholm\Psr7\Request as Psr7Request;
 use Nyholm\Psr7\Response as Psr7Response;
 use Psr\Http\Message\RequestInterface as MessageRequestInterface;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
 use function Busarm\PhpMini\Helpers\app;
 
@@ -77,7 +86,7 @@ class DependencyResolver implements DependencyResolverInterface
                 }
             } else if ($instance instanceof CollectionBaseDto) {
                 if ($this->request instanceof RequestInterface) {
-                    $instance->load($this->request->request()->all(), true);
+                    $instance->load($this->request->request()->all());
                 } else if ($this->request instanceof RouteInterface) {
                     $instance->load($this->request->getParams());
                 }

@@ -2,9 +2,6 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Busarm\PhpMini\Route;
-
 /**
  * PHP Mini Framework
  *
@@ -28,7 +25,7 @@ interface RouterInterface
     public function addRoute(RouteInterface $route): self;
 
     /**
-     * @param RouteInterface[] $route 
+     * @param RouteInterface[] $routes
      * @return self
      */
     public function addRoutes(array $routes): self;

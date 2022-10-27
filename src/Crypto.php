@@ -29,29 +29,29 @@ class Crypto
     public static $HMAC_HASH_ALGO = "sha1";
     /**
      * Number of key hash iterations. @see `\hash_pbkdf2`. Default: 8.
-     * @var string
+     * @var int
      */
     public static $KEY_HASH_ITERATIONS = 8;
     /**
      * Length of key hash. @see `\hash_pbkdf2`. Default: 16.
-     * @var string
+     * @var int
      */
     public static $KEY_HASH_LENGTH = 16;
     /**
      * Length of key salt. @see `\openssl_random_pseudo_bytes`. Default: 8.
-     * @var string
+     * @var int
      */
     public static $KEY_SALT_LENGTH = 8;
     /**
      * Length of key iv. @see `\openssl_random_pseudo_bytes`. Default: 16.
-     * @var string
+     * @var int
      */
     public static $KEY_IV_LENGTH = 16;
 
     /**
      * Encrypt Data for client
      * 
-     * @param string $paraphrase  Encryption Key
+     * @param string $passphrase  Encryption Key
      * @param string $plain Data to encrypt
      * @param array $configs Encryption configs
      * - `METHOD` - Default: AES-256-CBC. @see `\openssl_get_cipher_methods`
@@ -89,7 +89,7 @@ class Crypto
     /**
      * Decrypt Data from client
      * 
-     * @param string $paraphrase  Encryption Key
+     * @param string $passphrase  Encryption Key
      * @param string $cipher Data to decrypt
      * @param array $configs Encryption configs
      * - `METHOD` - Default: AES-256-CBC. @see `\openssl_get_cipher_methods`

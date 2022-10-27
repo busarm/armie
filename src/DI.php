@@ -29,7 +29,7 @@ class DI
      *
      * @param string $class
      * @param DependencyResolverInterface|null $resolver Custom resolver to extend class resolution
-     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return object
      */
     public static function instantiate(string $class, DependencyResolverInterface|null $resolver = null, array $params = [])
@@ -51,14 +51,14 @@ class DI
      * @param string $class
      * @param string $method
      * @param DependencyResolverInterface|null $resolver Custom resolver to extend class resolution
-     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
     public static function resolveMethodDependencies(string $class, string $method, DependencyResolverInterface|null $resolver = null, array $params = [])
     {
         $reflection = new ReflectionMethod($class, $method);
         // Detect circular dependencies
-        $parameters = array_map(fn ($param) => strval($param->getType()) ?: ($param->getType()?->getName()), $reflection->getParameters());
+        $parameters = array_map(fn ($param) => strval($param->getType()), $reflection->getParameters());
         if (in_array($class, $parameters)) {
             throw new DependencyError("Circular dependency detected in " . $class);
         }
@@ -70,7 +70,7 @@ class DI
      *
      * @param Closure $callable
      * @param DependencyResolverInterface|null $resolver Custom resolver to extend class resolution
-     * @param array $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
     public static function resolveCallableDependencies(Closure $callable, DependencyResolverInterface|null $resolver = null, array $params = [])
@@ -82,16 +82,16 @@ class DI
     /**
      * Resolve dependendies
      *
-     * @param \ReflectionParameter $parameters
+     * @param \ReflectionParameter[] $parameters
      * @param DependencyResolverInterface|null $resolver
-     * @param array $params
+     * @param array<string, mixed> $params
      * @return array
      */
     protected static function resolveDependencies(array $parameters, DependencyResolverInterface|null $resolver = null, array $params = [])
     {
         $paramKeys = array_keys($params);
         foreach ($parameters as $param) {
-            if (!in_array($param->getName(), $paramKeys) && ($type = $param->getType()) && ($name = strval($type) ?: $type?->getName())) {
+            if (!in_array($param->getName(), $paramKeys) && ($type = $param->getType()) && ($name = strval($type))) {
 
                 // Resolve with custom resolver
                 if (!($instance = self::processResolver($name, $resolver))) {
@@ -145,7 +145,7 @@ class DI
     {
         // Add conditon if something is leftout.
         // This is to ensure that the type is an existing class.
-        $name = strval($type) ?: $type->getName();
+        $name = strval($type);
         return $name != Closure::class && !is_callable($name) && class_exists($name);
     }
 }

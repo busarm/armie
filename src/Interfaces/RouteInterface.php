@@ -20,15 +20,15 @@ interface RouteInterface extends ContainerInterface
     public function getController(): string|null;
     /**  @return string */
     public function getFunction(): string|null;
-    /**  @return array|null */
-    public function getParams(): array|null;
+    /**  @return array<string, mixed> */
+    public function getParams(): array;
     /**  @return string|null */
     public function getMethod(): string|null;
     /**  @return string|null */
     public function getPath(): string|null;
     /**  @return MiddlewareInterface[] */
     public function getMiddlewares(): array;
-    
+
     /**
      * Set callable route destination
      * 
@@ -57,22 +57,22 @@ interface RouteInterface extends ContainerInterface
     /**
      * Add route middleware
      * 
-     * @param MiddlewareInterface $middlewares
+     * @param MiddlewareInterface $middleware
      * @return self
      */
     public function middleware(MiddlewareInterface $middleware): self;
 
     /**
      * Add route params.
+     * @param array<string, mixed> $params
      * List of key => value params. 
      * Where:
      * - `key` = function paramater name 
      * - `value` =  function paramater value
-     * 
      * @return self 
      */
     public function params(array $params): self;
-    
+
     /**
      * Set HTTP GET routes
      * 

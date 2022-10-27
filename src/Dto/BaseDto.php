@@ -7,6 +7,7 @@ use ReflectionObject;
 use ReflectionUnionType;
 use Busarm\PhpMini\Errors\DtoError;
 use Busarm\PhpMini\Interfaces\Arrayable;
+use ReflectionType;
 
 /**
  * PHP Mini Framework
@@ -137,7 +138,7 @@ class BaseDto implements Arrayable
      */
     public static function with(array|object|null $data): static
     {
-        $response = new static();
+        $response = new self();
         if ($data) $response->load((array)$data);
         return $response;
     }

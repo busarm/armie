@@ -14,7 +14,7 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
  */
 class HomeTestController
 {
-    public function __construct(private App $app, ResponseInterface $res, RequestInterface $req = null)
+    public function __construct(private App $app)
     {
     }
 
@@ -25,6 +25,6 @@ class HomeTestController
 
     public function pingHtml(ResponseInterface $response)
     {
-        return $response->html('success-' . $this->app->env, 200, false);
+        return $response->html('success-' . $this->app->env, 200);
     }
 }

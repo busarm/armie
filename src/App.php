@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Middlewares\PsrMiddleware;
 use Closure;
 use Throwable;
 
@@ -80,7 +81,7 @@ class App implements HttpServerInterface, ContainerInterface
     public $isCli;
 
 
-    /** @var MiddlewareInterface[]|ServerMiddlewareInterface[] */
+    /** @var MiddlewareInterface[] */
     protected $middlewares = [];
 
     /** @var array */
@@ -249,7 +250,7 @@ class App implements HttpServerInterface, ContainerInterface
      *
      * @param RequestInterface|RouteInterface $request
      * @param ResponseInterface $response
-     * @param MiddlewareInterface[]|ServerMiddlewareInterface[] $middlewares
+     * @param MiddlewareInterface[] $middlewares
      * @return ResponseInterface
      */
     protected function processMiddleware(RequestInterface|RouteInterface $request, ResponseInterface $response, array $middlewares): ResponseInterface
@@ -260,13 +261,7 @@ class App implements HttpServerInterface, ContainerInterface
             $response->html("Resource not found", 404);
 
         foreach (array_reverse($middlewares) as $middleware) {
-            if ($middleware instanceof ServerMiddlewareInterface) {
-                if ($request instanceof RequestInterface) {
-                    $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => Response::fromPsr($middleware->process($request->toPsr(), new ServerRequestHandler(new RequestHandler($action))));
-                }
-            } elseif ($middleware instanceof MiddlewareInterface) {
-                $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
-            }
+            $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
         }
 
         return ($action)($request) ?: $response;
@@ -405,7 +400,11 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function addMiddleware(MiddlewareInterface|ServerMiddlewareInterface $middleware)
     {
-        $this->middlewares[] = $middleware;
+        if ($middleware instanceof ServerMiddlewareInterface) {
+            $this->middlewares[] = new PsrMiddleware($middleware);
+        } else {
+            $this->middlewares[] = $middleware;
+        }
         return $this;
     }
 

@@ -123,7 +123,7 @@ function out($data = null, $responseCode = 500)
     if (!is_array($data) && !is_object($data)) {
         return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode)->send(false);
     }
-    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode, false)->send(false);
+    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode)->send(false);
 }
 
 /**

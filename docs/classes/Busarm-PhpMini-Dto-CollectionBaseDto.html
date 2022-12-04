@@ -111,14 +111,17 @@
     
             <span class="phpdocumentor-element__implements">
             implements
-                            <a href="classes/Busarm-PhpMini-Interfaces-Arrayable.html"><abbr title="\Busarm\PhpMini\Interfaces\Arrayable">Arrayable</abbr></a>                    </span>
+                            <a href="classes/Busarm-PhpMini-Interfaces-Arrayable.html"><abbr title="\Busarm\PhpMini\Interfaces\Arrayable">Arrayable</abbr></a>,                             <abbr title="\Stringable">Stringable</abbr>                    </span>
     
+            <span class="phpdocumentor-element__extends">
+            Uses
+                            <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html"><abbr title="\Busarm\PhpMini\Traits\TypeResolver">TypeResolver</abbr></a>                    </span>
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">21</span>
+    <span class="phpdocumentor-element-found-in__line">26</span>
 
     </aside>
 
@@ -170,6 +173,8 @@
 <dl class="phpdocumentor-table-of-contents">
             <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/Busarm-PhpMini-Interfaces-Arrayable.html"><abbr title="\Busarm\PhpMini\Interfaces\Arrayable">Arrayable</abbr></a></dt>
         <dd>PHP Mini Framework</dd>
+            <dt class="phpdocumentor-table-of-contents__entry -interface"><abbr title="\Stringable">Stringable</abbr></dt>
+        <dd></dd>
     
     
     
@@ -182,19 +187,26 @@
 </h3>
 
 <dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -constant -public">
-    <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#constant_ITEM_CLASS">ITEM_CLASS</a>
+                    <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#property_itemClass">$itemClass</a>
     <span>
-        &nbsp;= NULL                            </span>
+                        &nbsp;: mixed            </span>
 </dt>
 <dd>Define the class that will be used for all items in the array.</dd>
 
-                        <dt class="phpdocumentor-table-of-contents__entry -method -public">
+                <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method___clone">__clone()</a>
     <span>
                                 &nbsp;: mixed    </span>
 </dt>
 <dd>Clone a collection by cloning all items.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method___toString">__toString()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Gets a string representation of the object</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_at">at()</a>
@@ -237,6 +249,13 @@
                                 &nbsp;: mixed    </span>
 </dt>
 <dd>Finding the first element in the Array, for which $callback returns true</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_findType">findType()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Identify the data type by analyzing the data</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_first">first()</a>
@@ -303,11 +322,25 @@ if it is not.</dd>
 <dd>Use a user supplied callback to reduce the array to a single member and return it.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_resolveType">resolveType()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd>Resolve variable type</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_reverse">reverse()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
 <dd>Apply a user supplied function to every member of an array</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_setItemClass">setItemClass()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set define the class that will be used for all items in the array.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_slice">slice()</a>
@@ -335,7 +368,7 @@ if it is not.</dd>
     <span>
                                 &nbsp;: array&lt;string|int, mixed&gt;    </span>
 </dt>
-<dd>Get array response data</dd>
+<dd>Convert dto to array</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_unshift">unshift()</a>
@@ -343,6 +376,13 @@ if it is not.</dd>
                                 &nbsp;: int    </span>
 </dt>
 <dd>Adding a new value at the beginning of the collection</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_validateDate">validateDate()</a>
+    <span>
+                                &nbsp;: <abbr title="\DateTime">DateTime</abbr>|bool    </span>
+</dt>
+<dd>Validate and resolve date</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_walk">walk()</a>
@@ -359,6 +399,20 @@ if it is not.</dd>
 <dd>Constructor</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_checkDate">checkDate()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Check if string is a data</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -private">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_getTypeName">getTypeName()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Get type name</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_validateIndex">validateIndex()</a>
     <span>
                                 &nbsp;: mixed    </span>
@@ -370,33 +424,40 @@ if it is not.</dd>
 
 
         
-    <section class="phpdocumentor-constants">
-        <h3 class="phpdocumentor-elements__header" id="constants">
-            Constants
-            <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#constants" class="headerlink"><i class="fas fa-link"></i></a>
-        </h3>
-                    <article class="phpdocumentor-element -constant -public ">
-    <h4 class="phpdocumentor-element__name" id="constant_ITEM_CLASS">
-        ITEM_CLASS
-        <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#constant_ITEM_CLASS" class="headerlink"><i class="fas fa-link"></i></a>
-    </h4>
 
+        
+    <section class="phpdocumentor-properties">
+        <h3 class="phpdocumentor-elements__header" id="properties">
+            Properties
+            <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+        </h3>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_itemClass">
+        $itemClass
+        <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#property_itemClass" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">34</span>
 
     </aside>
 
         <p class="phpdocumentor-summary">Define the class that will be used for all items in the array.</p>
 
-    <code class="phpdocumentor-signature phpdocumentor-code ">
-    <span class="phpdocumentor-signature__visibility">public</span>
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
         <span class="phpdocumentor-signature__type">mixed</span>
-    <span class="phpdocumentor-signature__name">ITEM_CLASS</span>
-    = <span class="phpdocumentor-signature__default-value">NULL</span>
-</code>
-
+    <span class="phpdocumentor-signature__name">$itemClass</span>
+     = <span class="phpdocumentor-signature__default-value">NULL</span></code>
 
         <section class="phpdocumentor-description"><p>To be defined in each sub-class.</p>
 </section>
@@ -413,8 +474,6 @@ if it is not.</dd>
 
 </article>
             </section>
-
-        
 
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
@@ -434,7 +493,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">77</span>
+    <span class="phpdocumentor-element-found-in__line">97</span>
 
     </aside>
 
@@ -466,6 +525,47 @@ if it is not.</dd>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method___toString">
+        __toString()
+        <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method___toString" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">489</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Gets a string representation of the object</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">__toString</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string</span>
+            &mdash;
+            <section class="phpdocumentor-description"><p>Returns the <code class="prettyprint">string</code> representation of the object.</p>
+</section>
+
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_at">
         at()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_at" class="headerlink"><i class="fas fa-link"></i></a>
@@ -473,7 +573,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">265</span>
+    <span class="phpdocumentor-element-found-in__line">285</span>
 
     </aside>
 
@@ -538,7 +638,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">206</span>
+    <span class="phpdocumentor-element-found-in__line">226</span>
 
     </aside>
 
@@ -594,7 +694,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">221</span>
+    <span class="phpdocumentor-element-found-in__line">241</span>
 
     </aside>
 
@@ -650,7 +750,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">247</span>
+    <span class="phpdocumentor-element-found-in__line">267</span>
 
     </aside>
 
@@ -699,7 +799,7 @@ if it is not.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">337</span>
+    <span class="phpdocumentor-element-found-in__line">357</span>
 
     </aside>
 
@@ -766,7 +866,7 @@ Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback inst
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">315</span>
+    <span class="phpdocumentor-element-found-in__line">335</span>
 
     </aside>
 
@@ -810,6 +910,62 @@ Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback inst
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_findType">
+        findType()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_findType" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">65</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Identify the data type by analyzing the data</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">findType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, <abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$types</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$types</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, <abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>&gt;</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_first">
         first()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_first" class="headerlink"><i class="fas fa-link"></i></a>
@@ -817,7 +973,7 @@ Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback inst
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">352</span>
+    <span class="phpdocumentor-element-found-in__line">372</span>
 
     </aside>
 
@@ -864,7 +1020,7 @@ Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback inst
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">299</span>
+    <span class="phpdocumentor-element-found-in__line">319</span>
 
     </aside>
 
@@ -922,7 +1078,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">110</span>
 
     </aside>
 
@@ -978,7 +1134,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">391</span>
+    <span class="phpdocumentor-element-found-in__line">411</span>
 
     </aside>
 
@@ -1017,7 +1173,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">368</span>
+    <span class="phpdocumentor-element-found-in__line">388</span>
 
     </aside>
 
@@ -1064,7 +1220,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">55</span>
+    <span class="phpdocumentor-element-found-in__line">75</span>
 
     </aside>
 
@@ -1113,7 +1269,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">234</span>
+    <span class="phpdocumentor-element-found-in__line">254</span>
 
     </aside>
 
@@ -1165,7 +1321,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">448</span>
+    <span class="phpdocumentor-element-found-in__line">480</span>
 
     </aside>
 
@@ -1173,7 +1329,7 @@ if it is not.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">of</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;|object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">of</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;|object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$itemClass</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -1182,6 +1338,13 @@ if it is not.</p>
                 <span class="phpdocumentor-signature__argument__name">$data</span>
                 : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;|object</span>
                             </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$itemClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
                 
             </dd>
@@ -1214,7 +1377,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">404</span>
+    <span class="phpdocumentor-element-found-in__line">424</span>
 
     </aside>
 
@@ -1263,6 +1426,66 @@ if it is not.</p>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_resolveType">
+        resolveType()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_resolveType" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">31</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Resolve variable type</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">resolveType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$type</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$type</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+            <section class="phpdocumentor-description"><ul>
+<li>Variable with appropraite type</li>
+</ul>
+</section>
+
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_reverse">
         reverse()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_reverse" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1270,7 +1493,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">386</span>
+    <span class="phpdocumentor-element-found-in__line">406</span>
 
     </aside>
 
@@ -1320,6 +1543,56 @@ if it is not.</p>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_setItemClass">
+        setItemClass()
+        <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_setItemClass" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">62</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set define the class that will be used for all items in the array.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setItemClass</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$itemClass</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$itemClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_slice">
         slice()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_slice" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1327,7 +1600,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">154</span>
+    <span class="phpdocumentor-element-found-in__line">174</span>
 
     </aside>
 
@@ -1398,7 +1671,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">168</span>
+    <span class="phpdocumentor-element-found-in__line">188</span>
 
     </aside>
 
@@ -1455,7 +1728,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">112</span>
+    <span class="phpdocumentor-element-found-in__line">132</span>
 
     </aside>
 
@@ -1526,11 +1799,11 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">414</span>
+    <span class="phpdocumentor-element-found-in__line">435</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Get array response data</p>
+        <p class="phpdocumentor-summary">Convert dto to array</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
@@ -1544,7 +1817,9 @@ if it is not.</p>
                 : <span class="phpdocumentor-signature__argument__return-type">bool</span>
                  = <span class="phpdocumentor-signature__argument__default-value">true</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Remove NULL properties</p>
+                    <section class="phpdocumentor-description"><ul>
+<li>Remove NULL properties</li>
+</ul>
 </section>
 
             </dd>
@@ -1577,7 +1852,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">134</span>
+    <span class="phpdocumentor-element-found-in__line">154</span>
 
     </aside>
 
@@ -1621,6 +1896,55 @@ if it is not.</p>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_validateDate">
+        validateDate()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_validateDate" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">110</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Validate and resolve date</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">validateDate</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$str</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|bool</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$str</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_walk">
         walk()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_walk" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1628,7 +1952,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">189</span>
+    <span class="phpdocumentor-element-found-in__line">209</span>
 
     </aside>
 
@@ -1702,7 +2026,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">40</span>
+    <span class="phpdocumentor-element-found-in__line">47</span>
 
     </aside>
 
@@ -1774,6 +2098,111 @@ if it is not.</p>
             -private
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_checkDate">
+        checkDate()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_checkDate" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">144</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Check if string is a data</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+                    <span class="phpdocumentor-signature__name">checkDate</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$str</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$str</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getTypeName">
+        getTypeName()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_getTypeName" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">92</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get type name</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+                    <span class="phpdocumentor-signature__name">getTypeName</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$type</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$type</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -private
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_validateIndex">
         validateIndex()
         <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html#method_validateIndex" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1781,7 +2210,7 @@ if it is not.</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/CollectionBaseDto.php"><a href="files/src-dto-collectionbasedto.html"><abbr title="src/Dto/CollectionBaseDto.php">CollectionBaseDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">280</span>
+    <span class="phpdocumentor-element-found-in__line">300</span>
 
     </aside>
 

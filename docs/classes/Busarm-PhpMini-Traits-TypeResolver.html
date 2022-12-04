@@ -91,36 +91,25 @@
                     <ul class="phpdocumentor-breadcrumbs">
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm.html">Busarm</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini.html">PhpMini</a></li>
-            <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini-handlers.html">Handlers</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini-traits.html">Traits</a></li>
     </ul>
 
-    <article class="phpdocumentor-element -class">
+    <article class="phpdocumentor-element -trait">
         <h2 class="phpdocumentor-content__title">
-    DependencyResolver
-
-    
-            <div class="phpdocumentor-element__package">
-            in package
-            <ul class="phpdocumentor-breadcrumbs">
-                                    <li class="phpdocumentor-breadcrumb"><a href="packages/Application.html">Application</a></li>
-                            </ul>
-        </div>
-    
-            <span class="phpdocumentor-element__implements">
-            implements
-                            <a href="classes/Busarm-PhpMini-Interfaces-DependencyResolverInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\DependencyResolverInterface">DependencyResolverInterface</abbr></a>                    </span>
-    
+    TypeResolver
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/DependencyResolver.php"><a href="files/src-handlers-dependencyresolver.html"><abbr title="src/Handlers/DependencyResolver.php">DependencyResolver.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">39</span>
+    <span class="phpdocumentor-element-found-in__line">22</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">PHP Mini Framework</p>
+            <p class="phpdocumentor-summary">Manage Singletons</p>
 
+    <section class="phpdocumentor-description"><p>PHP Mini Framework</p>
+</section>
 
 
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
@@ -151,18 +140,6 @@
 
 
 
-<h3 id="interfaces_class_traits">
-    Interfaces, Classes, Traits and Enums
-    <a href="#interfaces_class_traits" class="headerlink"><i class="fas fa-link"></i></a>
-</h3>
-
-<dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/Busarm-PhpMini-Interfaces-DependencyResolverInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\DependencyResolverInterface">DependencyResolverInterface</abbr></a></dt>
-        <dd>Add support for app-wide singleton</dd>
-    
-    
-    
-    </dl>
 
 
 <h3 id="toc">
@@ -171,33 +148,40 @@
 </h3>
 
 <dl class="phpdocumentor-table-of-contents">
-                    <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#property_request">$request</a>
+                        <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_findType">findType()</a>
     <span>
-                        &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>|null            </span>
+                                &nbsp;: string    </span>
 </dt>
-<dd></dd>
-
-                <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method___construct">__construct()</a>
-    <span>
-                                &nbsp;: mixed    </span>
-</dt>
-<dd></dd>
+<dd>Identify the data type by analyzing the data</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_customizeDependency">customizeDependency()</a>
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_resolveType">resolveType()</a>
     <span>
                                 &nbsp;: mixed    </span>
 </dt>
-<dd>Customize dependency</dd>
+<dd>Resolve variable type</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_resolveDependency">resolveDependency()</a>
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_validateDate">validateDate()</a>
     <span>
-                                &nbsp;: mixed    </span>
+                                &nbsp;: <abbr title="\DateTime">DateTime</abbr>|bool    </span>
 </dt>
-<dd>Resolve dependency for class name</dd>
+<dd>Validate and resolve date</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -private">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_checkDate">checkDate()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Check if string is a data</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -private">
+    <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_getTypeName">getTypeName()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Get type name</dd>
 
         </dl>
 
@@ -205,58 +189,10 @@
 
         
 
-        
-    <section class="phpdocumentor-properties">
-        <h3 class="phpdocumentor-elements__header" id="properties">
-            Properties
-            <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
-        </h3>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -private
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_request">
-        $request
-        <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#property_request" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/DependencyResolver.php"><a href="files/src-handlers-dependencyresolver.html"><abbr title="src/Handlers/DependencyResolver.php">DependencyResolver.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">43</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">private</span>
-        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>|null</span>
-    <span class="phpdocumentor-signature__name">$request</span>
-     = <span class="phpdocumentor-signature__default-value">null</span></code>
-
-        <section class="phpdocumentor-description"></section>
-
-        <section class="phpdocumentor-description"></section>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-            </section>
-
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -264,32 +200,39 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method___construct">
-        __construct()
-        <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_findType">
+        findType()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_findType" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/DependencyResolver.php"><a href="files/src-handlers-dependencyresolver.html"><abbr title="src/Handlers/DependencyResolver.php">DependencyResolver.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">43</span>
+    <span class="phpdocumentor-element-found-in__line">65</span>
 
     </aside>
 
-    
+        <p class="phpdocumentor-summary">Identify the data type by analyzing the data</p>
+
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">findType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, <abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$types</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$request</span>
-                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>|null</span>
-                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$types</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, <abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>&gt;</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
             </dd>
             </dl>
 
@@ -302,7 +245,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">mixed</span>
+    <span class="phpdocumentor-signature__response_type">string</span>
             &mdash;
         
     
@@ -313,28 +256,35 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_customizeDependency">
-        customizeDependency()
-        <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_customizeDependency" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_resolveType">
+        resolveType()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_resolveType" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/DependencyResolver.php"><a href="files/src-handlers-dependencyresolver.html"><abbr title="src/Handlers/DependencyResolver.php">DependencyResolver.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">31</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Customize dependency</p>
+        <p class="phpdocumentor-summary">Resolve variable type</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">customizeDependency</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$instance</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">resolveType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$type</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$instance</span>
+                <span class="phpdocumentor-signature__argument__name">$type</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
                 : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
@@ -353,7 +303,11 @@
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type">mixed</span>
             &mdash;
-        
+            <section class="phpdocumentor-description"><ul>
+<li>Variable with appropraite type</li>
+</ul>
+</section>
+
     
 </article>
                     <article
@@ -362,28 +316,28 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_resolveDependency">
-        resolveDependency()
-        <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#method_resolveDependency" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_validateDate">
+        validateDate()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_validateDate" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/DependencyResolver.php"><a href="files/src-handlers-dependencyresolver.html"><abbr title="src/Handlers/DependencyResolver.php">DependencyResolver.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">54</span>
+    <span class="phpdocumentor-element-found-in__line">110</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Resolve dependency for class name</p>
+        <p class="phpdocumentor-summary">Validate and resolve date</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">resolveDependency</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$className</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">validateDate</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$str</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|bool</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$className</span>
+                <span class="phpdocumentor-signature__argument__name">$str</span>
                 : <span class="phpdocumentor-signature__argument__return-type">string</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
@@ -400,7 +354,112 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">mixed</span>
+    <span class="phpdocumentor-signature__response_type"><abbr title="\DateTime">DateTime</abbr>|bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_checkDate">
+        checkDate()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_checkDate" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">144</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Check if string is a data</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+                    <span class="phpdocumentor-signature__name">checkDate</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$str</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$str</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getTypeName">
+        getTypeName()
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#method_getTypeName" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Traits/TypeResolver.php"><a href="files/src-traits-typeresolver.html"><abbr title="src/Traits/TypeResolver.php">TypeResolver.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">92</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get type name</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+                    <span class="phpdocumentor-signature__name">getTypeName</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$type</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$type</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionUnionType">ReflectionUnionType</abbr>|<abbr title="\ReflectionNamedType">ReflectionNamedType</abbr>|<abbr title="\ReflectionType">ReflectionType</abbr>|string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string</span>
             &mdash;
         
     
@@ -411,7 +470,7 @@
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Handlers/DependencyResolver.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Traits/TypeResolver.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -513,7 +572,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Busarm-PhpMini-Handlers-DependencyResolver.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Busarm-PhpMini-Traits-TypeResolver.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

@@ -96,7 +96,7 @@
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    ResponseDto
+    PaginatedCollectionDto
 
         <span class="phpdocumentor-element__extends">
         extends <a href="classes/Busarm-PhpMini-Dto-BaseDto.html"><abbr title="\Busarm\PhpMini\Dto\BaseDto">BaseDto</abbr></a>
@@ -113,7 +113,7 @@
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
     <span class="phpdocumentor-element-found-in__line">11</span>
 
@@ -160,79 +160,58 @@
 
 <dl class="phpdocumentor-table-of-contents">
                     <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_data">$data</a>
-    <span>
-                        &nbsp;: object|array&lt;string|int, mixed&gt;            </span>
-</dt>
-<dd></dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_duration">$duration</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_count">$count</a>
     <span>
                         &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_env">$env</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_current">$current</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorCode">$errorCode</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_data">$data</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: <a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorFile">$errorFile</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_first">$first</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorLine">$errorLine</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_last">$last</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorTrace">$errorTrace</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_next">$next</a>
     <span>
-                        &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-Dto-ErrorTraceDto.html"><abbr title="\Busarm\PhpMini\Dto\ErrorTraceDto">ErrorTraceDto</abbr></a>&gt;|array&lt;string|int, mixed&gt;            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_ip">$ip</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_previous">$previous</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_message">$message</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_total">$total</a>
     <span>
-                        &nbsp;: string            </span>
-</dt>
-<dd></dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_success">$success</a>
-    <span>
-                        &nbsp;: bool            </span>
-</dt>
-<dd></dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -property -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_version">$version</a>
-    <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: int            </span>
 </dt>
 <dd></dd>
 
@@ -244,6 +223,13 @@
 <dd>Explicitly selected attributes</dd>
 
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method___construct">__construct()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-BaseDto.html#method___toString">__toString()</a>
     <span>
                                 &nbsp;: string    </span>
@@ -307,74 +293,60 @@
 <dd>Set property</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setData">setData()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setCount">setCount()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of count</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setCurrent">setCurrent()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of current</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setData">setData()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
 <dd>Set the value of data</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setDuration">setDuration()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setFirst">setFirst()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Set the value of duration</dd>
+<dd>Set the value of first</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setEnv">setEnv()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setLast">setLast()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Set the value of env</dd>
+<dd>Set the value of last</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorCode">setErrorCode()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setNext">setNext()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Set the value of errorCode</dd>
+<dd>Set the value of next</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorFile">setErrorFile()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setPrevious">setPrevious()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Set the value of errorFile</dd>
+<dd>Set the value of previous</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorLine">setErrorLine()</a>
+    <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setTotal">setTotal()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Set the value of errorLine</dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorTrace">setErrorTrace()</a>
-    <span>
-                                &nbsp;: self    </span>
-</dt>
-<dd>Set the value of errorTrace</dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setMessage">setMessage()</a>
-    <span>
-                                &nbsp;: self    </span>
-</dt>
-<dd>Set the value of message</dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setSuccess">setSuccess()</a>
-    <span>
-                                &nbsp;: self    </span>
-</dt>
-<dd>Set the value of success</dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setVersion">setVersion()</a>
-    <span>
-                                &nbsp;: self    </span>
-</dt>
-<dd>Set the value of version</dd>
+<dd>Set the value of total</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Dto-BaseDto.html#method_toArray">toArray()</a>
@@ -428,8 +400,84 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_count">
+        $count
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_count" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">16</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$count</span>
+    </code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_current">
+        $current
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_current" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">18</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$current</span>
+    </code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
                     <article
         class="
             phpdocumentor-element
@@ -439,21 +487,21 @@
 >
     <h4 class="phpdocumentor-element__name" id="property_data">
         $data
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_data" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_data" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">18</span>
+    <span class="phpdocumentor-element-found-in__line">14</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">object|array&lt;string|int, mixed&gt;</span>
+        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;</span>
     <span class="phpdocumentor-signature__name">$data</span>
     </code>
 
@@ -475,14 +523,52 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="property_duration">
-        $duration
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_duration" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="property_first">
+        $first
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_first" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">24</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$first</span>
+    </code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_last">
+        $last
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_last" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
     <span class="phpdocumentor-element-found-in__line">26</span>
 
@@ -492,7 +578,7 @@
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
         <span class="phpdocumentor-signature__type">int</span>
-    <span class="phpdocumentor-signature__name">$duration</span>
+    <span class="phpdocumentor-signature__name">$last</span>
     </code>
 
     
@@ -513,14 +599,14 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="property_env">
-        $env
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_env" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="property_next">
+        $next
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_next" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
     <span class="phpdocumentor-element-found-in__line">20</span>
 
@@ -529,8 +615,8 @@
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$env</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$next</span>
     </code>
 
     
@@ -551,166 +637,14 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="property_errorCode">
-        $errorCode
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorCode" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="property_previous">
+        $previous
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_previous" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">28</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$errorCode</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_errorFile">
-        $errorFile
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorFile" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">32</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$errorFile</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_errorLine">
-        $errorLine
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorLine" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">30</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$errorLine</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_errorTrace">
-        $errorTrace
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorTrace" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">34</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Dto-ErrorTraceDto.html"><abbr title="\Busarm\PhpMini\Dto\ErrorTraceDto">ErrorTraceDto</abbr></a>&gt;|array&lt;string|int, mixed&gt;</span>
-    <span class="phpdocumentor-signature__name">$errorTrace</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_ip">
-        $ip
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_ip" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
     <span class="phpdocumentor-element-found-in__line">22</span>
 
@@ -719,8 +653,8 @@
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$ip</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$previous</span>
     </code>
 
     
@@ -741,100 +675,24 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="property_message">
-        $message
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_message" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="property_total">
+        $total
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#property_total" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">16</span>
+    <span class="phpdocumentor-element-found-in__line">28</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$message</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_success">
-        $success
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_success" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">14</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">bool</span>
-    <span class="phpdocumentor-signature__name">$success</span>
-    </code>
-
-    
-    
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_version">
-        $version
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#property_version" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">24</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-        <span class="phpdocumentor-signature__type">string</span>
-    <span class="phpdocumentor-signature__name">$version</span>
+        <span class="phpdocumentor-signature__type">int</span>
+    <span class="phpdocumentor-signature__name">$total</span>
     </code>
 
     
@@ -892,8 +750,90 @@
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method___construct">
+        __construct()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">30</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$page</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$limit</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$total</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$count</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$data</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$page</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$limit</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$total</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$count</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+        
+    
+</article>
                     <article
         class="phpdocumentor-element
             -method
@@ -1386,14 +1326,114 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setData">
-        setData()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setData" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setCount">
+        setCount()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setCount" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">65</span>
+    <span class="phpdocumentor-element-found-in__line">69</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of count</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setCount</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$count</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$count</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setCurrent">
+        setCurrent()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setCurrent" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">81</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of current</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setCurrent</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$current</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$current</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setData">
+        setData()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setData" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">57</span>
 
     </aside>
 
@@ -1401,14 +1441,14 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setData</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setData</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
                 <span class="phpdocumentor-signature__argument__name">$data</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Dto-CollectionBaseDto.html"><abbr title="\Busarm\PhpMini\Dto\CollectionBaseDto">CollectionBaseDto</abbr></a>|array&lt;string|int, mixed&gt;</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -1436,29 +1476,29 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setDuration">
-        setDuration()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setDuration" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setFirst">
+        setFirst()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setFirst" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">101</span>
+    <span class="phpdocumentor-element-found-in__line">117</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Set the value of duration</p>
+        <p class="phpdocumentor-summary">Set the value of first</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setDuration</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$duration</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setFirst</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$first</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$duration</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$first</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -1486,29 +1526,29 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setEnv">
-        setEnv()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setEnv" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setLast">
+        setLast()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setLast" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">77</span>
+    <span class="phpdocumentor-element-found-in__line">129</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Set the value of env</p>
+        <p class="phpdocumentor-summary">Set the value of last</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setEnv</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$env</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setLast</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$last</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$env</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$last</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -1536,29 +1576,29 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setErrorCode">
-        setErrorCode()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorCode" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setNext">
+        setNext()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setNext" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">113</span>
+    <span class="phpdocumentor-element-found-in__line">93</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Set the value of errorCode</p>
+        <p class="phpdocumentor-summary">Set the value of next</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setErrorCode</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$errorCode</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setNext</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$next</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$errorCode</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$next</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -1586,29 +1626,29 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setErrorFile">
-        setErrorFile()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorFile" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setPrevious">
+        setPrevious()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setPrevious" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">137</span>
+    <span class="phpdocumentor-element-found-in__line">105</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Set the value of errorFile</p>
+        <p class="phpdocumentor-summary">Set the value of previous</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setErrorFile</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$errorFile</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setPrevious</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$previous</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$errorFile</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$previous</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -1636,229 +1676,29 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_setErrorLine">
-        setErrorLine()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorLine" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setTotal">
+        setTotal()
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#method_setTotal" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/PaginatedCollectionDto.php"><a href="files/src-dto-paginatedcollectiondto.html"><abbr title="src/Dto/PaginatedCollectionDto.php">PaginatedCollectionDto.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">125</span>
+    <span class="phpdocumentor-element-found-in__line">141</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Set the value of errorLine</p>
+        <p class="phpdocumentor-summary">Set the value of total</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setErrorLine</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$errorLine</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">setTotal</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$total</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$errorLine</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
-            </dd>
-            </dl>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">self</span>
-            &mdash;
-        
-    
-</article>
-                    <article
-        class="phpdocumentor-element
-            -method
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="method_setErrorTrace">
-        setErrorTrace()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setErrorTrace" class="headerlink"><i class="fas fa-link"></i></a>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">149</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">Set the value of errorTrace</p>
-
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setErrorTrace</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$errorTrace</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
-
-    
-        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
-    <dl class="phpdocumentor-argument-list">
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$errorTrace</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
-            </dd>
-            </dl>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">self</span>
-            &mdash;
-        
-    
-</article>
-                    <article
-        class="phpdocumentor-element
-            -method
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="method_setMessage">
-        setMessage()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setMessage" class="headerlink"><i class="fas fa-link"></i></a>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">53</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">Set the value of message</p>
-
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setMessage</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$message</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
-
-    
-        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
-    <dl class="phpdocumentor-argument-list">
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$message</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
-            </dd>
-            </dl>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">self</span>
-            &mdash;
-        
-    
-</article>
-                    <article
-        class="phpdocumentor-element
-            -method
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="method_setSuccess">
-        setSuccess()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setSuccess" class="headerlink"><i class="fas fa-link"></i></a>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">41</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">Set the value of success</p>
-
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setSuccess</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$success</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
-
-    
-        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
-    <dl class="phpdocumentor-argument-list">
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$success</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
-            </dd>
-            </dl>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">self</span>
-            &mdash;
-        
-    
-</article>
-                    <article
-        class="phpdocumentor-element
-            -method
-            -public
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="method_setVersion">
-        setVersion()
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#method_setVersion" class="headerlink"><i class="fas fa-link"></i></a>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Dto/ResponseDto.php"><a href="files/src-dto-responsedto.html"><abbr title="src/Dto/ResponseDto.php">ResponseDto.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">89</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">Set the value of version</p>
-
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">setVersion</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$version</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
-
-    
-        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
-    <dl class="phpdocumentor-argument-list">
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$version</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$total</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
@@ -2191,7 +2031,7 @@
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Dto/ResponseDto.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Dto/PaginatedCollectionDto.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -2293,7 +2133,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Busarm-PhpMini-Dto-ResponseDto.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Busarm-PhpMini-Dto-PaginatedCollectionDto.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

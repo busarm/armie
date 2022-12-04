@@ -33,4 +33,52 @@ class ErrorTraceDto extends BaseDto
         $this->class = $trace['class'] ?? null;
         $this->function = $trace['function'] ?? null;
     }
+
+    /**
+     * Set the value of class
+     *
+     * @return  self
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of line
+     *
+     * @return  self
+     */
+    public function setLine($line)
+    {
+        $this->line = $line;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of file
+     *
+     * @return  self
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of function
+     *
+     * @return  self
+     */
+    public function setFunction($function)
+    {
+        $this->function = $function;
+
+        return $this;
+    }
 }

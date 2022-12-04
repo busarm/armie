@@ -8,6 +8,7 @@ use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\ResponseHandler;
+use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -39,8 +40,11 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (class_exists($this->controller)) {
+            // Get dependency resolver
+            $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
+
             // Load controller
-            $object = DI::instantiate($this->controller, new DependencyResolver($request));
+            $object = DI::instantiate($this->controller, new $resolver($request));
             if ($object) {
                 // Load method
                 if (
@@ -54,7 +58,7 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                             array_merge(DI::resolveMethodDependencies(
                                 $this->controller,
                                 $this->function,
-                                new DependencyResolver($request)
+                                new $resolver($request),
                             ), $this->params)
                         );
 

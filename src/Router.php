@@ -10,7 +10,6 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
 use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
 use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 
 /**
  * Application Router
@@ -97,7 +96,7 @@ class Router implements RouterInterface
      * Process routing
      *
      * @param RequestInterface|RouteInterface|null $request
-     * @return MiddlewareInterface[]
+     * @return \Busarm\PhpMini\Interfaces\MiddlewareInterface[]
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array
     {

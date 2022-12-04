@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Handlers;
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Data\PDO\ConnectionConfig;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\ErrorReporter;
@@ -64,6 +65,17 @@ class DependencyResolver implements DependencyResolverInterface
             Psr7Request::class, ServerRequestInterface::class, MessageRequestInterface::class => $this->request && $this->request instanceof RequestInterface ? $this->request->toPsr() : null,
             Response::class, ResponseInterface::class => $this->request && $this->request instanceof RequestInterface ? (new Response(version: $this->request->version(), format: app()->config->httpResponseFormat)) : new Response,
             Psr7Response::class, MessageResponseInterface::class => $this->request && $this->request instanceof RequestInterface ? (new Response(version: $this->request->version(), format: app()->config->httpResponseFormat))->toPsr() : (new Response)->toPsr(),
+            ConnectionConfig::class => (new ConnectionConfig())
+                ->setDriver(app()->config->pdoConnectionDriver)
+                ->setDsn(app()->config->pdoConnectionDNS)
+                ->setHost(app()->config->pdoConnectionHost)
+                ->setPort(app()->config->pdoConnectionPort)
+                ->setDatabase(app()->config->pdoConnectionDatabase)
+                ->setUser(app()->config->pdoConnectionUsername)
+                ->setPassword(app()->config->pdoConnectionPassword)
+                ->setPersist(app()->config->pdoConnectionPersist)
+                ->setErrorMode(app()->config->pdoConnectionErrorMode)
+                ->setOptions(app()->config->pdoConnectionOptions),
             default => ($this->request ? $this->request->getSingleton($className) : null) ?: app()->getSingleton($className)
         };
     }
@@ -80,9 +92,9 @@ class DependencyResolver implements DependencyResolverInterface
         if ($this->request) {
             if ($instance instanceof BaseDto) {
                 if ($this->request instanceof RequestInterface) {
-                    $instance->load($this->request->request()->all(), true);
+                    $instance->load($this->request->request()->all());
                 } else if ($this->request instanceof RouteInterface) {
-                    $instance->load($this->request->getParams(), true);
+                    $instance->load($this->request->getParams());
                 }
             } else if ($instance instanceof CollectionBaseDto) {
                 if ($this->request instanceof RequestInterface) {

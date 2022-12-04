@@ -6,7 +6,6 @@ use Busarm\PhpMini\Enums\ResponseFormat;
 use InvalidArgumentException;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
-use Psr\Http\Message\StreamInterface;
 use Throwable;
 
 use Nyholm\Psr7\Stream;
@@ -49,7 +48,7 @@ class Response implements ResponseInterface, Stringable
     protected $statusText;
 
     /**
-     * @var StreamInterface|Stringable|resource|string|null
+     * @var \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
      */
     protected $body = NULL;
 
@@ -117,7 +116,7 @@ class Response implements ResponseInterface, Stringable
     );
 
     /**
-     * @param StreamInterface|\Stringable|resource|string|array|null $body
+     * @param \Psr\Http\Message\StreamInterface|\Stringable|resource|string|array|null $body
      * @param int   $statusCode
      * @param array $headers
      * @param string $version
@@ -228,7 +227,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @param StreamInterface|Stringable|resource|string|null $body
+     * @param \Psr\Http\Message\StreamInterface|Stringable|resource|string|null $body
      * @return self
      */
     public function setBody(mixed $body): self
@@ -238,7 +237,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @return StreamInterface|Stringable|resource|string|null
+     * @return \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
      */
     public function getBody(): mixed
     {
@@ -387,7 +386,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @return StreamInterface|Stringable|resource|string|null
+     * @return \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
      * @throws InvalidArgumentException
      */
     public function getResponseBody()
@@ -492,7 +491,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @param StreamInterface|string|null $data
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
      * @param int $code response code
      * @return self
      */
@@ -506,7 +505,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @param StreamInterface|string|null $data
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
      * @param string $name
      * @param bool $inline
      * @param string $contentType

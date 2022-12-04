@@ -9,7 +9,6 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Server;
 use Busarm\PhpMini\Interfaces\RouterInterface;
-use Nyholm\Psr7\Request;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Log\LoggerInterface;
 

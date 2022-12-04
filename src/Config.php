@@ -258,6 +258,76 @@ class Config
      */
     public bool $httpSessionAutoStart = true;
 
+    /**
+     * PDO connection dns
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionDNS = null;
+
+    /**
+     * PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     * @see https://www.php.net/manual/en/pdo.drivers.php
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionDriver = null;
+
+    /**
+     * PDO connection host. Host IP or Url
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionHost = null;
+
+    /**
+     * PDO connection port
+     *
+     * @var int|null
+     */
+    public int|null $pdoConnectionPort = null;
+
+    /**
+     * PDO connection database name
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionDatabase = null;
+
+    /**
+     * PDO connection username
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionUsername = null;
+
+    /**
+     * PDO connection password
+     *
+     * @var string|null
+     */
+    public string|null $pdoConnectionPassword = null;
+
+    /**
+     * PDO connection persist
+     *
+     * @var bool
+     */
+    public bool $pdoConnectionPersist = false;
+
+    /**
+     * PDO connection activate error mode
+     *
+     * @var bool
+     */
+    public bool $pdoConnectionErrorMode = true;
+
+    /**
+     * PDO connection options
+     *
+     * @var array
+     */
+    public array $pdoConnectionOptions = [];
 
     function __construct()
     {
@@ -747,5 +817,145 @@ class Config
     public function set(string $name, $value = null)
     {
         return $this->custom[$name] = $value;
+    }
+
+    /**
+     * Set PDO connection dns
+     *
+     * @param  string|null  $pdoConnectionDNS  PDO connection dns
+     *
+     * @return  self
+     */
+    public function setPdoConnectionDNS($pdoConnectionDNS)
+    {
+        $this->pdoConnectionDNS = $pdoConnectionDNS;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     *
+     * @param  string|null  $pdoConnectionDriver  PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     *
+     * @return  self
+     */
+    public function setPdoConnectionDriver($pdoConnectionDriver)
+    {
+        $this->pdoConnectionDriver = $pdoConnectionDriver;
+
+        return $this;
+    }
+
+    /**
+     * Set pDO connection database name
+     *
+     * @param  string|null  $pdoConnectionDatabase  PDO connection database name
+     *
+     * @return  self
+     */
+    public function setPdoConnectionDatabase($pdoConnectionDatabase)
+    {
+        $this->pdoConnectionDatabase = $pdoConnectionDatabase;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection host. Host IP or Url
+     *
+     * @param  string|null  $pdoConnectionHost  PDO connection host. Host IP or Url
+     *
+     * @return  self
+     */
+    public function setPdoConnectionHost($pdoConnectionHost)
+    {
+        $this->pdoConnectionHost = $pdoConnectionHost;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection port
+     *
+     * @param  int|null  $pdoConnectionPort  PDO connection port
+     *
+     * @return  self
+     */
+    public function setPdoConnectionPort($pdoConnectionPort)
+    {
+        $this->pdoConnectionPort = $pdoConnectionPort;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection username
+     *
+     * @param  string|null  $pdoConnectionUsername  PDO connection username
+     *
+     * @return  self
+     */
+    public function setPdoConnectionUsername($pdoConnectionUsername)
+    {
+        $this->pdoConnectionUsername = $pdoConnectionUsername;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection password
+     *
+     * @param  string|null  $pdoConnectionPassword  PDO connection password
+     *
+     * @return  self
+     */
+    public function setPdoConnectionPassword($pdoConnectionPassword)
+    {
+        $this->pdoConnectionPassword = $pdoConnectionPassword;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection persist
+     *
+     * @param  bool  $pdoConnectionPersist  PDO connection persist
+     *
+     * @return  self
+     */
+    public function setPdoConnectionPersist(bool $pdoConnectionPersist)
+    {
+        $this->pdoConnectionPersist = $pdoConnectionPersist;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection activate error mode
+     *
+     * @param  bool  $pdoConnectionErrorMode  PDO connection activate error mode
+     *
+     * @return  self
+     */
+    public function setPdoConnectionErrorMode(bool $pdoConnectionErrorMode)
+    {
+        $this->pdoConnectionErrorMode = $pdoConnectionErrorMode;
+
+        return $this;
+    }
+
+    /**
+     * Set PDO connection options
+     *
+     * @param  array  $pdoConnectionOptions  PDO connection options
+     *
+     * @return  self
+     */
+    public function setPdoConnectionOptions(array $pdoConnectionOptions)
+    {
+        $this->pdoConnectionOptions = $pdoConnectionOptions;
+
+        return $this;
     }
 }

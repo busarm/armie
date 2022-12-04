@@ -313,3 +313,36 @@ function unit_convert($size)
     $index = floor(log($size, 1024));
     return (round($size / pow(1024, ($index)), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
 }
+
+/**
+ * Check if any item in array validates to true
+ *
+ * @param array $list
+ * @return boolean
+ */
+function any(array $list): bool
+{
+    return in_array(true, array_map(fn ($item) => !empty($item), $list));
+}
+
+/**
+ * Check if all items in array validates to true
+ *
+ * @param array $list
+ * @return boolean
+ */
+function all(array $list): bool
+{
+    return !in_array(false, array_map(fn ($item) => !empty($item), $list));
+}
+
+/**
+ * Check if array is a list - [a,b,c] not [a=>1,b=>2,c=>3]
+ *
+ * @param array $list
+ * @return boolean
+ */
+function is_list(array $list): bool
+{
+    return array_values($list) === $list;
+}

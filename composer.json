@@ -27,8 +27,13 @@
         ]
     },
     "scripts": {
-        "analyse": "./vendor/bin/phpstan analyse --level 3 src tests",
-        "test": "composer run analyse && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v"
+        "analyze": "./vendor/bin/phpstan analyse --level 3 src tests",
+        "test": "composer run analyze && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests --exclude skip -v",
+        "test-local": "composer run analyze && php -d xdebug.mode=coverage ./vendor/bin/phpunit tests -v",
+        "test-skip": "./vendor/bin/phpunit --group skip -v",
+        "test-pdo": "./vendor/bin/phpunit --group pdo -v",
+        "test-pdo-edit": "./vendor/bin/phpunit --group pdo-edit -v",
+        "test-pdo-get": "./vendor/bin/phpunit --group pdo-get -v"
     },
     "keywords": [
         "php",

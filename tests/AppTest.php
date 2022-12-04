@@ -18,7 +18,6 @@ use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
 use Middlewares\Firewall;
 
-use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework

@@ -16,12 +16,11 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
-use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\RequestHandler;
-use Busarm\PhpMini\Handlers\ServerRequestHandler;
 use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
+use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
@@ -43,6 +42,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function Busarm\PhpMini\Helpers\is_cli;
 
+// TODO:
+// Event Manager Interface - Handle sync and async dispatch
+// Queue Manager Interface - Handle sync and async jobs
 /**
  * Application Factory
  * 
@@ -133,7 +135,8 @@ class App implements HttpServerInterface, ContainerInterface
             Verbose::NORMAL => OutputInterface::VERBOSITY_NORMAL,
             Verbose::VERBOSE => OutputInterface::VERBOSITY_VERBOSE,
             Verbose::VERY_VERBOSE => OutputInterface::VERBOSITY_VERY_VERBOSE,
-            Verbose::DEBUG => OutputInterface::VERBOSITY_DEBUG
+            Verbose::DEBUG => OutputInterface::VERBOSITY_DEBUG,
+            default => OutputInterface::VERBOSITY_NORMAL
         }, true));
 
         // Set up error reporting
@@ -227,22 +230,16 @@ class App implements HttpServerInterface, ContainerInterface
             }
         }, $this, $request, $response);
 
-        // Initiate rerouting
-        if ($this->router) {
+        // Process route request
+        $response = $this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request)));
 
-            // Process route request
-            $response = $this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request)));
+        // Run complete hook
+        $this->triggerCompleteHook($request, $response);
 
-            // Run complete hook
-            $this->triggerCompleteHook($request, $response);
+        $this->status = AppStatus::STOPPED;
+        $request = NULL;
 
-            $this->status = AppStatus::STOPPED;
-            $request = NULL;
-
-            return $this->isCli ? $response : ($response->send($this->config->httpSendAndContinue) ?? $response);
-        } else {
-            throw new SystemError("Router not configured. See `setRouter`");
-        }
+        return $this->isCli ? $response : ($response->send($this->config->httpSendAndContinue) ?? $response);
     }
 
     /**
@@ -264,7 +261,7 @@ class App implements HttpServerInterface, ContainerInterface
             $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
         }
 
-        return ($action)($request) ?: $response;
+        return ($action)($request);
     }
 
     /**
@@ -332,10 +329,13 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null)
     {
+        // Get dependency resolver
+        $resolver = $this->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
+
         // Instantiate class
         $instance = DI::instantiate(
             $className,
-            new DependencyResolver($request),
+            new $resolver($request),
             $params
         );
 
@@ -575,10 +575,10 @@ class App implements HttpServerInterface, ContainerInterface
 
             // Show more info if not production
             if (!$response->success && $this->env !== Env::PROD) {
-                $response->code = !empty($errorCode) ? $errorCode : null;
-                $response->line = !empty($errorLine) ? $errorLine : null;
-                $response->file = !empty($errorFile) ? $errorFile : null;
-                $response->backtrace = !empty($errorTrace) ? $errorTrace : null;
+                $response->errorCode = !empty($errorCode) ? $errorCode : null;
+                $response->errorLine = !empty($errorLine) ? $errorLine : null;
+                $response->errorFile = !empty($errorFile) ? $errorFile : null;
+                $response->errorTrace = !empty($errorTrace) ? $errorTrace : null;
                 $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 

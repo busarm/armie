@@ -22,14 +22,134 @@ class ResponseDto extends BaseDto
     public string|null $ip;
     /** @var string */
     public string|null $version;
-    /** @var string */
-    public string|null $code;
-    /** @var string */
-    public string|null $line;
-    /** @var string */
-    public string|null $file;
-    /** @var array */
-    public array|null $backtrace;
     /** @var int */
     public int|null $duration;
+    /** @var string */
+    public string|null $errorCode;
+    /** @var string */
+    public string|null $errorLine;
+    /** @var string */
+    public string|null $errorFile;
+    /** @var ErrorTraceDto[]|array */
+    public array|null $errorTrace;
+
+    /**
+     * Set the value of success
+     *
+     * @return  self
+     */
+    public function setSuccess($success)
+    {
+        $this->success = $success;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of message
+     *
+     * @return  self
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of data
+     *
+     * @return  self
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of env
+     *
+     * @return  self
+     */
+    public function setEnv($env)
+    {
+        $this->env = $env;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of version
+     *
+     * @return  self
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of duration
+     *
+     * @return  self
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of errorCode
+     *
+     * @return  self
+     */
+    public function setErrorCode($errorCode)
+    {
+        $this->errorCode = $errorCode;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of errorLine
+     *
+     * @return  self
+     */
+    public function setErrorLine($errorLine)
+    {
+        $this->errorLine = $errorLine;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of errorFile
+     *
+     * @return  self
+     */
+    public function setErrorFile($errorFile)
+    {
+        $this->errorFile = $errorFile;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of errorTrace
+     *
+     * @return  self
+     */
+    public function setErrorTrace($errorTrace)
+    {
+        $this->errorTrace = $errorTrace;
+
+        return $this;
+    }
 }

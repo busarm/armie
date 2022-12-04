@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0]
+
+### Added
+
+-   Mini ORM for database management
+
 ## [1.2.0]
 
 ### Changed

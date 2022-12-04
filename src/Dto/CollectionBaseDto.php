@@ -9,6 +9,11 @@ use OutOfRangeException;
 use Traversable;
 
 use Busarm\PhpMini\Interfaces\Arrayable;
+use Busarm\PhpMini\Traits\TypeResolver;
+use DateTime;
+use Stringable;
+
+use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework
@@ -18,13 +23,15 @@ use Busarm\PhpMini\Interfaces\Arrayable;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class CollectionBaseDto extends ArrayObject implements Arrayable
+class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
 {
+    use TypeResolver;
+
     /**
      * Define the class that will be used for all items in the array.
      * To be defined in each sub-class.
      */
-    const ITEM_CLASS = NULL;
+    private $itemClass = NULL;
 
     /**
      * Constructor
@@ -46,6 +53,19 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
         $this->load($input);
     }
 
+
+    /**
+     * Set define the class that will be used for all items in the array.
+     *
+     * @return  self
+     */
+    public function setItemClass($itemClass)
+    {
+        $this->itemClass = $itemClass;
+
+        return $this;
+    }
+
     /**
      * Load data
      *
@@ -62,8 +82,8 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
         // Append each item so to validate it's type.
         foreach ($data as $key => $value) {
             // Validate Item type if available
-            if (!empty(static::ITEM_CLASS) && !($value instanceof (self::ITEM_CLASS))) {
-                throw new InvalidArgumentException('Items of $input must be an instance of ' . self::ITEM_CLASS);
+            if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
+                throw new InvalidArgumentException('Items of $input must be an instance of ' . $this->itemClass);
             }
             $this[$key] = $value;
         }
@@ -407,8 +427,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
     }
 
     /**
-     * Get array response data
-     * @param bool $trim Remove NULL properties
+     * Convert dto to array
+     * 
+     * @param bool $trim - Remove NULL properties
      * @return array
      */
     public function toArray($trim = true): array
@@ -417,22 +438,32 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
         foreach ($this as $key => $item) {
             if ((!$trim || $item !== NULL)) {
                 if ($item instanceof self) {
-                    $result[$key] = $item->toArray();
+                    $result[$key] = $item->toArray($trim);
                 } else if ($item instanceof BaseDto) {
-                    $result[$key] = $item->toArray();
+                    $result[$key] = $item->toArray($trim);
                 } else if (is_array($item)) {
-                    foreach ($item as &$data) {
-                        if ($data instanceof self) {
-                            $data = $data->toArray();
-                        } else if ($data instanceof BaseDto) {
-                            $data = $data->toArray();
-                        } else {
-                            $data = BaseDto::parseType(BaseDto::resolveType($data), $data);
+                    // Item class provided
+                    if ($this->itemClass) {
+                        // Item class is subclass of BaseDto
+                        if (in_array(BaseDto::class, class_parents($this->itemClass) ?: [])) {
+                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
+                        }
+                        // Item class is a custom class
+                        else {
+                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
                         }
                     }
-                    $result[$key] = $item;
+                    // Item class not provided - load with custom data
+                    else {
+                        $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : BaseDto::withCustom($item)->toArray($trim);
+                    }
                 } else {
-                    $result[$key] = BaseDto::parseType(BaseDto::resolveType($item), $item);
+                    $value = $this->resolveType($this->findType($item), $item);
+                    if ($value instanceof Stringable) {
+                        $result[$key] = strval($value);
+                    } else {
+                        $result[$key] = $value;
+                    }
                 }
             }
         }
@@ -443,10 +474,20 @@ class CollectionBaseDto extends ArrayObject implements Arrayable
      * Load dto with array
      *
      * @param array|object $data
+     * @param string $itemClass
      * @return self
      */
-    public static function of(array|object $data): self
+    public static function of(array|object $data, string $itemClass = null): self
     {
-        return new self($data);
+        return (new self($data))->setItemClass($itemClass);
+    }
+
+    /**
+     * Gets a string representation of the object
+     * @return string Returns the `string` representation of the object.
+     */
+    public function __toString()
+    {
+        return json_encode($this->toArray(), true);
     }
 }

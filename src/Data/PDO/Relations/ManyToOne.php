@@ -1,14 +1,13 @@
 <?php
 
-namespace Busarm\PhpMini\Errors;
+namespace Busarm\PhpMini\Data\PDO\Relations;
 
 /**
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @codeCoverageIgnore
  */
-class DtoError extends SystemError
+class ManyToOne extends OneToMany
 {
 }

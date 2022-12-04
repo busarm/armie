@@ -9,6 +9,7 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
+use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -41,9 +42,12 @@ final class CallableRouteMiddleware implements MiddlewareInterface
     {
         if (is_callable($this->callable)) {
             try {
+                // Get dependency resolver
+                $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
+        
                 $result = ($this->callable)(...array_merge(DI::resolveCallableDependencies(
                     $this->callable,
-                    new DependencyResolver($request)
+                    new $resolver($request),
                 ), $this->params));
 
                 if ($request instanceof RequestInterface) {

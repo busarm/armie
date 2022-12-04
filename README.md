@@ -5,7 +5,7 @@
 
 # PHP Mini
 
-A micro php framework designed for simple and quick application or microservice development. **(Still under development)**
+A micro php framework designed for simple and quick application or microservice development.
 
 ## Installation
 
@@ -251,6 +251,129 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
             return $this->include('components/login', true);
         }
     }
+```
+
+## Mini ORM
+
+A database mini ORM built on top of PHP Data Objects (PDO)
+
+### Define Model
+
+```php
+class ProductModel extends Model
+{
+    /**
+     * @inheritDoc
+     */
+    public function getFields(): array
+    {
+        return [
+            new Field('id', DataType::INT),
+            new Field('name', DataType::STRING),
+            new Field('type', DataType::STRING),
+            new Field('qty', DataType::INT),
+            new Field('categoryId', DataType::INT),
+            new Field('createdAt', DataType::DATETIME),
+            new Field('updatedAt', DataType::DATETIME),
+            new Field('deletedAt', DataType::DATETIME)
+        ];
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getRelations(): array
+    {
+        return [
+            new OneToOne('category', $this, new CategoryModel, ['categoryId' => 'id'])
+        ];
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getTableName(): string
+    {
+        return 'products';
+    }
+    /**
+     * @inheritDoc
+     */eturn string|null
+     */
+    public function getKeyName(): ?string
+    {
+        return 'id';
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getCreatedDateName(): ?string
+    {
+        return 'createdAt';
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getUpdatedDateName(): ?string
+    {
+        return 'updatedAt';
+    }
+    /**
+     * @inheritDoc
+     */
+    public function getSoftDeleteDateName(): ?string
+    {
+        return 'deletedAt';
+    }
+}
+```
+
+#### Save Model (Create / Update)
+
+```php
+...
+$product = new ProductModel;
+$product->load(['name' => 'IPhone 14', 'qty' => 3, 'type' => 'Mobile Phone', 'categoryId' => 1]);
+$product->save();
+```
+
+#### Find Item
+
+```php
+...
+$model = ProductModel::findById(1);
+// Or
+$model = (new ProductModel)->find(1);
+```
+
+#### Get List
+
+```php
+...
+$model = ProductModel::getAll();
+// Or
+$model = (new ProductModel)->all();
+```
+
+### Define Repository
+
+```php
+class ProductRepository extends Repository
+{
+    public function __construct()
+    {
+        parent::__construct(new ProductModel);
+    }
+}
+// Or - Use Generic Repository
+$productRepo = new Repository(new ProductModel)
+
+```
+
+#### Get Paginated List
+
+```php
+...
+$productRepo = new ProductRepository();
+$result = $productRepo->paginate(1, 3);
 ```
 
 ## Tests

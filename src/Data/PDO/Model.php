@@ -337,7 +337,7 @@ abstract class Model extends BaseDto
             "SELECT %s FROM %s %s LIMIT 1",
             $colsPlaceHolders,
             $this->getTableName(),
-            $condPlaceHolders
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         ));
 
         if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
@@ -389,7 +389,7 @@ abstract class Model extends BaseDto
             "SELECT %s FROM %s %s LIMIT %s",
             $colsPlaceHolders,
             $this->getTableName(),
-            $condPlaceHolders,
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : '',
             $this->perPage
         ));
 
@@ -624,55 +624,89 @@ abstract class Model extends BaseDto
     {
         $result = null;
 
-        // List type ([a,b,c])
-        if (is_list($conditions)) {
-            foreach ($conditions as $cond) {
-                if (is_array($cond)) {
-                    $result = $result ?
-                        $result . " AND " . sprintf("(%s)", $this->parseConditions($cond)) :
-                        sprintf("WHERE (%s)", $this->parseConditions($cond));
-                } else {
-                    $result = $result ?
-                        $result . " AND " . sprintf("(%s)", $cond) :
-                        sprintf("WHERE (%s)", $cond);
+        $parseCondtionalArray = function ($result, $key, $cond) {
+            $key = strtoupper($key);
+            return  $result ?
+                $result . sprintf(" %s %s", in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
+                sprintf("%s %s", $key == 'NOT' ? $key : '', $this->parseConditions($cond));
+        };
+        $parseArrayList = function ($result, $key, $cond) {
+            return $result ?
+                $result . " AND " . sprintf("%s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                sprintf("%s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
+        };
+        $parseArray = function ($result, $cond) {
+            return  $result ?
+                $result . " AND " . sprintf("%s", $this->parseConditions($cond)) :
+                sprintf("%s", $this->parseConditions($cond));
+        };
+
+        $parseString = function ($result, $cond) {
+            return $result ?
+                $result . " AND " . sprintf("(%s)", $cond) :
+                sprintf("(%s)", $cond);
+        };
+        $parseKeyedString = function ($result, $key, $cond) {
+            // Key is a conditional operator 
+            if (in_array(strtoupper($key), ['AND', 'OR'])) {
+                return $result ?
+                    $result  . sprintf(" %s (%s)", strtoupper($key), $cond) :
+                    sprintf("(%s)", $cond);
+            }
+            // Key is a conditional (NOT) operator 
+            if (strtoupper($key) == 'NOT') {
+                return $result ?
+                    $result  . sprintf("(%s)", $cond) :
+                    sprintf("%s (%s)", $key, $cond);
+            }
+            // Key is a parameter
+            else {
+                return $result ?
+                    $result . " AND " . sprintf("%s = %s", $key, $this->escapeCond($cond)) :
+                    sprintf("%s = %s", $key, $this->escapeCond($cond));
+            }
+        };
+
+
+        if (!empty($conditions)) {
+
+            // List type ([a,b,c])
+            if (is_list($conditions)) {
+                foreach ($conditions as $cond) {
+                    if (is_array($cond)) {
+                        $result = $parseArray($result, $cond);
+                    } else {
+                        $result = $parseString($result, $cond);
+                    }
+                }
+            }
+            // Key value type ([a=>1, b=>2, c=>3])
+            else {
+                foreach ($conditions as $key => $cond) {
+                    if (is_array($cond)) {
+                        // List type ([key => [a,b,c]])
+                        if (is_list($cond)) {
+                            $result = $parseArrayList($result, $key, $cond);
+                        }
+                        // Key value type (['AND/OR' => [a=>1, b=>2, c=>3]])
+                        else {
+                            $result = $parseCondtionalArray($result, $key, $cond);
+                        }
+                    } else {
+                        // Key not available - only value
+                        if (is_numeric($key)) {
+                            $result = $parseString($result, $cond);
+                        }
+                        // Key available
+                        else {
+                            $result = $parseKeyedString($result, $key, $cond);
+                        }
+                    }
                 }
             }
         }
 
-        // Key value type ([a=>1, b=>2, c=>3])
-        else {
-            foreach ($conditions as $key => $cond) {
-                if (is_array($cond)) {
-                    // List type ([a,b,c])
-                    if (is_list($cond)) {
-                        $result = $result ?
-                            $result . " AND " . sprintf("(%s)", $this->parseConditions($cond)) :
-                            sprintf("WHERE (%s)", $this->parseConditions($cond));
-                    }
-                    // Key value type ([a=>1, b=>2, c=>3])
-                    else {
-                        $result = $result ?
-                            $result . " AND " . sprintf("%s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
-                            sprintf("WHERE %s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
-                    }
-                } else {
-                    // Key not present - only value
-                    if (is_numeric($key)) {
-                        $result = $result ?
-                            $result . " AND " . sprintf("(%s)", $cond) :
-                            sprintf("WHERE (%s)", $cond);
-                    }
-                    // Key Available
-                    else {
-                        $result = $result ?
-                            $result . " AND " . sprintf("%s = %s", $key, $this->escapeCond($cond)) :
-                            sprintf("WHERE %s = %s", $key, $this->escapeCond($cond));
-                    }
-                }
-            }
-        }
-
-        return $result ?? '';
+        return $result ? '(' . $result . ')' : '';
     }
 
     /**
@@ -754,11 +788,14 @@ abstract class Model extends BaseDto
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
+     * @param int|null $limit Query limit
      * @return self[]
      */
-    public static function getAll($conditions = [], $params = [], $columns = []): array
+    public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
-        return (new static)->all($conditions, $params, $columns);
+        $model = (new static);
+        if ($limit) $model->setPerPage($limit);
+        return $model->all($conditions, $params, $columns);
     }
 
     /**
@@ -767,11 +804,14 @@ abstract class Model extends BaseDto
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
+     * @param int|null $limit Query limit
      * @return self[]
      */
-    public static function getAllTrashed($conditions = [], $params = [], $columns = []): array
+    public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
-        return (new static)->allTrashed($conditions, $params, $columns);
+        $model = (new static);
+        if ($limit) $model->setPerPage($limit);
+        return $model->allTrashed($conditions, $params, $columns);
     }
 
     /**

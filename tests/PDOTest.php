@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
 use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 
-
 /**
  * PHP Mini Framework
  *
@@ -178,7 +177,13 @@ final class PDOTest extends TestCase
     public function testGetProductList()
     {
         $productModel = new ProductTestModel();
-        $result = $productModel->setAutoLoadRelations(true)->setPerPage(2)->all();
+        $result = $productModel->setAutoLoadRelations(true)->setPerPage(2)->all([
+            'id' => [1, 2, 3],
+            'AND' => [
+                ['type' => ['Global', 'China']],
+                'OR' => "ISNULL(updatedAt)"
+            ]
+        ]);
         $this->assertNotEmpty($result);
     }
 

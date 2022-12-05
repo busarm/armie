@@ -158,7 +158,7 @@ class Repository implements CrudRepositoryInterface
             "SELECT %s FROM %s %s",
             $colsPlaceHolders,
             $this->model->getTableName(),
-            $condPlaceHolders
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         );
 
         $limit = $limit > 0 ? $limit : $this->model->getPerPage();

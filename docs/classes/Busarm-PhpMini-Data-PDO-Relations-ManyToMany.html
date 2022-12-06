@@ -98,10 +98,10 @@
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    ManyToOne
+    ManyToMany
 
         <span class="phpdocumentor-element__extends">
-        extends <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html"><abbr title="\Busarm\PhpMini\Data\PDO\Relations\OneToMany">OneToMany</abbr></a>
+        extends <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html"><abbr title="\Busarm\PhpMini\Data\PDO\Relation">Relation</abbr></a>
     </span>
     
             <div class="phpdocumentor-element__package">
@@ -115,9 +115,9 @@
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToOne.php"><a href="files/src-data-pdo-relations-manytoone.html"><abbr title="src/Data/PDO/Relations/ManyToOne.php">ManyToOne.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">11</span>
+    <span class="phpdocumentor-element-found-in__line">16</span>
 
     </aside>
 
@@ -162,7 +162,7 @@
 
 <dl class="phpdocumentor-table-of-contents">
                     <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_model">$model</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_model">$model</a>
     <span>
                         &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>            </span>
 </dt>
@@ -176,6 +176,13 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_pivotModel">$pivotModel</a>
+    <span>
+                        &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
     <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#property_referenceModel">$referenceModel</a>
     <span>
                         &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>            </span>
@@ -183,16 +190,9 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_references">$references</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_references">$references</a>
     <span>
                         &nbsp;: array&lt;string|int, mixed&gt;            </span>
-</dt>
-<dd></dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_toModel">$toModel</a>
-    <span>
-                        &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>            </span>
 </dt>
 <dd></dd>
 
@@ -204,9 +204,9 @@
 <dd></dd>
 
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Field.html#method___construct">__construct()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method___construct">__construct()</a>
     <span>
-                                &nbsp;: mixed    </span>
+                                &nbsp;: void    </span>
 </dt>
 <dd></dd>
 
@@ -218,18 +218,27 @@
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_get">get()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_get">get()</a>
     <span>
-                                &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;|<a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>|null    </span>
+                                &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;    </span>
 </dt>
 <dd>Get relation data</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getCurrentModel">getCurrentModel()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getCurrentModel">getCurrentModel()</a>
     <span>
                                 &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>    </span>
 </dt>
 <dd>Get relation current model</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames">getLoadablePivotRelationNames()</a>
+    <span>
+                                &nbsp;: array&lt;string|int, string&gt;    </span>
+</dt>
+<dd>Get relations in pivot model to be loaded
+Only load relations not linked to current model
+Ensure that pivot only contains One to One Relations to avoid infinite loops</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Data-PDO-Field.html#method_getName">getName()</a>
@@ -239,14 +248,14 @@
 <dd>Get field name</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getReferenceModel">getReferenceModel()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferenceModel">getReferenceModel()</a>
     <span>
                                 &nbsp;: <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>    </span>
 </dt>
 <dd>Get relation reference model</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getReferences">getReferences()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferences">getReferences()</a>
     <span>
                                 &nbsp;: array&lt;string|int, mixed&gt;    </span>
 </dt>
@@ -269,7 +278,7 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToOne.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="
@@ -280,14 +289,14 @@
 >
     <h4 class="phpdocumentor-element__name" id="property_model">
         $model
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_model" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_model" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/OneToMany.php"><a href="files/src-data-pdo-relations-onetomany.html"><abbr title="src/Data/PDO/Relations/OneToMany.php">OneToMany.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">25</span>
+    <span class="phpdocumentor-element-found-in__line">27</span>
 
     </aside>
 
@@ -358,6 +367,46 @@
             -private
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="property_pivotModel">
+        $pivotModel
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_pivotModel" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">28</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span>
+    <span class="phpdocumentor-signature__name">$pivotModel</span>
+    </code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="property_referenceModel">
         $referenceModel
         <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#property_referenceModel" class="headerlink"><i class="fas fa-link"></i></a>
@@ -400,14 +449,14 @@
 >
     <h4 class="phpdocumentor-element__name" id="property_references">
         $references
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_references" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_references" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/OneToMany.php"><a href="files/src-data-pdo-relations-onetomany.html"><abbr title="src/Data/PDO/Relations/OneToMany.php">OneToMany.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">29</span>
 
     </aside>
 
@@ -416,46 +465,6 @@
     <span class="phpdocumentor-signature__visibility">private</span>
         <span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
     <span class="phpdocumentor-signature__name">$references</span>
-    </code>
-
-        <section class="phpdocumentor-description"></section>
-
-        <section class="phpdocumentor-description"></section>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -private
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_toModel">
-        $toModel
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_toModel" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/OneToMany.php"><a href="files/src-data-pdo-relations-onetomany.html"><abbr title="src/Data/PDO/Relations/OneToMany.php">OneToMany.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">26</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">private</span>
-        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span>
-    <span class="phpdocumentor-signature__name">$toModel</span>
     </code>
 
         <section class="phpdocumentor-description"></section>
@@ -516,7 +525,7 @@
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToOne.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -526,19 +535,19 @@
 >
     <h4 class="phpdocumentor-element__name" id="method___construct">
         __construct()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Field.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Field.php"><a href="files/src-data-pdo-field.html"><abbr title="src/Data/PDO/Field.php">Field.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">19</span>
+    <span class="phpdocumentor-element-found-in__line">25</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$name</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$type</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$name</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$model</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$pivotModel</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$references</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -548,16 +557,34 @@
                 : <span class="phpdocumentor-signature__argument__return-type">string</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Field name</p>
+                    <section class="phpdocumentor-description"><p>Relation attribute name in Current Model</p>
 </section>
 
             </dd>
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$type</span>
-                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                <span class="phpdocumentor-signature__argument__name">$model</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Field type @see \Busarm\PhpMini\Enums\DataType::class</p>
+                    <section class="phpdocumentor-description"><p>Current Model</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$pivotModel</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Pivot Model</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$references</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>e.g. <code class="prettyprint">['modelKey1' =&gt; 'pivotModelKey1', 'modelKey2' =&gt; 'pivotModelKey2']</code></p>
 </section>
 
             </dd>
@@ -572,7 +599,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">mixed</span>
+    <span class="phpdocumentor-signature__response_type">void</span>
             &mdash;
         
     
@@ -626,16 +653,16 @@
         class="phpdocumentor-element
             -method
             -public
-                        -abstract                                "
+                                                        "
 >
     <h4 class="phpdocumentor-element__name" id="method_get">
         get()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_get" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_get" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relation.php"><a href="files/src-data-pdo-relation.html"><abbr title="src/Data/PDO/Relation.php">Relation.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">49</span>
+    <span class="phpdocumentor-element-found-in__line">60</span>
 
     </aside>
 
@@ -643,7 +670,7 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-    <span class="phpdocumentor-signature__abstract">abstract</span>                <span class="phpdocumentor-signature__name">get</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$conditions</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$params</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$columns</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[&#039;*&#039;]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;|<a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>|null</span></code>
+                    <span class="phpdocumentor-signature__name">get</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$conditions</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$params</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$columns</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[&#039;*&#039;]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -680,7 +707,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;|<a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>|null</span>
+    <span class="phpdocumentor-signature__response_type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&gt;</span>
             &mdash;
         
     
@@ -689,16 +716,16 @@
         class="phpdocumentor-element
             -method
             -public
-                        -abstract                                "
+                                                        "
 >
     <h4 class="phpdocumentor-element__name" id="method_getCurrentModel">
         getCurrentModel()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getCurrentModel" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getCurrentModel" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relation.php"><a href="files/src-data-pdo-relation.html"><abbr title="src/Data/PDO/Relation.php">Relation.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">39</span>
+    <span class="phpdocumentor-element-found-in__line">106</span>
 
     </aside>
 
@@ -706,7 +733,7 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-    <span class="phpdocumentor-signature__abstract">abstract</span>                <span class="phpdocumentor-signature__name">getCurrentModel</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">getCurrentModel</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span></code>
 
     
     
@@ -720,6 +747,47 @@
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getLoadablePivotRelationNames">
+        getLoadablePivotRelationNames()
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">41</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get relations in pivot model to be loaded
+Only load relations not linked to current model
+Ensure that pivot only contains One to One Relations to avoid infinite loops</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getLoadablePivotRelationNames</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, string&gt;</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">array&lt;string|int, string&gt;</span>
             &mdash;
         
     
@@ -767,16 +835,16 @@
         class="phpdocumentor-element
             -method
             -public
-                        -abstract                                "
+                                                        "
 >
     <h4 class="phpdocumentor-element__name" id="method_getReferenceModel">
         getReferenceModel()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getReferenceModel" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferenceModel" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relation.php"><a href="files/src-data-pdo-relation.html"><abbr title="src/Data/PDO/Relation.php">Relation.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">33</span>
+    <span class="phpdocumentor-element-found-in__line">97</span>
 
     </aside>
 
@@ -784,7 +852,7 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-    <span class="phpdocumentor-signature__abstract">abstract</span>                <span class="phpdocumentor-signature__name">getReferenceModel</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">getReferenceModel</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a></span></code>
 
     
     
@@ -806,16 +874,16 @@
         class="phpdocumentor-element
             -method
             -public
-                        -abstract                                "
+                                                        "
 >
     <h4 class="phpdocumentor-element__name" id="method_getReferences">
         getReferences()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getReferences" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferences" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relation.php"><a href="files/src-data-pdo-relation.html"><abbr title="src/Data/PDO/Relation.php">Relation.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">88</span>
 
     </aside>
 
@@ -823,7 +891,7 @@
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-    <span class="phpdocumentor-signature__abstract">abstract</span>                <span class="phpdocumentor-signature__name">getReferences</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
+                    <span class="phpdocumentor-signature__name">getReferences</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
 
     
     
@@ -886,7 +954,7 @@
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Data/PDO/Relations/ManyToOne.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Data/PDO/Relations/ManyToMany.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -988,7 +1056,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToOne.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

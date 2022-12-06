@@ -1216,6 +1216,16 @@ Search.appendIndex(
             "summary": "Set\u0020the\u0020value\u0020of\u0020autoLoadRelations.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_setAutoLoadRelations"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AsetEvents\u0028\u0029",
+            "name": "setEvents",
+            "summary": "Set\u0020Events",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_setEvents"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AsetRequestedRelations\u0028\u0029",
+            "name": "setRequestedRelations",
+            "summary": "Set\u0020requested\u0020relations",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_setRequestedRelations"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AgetTableName\u0028\u0029",
             "name": "getTableName",
             "summary": "Model\u0020table\u0020name.\u0020e.g\u0020db\u0020table,\u0020collection\u0020name",
@@ -1321,6 +1331,11 @@ Search.appendIndex(
             "summary": "Load\u0020relations",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_loadRelations"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AloadRelationList\u0028\u0029",
+            "name": "loadRelationList",
+            "summary": "Load\u0020relations\u0020with\u0020names",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_loadRelationList"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AloadRelation\u0028\u0029",
             "name": "loadRelation",
             "summary": "Load\u0020single\u0020relation\u0020by\u0020name",
@@ -1376,10 +1391,15 @@ Search.appendIndex(
             "summary": "Get\u0020list\u0020of\u0020model.\u0020With\u0020trashed\u0020\u0028deleted\u0029\u0020models",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_getAllTrashed"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AwithEvent\u0028\u0029",
-            "name": "withEvent",
-            "summary": "Load\u0020dto\u0020with\u0020array\u0020of\u0020class\u0020attibutes",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_withEvent"
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003Aclone\u0028\u0029",
+            "name": "clone",
+            "summary": "Clone\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_clone"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AwithRelations\u0028\u0029",
+            "name": "withRelations",
+            "summary": "Set\u0020relations\u0020to\u0020be\u0020loaded\u0020with\u0020query",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_withRelations"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003Awith\u0028\u0029",
             "name": "with",
@@ -1438,28 +1458,33 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024db",
             "name": "db",
-            "summary": "Database\u0020connection\u0020instance",
+            "summary": "Database\u0020connection\u0020instance.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_db"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024perPage",
             "name": "perPage",
-            "summary": "Max\u0020number\u0020of\u0020items\u0020to\u0020return\u0020in\u0020list",
+            "summary": "Max\u0020number\u0020of\u0020items\u0020to\u0020return\u0020in\u0020list.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_perPage"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024isNew",
             "name": "isNew",
-            "summary": "Model\u0020is\u0020new\u0020\u002D\u0020not\u0020saved\u0020yet",
+            "summary": "Model\u0020is\u0020new\u0020\u002D\u0020not\u0020saved\u0020yet.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_isNew"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024autoLoadRelations",
             "name": "autoLoadRelations",
-            "summary": "Auto\u0020populate\u0020relations",
+            "summary": "Auto\u0020populate\u0020relations.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_autoLoadRelations"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024loadedRelations",
             "name": "loadedRelations",
-            "summary": "Loaded\u0020relations",
+            "summary": "Loaded\u0020relations\u0020names.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_loadedRelations"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003A\u0024requestedRelations",
+            "name": "requestedRelations",
+            "summary": "Requested\u0020relations.\u0020Only\u0020these\u0020relation\u0020names\u0020will\u0020loaded\u0020if\u0020auto\u0020load\u0020relations\u0020not\u0020enabled.",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_requestedRelations"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relation",
             "name": "Relation",
@@ -1481,6 +1506,11 @@ Search.appendIndex(
             "summary": "Get\u0020relation\u0020reference\u0020model",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getReferenceModel"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relation\u003A\u003AgetCurrentModel\u0028\u0029",
+            "name": "getCurrentModel",
+            "summary": "Get\u0020relation\u0020current\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relation.html#method_getCurrentModel"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relation\u003A\u003Aget\u0028\u0029",
             "name": "get",
             "summary": "Get\u0020relation\u0020data",
@@ -1496,6 +1526,61 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relation.html#property_referenceModel"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany",
+            "name": "ManyToMany",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetLoadablePivotRelationNames\u0028\u0029",
+            "name": "getLoadablePivotRelationNames",
+            "summary": "Get\u0020relations\u0020in\u0020pivot\u0020model\u0020to\u0020be\u0020loaded\nOnly\u0020load\u0020relations\u0020not\u0020linked\u0020to\u0020current\u0020model\nEnsure\u0020that\u0020pivot\u0020only\u0020contains\u0020One\u0020to\u0020One\u0020Relations\u0020to\u0020avoid\u0020infinite\u0020loops",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020relation\u0020data",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetReferences\u0028\u0029",
+            "name": "getReferences",
+            "summary": "Get\u0020relation\u0020references",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferences"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetReferenceModel\u0028\u0029",
+            "name": "getReferenceModel",
+            "summary": "Get\u0020relation\u0020reference\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getReferenceModel"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetCurrentModel\u0028\u0029",
+            "name": "getCurrentModel",
+            "summary": "Get\u0020relation\u0020current\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getCurrentModel"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003A\u0024model",
+            "name": "model",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_model"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003A\u0024pivotModel",
+            "name": "pivotModel",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_pivotModel"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003A\u0024references",
+            "name": "references",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_references"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToOne",
+            "name": "ManyToOne",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToOne.html"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany",
             "name": "OneToMany",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -1505,11 +1590,6 @@ Search.appendIndex(
             "name": "__construct",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#method___construct"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003AvalidatePivotRelations\u0028\u0029",
-            "name": "validatePivotRelations",
-            "summary": "Validate\u0020pivot\u0020model\u0020relations.",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#method_validatePivotRelations"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003Aget\u0028\u0029",
             "name": "get",
@@ -1526,30 +1606,25 @@ Search.appendIndex(
             "summary": "Get\u0020relation\u0020reference\u0020model",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#method_getReferenceModel"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003AgetCurrentModel\u0028\u0029",
+            "name": "getCurrentModel",
+            "summary": "Get\u0020relation\u0020current\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#method_getCurrentModel"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003A\u0024model",
             "name": "model",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_model"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003A\u0024pivotModel",
-            "name": "pivotModel",
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003A\u0024toModel",
+            "name": "toModel",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_pivotModel"
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_toModel"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003A\u0024references",
             "name": "references",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_references"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToOne",
-            "name": "ManyToOne",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToOne.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToMany\u003A\u003A\u0024toModel",
-            "name": "toModel",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToMany.html#property_toModel"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToOne",
             "name": "OneToOne",
@@ -1575,6 +1650,11 @@ Search.appendIndex(
             "name": "getReferenceModel",
             "summary": "Get\u0020relation\u0020reference\u0020model",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToOne.html#method_getReferenceModel"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToOne\u003A\u003AgetCurrentModel\u0028\u0029",
+            "name": "getCurrentModel",
+            "summary": "Get\u0020relation\u0020current\u0020model",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-OneToOne.html#method_getCurrentModel"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\OneToOne\u003A\u003A\u0024model",
             "name": "model",

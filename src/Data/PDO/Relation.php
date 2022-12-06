@@ -33,6 +33,12 @@ abstract class Relation extends Field
     abstract public function getReferenceModel(): Model;
 
     /**
+     * Get relation current model
+     * @return Model
+     */
+    abstract public function getCurrentModel(): Model;
+
+    /**
      * Get relation data
      * 
      * @param array $conditions

@@ -144,7 +144,7 @@ final class PDOTest extends TestCase
     public function testGetProduct()
     {
         $productModel = new ProductTestModel();
-        $result = $productModel->setAutoLoadRelations(true)->findTrashed(1, [], [], ['name']);
+        $result = $productModel->setAutoLoadRelations(true)->findTrashed(1, [], [], ['name', 'type']);
         $this->assertNotNull($result);
         $this->assertNotNull($result->get('category'));
 

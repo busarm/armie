@@ -5,13 +5,15 @@ namespace Busarm\PhpMini\Data\PDO\Relations;
 use Busarm\PhpMini\Data\PDO\Model;
 use Busarm\PhpMini\Data\PDO\Relation;
 
+use function Busarm\PhpMini\Helpers\log_info;
+
 /**
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class OneToMany extends Relation
+class ManyToMany extends Relation
 {
     /**
      * @param string $name Relation attribute name in Current Model
@@ -30,18 +32,21 @@ class OneToMany extends Relation
     }
 
     /**
-     * Validate pivot model relations. 
+     * Get relations in pivot model to be loaded
+     * Only load relations not linked to current model
      * Ensure that pivot only contains One to One Relations to avoid infinite loops
-     * @return bool
+     * 
+     * @return string[]
      */
-    public function validatePivotRelations(): bool
+    public function getLoadablePivotRelationNames(): array
     {
-        foreach ($this->pivotModel->getRelations() as $relations) {
-            if (!($relations instanceof OneToOne)) {
-                return false;
+        $list = [];
+        foreach ($this->pivotModel->getRelations() as $relation) {
+            if (($relation instanceof OneToOne) && get_class($this->model) !== get_class($relation->getReferenceModel())) {
+                $list[] = $relation->getName();
             }
         }
-        return true;
+        return $list;
     }
 
     /**
@@ -63,12 +68,15 @@ class OneToMany extends Relation
             }
         }
 
-        if (count($referenceConditions) && count($referenceConditions)) {
-            return $this->pivotModel->setAutoLoadRelations($this->validatePivotRelations())->all(
-                array_merge($referenceConditions, $conditions),
-                array_merge($referenceParams, $params),
-                $columns
-            );
+        if (count($referenceConditions) && count($referenceParams)) {
+            return $this->pivotModel
+                ->withRelations($this->getLoadablePivotRelationNames())
+                ->setAutoLoadRelations(false)
+                ->all(
+                    array_merge($referenceConditions, $conditions),
+                    array_merge($referenceParams, $params),
+                    $columns
+                );
         }
         return [];
     }
@@ -89,5 +97,14 @@ class OneToMany extends Relation
     public function getReferenceModel(): Model
     {
         return $this->pivotModel;
+    }
+
+    /**
+     * Get relation current model
+     * @return Model
+     */
+    public function getCurrentModel(): Model
+    {
+        return $this->model;
     }
 }

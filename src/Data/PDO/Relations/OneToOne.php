@@ -75,4 +75,13 @@ class OneToOne extends Relation
     {
         return $this->toModel;
     }
+    
+    /**
+     * Get relation current model
+     * @return Model
+     */
+    public function getCurrentModel(): Model
+    {
+        return $this->model;
+    }
 }

@@ -33,39 +33,46 @@ abstract class Model extends BaseDto
     ];
 
     /**
-     * Database connection instance
+     * Database connection instance.
      *
      * @var Connection
      */
     protected Connection $db;
 
     /**
-     * Max number of items to return in list
+     * Max number of items to return in list.
      *
      * @var integer
      */
     protected int $perPage = 20;
 
     /**
-     * Model is new - not saved yet
+     * Model is new - not saved yet.
      *
      * @var boolean
      */
     protected bool $isNew = true;
 
     /**
-     * Auto populate relations
+     * Auto populate relations.
      *
      * @var boolean
      */
     protected bool $autoLoadRelations = true;
 
     /**
-     * Loaded relations
+     * Loaded relations names.
      *
-     * @var array
+     * @var array<string>
      */
     protected array $loadedRelations = [];
+
+    /**
+     * Requested relations. Only these relation names will loaded if auto load relations not enabled.
+     *
+     * @var array<string>
+     */
+    protected array $requestedRelations = [];
 
     final public function __construct(Connection $db = null)
     {
@@ -159,6 +166,41 @@ abstract class Model extends BaseDto
     public function setAutoLoadRelations(bool $autoLoadRelations)
     {
         $this->autoLoadRelations = $autoLoadRelations;
+
+        return $this;
+    }
+
+    /**
+     * Set Events
+     *
+     * @param array $events Map of events. e.g `['EVENT_BEFORE_CREATE' => fn() or [ fn(), fn() ]]`
+     * @return self
+     */
+    public function setEvents(array $events = []): self
+    {
+        $this->events = [];
+        foreach ($events as $key => $event) {
+            if (is_array($event)) {
+                foreach ($event as $e) {
+                    $this->listen($key, $e);
+                }
+            } else {
+                $this->listen($key, $event);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Set requested relations
+     *
+     * @param  array<string>  $requestedRelations  Only theses relation names will loaded if auto load relations not enabled.
+     *
+     * @return  self
+     */
+    public function setRequestedRelations(array $requestedRelations)
+    {
+        $this->requestedRelations = $requestedRelations;
 
         return $this;
     }
@@ -341,10 +383,9 @@ abstract class Model extends BaseDto
         ));
 
         if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
-            return self::withEvent($result, $this->events)
+            return $this->clone()
+                ->load($result)
                 ->setIsNew(false)
-                ->setPerPage($this->perPage)
-                ->setAutoLoadRelations($this->autoLoadRelations)
                 ->processAutoLoadRelations()
                 ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns));
         }
@@ -394,10 +435,10 @@ abstract class Model extends BaseDto
         ));
 
         if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_ASSOC)) {
-            return array_map(fn ($result) => self::withEvent($result, $this->events)
+            // TODO Implement proper eager of relations - Load all relations in one query
+            return array_map(fn ($result) => $this->clone()
+                ->load($result)
                 ->setIsNew(false)
-                ->setPerPage($this->perPage)
-                ->setAutoLoadRelations($this->autoLoadRelations)
                 ->processAutoLoadRelations()
                 ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns)), $results);
         }
@@ -521,7 +562,7 @@ abstract class Model extends BaseDto
      */
     public function processAutoLoadRelations(): self
     {
-        return $this->autoLoadRelations ? $this->loadRelations() : $this;
+        return $this->autoLoadRelations ? $this->loadRelations() : $this->loadRelationList($this->requestedRelations);
     }
 
     /**
@@ -534,11 +575,31 @@ abstract class Model extends BaseDto
      */
     public function loadRelations(array $conditions = [], array $params = [], array $columns = ['*']): self
     {
-        // TODO Implement proper eager of relations - Load all relations in one query
-
         foreach ($this->getRelations() as $relation) {
             $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
             $this->loadedRelations[] = $relation->getName();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Load relations with names 
+     *
+     * @param string[] $names
+     * @param array $conditions
+     * @param array $params
+     * @param array $columns
+     * @return self
+     */
+    public function loadRelationList(array $names, array $conditions = [], array $params = [], array $columns = ['*']): self
+    {
+        foreach ($this->getRelations() as $relation) {
+            if (in_array(strtolower($relation->getName()), $names)) {
+                $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
+                $this->loadedRelations[] = $relation->getName();
+                return $this;
+            }
         }
 
         return $this;
@@ -814,36 +875,30 @@ abstract class Model extends BaseDto
         return $model->allTrashed($conditions, $params, $columns);
     }
 
-    /**
-     * Load dto with array of class attibutes
-     *
-     * @param array|object|null $data
-     * @param array $events Map of events. e.g `['EVENT_BEFORE_CREATE' => fn() or [ fn(), fn() ]]`
-     * @return static
-     */
-    public static function withEvent(array|object|null $data, array $events = []): static
-    {
-        $model = new static;
-        if ($data) {
-            if ($data instanceof self) {
-                $model->load($data->toArray());
-            } else {
-                $model->load((array)$data);
-            }
-        }
 
-        $model->events = [];
-        foreach ($events as $key => $event) {
-            if (is_array($event)) {
-                foreach ($event as $e) {
-                    $model->listen($key, $e);
-                }
-            } else {
-                $model->listen($key, $event);
-            }
-        }
-        return $model;
+    ##### Clones #####
+
+    /**
+     * Clone model
+     * 
+     * @return Model
+     */
+    public function clone()
+    {
+        return (clone $this)->setEvents($this->events);
     }
+
+    /**
+     * Set relations to be loaded with query
+     *
+     * @param array<string> $relations
+     * @return self
+     */
+    public function withRelations(array $relations): self
+    {
+        return $this->clone()->setRequestedRelations($relations);
+    }
+
 
     ##### Override #####
 

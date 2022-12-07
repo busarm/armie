@@ -206,6 +206,34 @@ abstract class Model extends BaseDto
     }
 
     /**
+     * Set loaded relations names.
+     *
+     * @param  array<string>  $loadedRelations  Loaded relations names.
+     *
+     * @return  self
+     */
+    public function setLoadedRelations(array $loadedRelations)
+    {
+        $this->loadedRelations = $loadedRelations;
+
+        return $this;
+    }
+
+    /**
+     * Add loaded relations name.
+     *
+     * @param  string  $loadedRelations  Loaded relations name.
+     *
+     * @return  self
+     */
+    public function addLoadedRelation(string $loadedRelation)
+    {
+        $this->loadedRelations[] = $loadedRelation;
+
+        return $this;
+    }
+
+    /**
      * Model table name. e.g db table, collection name
      *
      * @return string
@@ -436,11 +464,10 @@ abstract class Model extends BaseDto
 
         if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_ASSOC)) {
             // TODO Implement proper eager of relations - Load all relations in one query
-            return array_map(fn ($result) => $this->clone()
+            return $this->processEagerLoadRelations(array_map(fn ($result) => $this->clone()
                 ->load($result)
                 ->setIsNew(false)
-                ->processAutoLoadRelations()
-                ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns)), $results);
+                ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns)), $results));
         }
 
         return [];
@@ -556,13 +583,45 @@ abstract class Model extends BaseDto
     }
 
     /**
-     * Load relations if auto load relations enabled
+     * Process eager loading of relations.
+     *
+     * @param self[] $items
+     * @return self[]
+     */
+    public function processEagerLoadRelations(array $items): array
+    {
+        return $this->autoLoadRelations || !empty($this->requestedRelations) ? $this->eagerLoadRelations($items) : $items;
+    }
+
+    /**
+     * Process auto loading of relations.
      *
      * @return self
      */
     public function processAutoLoadRelations(): self
     {
-        return $this->autoLoadRelations ? $this->loadRelations() : $this->loadRelationList($this->requestedRelations);
+        return $this->autoLoadRelations || !empty($this->requestedRelations) ? $this->loadRelations() : $this;
+    }
+
+    /**
+     * Eager load relations.
+     * 
+     * @param self[] $items
+     * @param array $conditions
+     * @param array $params
+     * @param array $columns
+     * @return self[]
+     */
+    public function eagerLoadRelations(array $items, array $conditions = [], array $params = [], array $columns = ['*']): array
+    {
+
+        foreach ($this->getRelations() as $relation) {
+            if (empty($this->requestedRelations) || in_array(strtolower($relation->getName()), $this->requestedRelations)) {
+                $items = $relation->load($items, $conditions, $params, $columns);
+            }
+        }
+
+        return $items;
     }
 
     /**
@@ -576,29 +635,9 @@ abstract class Model extends BaseDto
     public function loadRelations(array $conditions = [], array $params = [], array $columns = ['*']): self
     {
         foreach ($this->getRelations() as $relation) {
-            $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
-            $this->loadedRelations[] = $relation->getName();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Load relations with names 
-     *
-     * @param string[] $names
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
-     * @return self
-     */
-    public function loadRelationList(array $names, array $conditions = [], array $params = [], array $columns = ['*']): self
-    {
-        foreach ($this->getRelations() as $relation) {
-            if (in_array(strtolower($relation->getName()), $names)) {
+            if (empty($this->requestedRelations) || in_array(strtolower($relation->getName()), $this->requestedRelations)) {
                 $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
                 $this->loadedRelations[] = $relation->getName();
-                return $this;
             }
         }
 

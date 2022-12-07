@@ -290,6 +290,26 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
+     * Returns values in items of $key
+     *
+     * @param string $key
+     *
+     * @return array
+     */
+    public function pluck(string $key)
+    {
+        $list = [];
+        foreach ($this as $item) {
+            if (is_array($item) && isset($item[$key])) {
+                $list[] = $item[$key];
+            } else if (is_object($item) && isset($item->{$key})) {
+                $list[] = $item->{$key};
+            }
+        }
+        return $list;
+    }
+
+    /**
      * Validates a number to be used as an index
      *
      * @param int $index The number to be validated as an index

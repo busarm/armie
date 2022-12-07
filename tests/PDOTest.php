@@ -149,11 +149,12 @@ final class PDOTest extends TestCase
         $result = $productModel->setAutoLoadRelations(true)->findTrashed(1, [], [], ['name', 'type']);
         $this->assertNotNull($result);
         $this->assertNotNull($result->get('category'));
+        $this->assertNotEmpty($result->get('tags'));
 
         $catModel = new CategoryTestModel();
         $result = $catModel->setAutoLoadRelations(true)->findTrashed(1);
         $this->assertNotNull($result);
-        $this->assertNotNull($result->get('products'));
+        $this->assertNotEmpty($result->get('products'));
     }
 
     /**

@@ -21,7 +21,7 @@ class OneToMany extends Relation
      * @return void
      */
     public function __construct(
-        string $name,
+        private string $name,
         private Model $model,
         private Model $toModel,
         private array $references
@@ -59,6 +59,56 @@ class OneToMany extends Relation
     }
 
     /**
+     * Load relation data for list of items
+     * 
+     * @param Model[] $items
+     * @param array $conditions
+     * @param array $conditions
+     * @param array $params
+     * @param array $columns
+     * @return Model[] $items with loaded relations
+     */
+    public function load(array $items, array $conditions = [], array $params = [], array $columns = ['*']): array
+    {
+        $referenceConditions = [];
+        $referenceParams = [];
+        foreach ($this->references as $modelRef => $toModelRef) {
+            $refs = array_map(fn ($item) => $item->{$modelRef}, $items);
+            if (!empty($refs)) {
+                $referenceConditions[] = sprintf("$toModelRef IN (%s)", implode(',', array_fill(0, count($refs), '?')));
+                $referenceParams = array_merge($referenceParams, $refs);
+            }
+        }
+
+        if (count($referenceConditions) && count($referenceConditions)) {
+
+            // Get relation results for all items
+            $results = $this->toModel->setAutoLoadRelations(false)->all(
+                array_merge($referenceConditions, $conditions),
+                array_merge($referenceParams, $params),
+                $columns
+            );
+
+            // Group result for references
+            $resultsMap = [];
+            foreach ($results as $result) {
+                $key = implode('-', array_map(fn ($ref) => $result->{$ref}, array_values($this->references)));
+                $resultsMap[$key][] = $result;  // Multiple items (1:m)
+            }
+
+            // Map relation for each item
+            foreach ($items as &$item) {
+                $key = implode('-', array_map(fn ($ref) => $item->{$ref}, array_keys($this->references)));
+                $item->{$this->getName()} = $resultsMap[$key] ?? [];
+                $item->addLoadedRelation($this->getName());
+            }
+
+            return $items;
+        }
+        return [];
+    }
+
+    /**
      * Get relation references
      * @return array
      */
@@ -75,7 +125,7 @@ class OneToMany extends Relation
     {
         return $this->toModel;
     }
-    
+
     /**
      * Get relation current model
      * @return Model

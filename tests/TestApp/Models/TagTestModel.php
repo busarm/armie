@@ -10,7 +10,6 @@ use Busarm\PhpMini\Data\PDO\Relations\ManyToMany;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @codeCoverageIgnore
  */
 class TagTestModel extends Model
 {

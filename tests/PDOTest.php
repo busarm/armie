@@ -18,6 +18,8 @@ use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
  * @covers \Busarm\PhpMini\Data\PDO\ConnectionConfig
  * @covers \Busarm\PhpMini\Data\PDO\Model
  * @covers \Busarm\PhpMini\Data\PDO\Repository
+ * @covers \Busarm\PhpMini\Test\TestApp\Models
+ * @covers \Busarm\PhpMini\Test\TestApp\Repositories
  * @group skip
  * @group pdo
  */

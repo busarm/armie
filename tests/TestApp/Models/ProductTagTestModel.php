@@ -11,7 +11,6 @@ use Busarm\PhpMini\Data\PDO\Relations\OneToOne;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @codeCoverageIgnore
  */
 class ProductTagTestModel extends Model
 {

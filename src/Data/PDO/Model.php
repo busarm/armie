@@ -222,7 +222,7 @@ abstract class Model extends BaseDto
     /**
      * Add loaded relations name.
      *
-     * @param  string  $loadedRelations  Loaded relations name.
+     * @param  string  $loadedRelation  Loaded relations name.
      *
      * @return  self
      */

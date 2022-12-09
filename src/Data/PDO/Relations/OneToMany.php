@@ -42,7 +42,7 @@ class OneToMany extends Relation
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $toModelRef) {
             if (isset($this->model->{$modelRef})) {
-                $referenceConditions[] = "$toModelRef = :$toModelRef";
+                $referenceConditions[] = "`$toModelRef` = :$toModelRef";
                 $referenceParams[":$toModelRef"] = $this->model->{$modelRef};
             }
         }
@@ -71,10 +71,8 @@ class OneToMany extends Relation
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $toModelRef) {
             $refs = array_map(fn ($item) => $item->{$modelRef}, $items);
-            if (!empty($refs)) {
-                $referenceConditions[] = sprintf("$toModelRef IN (%s)", implode(',', array_fill(0, count($refs), '?')));
-                $referenceParams = array_merge($referenceParams, $refs);
-            }
+            $referenceConditions[] = sprintf("`$toModelRef` IN (%s)", implode(',', array_fill(0, count($refs), '?')));
+            $referenceParams = array_merge($referenceParams, $refs);
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {

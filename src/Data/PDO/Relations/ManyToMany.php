@@ -62,7 +62,7 @@ class ManyToMany extends Relation
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $pivotModelRef) {
             if (isset($this->model->{$modelRef})) {
-                $referenceConditions[] = "$pivotModelRef = :$pivotModelRef";
+                $referenceConditions[] = "`$pivotModelRef` = :$pivotModelRef";
                 $referenceParams[":$pivotModelRef"] = $this->model->{$modelRef};
             }
         }
@@ -95,10 +95,8 @@ class ManyToMany extends Relation
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $pivotModelRef) {
             $refs = array_map(fn ($item) => $item->{$modelRef}, $items);
-            if (!empty($refs)) {
-                $referenceConditions[] = sprintf("$pivotModelRef IN (%s)", implode(',', array_fill(0, count($refs), '?')));
-                $referenceParams = array_merge($referenceParams, $refs);
-            }
+            $referenceConditions[] = sprintf("`$pivotModelRef` IN (%s)", implode(',', array_fill(0, count($refs), '?')));
+            $referenceParams = array_merge($referenceParams, $refs);
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.5]
+
+### Added
+
+-   Mini ORM - Modify relation conditions and limit
+-   Mini ORM - Save relations along with model
+
 ## [1.3.0]
 
 ### Added

@@ -12,13 +12,10 @@ use Busarm\PhpMini\Data\PDO\Model;
  */
 abstract class Relation extends Field
 {
-    /**
-     * @param string $name Relation name
-     */
-    public function __construct(private string $name, private Model $referenceModel)
-    {
-        parent::__construct($name, get_class($referenceModel));
-    }
+    protected array $conditions = [];
+    protected array $params = [];
+    protected array $columns = ['*'];
+    protected int $limit = -1;
 
     /**
      * Get relation references
@@ -41,12 +38,9 @@ abstract class Relation extends Field
     /**
      * Get relation data
      * 
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
      * @return Model[]|Model|null
      */
-    abstract public function get(array $conditions = [], array $params = [], array $columns = ['*']): array|Model|null;
+    abstract public function get(): array|Model|null;
 
     /**
      * Load relation data for list of items
@@ -58,5 +52,93 @@ abstract class Relation extends Field
      * @param array $columns
      * @return Model[] $items with loaded relations
      */
-    abstract public function load(array $items, array $conditions = [], array $params = [], array $columns = ['*']): array;
+    abstract public function load(array $items): array;
+
+    /**
+     * Save relation data
+     * 
+     * @param array $data
+     * @return bool
+     */
+    abstract public function save(array $data): bool;
+
+    /**
+     * Get the value of conditions
+     */
+    public function getConditions(): array
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * Set the value of conditions
+     *
+     * @return  self
+     */
+    public function setConditions(array $conditions)
+    {
+        $this->conditions = $conditions;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of params
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Set the value of params
+     *
+     * @return  self
+     */
+    public function setParams(array $params)
+    {
+        $this->params = $params;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of columns
+     */
+    public function getColumns(): array
+    {
+        return $this->columns;
+    }
+
+    /**
+     * Set the value of columns
+     *
+     * @return  self
+     */
+    public function setColumns(array $columns)
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of limit
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * Set the value of limit
+     *
+     * @return  self
+     */
+    public function setLimit(int $limit)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
 }

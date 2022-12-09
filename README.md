@@ -296,7 +296,6 @@ class ProductModel extends Model
     }
     /**
      * @inheritDoc
-     */eturn string|null
      */
     public function getKeyName(): ?string
     {
@@ -329,6 +328,9 @@ class ProductModel extends Model
 #### Save Model (Create / Update)
 
 ```php
+$model = ProductModel::create(['name' => 'IPhone 14', 'qty' => 3, 'type' => 'Mobile Phone', 'categoryId' => 1]);
+$model = ProductModel::update(1, ['name' => 'IPhone 14', 'qty' => 3, 'type' => 'Mobile Phone', 'categoryId' => 1]);
+// Or
 ...
 $product = new ProductModel;
 $product->load(['name' => 'IPhone 14', 'qty' => 3, 'type' => 'Mobile Phone', 'categoryId' => 1]);

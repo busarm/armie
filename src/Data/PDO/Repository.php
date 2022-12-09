@@ -206,8 +206,7 @@ class Repository implements CrudRepositoryInterface
      */
     public function create(array $data): ?BaseDto
     {
-        $model = clone $this->model;
-        $model->setUp();
+        $model = $this->model->clone();
         $model->load($data);
         if ($model->save()) {
             return $model;

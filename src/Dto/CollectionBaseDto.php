@@ -298,15 +298,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      */
     public function pluck(string $key)
     {
-        $list = [];
-        foreach ($this as $item) {
-            if (is_array($item) && isset($item[$key])) {
-                $list[] = $item[$key];
-            } else if (is_object($item) && isset($item->{$key})) {
-                $list[] = $item->{$key};
-            }
-        }
-        return $list;
+        return array_column((array)$this, $key);
     }
 
     /**

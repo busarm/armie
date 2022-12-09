@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Dto;
 use ReflectionObject;
 use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Traits\TypeResolver;
+use InvalidArgumentException;
 use Stringable;
 
 use function Busarm\PhpMini\Helpers\is_list;
@@ -66,8 +67,20 @@ class BaseDto implements Arrayable, Stringable
     {
         if ($data) {
             foreach ($this->attributes() as $attr => $type) {
-                if (isset($data[$attr])) {
-                    $this->{$attr} = $this->resolveType($type ?: $this->findType($data[$attr]), $data[$attr]);
+                if (array_key_exists($attr, $data)) {
+                    if ($type == self::class) {
+                        if (!is_array($data[$attr])) {
+                            throw new InvalidArgumentException("$attr must be an array or object");
+                        }
+                        $this->{$attr} = self::with($data[$attr]);
+                    } else if ($type == CollectionBaseDto::class) {
+                        if (!is_array($data[$attr])) {
+                            throw new InvalidArgumentException("$attr must be an array");
+                        }
+                        $this->{$attr} = CollectionBaseDto::of($data[$attr]);
+                    } else {
+                        $this->{$attr} = $this->resolveType($type ?: $this->findType($data[$attr]), $data[$attr]);
+                    }
                 } else if (!isset($this->{$attr})) {
                     $this->{$attr} = null;
                 }

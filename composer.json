@@ -54,6 +54,7 @@
     "require-dev": {
         "middlewares/firewall": "^2.0",
         "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^1.8"
+        "phpstan/phpstan": "^1.8",
+        "fakerphp/faker": "^1.20"
     }
 }

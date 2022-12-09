@@ -3,7 +3,10 @@
 namespace Busarm\PhpMini\Data\PDO\Relations;
 
 use Busarm\PhpMini\Data\PDO\Model;
+use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relation;
+
+use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework
@@ -16,32 +19,27 @@ class OneToOne extends Relation
     /**
      * @param string $name Relation attribute name in Current Model
      * @param Model $model Current Model 
-     * @param Model $toModel Related Model
-     * @param array $references e.g. `['modelKey1' => 'toModelKey1', 'modelKey2' => 'toModelKey2']`
+     * @param Reference $reference Relation Reference
      * @return void
      */
     public function __construct(
         private string $name,
         private Model $model,
-        private Model $toModel,
-        private array $references
+        private Reference $reference,
     ) {
-        parent::__construct($name, $toModel);
+        parent::__construct($name, get_class($reference->getModel()));
     }
 
     /**
      * Get relation data
      * 
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
      * @return Model|null
      */
-    public function get(array $conditions = [], array $params = [], array $columns = ['*']): ?Model
+    public function get(): ?Model
     {
         $referenceConditions = [];
         $referenceParams = [];
-        foreach ($this->references as $modelRef => $toModelRef) {
+        foreach ($this->getReferences() as $modelRef => $toModelRef) {
             if (isset($this->model->{$modelRef})) {
                 $referenceConditions[] = "$toModelRef = :$toModelRef";
                 $referenceParams[":$toModelRef"] = $this->model->{$modelRef};
@@ -49,10 +47,10 @@ class OneToOne extends Relation
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {
-            return $this->toModel->setAutoLoadRelations(false)->findWhere(
-                array_merge($referenceConditions, $conditions),
-                array_merge($referenceParams, $params),
-                $columns
+            return $this->getReferenceModel()->clone()->setAutoLoadRelations(false)->findWhere(
+                array_merge($referenceConditions, $this->conditions),
+                array_merge($referenceParams, $this->params),
+                $this->columns
             );
         }
         return null;
@@ -68,11 +66,13 @@ class OneToOne extends Relation
      * @param array $columns
      * @return Model[] $items with loaded relations
      */
-    public function load(array $items, array $conditions = [], array $params = [], array $columns = ['*']): array
+    public function load(array $items): array
     {
+        if (empty($items)) return [];
+
         $referenceConditions = [];
         $referenceParams = [];
-        foreach ($this->references as $modelRef => $toModelRef) {
+        foreach ($this->getReferences() as $modelRef => $toModelRef) {
             $refs = array_map(fn ($item) => $item->{$modelRef}, $items);
             if (!empty($refs)) {
                 $referenceConditions[] = sprintf("$toModelRef IN (%s)", implode(',', array_fill(0, count($refs), '?')));
@@ -83,22 +83,22 @@ class OneToOne extends Relation
         if (count($referenceConditions) && count($referenceConditions)) {
 
             // Get relation results for all items
-            $results = $this->toModel->setAutoLoadRelations(false)->all(
-                array_merge($referenceConditions, $conditions),
-                array_merge($referenceParams, $params),
-                $columns
+            $results = $this->getReferenceModel()->clone()->setAutoLoadRelations(false)->setPerPage(count($items))->all(
+                array_merge($referenceConditions, $this->conditions),
+                array_merge($referenceParams, $this->params),
+                $this->columns
             );
 
             // Group result for references
             $resultsMap = [];
             foreach ($results as $result) {
-                $key = implode('-', array_map(fn ($ref) => $result->{$ref}, array_values($this->references)));
+                $key = implode('-', array_map(fn ($ref) => $result->{$ref}, array_values($this->getReferences())));
                 $resultsMap[$key] = $result;  // Single item (1:1)
             }
 
             // Map relation for each item
             foreach ($items as &$item) {
-                $key = implode('-', array_map(fn ($ref) => $item->{$ref}, array_keys($this->references)));
+                $key = implode('-', array_map(fn ($ref) => $item->{$ref}, array_keys($this->getReferences())));
                 $item->{$this->getName()} = $resultsMap[$key] ?? null;
                 $item->addLoadedRelation($this->getName());
             }
@@ -109,21 +109,54 @@ class OneToOne extends Relation
     }
 
     /**
-     * Get relation references
-     * @return array
+     * Save relation data
+     * 
+     * @param array $data Singe array item
+     * @return bool
      */
-    public function getReferences(): array
+    public function save(array $data): bool
     {
-        return $this->references;
-    }
+        if (empty($data)) return false;
 
-    /**
-     * Get relation reference model
-     * @return Model
-     */
-    public function getReferenceModel(): Model
-    {
-        return $this->toModel;
+        // Is multiple values - select last, as 1:1 relation only supports single item
+        if (is_list($data)) {
+            $data = $data[count($data) - 1];
+        }
+
+        $referenceModel = $this->getReferenceModel()->clone();
+
+        // Load reference model keys in to $data if available
+        $reFieldNames = $referenceModel->getFieldNames();
+        foreach ($this->getReferences() as $modelRef => $toModelRef) {
+            if (!isset($data[$toModelRef]) && isset($this->getCurrentModel()->{$modelRef}) && in_array($toModelRef, $reFieldNames)) {
+                $data[$toModelRef] = $this->getCurrentModel()->{$modelRef};
+            }
+        }
+
+        // Save reference model
+        $referenceModel->load($data);
+        if ($referenceModel->save()) {
+
+            $modelData = [];
+
+            // Load current model keys
+            $fieldNames = $this->getCurrentModel()->getFieldNames();
+            foreach ($this->getReferences() as $modelRef => $toModelRef) {
+                if (isset($referenceModel->{$toModelRef}) && in_array($modelRef, $fieldNames)) {
+                    $modelData[$modelRef] = $referenceModel->{$toModelRef};
+                }
+            }
+
+            // Save current model keys
+            if (!empty($modelData) || isset($this->getCurrentModel()->{$this->getCurrentModel()->getKeyName()})) {
+                $this->getCurrentModel()->load($modelData);
+                $this->getCurrentModel()->save(false, false);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -133,5 +166,23 @@ class OneToOne extends Relation
     public function getCurrentModel(): Model
     {
         return $this->model;
+    }
+
+    /**
+     * Get relation reference model
+     * @return Model
+     */
+    public function getReferenceModel(): Model
+    {
+        return $this->reference->getModel();
+    }
+
+    /**
+     * Get relation references
+     * @return array
+     */
+    public function getReferences(): array
+    {
+        return $this->reference->getKeys();
     }
 }

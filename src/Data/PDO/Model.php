@@ -70,7 +70,7 @@ abstract class Model extends BaseDto
     /**
      * Requested relations. Only these relation names will loaded if auto load relations not enabled.
      *
-     * @var array<string>
+     * @var array<string>|array<string,callable>
      */
     protected array $requestedRelations = [];
 
@@ -82,24 +82,14 @@ abstract class Model extends BaseDto
 
     /**
      * Set up model.
-     * Override to add constumizations when model is initialized
+     * Override to add customizations when model is initialized
      */
     public function setUp()
     {
-        if (!empty($this->getCreatedDateName())) {
-            if (!empty($this->getUpdatedDateName())) {
-                $this->listen(self::EVENT_BEFORE_CREATE, fn () => $this->{$this->getCreatedDateName()} = $this->{$this->getUpdatedDateName()} = new StringableDateTime);
-            } else {
-                $this->listen(self::EVENT_BEFORE_CREATE, fn () => $this->{$this->getCreatedDateName()} = new StringableDateTime);
-            }
-        }
-        if (!empty($this->getUpdatedDateName())) {
-            $this->listen(self::EVENT_BEFORE_UPDATE, fn () => $this->{$this->getUpdatedDateName()} = new StringableDateTime);
-        }
     }
 
     /**
-     * Get the value of db
+     * Get the database connection
      */
     public function getDb(): Connection
     {
@@ -107,8 +97,7 @@ abstract class Model extends BaseDto
     }
 
     /**
-     * Set the value of perPage.
-     * Pagination limit per page.
+     * Set pagination limit per page.
      *
      * @return  self
      */
@@ -120,8 +109,7 @@ abstract class Model extends BaseDto
     }
 
     /**
-     * Get the value of perPage.
-     * Pagination limit per page.
+     * Get pagination limit per page.
      */
     public function getPerPage()
     {
@@ -173,7 +161,7 @@ abstract class Model extends BaseDto
     /**
      * Set Events
      *
-     * @param array $events Map of events. e.g `['EVENT_BEFORE_CREATE' => fn() or [ fn(), fn() ]]`
+     * @param array $events Map of events. e.g `[Model::EVENT_BEFORE_CREATE => fn() or [ fn(), fn() ]]`
      * @return self
      */
     public function setEvents(array $events = []): self
@@ -194,7 +182,8 @@ abstract class Model extends BaseDto
     /**
      * Set requested relations
      *
-     * @param  array<string>  $requestedRelations  Only theses relation names will loaded if auto load relations not enabled.
+     * @param  array<string>|array<string,callable> $requestedRelations List of relation names or Relation name as key with callback as value. 
+     * Only these relation names will loaded if auto load relations not enabled.
      *
      * @return  self
      */
@@ -278,7 +267,8 @@ abstract class Model extends BaseDto
      */
     public function getFieldNames(): array
     {
-        $fieldNames = array_map(fn ($field) => strval($field), $this->getFields());
+        $fields = $this->getFields();
+        $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys($this->attributes());
         $relationNames = $this->getRelationNames();
         return array_diff($fieldNames, $relationNames);
     }
@@ -455,15 +445,14 @@ abstract class Model extends BaseDto
         $condPlaceHolders = $this->parseConditions($conditions);
 
         $stmt = $this->db->prepare(sprintf(
-            "SELECT %s FROM %s %s LIMIT %s",
+            "SELECT %s FROM %s %s %s",
             $colsPlaceHolders,
             $this->getTableName(),
             !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : '',
-            $this->perPage
+            $this->perPage >= 0 ? 'LIMIT ' . $this->perPage : ''
         ));
 
         if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_ASSOC)) {
-            // TODO Implement proper eager of relations - Load all relations in one query
             return $this->processEagerLoadRelations(array_map(fn ($result) => $this->clone()
                 ->load($result)
                 ->setIsNew(false)
@@ -525,19 +514,28 @@ abstract class Model extends BaseDto
      * Save model
      * 
      * @param bool $trim Exclude NULL properties before saving
+     * @param bool $relations Save relations if available
      * @return bool
      */
-    public function save($trim = false): bool
+    public function save($trim = false, $relations = true): bool
     {
         // Create
         if ($this->isNew || !isset($this->{$this->getKeyName()})) {
 
             $this->emit(self::EVENT_BEFORE_CREATE);
 
+            // Add created & updated dates if not available
+            if (!empty($this->getCreatedDateName()) && !isset($this->{$this->getCreatedDateName()})) {
+                $this->{$this->getCreatedDateName()} = new StringableDateTime;
+            }
+            if (!empty($this->getUpdatedDateName()) && !isset($this->{$this->getUpdatedDateName()})) {
+                $this->{$this->getUpdatedDateName()} = new StringableDateTime;
+            }
+
             $params = $this->select($this->getFieldNames())->toArray($trim);
             if (empty($params)) return false;
 
-            $placeHolderKeys = implode(',', array_keys($params));
+            $placeHolderKeys = implode(',', array_map(fn ($key) => "`$key`", array_keys($params)));
             $placeHolderValues = implode(',', array_fill(0, count($params), '?'));
             $stmt = $this->db->prepare(sprintf(
                 "INSERT INTO %s (%s) VALUES (%s)",
@@ -561,10 +559,15 @@ abstract class Model extends BaseDto
 
             $this->emit(self::EVENT_BEFORE_UPDATE);
 
+            // Add updated date if not available
+            if (!empty($this->getUpdatedDateName()) && !isset($this->{$this->getUpdatedDateName()})) {
+                $this->{$this->getUpdatedDateName()} = new StringableDateTime;
+            }
+
             $params = $this->select($this->getFieldNames())->toArray($trim);
             if (empty($params)) return false;
 
-            $placeHolder = implode(',', array_map(fn ($key) => "$key = ?", array_keys($params)));
+            $placeHolder = implode(',', array_map(fn ($key) => "`$key` = ?", array_keys($params)));
             $stmt = $this->db->prepare(sprintf(
                 "UPDATE %s SET %s WHERE %s = ?",
                 $this->getTableName(),
@@ -579,7 +582,46 @@ abstract class Model extends BaseDto
 
         $this->isNew = false;
 
+        // Save relations if available
+        if ($relations) {
+            $this->saveRelations();
+        }
+
         return true;
+    }
+
+    /**
+     * Save relations
+     * 
+     * @return bool
+     */
+    protected  function saveRelations(): bool
+    {
+        $success = true;
+        foreach ($this->getRelations() as $relation) {
+            $data = $this->{$relation->getName()} ?? null;
+            if (isset($data)) {
+                $success = !$relation->save($data) ? false : $success;
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Perform database transaction. Auto rollback if unsuccessful.
+     * 
+     * @param callable $callable Return FALSE if unsuccessful
+     * @return mixed result of $callable.
+     */
+    public function transaction(callable $callable)
+    {
+        $this->db->beginTransaction();
+        $result = $callable();
+        if ($result === false) {
+            $this->db->rollBack();
+        }
+        $this->db->commit();
+        return $result;
     }
 
     /**
@@ -607,17 +649,20 @@ abstract class Model extends BaseDto
      * Eager load relations.
      * 
      * @param self[] $items
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
      * @return self[]
      */
-    public function eagerLoadRelations(array $items, array $conditions = [], array $params = [], array $columns = ['*']): array
+    public function eagerLoadRelations(array $items): array
     {
 
-        foreach ($this->getRelations() as $relation) {
-            if (empty($this->requestedRelations) || in_array(strtolower($relation->getName()), $this->requestedRelations)) {
-                $items = $relation->load($items, $conditions, $params, $columns);
+        $relsIsList = is_list($this->requestedRelations);
+        foreach ($this->getRelations() as &$relation) {
+            if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
+                // Trigger callback if available
+                if (!$relsIsList) {
+                    $callback = $this->requestedRelations[$relation->getName()] ?? null;
+                    if ($callback) $callback($relation);
+                }
+                $items = $relation->load($items);
             }
         }
 
@@ -627,16 +672,19 @@ abstract class Model extends BaseDto
     /**
      * Load relations
      *
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
      * @return self
      */
-    public function loadRelations(array $conditions = [], array $params = [], array $columns = ['*']): self
+    public function loadRelations(): self
     {
-        foreach ($this->getRelations() as $relation) {
-            if (empty($this->requestedRelations) || in_array(strtolower($relation->getName()), $this->requestedRelations)) {
-                $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
+        $relsIsList = is_list($this->requestedRelations);
+        foreach ($this->getRelations() as &$relation) {
+            if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
+                // Trigger callback if available
+                if (!$relsIsList) {
+                    $callback = $this->requestedRelations[$relation->getName()] ?? null;
+                    if ($callback) $callback($relation);
+                }
+                $this->{$relation->getName()} = $relation->get();
                 $this->loadedRelations[] = $relation->getName();
             }
         }
@@ -648,16 +696,17 @@ abstract class Model extends BaseDto
      * Load single relation by name
      *
      * @param string $name
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
+     * @param callable $callback Anonymous function with `Relation::class` as parameter
      * @return self
      */
-    public function loadRelation(string $name, array $conditions = [], array $params = [], array $columns = ['*']): self
+    public function loadRelation(string $name, callable $callback = null): self
     {
-        foreach ($this->getRelations() as $relation) {
+        foreach ($this->getRelations() as &$relation) {
             if (strtolower($name) === strtolower($relation->getName())) {
-                $this->{$relation->getName()} = $relation->get($conditions, $params, $columns);
+                // Trigger callback if available
+                if ($callback) $callback($relation);
+
+                $this->{$relation->getName()} = $relation->get();
                 $this->loadedRelations[] = $relation->getName();
                 return $this;
             }
@@ -708,10 +757,16 @@ abstract class Model extends BaseDto
 
         foreach ($columns as $key => $col) {
             if (!str_starts_with($col, '-')) {
-                $cols[] = is_numeric($key) ? $col : sprintf("%s AS %s", $key, $col);
+                if ($col === "*") {
+                    if (!in_array($col, $cols)) {
+                        $cols[] = $col;
+                    }
+                } else {
+                    $cols[] = is_numeric($key) ? "`$col`" : sprintf("`%s` AS %s", $key, $col);
+                }
             }
         }
-        return implode(',', $cols);
+        return  implode(',', $cols);
     }
 
     /**
@@ -732,8 +787,8 @@ abstract class Model extends BaseDto
         };
         $parseArrayList = function ($result, $key, $cond) {
             return $result ?
-                $result . " AND " . sprintf("%s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
-                sprintf("%s IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
+                $result . " AND " . sprintf("`%s` IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                sprintf("`%s` IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
         };
         $parseArray = function ($result, $cond) {
             return  $result ?
@@ -754,7 +809,7 @@ abstract class Model extends BaseDto
                     sprintf("(%s)", $cond);
             }
             // Key is a conditional (NOT) operator 
-            if (strtoupper($key) == 'NOT') {
+            else if (strtoupper($key) == 'NOT') {
                 return $result ?
                     $result  . sprintf("(%s)", $cond) :
                     sprintf("%s (%s)", $key, $cond);
@@ -762,8 +817,8 @@ abstract class Model extends BaseDto
             // Key is a parameter
             else {
                 return $result ?
-                    $result . " AND " . sprintf("%s = %s", $key, $this->escapeCond($cond)) :
-                    sprintf("%s = %s", $key, $this->escapeCond($cond));
+                    $result . " AND " . sprintf("`%s` = %s", $key, $this->escapeCond($cond)) :
+                    sprintf("`%s` = %s", $key, $this->escapeCond($cond));
             }
         };
 
@@ -855,15 +910,46 @@ abstract class Model extends BaseDto
     ##### Statics #####
 
     /**
+     * Create record
+     *
+     * @param array $data
+     * @return self|null
+     */
+    public static function create(array $data): ?self
+    {
+        $model = self::with($data);
+        if ($model->save()) {
+            return $model;
+        }
+        return null;
+    }
+
+    /**
+     * Update record
+     *
+     * @param string|int $id
+     * @param array $data
+     * @return self|null
+     */
+    public static function update(string|int $id, array $data): ?self
+    {
+        $model = self::findById($id);
+        if ($model && $model->load($data)->save()) {
+            return $model;
+        }
+        return null;
+    }
+
+    /**
      * Find model for id. Without trashed (deleted) models
      *
-     * @param mixed $id
+     * @param string|int $id
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
      * @return self|null
      */
-    public static function findById($id, $conditions = [], $params = [], $columns = []): ?self
+    public static function findById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?self
     {
         return (new static)->find($id, $conditions, $params, $columns);
     }
@@ -871,13 +957,13 @@ abstract class Model extends BaseDto
     /**
      * Find model for id. With trashed (deleted) models
      *
-     * @param mixed $id
+     * @param string|int $id
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
      * @return self|null
      */
-    public static function findTrashedById($id, $conditions = [], $params = [], $columns = []): ?self
+    public static function findTrashedById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?self
     {
         return (new static)->findTrashed($id, $conditions, $params, $columns);
     }
@@ -924,20 +1010,42 @@ abstract class Model extends BaseDto
      */
     public function clone()
     {
-        return (clone $this)->setEvents($this->events);
+        $model = (clone $this);
+        return $model;
     }
 
     /**
-     * Set relations to be loaded with query
+     * Set events to be loaded with model
      *
-     * @param array<string> $relations
+     * @param array $events
+     * @return self
+     */
+    public function withEvents(array $events): self
+    {
+        return $this->clone()->setEvents($events);
+    }
+
+    /**
+     * Set limit to be loaded with model
+     *
+     * @param int $limit
+     * @return self
+     */
+    public function withLimit(int $limit): self
+    {
+        return $this->clone()->setPerPage($limit);
+    }
+
+    /**
+     * Set relations to be loaded with model
+     *
+     * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
      * @return self
      */
     public function withRelations(array $relations): self
     {
         return $this->clone()->setRequestedRelations($relations);
     }
-
 
     ##### Override #####
 
@@ -980,13 +1088,12 @@ abstract class Model extends BaseDto
      */
     public function attributes($all = false, $trim = false): array
     {
-        // print_r($this->getRelationNames());
         if (!empty($fields = $this->getFields())) {
             $attrs = [];
             if ($this->autoLoadRelations) {
                 $fields = array_merge($fields, $this->getRelations());
             } else if (!empty($this->loadedRelations)) {
-                $fields = array_merge($fields, $this->getRelations());
+                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->loadedRelations),));
             }
             foreach ($fields as $field) {
                 $attrs[$field->getName()] = $field->getType();

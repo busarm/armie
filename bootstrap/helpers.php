@@ -13,6 +13,19 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
 
+########## FEATURE HELPERS ############
+
+/**
+ * Convert to proper unit
+ * @param int|float $size
+ * @return string
+ */
+function unit_convert($size)
+{
+    $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+    $index = floor(log($size, 1024));
+    return (round($size / pow(1024, ($index)), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
+}
 
 /**
  * Parses http query string into an array
@@ -125,6 +138,9 @@ function out($data = null, $responseCode = 500)
     }
     return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode)->send(false);
 }
+
+
+########## APPLICATION HELPERS ############
 
 /**
  * Get current app instance
@@ -302,20 +318,11 @@ function run_async(string $command, array $params, \Symfony\Component\Console\Ou
     return run($command, $params, $output, $timeout, false);
 }
 
-/**
- * Convert to proper unit
- * @param int|float $size
- * @return string
- */
-function unit_convert($size)
-{
-    $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
-    $index = floor(log($size, 1024));
-    return (round($size / pow(1024, ($index)), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
-}
+
+########### ARRAY HELPERS #################
 
 /**
- * Check if any item in array validates to true
+ * Check if any item in array validates to `true`
  *
  * @param array $list
  * @return boolean
@@ -326,7 +333,7 @@ function any(array $list): bool
 }
 
 /**
- * Check if all items in array validates to true
+ * Check if all items in array validates to `true`
  *
  * @param array $list
  * @return boolean
@@ -334,6 +341,22 @@ function any(array $list): bool
 function all(array $list): bool
 {
     return !in_array(false, array_map(fn ($item) => !empty($item), $list));
+}
+
+/**
+ * Find item in list by checking against predicate function
+ *
+ * @param callable $fn Predicate function. Return `true` if matched, else `false`
+ * @param array $list List to check
+ * @return mixed found item or `null` if failed
+ */
+function find(callable $fn, array $list): mixed
+{
+    foreach ($list as $item) {
+        if ($fn($item) != false)
+            return $item;
+    }
+    return null;
 }
 
 /**

@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Test\TestApp\Models;
 
 use Busarm\PhpMini\Data\PDO\Field;
 use Busarm\PhpMini\Data\PDO\Model;
+use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relations\ManyToMany;
 use Busarm\PhpMini\Data\PDO\Relations\OneToOne;
 use Busarm\PhpMini\Enums\DataType;
@@ -39,8 +40,13 @@ class ProductTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToOne('category', $this, new CategoryTestModel, ['categoryId' => 'id']),
-            new ManyToMany('tags', $this, new ProductTagTestModel, ['id' => 'productId'])
+            new OneToOne('category', $this, new Reference(new CategoryTestModel, ['categoryId' => 'id'])),
+            new ManyToMany(
+                'tags',
+                $this,
+                new Reference(new ProductTagTestModel, ['id' => 'productId']),
+                new Reference(new TagTestModel, ['tagId' => 'id'])
+            )
         ];
     }
 

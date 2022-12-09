@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Test\TestApp\Models;
 
 use Busarm\PhpMini\Data\PDO\Model;
+use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relations\ManyToMany;
 
 /**
@@ -30,7 +31,12 @@ class TagTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new ManyToMany('tags', $this, new ProductTagTestModel, ['id' => 'tagId'])
+            new ManyToMany(
+                'products',
+                $this,
+                new Reference(new ProductTagTestModel, ['id' => 'tagId']),
+                new Reference(new ProductTestModel, ['productId' => 'id'])
+            )
         ];
     }
 

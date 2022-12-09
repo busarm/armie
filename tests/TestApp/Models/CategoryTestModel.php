@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Test\TestApp\Models;
 
 use Busarm\PhpMini\Data\PDO\Model;
+use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relations\OneToMany;
 
 /**
@@ -33,7 +34,7 @@ class CategoryTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToMany('products', $this, new ProductTestModel(), ['id' => 'categoryId'])
+            new OneToMany('products', $this, new Reference(new ProductTestModel(), ['id' => 'categoryId']))
         ];
     }
 

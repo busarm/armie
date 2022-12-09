@@ -4,10 +4,13 @@ namespace Busarm\PhpMini\Test;
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
-use PHPUnit\Framework\TestCase;
+use Busarm\PhpMini\Data\PDO\Relation;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
 use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
+use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
+use Faker\Factory;
+use Faker\Generator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * PHP Mini Framework
@@ -26,6 +29,7 @@ use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 final class PDOTest extends TestCase
 {
     private static App|null $app = NULL;
+    private Generator|null $faker = NULL;
 
     /**
      * This method is called before each test.
@@ -47,6 +51,7 @@ final class PDOTest extends TestCase
                 ->setPdoConnectionErrorMode(true);
             self::$app = new App($config);
         }
+        $this->faker = Factory::create();
     }
 
     /**
@@ -66,6 +71,7 @@ final class PDOTest extends TestCase
         $result = $productModel->save();
         $this->assertNotNull($result);
         $this->assertNotEquals(false, $result);
+        $this->assertNotNull($productModel->get('id'));
     }
 
     /**
@@ -85,14 +91,17 @@ final class PDOTest extends TestCase
         $result = $productModel->save();
         $this->assertNotNull($result);
         $this->assertNotEquals(false, $result);
+        $this->assertNotNull($productModel->get('id'));
 
-        $productModel->load([
-            'type' => "China",
-            'qty' => 15,
-        ]);
-        $result = $productModel->save();
-        $this->assertNotNull($result);
-        $this->assertNotEquals(false, $result);
+        if ($productModel->get('id')) {
+            $productModel->load([
+                'type' => "China",
+                'qty' => 15,
+            ]);
+            $result = $productModel->save();
+            $this->assertNotNull($result);
+            $this->assertNotEquals(false, $result);
+        }
     }
 
     /**
@@ -108,6 +117,21 @@ final class PDOTest extends TestCase
             'name' => "IPhone 14",
             'type' => "Space Gray",
             'qty' => 10,
+            'category' => [
+                'name' => $this->faker->word(),
+                'desc' => $this->faker->sentence()
+            ],
+            'tags' => [
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+                [ 'name' => $this->faker->word() ],
+            ]
+
         ]);
         $this->assertNotNull($result);
     }
@@ -146,7 +170,22 @@ final class PDOTest extends TestCase
     public function testGetProduct()
     {
         $productModel = new ProductTestModel();
-        $result = $productModel->setAutoLoadRelations(true)->findTrashed(1, [], [], ['name', 'type']);
+        $result = $productModel
+            ->setAutoLoadRelations(false)
+            ->setRequestedRelations([
+                'category' => function (Relation $relation) {
+                    $relation->setColumns([
+                        'id', 'name'
+                    ]);
+                },
+                'tags' => function (Relation $relation) {
+                    $relation->setColumns([
+                        'id'
+                    ])
+                        ->setLimit(2);
+                }
+            ])
+            ->findTrashed(1);
         $this->assertNotNull($result);
         $this->assertNotNull($result->get('category'));
         $this->assertNotEmpty($result->get('tags'));

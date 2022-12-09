@@ -284,7 +284,7 @@ class ProductModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToOne('category', $this, new CategoryModel, ['categoryId' => 'id'])
+            new OneToOne('category', new Reference(new CategoryTestModel, ['categoryId' => 'id']))
         ];
     }
     /**

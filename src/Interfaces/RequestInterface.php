@@ -2,8 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
-use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -16,12 +16,6 @@ use Psr\Http\Message\UriInterface;
  */
 interface RequestInterface extends ContainerInterface
 {
-    /**
-     * @param UriInterface $uri
-     * @return self
-     */
-    public function withUri(UriInterface $uri): self;
-
     /**
      * @return string
      */
@@ -76,46 +70,101 @@ interface RequestInterface extends ContainerInterface
      * @return mixed
      */
     public function content();
-    
+
     /**
      * @return string
      */
     public function version();
 
     /**
-     * @return AttributeBag
+     * @return UploadBagInterface|StorageBagInterface
      */
-    public function file(): AttributeBag;
+    public function file(): UploadBagInterface|StorageBagInterface;
 
     /**
-     * @return SessionBag
+     * @return SessionStoreInterface
      */
-    public function session(): SessionBag;
+    public function session(): SessionStoreInterface;
 
     /**
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function cookie(): AttributeBag;
+    public function cookie(): StorageBagInterface;
 
     /**
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function query(): AttributeBag;
+    public function query(): StorageBagInterface;
 
     /**
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function request(): AttributeBag;
+    public function request(): StorageBagInterface;
 
     /**
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function server(): AttributeBag;
+    public function server(): StorageBagInterface;
 
     /**
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function header(): AttributeBag;
+    public function header(): StorageBagInterface;
+
+    /**
+     * Set the value of session
+     *
+     * @return  self
+     */
+    public function setSession(SessionStoreInterface $session);
+
+    /**
+     * Set the value of request
+     *
+     * @return  self
+     */
+    public function setRequest(StorageBagInterface $request);
+
+    /**
+     * Set the value of query
+     *
+     * @return  self
+     */
+    public function setQuery(StorageBagInterface $query);
+
+    /**
+     * Set the value of server
+     *
+     * @return  self
+     */
+    public function setServer(StorageBagInterface $server);
+
+    /**
+     * Set the value of files
+     *
+     * @return  self
+     */
+    public function setFiles(UploadBagInterface|StorageBagInterface $files);
+
+    /**
+     * Set the value of cookies
+     *
+     * @return  self
+     */
+    public function setCookies(StorageBagInterface $cookies);
+
+    /**
+     * Set the value of headers
+     *
+     * @return  self
+     */
+    public function setHeaders(StorageBagInterface $headers);
+
+    /**
+     * @param UriInterface $uri
+     * @return self
+     */
+    public function withUri(UriInterface $uri): self;
 
     /**
      * @return ServerRequestInterface

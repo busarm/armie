@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-            <title>    PHP Mini Documentation &raquo; Markers
-</title>
+            <title>PHP Mini Documentation</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="../">
@@ -90,81 +89,132 @@
 
             <div class="phpdocumentor-column -eight phpdocumentor-content">
                     <ul class="phpdocumentor-breadcrumbs">
-        <li><a href="">Home</a></li>
     </ul>
 
-    <div class="phpdocumentor-row">
-        <h2 class="phpdocumentor-content__title">Markers</h2>
+    <article class="phpdocumentor-element -file">
+        <h2 class="phpdocumentor-content__title">Upload.php</h2>
 
-                    <h3>Table of Contents</h3>
-            <table class="phpdocumentor-table_of_contents">
-                                                            <tr>
-                            <td class="phpdocumentor-cell"><a href="reports/markers.html#src/App.php">src/App.php</a></td>
-                            <td class="phpdocumentor-cell">5</td>
-                        </tr>
-                                                                                <tr>
-                            <td class="phpdocumentor-cell"><a href="reports/markers.html#src/Request.php">src/Request.php</a></td>
-                            <td class="phpdocumentor-cell">1</td>
-                        </tr>
-                                                </table>
         
-                    <a id="src/App.php"></a>
-            <h3><abbr title="src/App.php">App.php</abbr></h3>
-            <table>
-                <thead>
-                <tr>
-                    <th class="phpdocumentor-heading">Type</th>
-                    <th class="phpdocumentor-heading">Line</th>
-                    <th class="phpdocumentor-heading">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">43</td>
-                        <td class="phpdocumentor-cell">Event Manager Interface - Handle sync and async dispatch</td>
-                    </tr>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">44</td>
-                        <td class="phpdocumentor-cell">Queue Manager Interface - Handle sync and async jobs</td>
-                    </tr>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">45</td>
-                        <td class="phpdocumentor-cell">PSR Cache Interface</td>
-                    </tr>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">46</td>
-                        <td class="phpdocumentor-cell">PSR Session Interface - replace SessionStoreInterface &amp; SessionManager</td>
-                    </tr>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">47</td>
-                        <td class="phpdocumentor-cell">Restructure folders to be self contained - class + it&#039;s interface</td>
-                    </tr>
-                                </tbody>
-            </table>
-                    <a id="src/Request.php"></a>
-            <h3><abbr title="src/Request.php">Request.php</abbr></h3>
-            <table>
-                <thead>
-                <tr>
-                    <th class="phpdocumentor-heading">Type</th>
-                    <th class="phpdocumentor-heading">Line</th>
-                    <th class="phpdocumentor-heading">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                                    <tr>
-                        <td class="phpdocumentor-cell">TODO</td>
-                        <td class="phpdocumentor-cell">370</td>
-                        <td class="phpdocumentor-cell">Validate ipv6</td>
-                    </tr>
-                                </tbody>
-            </table>
-            </div>
+    <section class="phpdocumentor-description"></section>
+
+
+
+
+
+
+<h3 id="interfaces_class_traits">
+    Interfaces, Classes, Traits and Enums
+    <a href="#interfaces_class_traits" class="headerlink"><i class="fas fa-link"></i></a>
+</h3>
+
+<dl class="phpdocumentor-table-of-contents">
+    
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/Busarm-PhpMini-Bags-Upload.html"><abbr title="\Busarm\PhpMini\Bags\Upload">Upload</abbr></a></dt>
+        <dd>PHP Mini Framework</dd>
+    
+    
+    </dl>
+
+
+
+
+
+        
+
+        
+        <div class="phpdocumentor-modal" id="source-view">
+    <div class="phpdocumentor-modal-bg" data-exit-button></div>
+    <div class="phpdocumentor-modal-container">
+        <div class="phpdocumentor-modal-content">
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Bags/Upload.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+        </div>
+        <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
+    </div>
+</div>
+
+    <script type="text/javascript">
+        (function () {
+            function loadExternalCodeSnippet(el, url, line) {
+                Array.prototype.slice.call(el.querySelectorAll('pre[data-src]')).forEach((pre) => {
+                    const src = url || pre.getAttribute('data-src').replace(/\\/g, '/');
+                    const language = 'php';
+
+                    const code = document.createElement('code');
+                    code.className = 'language-' + language;
+                    pre.textContent = '';
+                    pre.setAttribute('data-line', line)
+                    code.textContent = 'Loading…';
+                    pre.appendChild(code);
+
+                    var xhr = new XMLHttpRequest();
+
+                    xhr.open('GET', src, true);
+
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState !== 4) {
+                            return;
+                        }
+
+                        if (xhr.status < 400 && xhr.responseText) {
+                            code.textContent = xhr.responseText;
+                            Prism.highlightElement(code);
+                            return;
+                        }
+
+                        if (xhr.status === 404) {
+                            code.textContent = '✖ Error: File could not be found';
+                            return;
+                        }
+
+                        if (xhr.status >= 400) {
+                            code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                            return;
+                        }
+
+                        code.textContent = '✖ Error: An unknown error occurred';
+                    };
+
+                    xhr.send(null);
+                });
+            }
+
+            const modalButtons = document.querySelectorAll("[data-modal]");
+            const openedAsLocalFile = window.location.protocol === 'file:';
+            if (modalButtons.length > 0 && openedAsLocalFile) {
+                console.warn(
+                    'Viewing the source code is unavailable because you are opening this page from the file:// scheme; ' +
+                    'browsers block XHR requests when a page is opened this way'
+                );
+            }
+
+            modalButtons.forEach(function (trigger) {
+                if (openedAsLocalFile) {
+                    trigger.setAttribute("hidden", "hidden");
+                }
+
+                trigger.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const modal = document.getElementById(trigger.dataset.modal);
+                    if (!modal) {
+                        console.error(`Modal with id "${trigger.dataset.modal}" could not be found`);
+                        return;
+                    }
+                    modal.classList.add("phpdocumentor-modal__open");
+
+                    loadExternalCodeSnippet(modal, trigger.dataset.src || null, trigger.dataset.line)
+                    const exits = modal.querySelectorAll("[data-exit-button]");
+                    exits.forEach(function (exit) {
+                        exit.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            modal.classList.remove("phpdocumentor-modal__open");
+                        });
+                    });
+                });
+            });
+        })();
+    </script>
+
+    </article>
                 <section data-search-results class="phpdocumentor-search-results phpdocumentor-search-results--hidden">
     <section class="phpdocumentor-search-results__dialog">
         <header class="phpdocumentor-search-results__header">
@@ -178,7 +228,7 @@
 </section>
             </div>
         </div>
-        <a href="reports/markers.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="files/src-bags-upload.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

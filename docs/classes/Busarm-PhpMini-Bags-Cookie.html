@@ -96,8 +96,11 @@
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    Attribute
+    Cookie
 
+        <span class="phpdocumentor-element__extends">
+        extends <a href="classes/Busarm-PhpMini-Bags-Attribute.html"><abbr title="\Busarm\PhpMini\Bags\Attribute">Attribute</abbr></a>
+    </span>
     
             <div class="phpdocumentor-element__package">
             in package
@@ -106,16 +109,13 @@
                             </ul>
         </div>
     
-            <span class="phpdocumentor-element__implements">
-            implements
-                            <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>                    </span>
     
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">15</span>
+    <span class="phpdocumentor-element-found-in__line">16</span>
 
     </aside>
 
@@ -158,18 +158,6 @@
 
 
 
-<h3 id="interfaces_class_traits">
-    Interfaces, Classes, Traits and Enums
-    <a href="#interfaces_class_traits" class="headerlink"><i class="fas fa-link"></i></a>
-</h3>
-
-<dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></dt>
-        <dd>PHP Mini Framework</dd>
-    
-    
-    
-    </dl>
 
 
 <h3 id="toc">
@@ -199,8 +187,36 @@
 </dt>
 <dd></dd>
 
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_encrypt">$encrypt</a>
+    <span>
+                        &nbsp;: bool            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_id">$id</a>
+    <span>
+                        &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_options">$options</a>
+    <span>
+                        &nbsp;: array&lt;string|int, mixed&gt;            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_prefix">$prefix</a>
+    <span>
+                        &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method___construct">__construct()</a>
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method___construct">__construct()</a>
     <span>
                                 &nbsp;: mixed    </span>
 </dt>
@@ -221,14 +237,14 @@
 <dd>Get all attributes</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_clear">clear()</a>
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_clear">clear()</a>
     <span>
                                 &nbsp;: void    </span>
 </dt>
 <dd>Remove all attribute</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_get">get()</a>
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_get">get()</a>
     <span>
                                 &nbsp;: mixed    </span>
 </dt>
@@ -240,6 +256,13 @@
                                 &nbsp;: bool    </span>
 </dt>
 <dd>Checks if an attribute exists</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_load">load()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Load cookies</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_mirror">mirror()</a>
@@ -270,7 +293,7 @@
 <dd>Pull attribute: Get and delete</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_remove">remove()</a>
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_remove">remove()</a>
     <span>
                                 &nbsp;: void    </span>
 </dt>
@@ -284,7 +307,7 @@
 <dd>Set bulk attributes</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_set">set()</a>
+    <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_set">set()</a>
     <span>
                                 &nbsp;: bool    </span>
 </dt>
@@ -300,7 +323,7 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Busarm-PhpMini-Bags-Attribute.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Bags-Cookie.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="
@@ -422,12 +445,172 @@
                                 </dl>
 
 </article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_encrypt">
+        $encrypt
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_encrypt" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">33</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">bool</span>
+    <span class="phpdocumentor-signature__name">$encrypt</span>
+     = <span class="phpdocumentor-signature__default-value">true</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_id">
+        $id
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_id" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">33</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$id</span>
+     = <span class="phpdocumentor-signature__default-value">&#039;&#039;</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_options">
+        $options
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_options" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">33</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
+    <span class="phpdocumentor-signature__name">$options</span>
+     = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_prefix">
+        $prefix
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#property_prefix" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">33</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$prefix</span>
+     = <span class="phpdocumentor-signature__default-value">&#039;&#039;</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
             </section>
 
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Busarm-PhpMini-Bags-Attribute.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Bags-Cookie.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -437,30 +620,66 @@
 >
     <h4 class="phpdocumentor-element__name" id="method___construct">
         __construct()
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">21</span>
+    <span class="phpdocumentor-element-found-in__line">33</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$attributes</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$options</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$encrypt</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">true</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$id</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">&#039;&#039;</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$prefix</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">&#039;&#039;</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
 
-        <section class="phpdocumentor-description"></section>
-
+    
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$attributes</span>
+                <span class="phpdocumentor-signature__argument__name">$options</span>
                 : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
                  = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
+                    <section class="phpdocumentor-description"><p>Cookie config options
+List of available <code class="prettyprint">$options</code> with their default values:</p>
+<ul>
+<li>domain: &quot;&quot;</li>
+<li>httponly: &quot;0&quot;</li>
+<li>expires: &quot;0&quot; (seconds)</li>
+<li>path: &quot;/&quot;</li>
+<li>samesite: &quot;&quot;</li>
+<li>secure: &quot;0&quot;</li>
+</ul>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$encrypt</span>
+                : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">true</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Encrypt Cookie</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$id</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">&#039;&#039;</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Unique id for Encrypted cookie. Use to bind cookies to specific user. E.g Ip address</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$prefix</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">&#039;&#039;</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Prefix for cookies</p>
+</section>
 
             </dd>
             </dl>
@@ -567,12 +786,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_clear">
         clear()
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_clear" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_clear" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">154</span>
+    <span class="phpdocumentor-element-found-in__line">120</span>
 
     </aside>
 
@@ -606,12 +825,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_get">
         get()
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_get" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_get" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">94</span>
+    <span class="phpdocumentor-element-found-in__line">89</span>
 
     </aside>
 
@@ -699,6 +918,56 @@
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type">bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_load">
+        load()
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_load" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">47</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Load cookies</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">load</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$cookies</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$cookies</span>
+                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
             &mdash;
         
     
@@ -905,12 +1174,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_remove">
         remove()
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_remove" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_remove" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">143</span>
+    <span class="phpdocumentor-element-found-in__line">108</span>
 
     </aside>
 
@@ -1003,12 +1272,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_set">
         set()
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#method_set" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#method_set" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Attribute.php"><a href="files/src-bags-attribute.html"><abbr title="src/Bags/Attribute.php">Attribute.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Bags/Cookie.php"><a href="files/src-bags-cookie.html"><abbr title="src/Bags/Cookie.php">Cookie.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">67</span>
+    <span class="phpdocumentor-element-found-in__line">62</span>
 
     </aside>
 
@@ -1064,7 +1333,7 @@
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Bags/Attribute.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Bags/Cookie.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -1166,7 +1435,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Busarm-PhpMini-Bags-Attribute.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Busarm-PhpMini-Bags-Cookie.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

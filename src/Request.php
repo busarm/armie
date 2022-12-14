@@ -7,12 +7,14 @@ use Nyholm\Psr7\Uri;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Bags\Attribute;
-use Busarm\PhpMini\Bags\Cookies;
+use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Bags\Query;
+use Busarm\PhpMini\Bags\Upload;
 use Busarm\PhpMini\Session\PHPSession;
-use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
-use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\UploadBagInterface;
 use Busarm\PhpMini\Traits\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -46,15 +48,15 @@ class Request implements RequestInterface
     protected string|null $contentType  =   NULL;
     protected string|null $protocol     =   NULL;
     protected mixed $content  =   NUll;
-    protected SessionBag|null $session      =   null;
-    protected AttributeBag|null $request    =   null;
-    protected AttributeBag|null $query      =   null;
-    protected AttributeBag|null $server     =   null;
-    protected AttributeBag|null $files      =   null;
-    protected AttributeBag|null $cookies    =   null;
-    protected AttributeBag|null $headers    =   null;
+    protected UploadBagInterface|StorageBagInterface|null $files      =   null;
+    protected SessionStoreInterface|null $session   =   null;
+    protected StorageBagInterface|null $request     =   null;
+    protected StorageBagInterface|null $query       =   null;
+    protected StorageBagInterface|null $server      =   null;
+    protected StorageBagInterface|null $cookies     =   null;
+    protected StorageBagInterface|null $headers     =   null;
 
-    protected ServerRequestInterface|null $psr   =   NUll;
+    protected ServerRequestInterface|null $psr      =   NUll;
 
     private array $sessionOptions   =   [];
     private array $cookieOptions    =   [];
@@ -102,8 +104,8 @@ class Request implements RequestInterface
             $request->initialize(
                 (new Query)->setQuery($uri->getQuery()),
                 (new Attribute),
-                (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? '')),
-                app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
+                (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? '')),
+                (new PHPSession($request->sessionOptions)),
                 (new Attribute),
                 (new Attribute)
             );
@@ -132,8 +134,8 @@ class Request implements RequestInterface
         $request->initialize(
             (new Query)->mirror($_GET),
             (new Attribute)->mirror($_POST),
-            (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->mirror($_COOKIE),
-            app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
+            (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->mirror($_COOKIE),
+            (new PHPSession($request->sessionOptions)),
             (new Attribute)->mirror($_FILES),
             new Attribute($_SERVER)
         );
@@ -152,9 +154,9 @@ class Request implements RequestInterface
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
-            (new Cookies($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
-            app()->sessionManager ?? (new PHPSession($request->sessionOptions)),
-            new Attribute($psr->getUploadedFiles()),
+            (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
+            (new PHPSession($request->sessionOptions)),
+            new Upload($psr->getUploadedFiles()),
             new Attribute($psr->getServerParams())
         );
 
@@ -172,25 +174,25 @@ class Request implements RequestInterface
      *
      * This method also re-initializes all properties.
      *
-     * @param AttributeBag  $query      - The GET parameters
-     * @param AttributeBag  $request    - The POST parameters
-     * @param AttributeBag  $cookies    - The COOKIE parameters
-     * @param SessionBag    $session    - The SESSION parameters
-     * @param AttributeBag  $files      - The FILES parameters
-     * @param AttributeBag  $server     - The SERVER parameters
-     * @param AttributeBag  $headers    - The headers
+     * @param StorageBagInterface  $query      - The GET parameters
+     * @param StorageBagInterface  $request    - The POST parameters
+     * @param StorageBagInterface  $cookies    - The COOKIE parameters
+     * @param SessionStoreInterface    $session    - The SESSION parameters
+     * @param UploadBagInterface|StorageBagInterface  $files      - The FILES parameters
+     * @param StorageBagInterface  $server     - The SERVER parameters
+     * @param StorageBagInterface  $headers    - The headers
      * @param string $content    - The raw body data
      *
      * @return self
      */
     public function initialize(
-        AttributeBag $query = NULL,
-        AttributeBag $request = NULL,
-        AttributeBag $cookies = NULL,
-        SessionBag  $session = NULL,
-        AttributeBag $files = NULL,
-        AttributeBag $server = NULL,
-        AttributeBag $headers = NULL,
+        StorageBagInterface $query = NULL,
+        StorageBagInterface $request = NULL,
+        StorageBagInterface $cookies = NULL,
+        SessionStoreInterface  $session = NULL,
+        UploadBagInterface|StorageBagInterface $files = NULL,
+        StorageBagInterface $server = NULL,
+        StorageBagInterface $headers = NULL,
         $content = null
     ): self {
 
@@ -365,6 +367,7 @@ class Request implements RequestInterface
     /**
      * Ensures an ip address is both a valid IP and does not fall within
      * a private network range.
+     * // TODO Validate ipv6
      * 
      * @param $ip
      * @return bool
@@ -564,63 +567,63 @@ class Request implements RequestInterface
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function file(): AttributeBag
+    public function file(): StorageBagInterface
     {
         return $this->files;
     }
 
     /**
      *
-     * @return SessionBag
+     * @return SessionStoreInterface
      */
-    public function session(): SessionBag
+    public function session(): SessionStoreInterface
     {
         return $this->session;
     }
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function cookie(): AttributeBag
+    public function cookie(): StorageBagInterface
     {
         return $this->cookies;
     }
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function query(): AttributeBag
+    public function query(): StorageBagInterface
     {
         return $this->query;
     }
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function request(): AttributeBag
+    public function request(): StorageBagInterface
     {
         return $this->request;
     }
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function server(): AttributeBag
+    public function server(): StorageBagInterface
     {
         return $this->server;
     }
 
     /**
      *
-     * @return AttributeBag
+     * @return StorageBagInterface
      */
-    public function header(): AttributeBag
+    public function header(): StorageBagInterface
     {
         return $this->headers;
     }
@@ -638,7 +641,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setSession(SessionBag $session)
+    public function setSession(SessionStoreInterface $session)
     {
         $this->session = $session;
 
@@ -650,7 +653,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setRequest(AttributeBag $request)
+    public function setRequest(StorageBagInterface $request)
     {
         $this->request = $request;
 
@@ -662,7 +665,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setQuery(AttributeBag $query)
+    public function setQuery(StorageBagInterface $query)
     {
         $this->query = $query;
 
@@ -674,7 +677,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setServer(AttributeBag $server)
+    public function setServer(StorageBagInterface $server)
     {
         $this->server = $server;
 
@@ -686,7 +689,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setFiles(AttributeBag $files)
+    public function setFiles(UploadBagInterface|StorageBagInterface $files)
     {
         $this->files = $files;
 
@@ -698,7 +701,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setCookies(AttributeBag $cookies)
+    public function setCookies(StorageBagInterface $cookies)
     {
         $this->cookies = $cookies;
 
@@ -710,7 +713,7 @@ class Request implements RequestInterface
      *
      * @return  self
      */
-    public function setHeaders(AttributeBag $headers)
+    public function setHeaders(StorageBagInterface $headers)
     {
         $this->headers = $headers;
 

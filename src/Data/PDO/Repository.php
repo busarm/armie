@@ -222,14 +222,15 @@ class Repository implements CrudRepositoryInterface
      */
     public function createBulk(array $data): bool
     {
-        $this->model->getDb()->beginTransaction();
-        foreach ($data as $item) {
-            if (!$this->create($item)) {
-                $this->model->getDb()->rollBack();
-                return false;
+        return $this->model->transaction(function () use ($data) {
+            foreach ($data as $item) {
+                if (!$this->create($item)) {
+                    $this->model->getDb()->rollBack();
+                    return false;
+                }
             }
-        }
-        return $this->model->getDb()->commit();
+            return true;
+        });
     }
 
     /**
@@ -257,14 +258,14 @@ class Repository implements CrudRepositoryInterface
      */
     public function updateBulk(array $data): bool
     {
-        $this->model->getDb()->beginTransaction();
-        foreach ($data as $item) {
-            if (!isset($item[$this->model->getKeyName()]) || !$this->updateById($item[$this->model->getKeyName()], $item)) {
-                $this->model->getDb()->rollBack();
-                return false;
+        return $this->model->transaction(function () use ($data) {
+            foreach ($data as $item) {
+                if (!isset($item[$this->model->getKeyName()]) || !$this->updateById($item[$this->model->getKeyName()], $item)) {
+                    return false;
+                }
             }
-        }
-        return $this->model->getDb()->commit();
+            return true;
+        });
     }
 
     /**
@@ -292,14 +293,15 @@ class Repository implements CrudRepositoryInterface
      */
     public function deleteBulk(array $ids, $force = false): bool
     {
-        $this->model->getDb()->beginTransaction();
-        foreach ($ids as $id) {
-            if (!$this->deleteById($id, $force)) {
-                $this->model->getDb()->rollBack();
-                return false;
+        return $this->model->transaction(function () use ($ids, $force) {
+            foreach ($ids as $id) {
+                if (!$this->deleteById($id, $force)) {
+                    $this->model->getDb()->rollBack();
+                    return false;
+                }
             }
-        }
-        return $this->model->getDb()->commit();
+            return true;
+        });
     }
 
     /**

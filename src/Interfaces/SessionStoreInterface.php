@@ -1,8 +1,8 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Bags;
+namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
 
 /**
  * PHP Mini Framework
@@ -11,7 +11,7 @@ use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface SessionBag extends AttributeBag
+interface SessionStoreInterface extends StorageBagInterface
 {
     /**
      * Start session
@@ -20,17 +20,19 @@ interface SessionBag extends AttributeBag
      */
     public function start(): bool;
     /**
-     * Gets the session name.
+     * Get session store name.
      * 
      * @return string
      */
     public function getName(): string;
     /**
-     * Gets the session ID.
+     * Get current session ID.
+     * 
+     * @return string
      */
     public function getId(): string;
     /**
-     * Sets the session ID.
+     * Set current session ID.
      *
      * @param string $sessionId
      * @return void

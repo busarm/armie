@@ -2,8 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
-use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Closure;
 use Psr\Http\Message\UriInterface;
 

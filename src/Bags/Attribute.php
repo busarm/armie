@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Bags;
 
-use Busarm\PhpMini\Interfaces\Bags\AttributeBag;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
 
 /**
@@ -12,7 +12,7 @@ use Closure;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class Attribute implements AttributeBag
+class Attribute implements StorageBagInterface
 {
 
 	protected Closure|null $onChange = null;

@@ -193,7 +193,7 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_cookie">cookie()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
@@ -214,7 +214,7 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_file">file()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\UploadBagInterface">UploadBagInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
@@ -228,7 +228,7 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_header">header()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
@@ -256,14 +256,14 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_query">query()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_request">request()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
@@ -284,16 +284,65 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_server">server()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_session">session()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-Bags-SessionBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\SessionBag">SessionBag</abbr></a>    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\SessionStoreInterface">SessionStoreInterface</abbr></a>    </span>
 </dt>
 <dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setCookies">setCookies()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of cookies</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setFiles">setFiles()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of files</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setHeaders">setHeaders()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of headers</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setQuery">setQuery()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of query</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setRequest">setRequest()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of request</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setServer">setServer()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of server</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setSession">setSession()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of session</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_toPsr">toPsr()</a>
@@ -403,7 +452,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">48</span>
+    <span class="phpdocumentor-element-found-in__line">42</span>
 
     </aside>
 
@@ -441,7 +490,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">78</span>
+    <span class="phpdocumentor-element-found-in__line">72</span>
 
     </aside>
 
@@ -479,7 +528,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">73</span>
+    <span class="phpdocumentor-element-found-in__line">67</span>
 
     </aside>
 
@@ -517,14 +566,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">98</span>
+    <span class="phpdocumentor-element-found-in__line">92</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">cookie</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">cookie</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -537,7 +586,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -555,7 +604,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">63</span>
+    <span class="phpdocumentor-element-found-in__line">57</span>
 
     </aside>
 
@@ -593,7 +642,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">38</span>
+    <span class="phpdocumentor-element-found-in__line">32</span>
 
     </aside>
 
@@ -631,14 +680,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">88</span>
+    <span class="phpdocumentor-element-found-in__line">82</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">file</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">file</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\UploadBagInterface">UploadBagInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -651,7 +700,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\UploadBagInterface">UploadBagInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -725,14 +774,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">118</span>
+    <span class="phpdocumentor-element-found-in__line">112</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">header</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">header</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -745,7 +794,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -763,7 +812,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">43</span>
+    <span class="phpdocumentor-element-found-in__line">37</span>
 
     </aside>
 
@@ -801,7 +850,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">28</span>
+    <span class="phpdocumentor-element-found-in__line">22</span>
 
     </aside>
 
@@ -839,7 +888,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">68</span>
+    <span class="phpdocumentor-element-found-in__line">62</span>
 
     </aside>
 
@@ -877,14 +926,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">103</span>
+    <span class="phpdocumentor-element-found-in__line">97</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">query</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">query</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -897,7 +946,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -915,14 +964,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">108</span>
+    <span class="phpdocumentor-element-found-in__line">102</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">request</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">request</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -935,7 +984,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -953,7 +1002,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">33</span>
+    <span class="phpdocumentor-element-found-in__line">27</span>
 
     </aside>
 
@@ -991,7 +1040,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">58</span>
+    <span class="phpdocumentor-element-found-in__line">52</span>
 
     </aside>
 
@@ -1029,14 +1078,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">113</span>
+    <span class="phpdocumentor-element-found-in__line">107</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">server</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">server</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span></code>
 
     
     
@@ -1049,7 +1098,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-AttributeBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\AttributeBag">AttributeBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
             &mdash;
         
     
@@ -1067,14 +1116,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">93</span>
+    <span class="phpdocumentor-element-found-in__line">87</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">session</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-SessionBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\SessionBag">SessionBag</abbr></a></span></code>
+                    <span class="phpdocumentor-signature__name">session</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\SessionStoreInterface">SessionStoreInterface</abbr></a></span></code>
 
     
     
@@ -1087,7 +1136,357 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-Bags-SessionBag.html"><abbr title="\Busarm\PhpMini\Interfaces\Bags\SessionBag">SessionBag</abbr></a></span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\SessionStoreInterface">SessionStoreInterface</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setCookies">
+        setCookies()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setCookies" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">154</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of cookies</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setCookies</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$cookies</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$cookies</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setFiles">
+        setFiles()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setFiles" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">147</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of files</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setFiles</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\UploadBagInterface">UploadBagInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$files</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$files</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\UploadBagInterface">UploadBagInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setHeaders">
+        setHeaders()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setHeaders" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">161</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of headers</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setHeaders</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$headers</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$headers</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setQuery">
+        setQuery()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setQuery" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">133</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of query</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setQuery</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$query</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$query</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setRequest">
+        setRequest()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setRequest" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">126</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of request</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setRequest</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$request</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setServer">
+        setServer()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setServer" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">140</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of server</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setServer</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$server</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$server</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\StorageBagInterface">StorageBagInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_setSession">
+        setSession()
+        <a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_setSession" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">119</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of session</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setSession</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\SessionStoreInterface">SessionStoreInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$session</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$session</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\SessionStoreInterface">SessionStoreInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
             &mdash;
         
     
@@ -1105,7 +1504,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">123</span>
+    <span class="phpdocumentor-element-found-in__line">172</span>
 
     </aside>
 
@@ -1143,7 +1542,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">53</span>
+    <span class="phpdocumentor-element-found-in__line">47</span>
 
     </aside>
 
@@ -1181,7 +1580,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">83</span>
+    <span class="phpdocumentor-element-found-in__line">77</span>
 
     </aside>
 
@@ -1219,7 +1618,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RequestInterface.php"><a href="files/src-interfaces-requestinterface.html"><abbr title="src/Interfaces/RequestInterface.php">RequestInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">23</span>
+    <span class="phpdocumentor-element-found-in__line">167</span>
 
     </aside>
 

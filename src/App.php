@@ -18,12 +18,10 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\RequestHandler;
-use Busarm\PhpMini\Interfaces\Bags\SessionBag;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
@@ -45,7 +43,7 @@ use function Busarm\PhpMini\Helpers\is_cli;
 // TODO Event Manager Interface - Handle sync and async dispatch
 // TODO Queue Manager Interface - Handle sync and async jobs
 // TODO PSR Cache Interface
-// TODO PSR Session Interface - replace SessionBag & SessionManager
+// TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
 // TODO Restructure folders to be self contained - class + it's interface
 /**
  * Application Factory
@@ -68,15 +66,11 @@ class App implements HttpServerInterface, ContainerInterface
     /** @var LoggerInterface */
     public $logger;
 
-    /** @var LoaderInterface */
+    /** @var \Busarm\PhpMini\Interfaces\LoaderInterface */
     public $loader;
 
     /** @var ErrorReportingInterface */
     public $reporter;
-
-    /** @var SessionBag */
-    public $sessionManager;
-
 
     /** @var int Request start time in milliseconds */
     public $startTimeMs;
@@ -446,17 +440,6 @@ class App implements HttpServerInterface, ContainerInterface
         return $this;
     }
 
-    /**
-     * Set Session Manager
-     * 
-     * @param SessionBag $sessionManager
-     * @return self
-     */
-    public function setSessionManager(SessionBag $sessionManager)
-    {
-        $this->sessionManager = $sessionManager;
-        return $this;
-    }
 
     ############################
     # HTTP Server Endpoints

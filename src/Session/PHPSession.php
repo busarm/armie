@@ -3,7 +3,7 @@
 namespace Busarm\PhpMini\Session;
 
 use Busarm\PhpMini\Errors\SessionError;
-use Busarm\PhpMini\Interfaces\Bags\SessionBag;
+use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 
 /**
  * PHP Mini Framework
@@ -12,7 +12,7 @@ use Busarm\PhpMini\Interfaces\Bags\SessionBag;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class PHPSession implements SessionBag
+class PHPSession implements SessionStoreInterface
 {
     /**
      * @param array $options
@@ -66,7 +66,7 @@ class PHPSession implements SessionBag
     }
 
     /**
-     * Gets the session name.
+     * Get session store name.
      * 
      * @return string
      */
@@ -78,7 +78,7 @@ class PHPSession implements SessionBag
     }
 
     /**
-     * Gets the session ID.
+     * Get current session ID.
      * 
      * @return string
      */
@@ -88,7 +88,7 @@ class PHPSession implements SessionBag
     }
 
     /**
-     * Sets the session ID.
+     * Set current session ID.
      *
      * @param string $sessionId
      * 

@@ -13,10 +13,10 @@ use function Busarm\PhpMini\Helpers\app;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class Cookies extends Attribute
+class Cookie extends Attribute
 {
     /**
-     * @param array $options Cookies config options
+     * @param array $options Cookie config options
      * List of available `$options` with their default values:
      *
      * * domain: ""
@@ -26,7 +26,7 @@ class Cookies extends Attribute
      * * samesite: ""
      * * secure: "0"
      * 
-     * @param boolean $encrypt Encrypt Cookies
+     * @param boolean $encrypt Encrypt Cookie
      * @param string $id Unique id for Encrypted cookie. Use to bind cookies to specific user. E.g Ip address
      * @param string $prefix Prefix for cookies
      */

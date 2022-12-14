@@ -200,14 +200,14 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getController">getController()</a>
     <span>
-                                &nbsp;: string    </span>
+                                &nbsp;: string|null    </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getFunction">getFunction()</a>
     <span>
-                                &nbsp;: string    </span>
+                                &nbsp;: string|null    </span>
 </dt>
 <dd></dd>
 
@@ -245,6 +245,13 @@
                                 &nbsp;: self    </span>
 </dt>
 <dd>Get singleton</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getView">getView()</a>
+    <span>
+                                &nbsp;: string|null    </span>
+</dt>
+<dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_head">head()</a>
@@ -301,6 +308,13 @@
                                 &nbsp;: self    </span>
 </dt>
 <dd>Set controller route destination</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_view">view()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set view component route destination</dd>
 
         </dl>
 
@@ -382,7 +396,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">38</span>
+    <span class="phpdocumentor-element-found-in__line">40</span>
 
     </aside>
 
@@ -433,7 +447,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">114</span>
+    <span class="phpdocumentor-element-found-in__line">124</span>
 
     </aside>
 
@@ -484,7 +498,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">82</span>
+    <span class="phpdocumentor-element-found-in__line">92</span>
 
     </aside>
 
@@ -580,7 +594,7 @@
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">getController</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+                    <span class="phpdocumentor-signature__name">getController</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
 
     
     
@@ -593,7 +607,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">string</span>
+    <span class="phpdocumentor-signature__response_type">string|null</span>
             &mdash;
         
     
@@ -618,7 +632,7 @@
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">getFunction</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+                    <span class="phpdocumentor-signature__name">getFunction</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
 
     
     
@@ -631,7 +645,7 @@
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">string</span>
+    <span class="phpdocumentor-signature__response_type">string|null</span>
             &mdash;
         
     
@@ -649,7 +663,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">26</span>
+    <span class="phpdocumentor-element-found-in__line">28</span>
 
     </aside>
 
@@ -687,7 +701,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">30</span>
+    <span class="phpdocumentor-element-found-in__line">32</span>
 
     </aside>
 
@@ -763,7 +777,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">28</span>
+    <span class="phpdocumentor-element-found-in__line">30</span>
 
     </aside>
 
@@ -848,6 +862,44 @@
         class="phpdocumentor-element
             -method
             -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getView">
+        getView()
+        <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getView" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">26</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getView</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">string|null</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
                                     -static                    "
 >
     <h4 class="phpdocumentor-element__name" id="method_head">
@@ -857,7 +909,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">122</span>
+    <span class="phpdocumentor-element-found-in__line">132</span>
 
     </aside>
 
@@ -908,7 +960,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">63</span>
+    <span class="phpdocumentor-element-found-in__line">73</span>
 
     </aside>
 
@@ -957,7 +1009,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">55</span>
+    <span class="phpdocumentor-element-found-in__line">65</span>
 
     </aside>
 
@@ -1008,7 +1060,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">74</span>
+    <span class="phpdocumentor-element-found-in__line">84</span>
 
     </aside>
 
@@ -1066,7 +1118,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">106</span>
+    <span class="phpdocumentor-element-found-in__line">116</span>
 
     </aside>
 
@@ -1117,7 +1169,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">100</span>
 
     </aside>
 
@@ -1168,7 +1220,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">98</span>
+    <span class="phpdocumentor-element-found-in__line">108</span>
 
     </aside>
 
@@ -1219,7 +1271,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">47</span>
+    <span class="phpdocumentor-element-found-in__line">49</span>
 
     </aside>
 
@@ -1247,6 +1299,57 @@ Where:</p>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"><p>Application Controller (public) function. e.g index</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_view">
+        view()
+        <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_view" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouteInterface.php"><a href="files/src-interfaces-routeinterface.html"><abbr title="src/Interfaces/RouteInterface.php">RouteInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">57</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set view component route destination</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">view</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Path to view file relative to <code class="prettyprint">Config::viewPath</code> or View class name</p>
 </section>
 
             </dd>

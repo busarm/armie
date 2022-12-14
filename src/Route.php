@@ -4,6 +4,7 @@ namespace Busarm\PhpMini;
 
 use Closure;
 use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Traits\Container;
@@ -23,20 +24,23 @@ class Route implements RouteInterface
     /** @var Closure Request executable function */
     protected Closure|null $callable = null;
 
-    /** @var string Request controller */
-    protected string|null $controller = null;
+    /** @var string|null Request controller */
+    protected ?string $controller = null;
 
-    /** @var string Request controller function*/
-    protected string|null $function = null;
+    /** @var string|null Request controller function*/
+    protected ?string $function = null;
 
     /** @var array<string, mixed> Request controller function params */
     protected array $params = [];
 
+    /** @var string|null Request path to view file relative to `Config::viewPath` or View class name*/
+    protected ?string $viewPathOrClass = null;
+
     /** @var string HTTP request method */
-    protected string|null $method = null;
+    protected ?string $method = null;
 
     /** @var string HTTP request path */
-    protected string|null $path = null;
+    protected ?string $path = null;
 
     /** @var MiddlewareInterface[] */
     protected array $middlewares = [];
@@ -51,12 +55,12 @@ class Route implements RouteInterface
         return $this->callable;
     }
     /**  @return string */
-    public function getController(): string|null
+    public function getController(): ?string
     {
         return $this->controller;
     }
     /**  @return string */
-    public function getFunction(): string|null
+    public function getFunction(): ?string
     {
         return $this->function;
     }
@@ -65,13 +69,20 @@ class Route implements RouteInterface
     {
         return $this->params;
     }
+    /**
+     * @return null|string
+     */
+    public function getView(): ?string
+    {
+        return $this->viewPathOrClass;
+    }
     /**  @return string */
-    public function getMethod(): string|null
+    public function getMethod(): ?string
     {
         return $this->method;
     }
     /**  @return string */
-    public function getPath(): string|null
+    public function getPath(): ?string
     {
         return $this->path;
     }
@@ -122,6 +133,24 @@ class Route implements RouteInterface
         $this->controller = $controller;
         $this->function = $function;
         $this->callable = null;
+        return $this;
+    }
+
+    /**
+     * Set view component route destination
+     *
+     * @param string $viewPathOrClass Path to view file relative to `Config::viewPath` or View class name
+     * @return self
+     */
+    public function view(string $viewPathOrClass): self
+    {
+        if (class_exists($viewPathOrClass)) {
+            if (!in_array(View::class, class_parents($viewPathOrClass))) {
+                throw new SystemError(sprintf("Route destination view class must be an instance of '%s'", View::class));
+            }
+        }
+
+        $this->viewPathOrClass = $viewPathOrClass;
         return $this;
     }
 

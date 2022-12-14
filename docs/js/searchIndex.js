@@ -3486,6 +3486,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getParams"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouteInterface\u003A\u003AgetView\u0028\u0029",
+            "name": "getView",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_getView"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouteInterface\u003A\u003AgetMethod\u0028\u0029",
             "name": "getMethod",
             "summary": "",
@@ -3510,6 +3515,11 @@ Search.appendIndex(
             "name": "to",
             "summary": "Set\u0020controller\u0020route\u0020destination",
             "url": "classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_to"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouteInterface\u003A\u003Aview\u0028\u0029",
+            "name": "view",
+            "summary": "Set\u0020view\u0020component\u0020route\u0020destination",
+            "url": "classes/Busarm-PhpMini-Interfaces-RouteInterface.html#method_view"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouteInterface\u003A\u003Amiddlewares\u0028\u0029",
             "name": "middlewares",
@@ -4291,6 +4301,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Route.html#method_getParams"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003AgetView\u0028\u0029",
+            "name": "getView",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Route.html#method_getView"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003AgetMethod\u0028\u0029",
             "name": "getMethod",
             "summary": "",
@@ -4320,6 +4335,11 @@ Search.appendIndex(
             "name": "to",
             "summary": "Set\u0020controller\u0020route\u0020destination",
             "url": "classes/Busarm-PhpMini-Route.html#method_to"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003Aview\u0028\u0029",
+            "name": "view",
+            "summary": "Set\u0020view\u0020component\u0020route\u0020destination",
+            "url": "classes/Busarm-PhpMini-Route.html#method_view"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003A\u0024middlewares",
             "name": "middlewares",
@@ -4380,6 +4400,11 @@ Search.appendIndex(
             "name": "function",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Route.html#property_function"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003A\u0024viewPathOrClass",
+            "name": "viewPathOrClass",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Route.html#property_viewPathOrClass"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Route\u003A\u003A\u0024method",
             "name": "method",
@@ -4728,12 +4753,12 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\View\u003A\u003Aload\u0028\u0029",
             "name": "load",
-            "summary": "Fetches\u0020the\u0020view\u0020result\u0020intead\u0020of\u0020sending\u0020it\u0020to\u0020the\u0020output\u0020buffer",
+            "summary": "Fetches\u0020the\u0020view\u0020result\u0020instead\u0020of\u0020sending\u0020it\u0020to\u0020the\u0020output\u0020buffer",
             "url": "classes/Busarm-PhpMini-View.html#method_load"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\View\u003A\u003AaddHeader\u0028\u0029",
             "name": "addHeader",
-            "summary": "",
+            "summary": "Add\u0020http\u0020header",
             "url": "classes/Busarm-PhpMini-View.html#method_addHeader"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\View\u003A\u003Ainclude\u0028\u0029",
@@ -4770,6 +4795,11 @@ Search.appendIndex(
             "name": "handle",
             "summary": "",
             "url": "classes/Busarm-PhpMini-View.html#method_handle"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\View\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
+            "url": "classes/Busarm-PhpMini-View.html#method___toString"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\View\u003A\u003A\u0024headers",
             "name": "headers",
@@ -5085,6 +5115,31 @@ Search.appendIndex(
             "name": "store",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#property_store"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware",
+            "name": "ViewRouteMiddleware",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
+            "summary": "Middleware\u0020handler",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method_process"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024viewPathOrClass",
+            "name": "viewPathOrClass",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_viewPathOrClass"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024params",
+            "name": "params",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_params"
         },                {
             "fqsen": "\\",
             "name": "\\",

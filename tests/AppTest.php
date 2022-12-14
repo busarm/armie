@@ -16,8 +16,8 @@ use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
+use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
 use Middlewares\Firewall;
-
 
 /**
  * PHP Mini Framework
@@ -91,15 +91,27 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttp()
     {
-        $this->app->router->addRoutes([
-            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
-        ]);
+        $this->app->get('pingHtml')->to(HomeTestController::class, 'pingHtml');
         $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success-' . $this->app->env, $response->getBody());
     }
 
+    /**
+     * Test app run mock HTTP with view page as destination
+     *
+     * @return void
+     */
+    public function testAppRunMockHttpView()
+    {
+        $this->app->get('pingHtml')->view(TestViewPage::class);
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString("Test View Component", strval($response->getBody()));
+    }
+    
     /**
      * Test app run mock HTTP CORS
      * 

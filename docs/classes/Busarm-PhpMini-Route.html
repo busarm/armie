@@ -117,7 +117,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">19</span>
+    <span class="phpdocumentor-element-found-in__line">20</span>
 
     </aside>
 
@@ -185,14 +185,14 @@
             <dt class="phpdocumentor-table-of-contents__entry -property -protected">
     <a href="classes/Busarm-PhpMini-Route.html#property_controller">$controller</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: string|null            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -protected">
     <a href="classes/Busarm-PhpMini-Route.html#property_function">$function</a>
     <span>
-                        &nbsp;: string            </span>
+                        &nbsp;: string|null            </span>
 </dt>
 <dd></dd>
 
@@ -221,6 +221,13 @@
     <a href="classes/Busarm-PhpMini-Route.html#property_path">$path</a>
     <span>
                         &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -protected">
+    <a href="classes/Busarm-PhpMini-Route.html#property_viewPathOrClass">$viewPathOrClass</a>
+    <span>
+                        &nbsp;: string|null            </span>
 </dt>
 <dd></dd>
 
@@ -323,6 +330,13 @@
 <dd>Get singleton</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Route.html#method_getView">getView()</a>
+    <span>
+                                &nbsp;: null|string    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Route.html#method_head">head()</a>
     <span>
                                 &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>    </span>
@@ -378,6 +392,13 @@
 </dt>
 <dd>Set controller route destination</dd>
 
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Route.html#method_view">view()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set view component route destination</dd>
+
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a href="classes/Busarm-PhpMini-Route.html#method___construct">__construct()</a>
     <span>
@@ -413,7 +434,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">24</span>
+    <span class="phpdocumentor-element-found-in__line">25</span>
 
     </aside>
 
@@ -453,14 +474,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">28</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">protected</span>
-        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__type">string|null</span>
     <span class="phpdocumentor-signature__name">$controller</span>
      = <span class="phpdocumentor-signature__default-value">null</span></code>
 
@@ -493,14 +514,14 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">30</span>
+    <span class="phpdocumentor-element-found-in__line">31</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">protected</span>
-        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__type">string|null</span>
     <span class="phpdocumentor-signature__name">$function</span>
      = <span class="phpdocumentor-signature__default-value">null</span></code>
 
@@ -533,7 +554,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">36</span>
+    <span class="phpdocumentor-element-found-in__line">40</span>
 
     </aside>
 
@@ -573,7 +594,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">42</span>
+    <span class="phpdocumentor-element-found-in__line">46</span>
 
     </aside>
 
@@ -611,7 +632,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">33</span>
+    <span class="phpdocumentor-element-found-in__line">34</span>
 
     </aside>
 
@@ -651,7 +672,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">39</span>
+    <span class="phpdocumentor-element-found-in__line">43</span>
 
     </aside>
 
@@ -664,6 +685,46 @@
 
     
         <section class="phpdocumentor-description"><p>HTTP request path</p>
+</section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -protected
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_viewPathOrClass">
+        $viewPathOrClass
+        <a href="classes/Busarm-PhpMini-Route.html#property_viewPathOrClass" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">37</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">protected</span>
+        <span class="phpdocumentor-signature__type">string|null</span>
+    <span class="phpdocumentor-signature__name">$viewPathOrClass</span>
+     = <span class="phpdocumentor-signature__default-value">null</span></code>
+
+    
+        <section class="phpdocumentor-description"><p>Request path to view file relative to <code class="prettyprint">Config::viewPath</code> or View class name</p>
 </section>
 
     
@@ -791,7 +852,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">105</span>
+    <span class="phpdocumentor-element-found-in__line">116</span>
 
     </aside>
 
@@ -842,7 +903,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">160</span>
+    <span class="phpdocumentor-element-found-in__line">189</span>
 
     </aside>
 
@@ -905,7 +966,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">231</span>
+    <span class="phpdocumentor-element-found-in__line">260</span>
 
     </aside>
 
@@ -956,7 +1017,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">175</span>
+    <span class="phpdocumentor-element-found-in__line">204</span>
 
     </aside>
 
@@ -1007,7 +1068,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">49</span>
+    <span class="phpdocumentor-element-found-in__line">53</span>
 
     </aside>
 
@@ -1045,7 +1106,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">54</span>
+    <span class="phpdocumentor-element-found-in__line">58</span>
 
     </aside>
 
@@ -1083,7 +1144,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">59</span>
+    <span class="phpdocumentor-element-found-in__line">63</span>
 
     </aside>
 
@@ -1121,7 +1182,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">69</span>
+    <span class="phpdocumentor-element-found-in__line">80</span>
 
     </aside>
 
@@ -1159,7 +1220,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">79</span>
+    <span class="phpdocumentor-element-found-in__line">90</span>
 
     </aside>
 
@@ -1197,7 +1258,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">64</span>
+    <span class="phpdocumentor-element-found-in__line">68</span>
 
     </aside>
 
@@ -1235,7 +1296,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">74</span>
+    <span class="phpdocumentor-element-found-in__line">85</span>
 
     </aside>
 
@@ -1320,6 +1381,44 @@
         class="phpdocumentor-element
             -method
             -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getView">
+        getView()
+        <a href="classes/Busarm-PhpMini-Route.html#method_getView" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">75</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">getView</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">null|string</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">null|string</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
                                     -static                    "
 >
     <h4 class="phpdocumentor-element__name" id="method_head">
@@ -1329,7 +1428,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">245</span>
+    <span class="phpdocumentor-element-found-in__line">274</span>
 
     </aside>
 
@@ -1380,7 +1479,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">146</span>
+    <span class="phpdocumentor-element-found-in__line">175</span>
 
     </aside>
 
@@ -1429,7 +1528,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">134</span>
+    <span class="phpdocumentor-element-found-in__line">163</span>
 
     </aside>
 
@@ -1474,7 +1573,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">93</span>
+    <span class="phpdocumentor-element-found-in__line">104</span>
 
     </aside>
 
@@ -1526,7 +1625,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">217</span>
+    <span class="phpdocumentor-element-found-in__line">246</span>
 
     </aside>
 
@@ -1577,7 +1676,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">189</span>
+    <span class="phpdocumentor-element-found-in__line">218</span>
 
     </aside>
 
@@ -1628,7 +1727,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">203</span>
+    <span class="phpdocumentor-element-found-in__line">232</span>
 
     </aside>
 
@@ -1679,7 +1778,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">120</span>
+    <span class="phpdocumentor-element-found-in__line">131</span>
 
     </aside>
 
@@ -1729,6 +1828,57 @@ Where:</p>
                     <article
         class="phpdocumentor-element
             -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_view">
+        view()
+        <a href="classes/Busarm-PhpMini-Route.html#method_view" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">145</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set view component route destination</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">view</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Path to view file relative to <code class="prettyprint">Config::viewPath</code> or View class name</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
             -private
                                                         "
 >
@@ -1739,7 +1889,7 @@ Where:</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Route.php"><a href="files/src-route.html"><abbr title="src/Route.php">Route.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">44</span>
+    <span class="phpdocumentor-element-found-in__line">48</span>
 
     </aside>
 

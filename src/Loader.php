@@ -81,19 +81,19 @@ class Loader implements LoaderInterface
      * @param $path
      * @param array $vars
      * @param bool $return
+     * 
      * @throws LoaderError
      * @return string
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
-        $path = (str_starts_with($this->viewPath, $this->appPath) ? $this->viewPath : $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath) . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = (str_starts_with($this->viewPath, $this->appPath) ? $this->viewPath : $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             $content = self::load($path, $vars);
             if ($return) return $content;
             else echo $content;
         } else {
-            if ($return) return null;
-            else throw new LoaderError("View file '$path' not found");
+            if (!$return) throw new LoaderError("View file '$path' not found");
         }
         return null;
     }
@@ -107,7 +107,7 @@ class Loader implements LoaderInterface
      */
     public function config($path): mixed
     {
-        $path = (str_starts_with($this->configPath, $this->appPath) ? $this->configPath : $this->appPath . DIRECTORY_SEPARATOR . $this->configPath) . DIRECTORY_SEPARATOR . $path . '.php';
+        $path = (str_starts_with($this->configPath, $this->appPath) ? $this->configPath : $this->appPath . DIRECTORY_SEPARATOR . $this->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             return require_once $path;
         } else {

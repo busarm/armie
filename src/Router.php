@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\RouteInterface;
@@ -9,7 +10,7 @@ use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
 use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
-use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Middlewares\ViewRouteMiddleware;
 
 /**
  * Application Router
@@ -103,8 +104,14 @@ class Router implements RouterInterface
         // If custom routes
         if ($request instanceof RouteInterface) {
 
+            // View
+            if ($view = $request->getView()) {
+                $routeMiddleware = $request->getMiddlewares() ?? [];
+                $routeMiddleware[] = new ViewRouteMiddleware($view, $request->getParams());
+                return $routeMiddleware;
+            }
             // Callable
-            if ($callable = $request->getCallable()) {
+            else if ($callable = $request->getCallable()) {
                 $routeMiddleware = $request->getMiddlewares() ?? [];
                 $routeMiddleware[] = new CallableRouteMiddleware($callable, $request->getParams());
                 return $routeMiddleware;
@@ -128,6 +135,12 @@ class Router implements RouterInterface
                     // Set current route
                     $route->params(is_array($params) ? $params : []);
 
+                    // View
+                    if ($view = $route->getView()) {
+                        $routeMiddleware = $route->getMiddlewares() ?? [];
+                        $routeMiddleware[] = new ViewRouteMiddleware($view, $route->getParams());
+                        return $routeMiddleware;
+                    }
                     // Callable
                     if ($callable = $route->getCallable()) {
                         $routeMiddleware = $route->getMiddlewares() ?? [];

@@ -7,6 +7,7 @@ use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Stringable;
 use Throwable;
 
 use function Busarm\PhpMini\Helpers\app;
@@ -19,18 +20,18 @@ use function Busarm\PhpMini\Helpers\app;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class View implements ResponseHandlerInterface
+class View implements ResponseHandlerInterface, Stringable
 {
     /**
-     * @param BaseDto|array|null $data
-     * @param array $headers
+     * @param BaseDto|array|null $data View Data
+     * @param array $headers Http headers
      */
     public function __construct(protected BaseDto|array|null $data = null, protected $headers = array())
     {
     }
 
     /**
-     * Fetches the view result intead of sending it to the output buffer
+     * Fetches the view result instead of sending it to the output buffer
      *
      * @param BaseDto|array|null $data View Data
      * @param array $headers Http headers
@@ -50,6 +51,8 @@ class View implements ResponseHandlerInterface
     }
 
     /**
+     * Add http header 
+     * 
      * @param string $name
      * @param mixed $value
      * @return self
@@ -156,5 +159,14 @@ class View implements ResponseHandlerInterface
         $this->render();
         $content = $this->end();
         return (new Response)->addHttpHeaders($this->headers)->html($content, 200);
+    }
+
+    /**
+     * Gets a string representation of the object
+     * @return string Returns the `string` representation of the object.
+     */
+    public function __toString()
+    {
+        return strval($this->handle()->getBody());
     }
 }

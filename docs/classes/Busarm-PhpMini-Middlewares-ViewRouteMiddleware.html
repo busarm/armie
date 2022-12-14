@@ -91,12 +91,12 @@
                     <ul class="phpdocumentor-breadcrumbs">
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm.html">Busarm</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini.html">PhpMini</a></li>
-            <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini-handlers.html">Handlers</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/busarm-phpmini-middlewares.html">Middlewares</a></li>
     </ul>
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    ResponseHandler
+    ViewRouteMiddleware
 
     
             <div class="phpdocumentor-element__package">
@@ -108,14 +108,14 @@
     
             <span class="phpdocumentor-element__implements">
             implements
-                            <a href="classes/Busarm-PhpMini-Interfaces-ResponseHandlerInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseHandlerInterface">ResponseHandlerInterface</abbr></a>                    </span>
+                            <a href="classes/Busarm-PhpMini-Interfaces-MiddlewareInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\MiddlewareInterface">MiddlewareInterface</abbr></a>                    </span>
     
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Middlewares/ViewRouteMiddleware.php"><a href="files/src-middlewares-viewroutemiddleware.html"><abbr title="src/Middlewares/ViewRouteMiddleware.php">ViewRouteMiddleware.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">20</span>
+    <span class="phpdocumentor-element-found-in__line">28</span>
 
     </aside>
 
@@ -157,7 +157,7 @@
 </h3>
 
 <dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/Busarm-PhpMini-Interfaces-ResponseHandlerInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseHandlerInterface">ResponseHandlerInterface</abbr></a></dt>
+            <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/Busarm-PhpMini-Interfaces-MiddlewareInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\MiddlewareInterface">MiddlewareInterface</abbr></a></dt>
         <dd>PHP Mini Framework</dd>
     
     
@@ -172,39 +172,32 @@
 
 <dl class="phpdocumentor-table-of-contents">
                     <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_data">$data</a>
+    <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_params">$params</a>
     <span>
                         &nbsp;: mixed            </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_format">$format</a>
+    <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_viewPathOrClass">$viewPathOrClass</a>
     <span>
-                        &nbsp;: mixed            </span>
-</dt>
-<dd></dd>
-
-            <dt class="phpdocumentor-table-of-contents__entry -property -private">
-    <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_version">$version</a>
-    <span>
-                        &nbsp;: mixed            </span>
+                        &nbsp;: string            </span>
 </dt>
 <dd></dd>
 
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method___construct">__construct()</a>
+    <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method___construct">__construct()</a>
     <span>
                                 &nbsp;: mixed    </span>
 </dt>
 <dd></dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method_handle">handle()</a>
+    <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method_process">process()</a>
     <span>
                                 &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>    </span>
 </dt>
-<dd></dd>
+<dd>Middleware handler</dd>
 
         </dl>
 
@@ -216,7 +209,7 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="
@@ -225,16 +218,16 @@
             -private
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="property_data">
-        $data
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_data" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="property_params">
+        $params
+        <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_params" class="headerlink"><i class="fas fa-link"></i></a>
         <span class="phpdocumentor-element__modifiers">
                                 </span>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Middlewares/ViewRouteMiddleware.php"><a href="files/src-middlewares-viewroutemiddleware.html"><abbr title="src/Middlewares/ViewRouteMiddleware.php">ViewRouteMiddleware.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">22</span>
+    <span class="phpdocumentor-element-found-in__line">30</span>
 
     </aside>
 
@@ -242,88 +235,48 @@
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">private</span>
         <span class="phpdocumentor-signature__type">mixed</span>
-    <span class="phpdocumentor-signature__name">$data</span>
+    <span class="phpdocumentor-signature__name">$params</span>
+     = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_viewPathOrClass">
+        $viewPathOrClass
+        <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_viewPathOrClass" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Middlewares/ViewRouteMiddleware.php"><a href="files/src-middlewares-viewroutemiddleware.html"><abbr title="src/Middlewares/ViewRouteMiddleware.php">ViewRouteMiddleware.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">30</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$viewPathOrClass</span>
     </code>
-
-        <section class="phpdocumentor-description"></section>
-
-        <section class="phpdocumentor-description"></section>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -private
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_format">
-        $format
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_format" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">22</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">private</span>
-        <span class="phpdocumentor-signature__type">mixed</span>
-    <span class="phpdocumentor-signature__name">$format</span>
-     = <span class="phpdocumentor-signature__default-value">ResponseFormat::JSON</span></code>
-
-        <section class="phpdocumentor-description"></section>
-
-        <section class="phpdocumentor-description"></section>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                </dl>
-
-</article>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -private
-                                                        "
->
-    <h4 class="phpdocumentor-element__name" id="property_version">
-        $version
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#property_version" class="headerlink"><i class="fas fa-link"></i></a>
-        <span class="phpdocumentor-element__modifiers">
-                                </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">22</span>
-
-    </aside>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">private</span>
-        <span class="phpdocumentor-signature__type">mixed</span>
-    <span class="phpdocumentor-signature__name">$version</span>
-     = <span class="phpdocumentor-signature__default-value">&#039;1.1&#039;</span></code>
 
         <section class="phpdocumentor-description"></section>
 
@@ -343,7 +296,7 @@
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -353,44 +306,36 @@
 >
     <h4 class="phpdocumentor-element__name" id="method___construct">
         __construct()
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Middlewares/ViewRouteMiddleware.php"><a href="files/src-middlewares-viewroutemiddleware.html"><abbr title="src/Middlewares/ViewRouteMiddleware.php">ViewRouteMiddleware.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">22</span>
+    <span class="phpdocumentor-element-found-in__line">30</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$version</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">&#039;1.1&#039;</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$format</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">ResponseFormat::JSON</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$params</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
 
         <section class="phpdocumentor-description"></section>
 
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$data</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
+                <span class="phpdocumentor-signature__argument__name">$viewPathOrClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
 
             </dd>
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$version</span>
+                <span class="phpdocumentor-signature__argument__name">$params</span>
                 : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                 = <span class="phpdocumentor-signature__argument__default-value">&#039;1.1&#039;</span>            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"></section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$format</span>
-                : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
-                 = <span class="phpdocumentor-signature__argument__default-value">ResponseFormat::JSON</span>            </dt>
+                 = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"></section>
 
@@ -417,25 +362,42 @@
             -public
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_handle">
-        handle()
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#method_handle" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_process">
+        process()
+        <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method_process" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Handlers/ResponseHandler.php"><a href="files/src-handlers-responsehandler.html"><abbr title="src/Handlers/ResponseHandler.php">ResponseHandler.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Middlewares/ViewRouteMiddleware.php"><a href="files/src-middlewares-viewroutemiddleware.html"><abbr title="src/Middlewares/ViewRouteMiddleware.php">ViewRouteMiddleware.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">26</span>
+    <span class="phpdocumentor-element-found-in__line">41</span>
 
     </aside>
 
-    
+        <p class="phpdocumentor-summary">Middleware handler</p>
+
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">handle</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a></span></code>
-
-        <section class="phpdocumentor-description"></section>
+                    <span class="phpdocumentor-signature__name">process</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestHandlerInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestHandlerInterface">RequestHandlerInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$handler</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a></span></code>
 
     
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$request</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>|<a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$handler</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestHandlerInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestHandlerInterface">RequestHandlerInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
     
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
         Tags
@@ -456,7 +418,7 @@
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Handlers/ResponseHandler.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/Middlewares/ViewRouteMiddleware.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -558,7 +520,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Busarm-PhpMini-Handlers-ResponseHandler.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

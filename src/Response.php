@@ -9,7 +9,6 @@ use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Throwable;
 
 use Nyholm\Psr7\Stream;
-use Stringable;
 
 /**
  * HTTP Response Provider
@@ -24,7 +23,7 @@ use Stringable;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class Response implements ResponseInterface, Stringable
+class Response implements ResponseInterface
 {
     /**
      * 
@@ -48,7 +47,7 @@ class Response implements ResponseInterface, Stringable
     protected $statusText;
 
     /**
-     * @var \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
+     * @var \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      */
     protected $body = NULL;
 
@@ -227,7 +226,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @param \Psr\Http\Message\StreamInterface|Stringable|resource|string|null $body
+     * @param \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null $body
      * @return self
      */
     public function setBody(mixed $body): self
@@ -237,7 +236,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @return \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
+     * @return \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      */
     public function getBody(): mixed
     {
@@ -386,7 +385,7 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * @return \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
+     * @return \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      * @throws InvalidArgumentException
      */
     public function getResponseBody()

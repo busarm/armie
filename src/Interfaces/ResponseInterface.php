@@ -4,7 +4,6 @@ namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Enums\ResponseFormat;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
-use Psr\Http\Message\StreamInterface;
 use Stringable;
 
 /**
@@ -14,7 +13,7 @@ use Stringable;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface ResponseInterface
+interface ResponseInterface extends Stringable
 {
     /**
      * @param string $format
@@ -45,13 +44,13 @@ interface ResponseInterface
     public function getStatusText(): string;
 
     /**
-     * @param StreamInterface|Stringable|resource|string|null $body
+     * @param \Psr\Http\Message\StreamInterface|Stringable|resource|string|null $body
      * @return self
      */
     public function setBody(mixed $body): self;
 
     /**
-     * @return StreamInterface|Stringable|resource|string|null
+     * @return \Psr\Http\Message\StreamInterface|Stringable|resource|string|null
      */
     public function getBody(): mixed;
 
@@ -146,14 +145,14 @@ interface ResponseInterface
     public function xml($data, $code = 200): self;
 
     /**
-     * @param StreamInterface|string|null $data
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
      * @param int $code response code
      * @return self
      */
     public function html($data, $code = 200): self;
 
     /**
-     * @param StreamInterface|string|null $data
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
      * @param string $name
      * @param bool $inline
      * @param string $contentType

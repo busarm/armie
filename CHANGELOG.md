@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.8]
+
+### Added
+
+-   View route middleware - Route directly to view file
+
 ## [1.3.7]
 
 ### Added

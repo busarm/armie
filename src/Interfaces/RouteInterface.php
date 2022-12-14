@@ -15,17 +15,19 @@ use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 interface RouteInterface extends ContainerInterface
 {
     /**  @return Closure|null */
-    public function getCallable(): Closure|null;
-    /**  @return string */
-    public function getController(): string|null;
-    /**  @return string */
-    public function getFunction(): string|null;
+    public function getCallable(): ?Closure;
+    /**  @return string|null */
+    public function getController(): ?string;
+    /**  @return string|null */
+    public function getFunction(): ?string;
     /**  @return array<string, mixed> */
     public function getParams(): array;
     /**  @return string|null */
-    public function getMethod(): string|null;
+    public function getView(): ?string;
     /**  @return string|null */
-    public function getPath(): string|null;
+    public function getMethod(): ?string;
+    /**  @return string|null */
+    public function getPath(): ?string;
     /**  @return MiddlewareInterface[] */
     public function getMiddlewares(): array;
 
@@ -45,6 +47,14 @@ interface RouteInterface extends ContainerInterface
      * @return self
      */
     public function to(string $controller, string $function): self;
+
+    /**
+     * Set view component route destination
+     * 
+     * @param string $viewPathOrClass Path to view file relative to `Config::viewPath` or View class name
+     * @return self
+     */
+    public function view(string $viewPathOrClass): self;
 
     /**
      * Add route middlewares

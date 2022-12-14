@@ -45,7 +45,7 @@ class ProductTestModel extends Model
                 'tags',
                 $this,
                 new Reference(new ProductTagTestModel, ['id' => 'productId']),
-                new Reference(new TagTestModel, ['tagId' => 'id'])
+                new Reference(new TagTestModel, ['tagId' => 'id']), false
             )
         ];
     }

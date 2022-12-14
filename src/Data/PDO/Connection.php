@@ -17,10 +17,9 @@ class Connection extends PDO implements SingletonInterface
     use Singleton;
 
     /**
-     * Undocumented function
-     *
      * @param ConnectionConfig $config
      * @throws \PDOException — if the attempt to connect to the requested database fails.
+     * @inheritDoc
      */
     public function __construct(ConnectionConfig $config)
     {

@@ -4,7 +4,6 @@ namespace Busarm\PhpMini\Test\TestApp\Models;
 
 use Busarm\PhpMini\Data\PDO\Model;
 use Busarm\PhpMini\Data\PDO\Reference;
-use Busarm\PhpMini\Data\PDO\Relations\OneToMany;
 use Busarm\PhpMini\Data\PDO\Relations\OneToOne;
 
 /**

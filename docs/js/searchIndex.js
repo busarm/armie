@@ -988,7 +988,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Connection\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
-            "summary": "Undocumented\u0020function",
+            "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Connection.html#method___construct"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Connection\u003A\u003AgetOffset\u0028\u0029",
@@ -1641,10 +1641,15 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method___construct"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetLoadablePivotRelationNames\u0028\u0029",
-            "name": "getLoadablePivotRelationNames",
-            "summary": "Get\u0020relations\u0020in\u0020pivot\u0020model\u0020to\u0020be\u0020loaded\nOnly\u0020load\u0020relations\u0020linked\u0020to\u0020related\u0020model\u0020\u0028self\u003A\u003AgetItemModel\u0029\nEnsure\u0020that\u0020pivot\u0020only\u0020contains\u0020One\u0020to\u0020One\u0020Relations\u0020to\u0020avoid\u0020infinite\u0020loops",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames"
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AsetFullMode\u0028\u0029",
+            "name": "setFullMode",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020fullMode",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_setFullMode"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003AgetItemRelationName\u0028\u0029",
+            "name": "getItemRelationName",
+            "summary": "Get\u0020item\u0020relation\u0020in\u0020pivot\u0020model\u0020to\u0020be\u0020loaded\n\u002A\u0020Only\u0020load\u0020relation\u0020if\u0020it\u0027s\u0020linked\u0020to\u0020item\u0020model\u0020\u0028self\u003A\u003AgetItemModel\u0029\n\u002A\u0020Ensure\u0020that\u0020relation\u0020is\u0020a\u0020One\u0020to\u0020One\u0020relation\u0020to\u0020avoid\u0020infinite\u0020loops",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getItemRelationName"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003Aget\u0028\u0029",
             "name": "get",
@@ -1705,6 +1710,11 @@ Search.appendIndex(
             "name": "itemReference",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_itemReference"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToMany\u003A\u003A\u0024fullMode",
+            "name": "fullMode",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_fullMode"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relations\\ManyToOne",
             "name": "ManyToOne",

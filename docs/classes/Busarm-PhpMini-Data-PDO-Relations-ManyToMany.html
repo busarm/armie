@@ -117,7 +117,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">18</span>
+    <span class="phpdocumentor-element-found-in__line">19</span>
 
     </aside>
 
@@ -186,6 +186,13 @@
     <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#property_params">$params</a>
     <span>
                         &nbsp;: array&lt;string|int, mixed&gt;            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_fullMode">$fullMode</a>
+    <span>
+                        &nbsp;: bool            </span>
 </dt>
 <dd></dd>
 
@@ -351,6 +358,13 @@
 <dd>Set the value of conditions</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_setFullMode">setFullMode()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Set the value of fullMode</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_setLimit">setLimit()</a>
     <span>
                                 &nbsp;: self    </span>
@@ -365,13 +379,13 @@
 <dd>Set the value of params</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
-    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames">getLoadablePivotRelationNames()</a>
+    <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getItemRelationName">getItemRelationName()</a>
     <span>
-                                &nbsp;: array&lt;string|int, string&gt;    </span>
+                                &nbsp;: string|null    </span>
 </dt>
-<dd>Get relations in pivot model to be loaded
-Only load relations linked to related model (self::getItemModel)
-Ensure that pivot only contains One to One Relations to avoid infinite loops</dd>
+<dd>Get item relation in pivot model to be loaded
+* Only load relation if it&#039;s linked to item model (self::getItemModel)
+* Ensure that relation is a One to One relation to avoid infinite loops</dd>
 
         </dl>
 
@@ -552,6 +566,46 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
             -private
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="property_fullMode">
+        $fullMode
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_fullMode" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">34</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">bool</span>
+    <span class="phpdocumentor-signature__name">$fullMode</span>
+     = <span class="phpdocumentor-signature__default-value">true</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="property_itemReference">
         $itemReference
         <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#property_itemReference" class="headerlink"><i class="fas fa-link"></i></a>
@@ -561,7 +615,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">31</span>
+    <span class="phpdocumentor-element-found-in__line">33</span>
 
     </aside>
 
@@ -601,7 +655,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">29</span>
+    <span class="phpdocumentor-element-found-in__line">31</span>
 
     </aside>
 
@@ -641,7 +695,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">28</span>
+    <span class="phpdocumentor-element-found-in__line">30</span>
 
     </aside>
 
@@ -681,7 +735,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">30</span>
+    <span class="phpdocumentor-element-found-in__line">32</span>
 
     </aside>
 
@@ -765,14 +819,14 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">29</span>
 
     </aside>
 
     
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$name</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$model</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Reference.html"><abbr title="\Busarm\PhpMini\Data\PDO\Reference">Reference</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$pivotReference</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Reference.html"><abbr title="\Busarm\PhpMini\Data\PDO\Reference">Reference</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$itemReference</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$name</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Model.html"><abbr title="\Busarm\PhpMini\Data\PDO\Model">Model</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$model</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Reference.html"><abbr title="\Busarm\PhpMini\Data\PDO\Reference">Reference</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$pivotReference</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Data-PDO-Reference.html"><abbr title="\Busarm\PhpMini\Data\PDO\Reference">Reference</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$itemReference</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$fullMode</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">true</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -810,6 +864,15 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"><p>Item Relation Reference</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$fullMode</span>
+                : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">true</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Defaut: <code class="prettyprint">true</code>. Get or Load full relation data with pivot relation or only item relation</p>
 </section>
 
             </dd>
@@ -887,7 +950,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">59</span>
+    <span class="phpdocumentor-element-found-in__line">73</span>
 
     </aside>
 
@@ -1015,7 +1078,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">196</span>
+    <span class="phpdocumentor-element-found-in__line">244</span>
 
     </aside>
 
@@ -1054,7 +1117,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">223</span>
+    <span class="phpdocumentor-element-found-in__line">271</span>
 
     </aside>
 
@@ -1093,7 +1156,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">232</span>
+    <span class="phpdocumentor-element-found-in__line">280</span>
 
     </aside>
 
@@ -1249,7 +1312,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">205</span>
+    <span class="phpdocumentor-element-found-in__line">253</span>
 
     </aside>
 
@@ -1288,7 +1351,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">214</span>
+    <span class="phpdocumentor-element-found-in__line">262</span>
 
     </aside>
 
@@ -1366,7 +1429,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">117</span>
 
     </aside>
 
@@ -1417,7 +1480,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">140</span>
+    <span class="phpdocumentor-element-found-in__line">188</span>
 
     </aside>
 
@@ -1561,6 +1624,56 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_setFullMode">
+        setFullMode()
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_setFullMode" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">44</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Set the value of fullMode</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">setFullMode</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$fullMode</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$fullMode</span>
+                : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_setLimit">
         setLimit()
         <a href="classes/Busarm-PhpMini-Data-PDO-Relation.html#method_setLimit" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1661,24 +1774,24 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</dd
             -private
                                                         "
 >
-    <h4 class="phpdocumentor-element__name" id="method_getLoadablePivotRelationNames">
-        getLoadablePivotRelationNames()
-        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getLoadablePivotRelationNames" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_getItemRelationName">
+        getItemRelationName()
+        <a href="classes/Busarm-PhpMini-Data-PDO-Relations-ManyToMany.html#method_getItemRelationName" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Data/PDO/Relations/ManyToMany.php"><a href="files/src-data-pdo-relations-manytomany.html"><abbr title="src/Data/PDO/Relations/ManyToMany.php">ManyToMany.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">43</span>
+    <span class="phpdocumentor-element-found-in__line">58</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Get relations in pivot model to be loaded
-Only load relations linked to related model (self::getItemModel)
-Ensure that pivot only contains One to One Relations to avoid infinite loops</p>
+        <p class="phpdocumentor-summary">Get item relation in pivot model to be loaded
+* Only load relation if it&#039;s linked to item model (self::getItemModel)
+* Ensure that relation is a One to One relation to avoid infinite loops</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">private</span>
-                    <span class="phpdocumentor-signature__name">getLoadablePivotRelationNames</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, string&gt;</span></code>
+                    <span class="phpdocumentor-signature__name">getItemRelationName</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
 
     
     
@@ -1691,7 +1804,7 @@ Ensure that pivot only contains One to One Relations to avoid infinite loops</p>
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">array&lt;string|int, string&gt;</span>
+    <span class="phpdocumentor-signature__response_type">string|null</span>
             &mdash;
         
     

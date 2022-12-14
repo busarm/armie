@@ -45,6 +45,8 @@ use function Busarm\PhpMini\Helpers\is_cli;
 // TODO Event Manager Interface - Handle sync and async dispatch
 // TODO Queue Manager Interface - Handle sync and async jobs
 // TODO PSR Cache Interface
+// TODO PSR Session Interface - replace SessionBag & SessionManager
+// TODO Restructure folders to be self contained - class + it's interface
 /**
  * Application Factory
  * 

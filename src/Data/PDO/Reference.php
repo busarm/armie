@@ -14,7 +14,7 @@ class Reference implements Stringable
 {
     /**
      * @param Model $model Reference Model
-     * @param array $keys Reference keys e.g. `['fromModelKey1' => 'toModelKey1', 'modelKey2' => 'fromModelKey2']`
+     * @param array $keys Reference keys e.g. `['fromModelKey1' => 'toModelKey1', 'fromModelKey2' => 'toModelKey2']`
      * @param string|null $name Reference keys. Default = `$model` class name
      */
     public function __construct(private Model $model, private array $keys, private string|null $name = null)

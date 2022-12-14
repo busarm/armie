@@ -122,14 +122,14 @@ final class PDOTest extends TestCase
                 'desc' => $this->faker->sentence()
             ],
             'tags' => [
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
-                [ 'name' => $this->faker->word() ],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
+                ['name' => $this->faker->word()],
             ]
 
         ]);
@@ -180,7 +180,7 @@ final class PDOTest extends TestCase
                 },
                 'tags' => function (Relation $relation) {
                     $relation->setColumns([
-                        'id'
+                        'id', 'name'
                     ])
                         ->setLimit(2);
                 }

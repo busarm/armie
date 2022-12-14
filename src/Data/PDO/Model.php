@@ -653,14 +653,13 @@ abstract class Model extends BaseDto
      */
     public function eagerLoadRelations(array $items): array
     {
-
         $relsIsList = is_list($this->requestedRelations);
         foreach ($this->getRelations() as &$relation) {
             if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
                 // Trigger callback if available
-                if (!$relsIsList) {
-                    $callback = $this->requestedRelations[$relation->getName()] ?? null;
-                    if ($callback) $callback($relation);
+                $callback = $this->requestedRelations[$relation->getName()] ?? null;
+                if (!$relsIsList && $callback && is_callable($callback)) {
+                    $callback($relation);
                 }
                 $items = $relation->load($items);
             }
@@ -680,9 +679,9 @@ abstract class Model extends BaseDto
         foreach ($this->getRelations() as &$relation) {
             if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
                 // Trigger callback if available
-                if (!$relsIsList) {
-                    $callback = $this->requestedRelations[$relation->getName()] ?? null;
-                    if ($callback) $callback($relation);
+                $callback = $this->requestedRelations[$relation->getName()] ?? null;
+                if (!$relsIsList && $callback && is_callable($callback)) {
+                    $callback($relation);
                 }
                 $this->{$relation->getName()} = $relation->get();
                 $this->loadedRelations[] = $relation->getName();
@@ -759,7 +758,8 @@ abstract class Model extends BaseDto
             if (!str_starts_with($col, '-')) {
                 if ($col === "*") {
                     if (!in_array($col, $cols)) {
-                        $cols[] = $col;
+                        $cols = [$col];
+                        break;
                     }
                 } else {
                     $cols[] = is_numeric($key) ? "`$col`" : sprintf("`%s` AS %s", $key, $col);

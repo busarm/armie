@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Data\PDO\Relations;
 use Busarm\PhpMini\Data\PDO\Model;
 use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relation;
+use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\DataType;
 
 use function Busarm\PhpMini\Helpers\is_list;
@@ -22,33 +23,46 @@ class ManyToMany extends Relation
      * @param Model $model Current Model 
      * @param Reference $pivotReference Pivot Relation Reference
      * @param Reference $itemReference Item Relation Reference
+     * @param bool $fullMode Defaut: `true`. Get or Load full relation data with pivot relation or only item relation
      * @return void
      */
     public function __construct(
         private string $name,
         private Model $model,
         private Reference $pivotReference,
-        private Reference $itemReference
+        private Reference $itemReference,
+        private bool $fullMode = true
     ) {
         parent::__construct($name, DataType::ARRAY);
     }
 
     /**
-     * Get relations in pivot model to be loaded
-     * Only load relations linked to related model (self::getItemModel)
-     * Ensure that pivot only contains One to One Relations to avoid infinite loops
-     * 
-     * @return string[]
+     * Set the value of fullMode
+     *
+     * @return  self
      */
-    private function getLoadablePivotRelationNames(): array
+    public function setFullMode(bool $fullMode)
     {
-        $list = [];
+        $this->fullMode = $fullMode;
+
+        return $this;
+    }
+
+    /**
+     * Get item relation in pivot model to be loaded
+     * * Only load relation if it's linked to item model (self::getItemModel)
+     * * Ensure that relation is a One to One relation to avoid infinite loops
+     * 
+     * @return string|null
+     */
+    private function getItemRelationName(): ?string
+    {
         foreach ($this->getReferenceModel()->getRelations() as $relation) {
             if (($relation instanceof OneToOne) && get_class($this->getItemModel()) === get_class($relation->getReferenceModel())) {
-                $list[] = $relation->getName();
+                return $relation->getName();
             }
         }
-        return $list;
+        return null;
     }
 
     /**
@@ -67,16 +81,29 @@ class ManyToMany extends Relation
             }
         }
 
+        $itemRelationName = $this->getItemRelationName();
         if (count($referenceConditions) && count($referenceParams)) {
-            return $this->getReferenceModel()
-                ->withRelations($this->getLoadablePivotRelationNames())
+            $results = $this->getReferenceModel()
+                ->withRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
+                    $itemRelationName => function (Relation $relation) {
+                        $relation->setConditions($this->conditions)
+                            ->setParams($this->params)
+                            ->setColumns($this->columns)
+                            ->setLimit($this->limit);
+                    }
+                ]) : [])
                 ->setAutoLoadRelations(false)
-                ->setPerPage($this->limit)
+                ->setPerPage($this->fullMode ? $this->limit : -1)
                 ->all(
-                    array_merge($referenceConditions, $this->conditions),
-                    array_merge($referenceParams, $this->params),
-                    $this->columns
+                    array_merge($referenceConditions, $this->fullMode ? $this->conditions : []),
+                    array_merge($referenceParams, $this->fullMode ? $this->params : []),
+                    $this->fullMode ? $this->columns : []
                 );
+
+            if (!$this->fullMode && $itemRelationName) {
+                return CollectionBaseDto::of($results)->pluck($itemRelationName);
+            }
+            return $results;
         }
         return [];
     }
@@ -103,13 +130,13 @@ class ManyToMany extends Relation
 
             // Get relation results for all items
             $results = $this->getReferenceModel()
-                ->withRelations($this->getLoadablePivotRelationNames())
+                ->clone()
                 ->setAutoLoadRelations(false)
-                ->setPerPage($this->limit * count($items))
+                ->setPerPage($this->fullMode ? $this->limit * count($items) : -1)
                 ->all(
-                    array_merge($referenceConditions, $this->conditions),
-                    array_merge($referenceParams, $this->params),
-                    $this->columns
+                    array_merge($referenceConditions, $this->fullMode ? $this->conditions : []),
+                    array_merge($referenceParams, $this->fullMode ? $this->params : []),
+                    $this->fullMode ? $this->columns : []
                 );
 
             // Group result for references
@@ -122,7 +149,28 @@ class ManyToMany extends Relation
             // Map relation for each item
             foreach ($items as &$item) {
                 $key = implode('-', array_map(fn ($ref) => $item->{$ref}, array_keys($this->getReferences())));
-                $item->{$this->getName()} = $resultsMap[$key] ?? [];
+                $data = $resultsMap[$key] ?? [];
+
+                // Get item relation name
+                $itemRelationName = $this->getItemRelationName();
+
+                // Eager Load item relation for result data
+                $data = $this->getReferenceModel()
+                    ->withRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
+                        $itemRelationName => function (Relation $relation) {
+                            $relation->setConditions($this->conditions)
+                                ->setParams($this->params)
+                                ->setColumns($this->columns)
+                                ->setLimit($this->limit);
+                        }
+                    ]) : [])->eagerLoadRelations($data);
+
+                // Get item relation if full mode not supported
+                if (!$this->fullMode && $itemRelationName) {
+                    $data = CollectionBaseDto::of($data)->pluck($itemRelationName);
+                }
+
+                $item->{$this->getName()} = $data;
                 $item->addLoadedRelation($this->getName());
             }
 

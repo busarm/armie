@@ -4,7 +4,9 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
+use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
+use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -65,6 +67,8 @@ class Router implements RouterInterface
     }
 
     /**
+     * Add single route
+     * 
      * @param RouteInterface $route 
      * @return RouterInterface
      */
@@ -75,12 +79,41 @@ class Router implements RouterInterface
     }
 
     /**
+     * Add list of routes
+     * 
      * @param RouteInterface[] $routes
      * @return RouterInterface
      */
     public function addRoutes(array $routes): RouterInterface
     {
         $this->routes = array_merge($this->routes, $routes);
+        return $this;
+    }
+
+    /**
+     * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * 
+     * @param string $path HTTP path. e.g /home. See "Router::MATCHER_REGX" for list of parameters matching keywords
+     * @param string $controller Application Controller class name e.g Home
+     * @return RouterInterface
+     */
+    public function addCrudRoutes(string $path, string $controller): RouterInterface
+    {
+
+        if (!in_array(CrudControllerInterface::class, class_implements($controller))) {
+            throw new SystemError("`$controller` does not implement " . CrudControllerInterface::class);
+        }
+
+        $this->createRoute(HttpMethod::GET, "$path/list")->to($controller, 'list');
+        $this->createRoute(HttpMethod::GET, "$path/paginate")->to($controller, 'paginatedList');
+        $this->createRoute(HttpMethod::GET, "$path/{id}")->to($controller, 'get');
+        $this->createRoute(HttpMethod::POST, "$path/bulk")->to($controller, 'createBulk');
+        $this->createRoute(HttpMethod::POST, $path)->to($controller, 'create');
+        $this->createRoute(HttpMethod::PUT, "$path/bulk")->to($controller, 'updateBulk');
+        $this->createRoute(HttpMethod::PUT, "$path/{id}")->to($controller, 'update');
+        $this->createRoute(HttpMethod::DELETE, "$path/bulk")->to($controller, 'deleteBulk');
+        $this->createRoute(HttpMethod::DELETE, "$path/{id}")->to($controller, 'delete');
+
         return $this;
     }
 

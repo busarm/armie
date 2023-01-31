@@ -19,6 +19,7 @@ use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\RequestHandler;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
+use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
@@ -516,6 +517,31 @@ class App implements HttpServerInterface, ContainerInterface
     {
         return $this->router->createRoute(HttpMethod::HEAD, $path);
     }
+
+    /**
+     * Set HTTP CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     *
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     * @param string $controller Application Controller class name e.g Home
+     * @return mixed
+     */
+    public function crud(string $path, string $controller)
+    {
+        if (!in_array(CrudControllerInterface::class, class_implements($controller))) {
+            throw new SystemError("`$controller` does not implement " . CrudControllerInterface::class);
+        }
+
+        $this->router->createRoute(HttpMethod::GET, "$path/list")->to($controller, 'list');
+        $this->router->createRoute(HttpMethod::GET, "$path/paginate")->to($controller, 'paginatedList');
+        $this->router->createRoute(HttpMethod::GET, "$path/{id}")->to($controller, 'get');
+        $this->router->createRoute(HttpMethod::POST, "$path/bulk")->to($controller, 'createBulk');
+        $this->router->createRoute(HttpMethod::POST, $path)->to($controller, 'create');
+        $this->router->createRoute(HttpMethod::PUT, "$path/bulk")->to($controller, 'updateBulk');
+        $this->router->createRoute(HttpMethod::PUT, "$path/{id}")->to($controller, 'update');
+        $this->router->createRoute(HttpMethod::DELETE, "$path/bulk")->to($controller, 'deleteBulk');
+        $this->router->createRoute(HttpMethod::DELETE, "$path/{id}")->to($controller, 'delete');
+    }
+
 
     ############################
     # Response

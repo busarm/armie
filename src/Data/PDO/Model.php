@@ -1052,7 +1052,7 @@ abstract class Model extends BaseDto
     /**
      * @inheritDoc
      */
-    public static function with(array|object|null $data): self
+    public static function with(array|object|null $data, $sanitize = false): self
     {
         $dto = new static;
         if ($data) {
@@ -1068,19 +1068,11 @@ abstract class Model extends BaseDto
     /**
      * @inheritDoc
      */
-    public static function withCustom(array|object|null $data): self
+    public static function withCustom(array|object|null $data, $sanitize = false): self
     {
         $dto = new static;
         if ($data) $dto->loadCustom((array)$data);
         return $dto;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toArray($trim = false): array
-    {
-        return parent::toArray($trim);
     }
 
     /**

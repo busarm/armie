@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Dto;
 
 use ArrayIterator;
 use ArrayObject;
+use Busarm\PhpMini\Helpers\Security;
 use InvalidArgumentException;
 use OutOfRangeException;
 use Traversable;
@@ -70,9 +71,10 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      * Load data
      *
      * @param array|Traversable $data
+     * @param bool $sanitize
      * @return self
      */
-    public function load(array|Traversable $data): self
+    public function load(array|Traversable $data, $sanitize = false): self
     {
         // Validate that the input is an array or an object with an Traversable interface.
         if (!(is_array($data) || (is_object($data) && in_array(Traversable::class, class_implements($data))))) {
@@ -85,7 +87,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
             if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
                 throw new InvalidArgumentException('Items of $input must be an instance of ' . $this->itemClass);
             }
-            $this[$key] = $value;
+            $this[$key] = $sanitize ? Security::clean($value) : $value;
         }
 
         return $this;
@@ -442,9 +444,10 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      * Convert dto to array
      * 
      * @param bool $trim - Remove NULL properties
+     * @param bool $sanitize - Perform security cleaning
      * @return array
      */
-    public function toArray($trim = true): array
+    public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
         foreach ($this as $key => $item) {
@@ -479,7 +482,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
                 }
             }
         }
-        return $result;
+        return $sanitize ? Security::cleanParams($result) : $result;
     }
 
     /**

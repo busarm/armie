@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Bags;
 
+use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
 
@@ -61,7 +62,6 @@ class Attribute implements StorageBagInterface
 	 * @param string $name
 	 * @param mixed $value
 	 * @param mixed $options
-	 *
 	 * @return bool
 	 */
 	public function set(string $name, mixed $value, $options = NULL): bool
@@ -75,7 +75,6 @@ class Attribute implements StorageBagInterface
 	 * Checks if an attribute exists
 	 *
 	 * @param string $name
-	 *
 	 * @return bool
 	 */
 	public function has(string $name): bool
@@ -88,12 +87,14 @@ class Attribute implements StorageBagInterface
 	 *
 	 * @param string $name
 	 * @param mixed $default
-	 *
+	 * @param bool $sanitize
 	 * @return mixed
 	 */
-	public function get(string $name, $default = null): mixed
+	public function get(string $name, $default = null, $sanitize = false): mixed
 	{
-		return $this->has($name) ? $this->attributes[$name] : $default;
+		return $this->has($name) ?
+			($sanitize ? Security::clean($this->attributes[$name]) : $this->attributes[$name]) :
+			$default;
 	}
 
 	/**
@@ -101,11 +102,12 @@ class Attribute implements StorageBagInterface
 	 *
 	 * @param string $name
 	 * @param mixed $default
+	 * @param bool $sanitize
 	 * @return mixed
 	 */
-	public function pull(string $name, $default = null): mixed
+	public function pull(string $name, $default = null, $sanitize = false): mixed
 	{
-		$value = $this->get($name, $default);
+		$value = $this->get($name, $default, $sanitize);
 		$this->remove($name);
 		return $value;
 	}
@@ -124,7 +126,6 @@ class Attribute implements StorageBagInterface
 	 * Set bulk attributes
 	 *
 	 * @param array $data
-	 *
 	 * @return void
 	 */
 	public function replace(array $data)
@@ -137,7 +138,6 @@ class Attribute implements StorageBagInterface
 	 * Remove attribute
 	 *
 	 * @param string $name
-	 *
 	 * @return void
 	 */
 	public function remove(string $name)

@@ -15,9 +15,12 @@ use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
 use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
 use Middlewares\Firewall;
+
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -111,7 +114,7 @@ final class AppTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString("Test View Component", strval($response->getBody()));
     }
-    
+
     /**
      * Test app run mock HTTP CORS
      * 
@@ -324,5 +327,38 @@ final class AppTest extends TestCase
         );
         $this->assertNotNull($response);
         $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    /**
+     * Test app run mock HTTP CRUD Controller
+     *
+     * @group pdo-get
+     * @return void
+     */
+    public function testAppRunMockHttpCrudController()
+    {
+        $this->app->config
+            ->setAppPath(__DIR__ . '/TestApp')
+            ->setConfigPath('Configs')
+            ->setViewPath('Views')
+            ->setPdoConnectionDriver("mysql")
+            ->setPdoConnectionHost("localhost")
+            ->setPdoConnectionDatabase('default')
+            ->setPdoConnectionPort(3306)
+            ->setPdoConnectionUsername("root")
+            ->setPdoConnectionPassword("root")
+            ->setPdoConnectionPersist(false)
+            ->setPdoConnectionErrorMode(true);
+
+        $this->app->router->addCrudRoutes('product', ProductTestController::class);
+        $response = $this->app->run(
+            Request::fromUrl(
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/product/paginate?limit=2&page=10',
+                HttpMethod::GET
+            )
+        );
+        $this->assertNotNull($response);
+        $this->assertNotNull($response->getParameters());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }

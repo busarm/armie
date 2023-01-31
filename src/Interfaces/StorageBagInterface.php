@@ -35,17 +35,19 @@ interface StorageBagInterface extends Stringable
      *
      * @param string $name
      * @param mixed $default
+     * @param bool $sanitize
      * @return mixed
      */
-    public function get(string $name, $default = null): mixed;
+    public function get(string $name, $default = null, $sanitize = false): mixed;
     /**
      * Pull attribute: Get and delete
      *
      * @param string $name
      * @param mixed $default
+     * @param bool $sanitize
      * @return mixed
      */
-    public function pull(string $name, $default = null): mixed;
+    public function pull(string $name, $default = null, $sanitize = false): mixed;
     /**
      * Get all attributes
      *

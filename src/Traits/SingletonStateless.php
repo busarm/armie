@@ -22,7 +22,7 @@ trait SingletonStateless
      *
      * @param RequestInterface|RouteInterface $request
      * @param array $params
-     * @return self
+     * @return static
      */
     public static function make(RequestInterface|RouteInterface $request, array $params = []): self
     {

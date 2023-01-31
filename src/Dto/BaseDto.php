@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Dto;
 
+use Busarm\PhpMini\Helpers\Security;
 use ReflectionObject;
 use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Traits\TypeResolver;
@@ -61,10 +62,14 @@ class BaseDto implements Arrayable, Stringable
      * Load data from array with class attributes
      *
      * @param array $data
+     * @param bool $sanitize
      * @return static
      */
-    public function load(array $data): static
+    public function load(array $data, $sanitize = false): static
     {
+        if ($sanitize)
+            $data = Security::clean($data);
+
         if ($data) {
             foreach ($this->attributes() as $attr => $type) {
                 if (array_key_exists($attr, $data)) {
@@ -93,10 +98,14 @@ class BaseDto implements Arrayable, Stringable
      * Load data from array with custom values
      *
      * @param array $data
+     * @param bool $sanitize
      * @return self
      */
-    public function loadCustom(array $data): self
+    public function loadCustom(array $data, $sanitize = false): self
     {
+        if ($sanitize)
+            $data = Security::clean($data);
+            
         if ($data) {
             $attibutes = $this->attributes();
             $attibutesKeys = array_keys($this->attributes());
@@ -149,9 +158,10 @@ class BaseDto implements Arrayable, Stringable
      * Convert dto to array
      * 
      * @param bool $trim - Remove NULL properties
+     * @param bool $sanitize - Perform security cleaning
      * @return array
      */
-    public function toArray($trim = true): array
+    public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
         foreach ($this->attributes() as $attr => $type) {
@@ -177,23 +187,24 @@ class BaseDto implements Arrayable, Stringable
                 }
             }
         }
-        return $result;
+        return $sanitize ? Security::cleanParams($result) : $result;
     }
 
     /**
      * Load dto with array of class attibutes
      *
      * @param array|object|null $data
+     * @param bool $sanitize
      * @return static|self
      */
-    public static function with(array|object|null $data): self
+    public static function with(array|object|null $data, $sanitize = false): self
     {
         $dto = new self;
         if ($data) {
             if ($data instanceof self) {
-                $dto->load($data->toArray());
+                $dto->load($data->toArray(), $sanitize);
             } else {
-                $dto->load((array)$data);
+                $dto->load((array)$data, $sanitize);
             }
         }
         return $dto;
@@ -203,12 +214,13 @@ class BaseDto implements Arrayable, Stringable
      * Load dto with array of custom data
      *
      * @param array|object|null $data
+     * @param bool $sanitize
      * @return static|self
      */
-    public static function withCustom(array|object|null $data): self
+    public static function withCustom(array|object|null $data, $sanitize = false): self
     {
         $dto = new self;
-        if ($data) $dto->loadCustom((array)$data);
+        if ($data) $dto->loadCustom((array)$data, $sanitize);
         return $dto;
     }
 

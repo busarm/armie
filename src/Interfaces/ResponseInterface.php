@@ -161,7 +161,7 @@ interface ResponseInterface extends Stringable
     public function download($data, $name = null, $inline = false, $contentType = null): self;
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      *
@@ -170,35 +170,35 @@ interface ResponseInterface extends Stringable
     public function isInvalid();
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
     public function isInformational();
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
     public function isSuccessful();
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
     public function isRedirection();
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
     public function isClientError();
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */

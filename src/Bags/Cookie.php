@@ -41,23 +41,20 @@ class Cookie extends Attribute
 
     /**
      * Load cookies
-     *
+     * 
+     * @param array $cookies
      * @return self
      */
-    public function load($cookies): self
+    public function load(array $cookies): self
     {
-        $this->attributes = $cookies;
+        foreach ($cookies as $name => $cookie) {
+            $this->set($name, $cookie);
+        }
         return $this;
     }
 
     /**
-     * Set attribute
-     *
-     * @param string $name
-     * @param mixed $value
-     * @param mixed $options
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function set(string $name, mixed $value, $options = NULL): bool
     {
@@ -79,14 +76,9 @@ class Cookie extends Attribute
     }
 
     /**
-     * Get attribute
-     *
-     * @param string $name
-     * @param mixed $default
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function get(string $name, $default = null): mixed
+    public function get(string $name, $default = null, $sanitize = false): mixed
     {
         $name = $this->prefix . '_' . $name;
         $value = $this->has($name) ? $this->attributes[$name] : null;
@@ -99,11 +91,7 @@ class Cookie extends Attribute
     }
 
     /**
-     * Remove attribute
-     *
-     * @param string $name
-     *
-     * @return void
+     * @inheritDoc
      */
     public function remove(string $name)
     {
@@ -113,9 +101,7 @@ class Cookie extends Attribute
     }
 
     /**
-     * Remove all attribute
-     *
-     * @return void
+     * @inheritDoc
      */
     public function clear()
     {

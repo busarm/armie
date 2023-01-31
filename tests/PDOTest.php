@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Test;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Data\PDO\Relation;
+use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
 use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
@@ -204,7 +205,6 @@ final class PDOTest extends TestCase
      */
     public function testGetProductRepo()
     {
-        $productModel = new ProductTestModel();
         $productRepo = new ProductTestRepository();
         $result = $productRepo->findTrashedById(1);
         $this->assertNotNull($result);

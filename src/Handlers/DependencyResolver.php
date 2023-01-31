@@ -92,15 +92,15 @@ class DependencyResolver implements DependencyResolverInterface
         if ($this->request) {
             if ($instance instanceof BaseDto) {
                 if ($this->request instanceof RequestInterface) {
-                    $instance->load($this->request->request()->all());
+                    $instance->load($this->request->request()->all(), true);
                 } else if ($this->request instanceof RouteInterface) {
-                    $instance->load($this->request->getParams());
+                    $instance->load($this->request->getParams(), true);
                 }
             } else if ($instance instanceof CollectionBaseDto) {
                 if ($this->request instanceof RequestInterface) {
-                    $instance->load($this->request->request()->all());
+                    $instance->load($this->request->request()->all(), true);
                 } else if ($this->request instanceof RouteInterface) {
-                    $instance->load($this->request->getParams());
+                    $instance->load($this->request->getParams(), true);
                 }
             }
         }

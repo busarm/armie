@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Session;
 
 use Busarm\PhpMini\Errors\SessionError;
+use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 
 /**
@@ -118,15 +119,16 @@ class PHPSession implements SessionStoreInterface
      *
      * @param string $name
      * @param mixed $default
+     * @param bool $sanitize
      *
      * @throws SessionError
      * @return mixed
      */
-    function pull(string $name, mixed $default = null): mixed
+    public function pull(string $name, $default = null, $sanitize = false): mixed
     {
         $this->throwIfNotStarted();
 
-        $value = $_SESSION[$name] ?? $default;
+        $value = ($sanitize ? Security::clean($_SESSION[$name]) : $_SESSION[$name]) ?? $default;
 
         unset($_SESSION[$name]);
 
@@ -179,12 +181,12 @@ class PHPSession implements SessionStoreInterface
      *
      * @param string $name
      * @param mixed $default
-     *
+     * @param bool $sanitize
      * @return mixed
      */
-    function get(string $name, $default = null): mixed
+    public function get(string $name, $default = null, $sanitize = false): mixed
     {
-        return $_SESSION[$name] ?? $default;
+        return ($sanitize ? Security::clean($_SESSION[$name]) : $_SESSION[$name]) ?? $default;
     }
 
     /**

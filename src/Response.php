@@ -522,7 +522,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      *
@@ -534,7 +534,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -544,7 +544,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -554,7 +554,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -564,7 +564,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */
@@ -574,7 +574,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      *
      * @api
      */

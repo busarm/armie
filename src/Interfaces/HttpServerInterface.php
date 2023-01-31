@@ -58,4 +58,12 @@ interface HttpServerInterface
      * @return RouteInterface
      */
     public function head(string $path): RouteInterface;
+
+    /**
+     * Set HTTP CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * 
+     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     * @param string $controller Application Controller class name e.g Home
+     */
+    public function crud(string $path, string $controller);
 }

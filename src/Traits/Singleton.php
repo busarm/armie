@@ -18,7 +18,7 @@ trait Singleton
      * Create / Retrieve singleton instance 
      *
      * @param array $params
-     * @return self
+     * @return static
      */
     public static function make(array $params = []): self
     {

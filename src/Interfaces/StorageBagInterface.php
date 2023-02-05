@@ -60,7 +60,7 @@ interface StorageBagInterface extends Stringable
      * @param array $data
      * @return void
      */
-    public function replace(array  $data);
+    public function replace(array $data);
     /**
      * Remove attribute
      *

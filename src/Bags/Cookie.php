@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Bags;
 use Busarm\PhpMini\Crypto;
 
 use function Busarm\PhpMini\Helpers\app;
+use function Busarm\PhpMini\Helpers\config;
 
 /**
  * PHP Mini Framework
@@ -34,9 +35,9 @@ class Cookie extends Attribute
     {
         parent::__construct([]);
 
-        $this->prefix = !empty($prefix) ? $prefix : (!empty(app()->config->cookiePrefix) ?
-            app()->config->cookiePrefix :
-            str_replace(' ', '_', strtolower(app()->config->name)));
+        $this->prefix = !empty($prefix) ? $prefix : (!empty(config('cookiePrefix')) ?
+            config('cookiePrefix') :
+            str_replace(' ', '_', strtolower(config('name'))));
     }
 
     /**
@@ -48,7 +49,8 @@ class Cookie extends Attribute
     public function load(array $cookies): self
     {
         foreach ($cookies as $name => $cookie) {
-            $this->set($name, $cookie);
+            if (!$this->has($name))
+                $this->set($name, $cookie);
         }
         return $this;
     }
@@ -58,7 +60,7 @@ class Cookie extends Attribute
      */
     public function set(string $name, mixed $value, $options = NULL): bool
     {
-        $name = $this->prefix . '_' . $name;
+        $name = str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
         $value = !empty($value) ?
             ($this->encrypt && !empty(app()->config->encryptionKey) ?
                 Crypto::encrypt(app()->config->encryptionKey . ($this->id ? md5($this->id) : ''), $value) :

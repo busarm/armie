@@ -36,6 +36,10 @@
         "test-pdo-edit": "composer run phpunit -- --group pdo-edit",
         "test-pdo-get": "composer run phpunit -- --group pdo-get"
     },
+    "test": [
+        "Composer\\Config::disableProcessTimeout",
+        "start-dev"
+    ],
     "keywords": [
         "php",
         "framework",
@@ -50,7 +54,8 @@
         "psr/http-server-middleware": "^1.0",
         "symfony/console": "^6.0",
         "symfony/process": "^6.0",
-        "nyholm/psr7": "^1.5"
+        "nyholm/psr7": "^1.5",
+        "guzzlehttp/guzzle": "^7.5"
     },
     "require-dev": {
         "middlewares/firewall": "^2.0",

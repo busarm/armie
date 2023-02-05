@@ -24,9 +24,9 @@ class BaseDto implements Arrayable, Stringable
     /**
      * Explicitly selected attributes
      *
-     * @var array
+     * @var array|null
      */
-    protected array $selectedAttrs = [];
+    private array|null $selectedAttrs = NULL;
 
     /**
      * Get dto attribute names & types
@@ -105,7 +105,7 @@ class BaseDto implements Arrayable, Stringable
     {
         if ($sanitize)
             $data = Security::clean($data);
-            
+
         if ($data) {
             $attibutes = $this->attributes();
             $attibutesKeys = array_keys($this->attributes());
@@ -116,6 +116,17 @@ class BaseDto implements Arrayable, Stringable
             }
         }
         return $this;
+    }
+
+    /**
+     * Get explicitly selected attributes
+     *
+     * @param array $attributes
+     * @return array
+     */
+    public function selected(): array
+    {
+        return $this->selectedAttrs ?? [];
     }
 
     /**

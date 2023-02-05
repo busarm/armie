@@ -2,14 +2,25 @@
 
 namespace Busarm\PhpMini;
 
-use Busarm\PhpMini\Enums\ResponseFormat;
+use Busarm\PhpMini\Dto\ErrorTraceDto;
+use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Dto\ServiceRequestDto;
+use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
+use Busarm\PhpMini\Interfaces\ServiceClientInterface;
+use Busarm\PhpMini\Service\LocalClient;
+use Busarm\PhpMini\Service\LocalService;
+use Busarm\PhpMini\Service\RemoteClient;
+use Busarm\PhpMini\Service\RemoteService;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Nyholm\Psr7\Uri;
+use Throwable;
+
+use function Busarm\PhpMini\Helpers\out;
 
 /**
  * Server Instance for handling multi tenancy
@@ -21,6 +32,11 @@ use Nyholm\Psr7\Uri;
  */
 class Server
 {
+    const HEADER_SERVER_NAME            = 'APP_SERVER_NAME';
+    const HEADER_CORRELATION_ID         = 'APP_CORRELATION_ID';
+    const HEADER_SERVICE_NAME           = 'APP_SERVICE_NAME';
+    const HEADER_SERVICE_CLIENT_PREFIX  = 'APP_SERVICE_CLIENT_';
+
     /**
      * @var App[]
      */
@@ -30,6 +46,10 @@ class Server
      */
     private $routePaths = [];
     /**
+     * @var ServiceClientInterface[]
+     */
+    private $routeServices = [];
+    /**
      * @var App[]
      */
     private $domainApps = [];
@@ -37,6 +57,52 @@ class Server
      * @var string[]
      */
     private $domainPaths = [];
+    /**
+     * @var ServiceClientInterface[]
+     */
+    private $domainServices = [];
+
+    private string $correlationId;
+
+    private ErrorReporter $reporter;
+
+    public function __construct(public string $name)
+    {
+        $this->correlationId = md5(uniqid()) . '.' . microtime(true);
+        $this->reporter = (new ErrorReporter);
+
+        // Set up error handler
+        set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
+            $this->reporter->reportError("Internal Server Error", $errstr, $errfile, $errline);
+            (new Response())
+                ->setParameters(
+                    (new ResponseDto)
+                        ->setSuccess(false)
+                        ->setErrorCode($errno)
+                        ->setErrorLine($errline)
+                        ->setErrorFile($errfile)
+                        ->setMessage(sprintf("Error: %s", $errstr))
+                        ->toArray()
+                )->send();
+        });
+        set_exception_handler(function (Throwable $e) {
+            $this->reporter->reportException($e);
+            $trace = array_map(function ($instance) {
+                return (new ErrorTraceDto($instance));
+            }, $e->getTrace());
+            (new Response())
+                ->setParameters(
+                    (new ResponseDto)
+                        ->setSuccess(false)
+                        ->setErrorCode($e->getCode())
+                        ->setErrorLine($e->getLine())
+                        ->setErrorFile($e->getFile())
+                        ->setErrorTrace($trace)
+                        ->setMessage(sprintf("%s: %s", get_class($e), $e->getMessage()))
+                        ->toArray()
+                )->send();
+        });
+    }
 
     /**
      * Map route to a particular app. (Not recommended for production)
@@ -48,6 +114,18 @@ class Server
     public function addRouteApp($route, App $app): self
     {
         $this->routeApps[$route] = $app;
+        return $this;
+    }
+
+    /**
+     * Map list of: route to a particular app
+     *
+     * @param array<string,App> $list Array of `$route => App::class`. see `self::addRouteApp`
+     * @return self
+     */
+    public function addRouteAppList(array $list): self
+    {
+        $this->routeApps = array_merge($this->routeApps, $list);
         return $this;
     }
 
@@ -66,14 +144,39 @@ class Server
     }
 
     /**
-     * Map list of route to a particular app path
+     * Map list of: route to a particular app path
      *
-     * @param array $list Array of `$route => $path`. see `self::addRoutePath`
+     * @param array<string,string> $list Array of `$route => $path`. see `self::addRoutePath`
      * @return self
      */
     public function addRoutePathList(array $list): self
     {
         $this->routePaths = array_merge($this->routePaths, $list);
+        return $this;
+    }
+
+    /**
+     * Map route to a particular service client
+     *
+     * @param string $route Route path to app. e.g v1
+     * @param ServiceClientInterface $client Service client
+     * @return self
+     */
+    public function addRouteService($route, ServiceClientInterface $client): self
+    {
+        $this->routeServices[$route] = $client;
+        return $this;
+    }
+
+    /**
+     * Map list of:  route to a particular service client
+     *
+     * @param array<string,ServiceClientInterface> $list Array of `$route => ServiceClientInterface::class`. see `self::addRouteService`
+     * @return self
+     */
+    public function addRouteServiceList(array $list): self
+    {
+        $this->routeServices = array_merge($this->routeServices, $list);
         return $this;
     }
 
@@ -87,6 +190,18 @@ class Server
     public function addDomainApp($domain, App $app): self
     {
         $this->domainApps[$domain] = $app;
+        return $this;
+    }
+
+    /**
+     * Map list of: domain to a particular app
+     *
+     * @param array<string,App> $list Array of `$domain => App::class`. see `self::addRouteApp`
+     * @return self
+     */
+    public function addDomainAppList(array $list): self
+    {
+        $this->domainApps = array_merge($this->domainApps, $list);
         return $this;
     }
 
@@ -117,38 +232,67 @@ class Server
     }
 
     /**
+     * Map domain to a particular service client
+     *
+     * @param string $route Route path to app. e.g v1
+     * @param ServiceClientInterface $client Service client
+     * @return self
+     */
+    public function addDomainService($route, ServiceClientInterface $client): self
+    {
+        $this->domainServices[$route] = $client;
+        return $this;
+    }
+
+    /**
+     * Map list of:  domain to a particular service client
+     *
+     * @param array<string,ServiceClientInterface> $list Array of `$domain => ServiceClientInterface::class`. see `self::addRouteService`
+     * @return self
+     */
+    public function addDomainServiceList(array $list): self
+    {
+        $this->domainServices = array_merge($this->domainServices, $list);
+        return $this;
+    }
+
+    /**
      * Run server
      *
      * @param ServerRequestInterface|null $request
-     * @return \Psr\Http\Message\ResponseInterface|bool True if successful. ResponseInterface if failed
+     * @param bool $send Send response or False to 
+     * @return ResponseInterface|null
      */
-    public function run(ServerRequestInterface|null $request = null): MessageResponseInterface|bool
+    public function run(ServerRequestInterface|null $request = null): ResponseInterface|null
     {
         $request = $request ? Request::fromPsr($request) : Request::fromGlobal();
-        if ($this->runRoute($request) !== false) {
-            return true;
-        } else if ($this->runDomain($request) !== false) {
-            return true;
+
+        $request->server()->set(self::HEADER_SERVER_NAME, $this->name);
+        $request->server()->set(self::HEADER_CORRELATION_ID, $this->correlationId);
+        $request->server()->replace($this->getServiceHeaderMap());
+
+        if (($response = $this->runRoute($request)) !== false) {
+            return $response ? $response : (new Response())->setStatusCode(500);
+        } else if (($response = $this->runDomain($request)) !== false) {
+            return $response ?  $response : (new Response())->setStatusCode(500);
         }
-        return (new Response())->setStatusCode(404)->toPsr();
+        return (new Response())->setStatusCode(404);
     }
 
     /**
      * Run for route
      * 
      * @param RequestInterface $request
-     * @return ResponseInterface|bool|null False if failed
+     * @return ResponseInterface|false|null False if failed
      */
-    protected function runRoute(RequestInterface $request): ResponseInterface|bool|null
+    protected function runRoute(RequestInterface $request): ResponseInterface|false|null
     {
-        $segments = $request->segments();
+        foreach ($request->segments() as $route) {
 
-        for ($i = 0; $i < count($segments); $i++) {
-            $route = implode('/', array_slice($segments, 0, $i + 1));
+            $uri = preg_replace("(^(/+)$route(/+))", "", $request->path());
 
             // Check route apps
             if (array_key_exists($route, $this->routeApps)) {
-                $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
                 return $this->routeApps[$route]->run($request->withUri(new Uri($request->baseUrl() . '/' . $uri)));
             }
 
@@ -159,9 +303,15 @@ class Server
                 if (!file_exists($path)) {
                     throw new SystemError("App file not found: $path");
                 }
+                return Loader::require($path, [
+                    'request' => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr()
+                ]);
+            }
 
-                $uri = implode('/', array_slice($segments, $i + 1, count($segments)));
-                return Loader::require($path, ['request' => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))]);
+            // Check route service client
+            if (array_key_exists($route, $this->routeServices)) {
+                $client = $this->routeServices[$route];
+                return $this->runServiceClient($request, $client, $uri);
             }
         }
 
@@ -174,13 +324,13 @@ class Server
      * @param RequestInterface $request
      * @return ResponseInterface|false|null False if failed
      */
-    protected function runDomain(RequestInterface $request): ResponseInterface|bool|null
+    protected function runDomain(RequestInterface $request): ResponseInterface|false|null
     {
         $domain = $request->domain();
 
         // Check domain apps
         if (array_key_exists($domain, $this->domainApps)) {
-            return $this->domainApps[$domain]->run();
+            return $this->domainApps[$domain]->run($request);
         }
 
         // Check domain paths
@@ -190,10 +340,79 @@ class Server
             if (!file_exists($path)) {
                 throw new SystemError("App file not found: $path");
             }
+            return Loader::require($path, ['request' => $request->toPsr()]);
+        }
 
-            return Loader::require($path, ['request' => $request]);
+
+        // Check domain service client
+        if (array_key_exists($domain, $this->domainServices)) {
+            $client = $this->domainServices[$domain];
+            return $this->runServiceClient($request, $client, $request->path());
         }
 
         return false;
+    }
+
+    /**
+     * Run for service client
+     * 
+     * @param RequestInterface $request
+     * @param ServiceClientInterface $client
+     * @param string $uri
+     * @return ResponseInterface|false|null False if failed
+     */
+    protected function runServiceClient(RequestInterface $request, ServiceClientInterface $client, string $uri): ResponseInterface|false|null
+    {
+        $type = match ($request->method()) {
+            HttpMethod::POST => ServiceType::CREATE,
+            HttpMethod::PUT, HttpMethod::PATCH => ServiceType::UPDATE,
+            HttpMethod::DELETE => ServiceType::DELETE,
+            default => ServiceType::READ,
+        };
+        $params = $request->method() == HttpMethod::GET ? $request->query()->all() : $request->request()->all();
+
+        // Local Client Service
+        if ($client instanceof LocalClient) {
+            return (new LocalService($request))->call(
+                (new ServiceRequestDto)
+                    ->setName($client->getName())
+                    ->setRoute($uri)
+                    ->setType($type)
+                    ->setParams($params)
+                    ->setHeaders($request->header()->all())
+            );
+        }
+        // Remote Client Service
+        if ($client instanceof RemoteClient) {
+            $response = (new RemoteService($request))->call(
+                (new ServiceRequestDto)
+                    ->setName($client->getName())
+                    ->setRoute($uri)
+                    ->setType($type)
+                    ->setParams($params)
+                    ->setHeaders([
+                        self::HEADER_SERVER_NAME => $this->name,
+                        self::HEADER_CORRELATION_ID => $this->correlationId,
+                    ])
+            );
+
+            return Response::fromPsr($response);
+        }
+
+        return false;
+    }
+
+    /**
+     * Get service map with header prefix
+     * i.e [name => location]
+     * @return array<string,string>
+     */
+    protected function getServiceHeaderMap()
+    {
+        $clients = [];
+        foreach (array_merge(array_values($this->routeServices), array_values($this->domainServices)) as $client) {
+            $clients[self::HEADER_SERVICE_CLIENT_PREFIX . strtoupper($client->getName())] = $client->getLocation();
+        }
+        return $clients;
     }
 }

@@ -1,13 +1,19 @@
 <?php
 
 /**
- * @var Busarm\PhpMini\Interfaces\RequestInterface|null $request Capture Server request
+ * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
  */
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Dto\ServiceRequestDto;
+use Busarm\PhpMini\Enums\ServiceType;
+use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Middlewares\CorsMiddleware;
+use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
+use Busarm\PhpMini\Service\LocalService;
+use Busarm\PhpMini\Service\RemoteService;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Middlewares\Firewall;
 
@@ -34,7 +40,16 @@ $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
     return 'success-callable-' . $app->env;
 });
+$app->get('test')->call(function (RequestInterface $req) {
+    return LocalService::make($req)->call((new ServiceRequestDto)
+            ->setName("MyTestAppV2")
+            ->setRoute('test')
+            ->setType(ServiceType::READ)
+    );
+});
+
 $app->get('download')->call(function (Response $response) {
     return $response->download(fopen(__DIR__ . '../../../README.md', 'rb'), 'README.md', false);
 });
-return $app->run($request ?? null);
+
+return $app->run(Request::capture($request ?? null))->send($config->httpSendAndContinue);

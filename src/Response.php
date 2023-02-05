@@ -155,7 +155,7 @@ class Response implements ResponseInterface
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText) . "\r\n" .
             $this->getHttpHeadersAsString($headers) . "\r\n" .
-            $this->getResponseBody();
+            strval($this->getResponseBody());
     }
 
     /**
@@ -390,20 +390,27 @@ class Response implements ResponseInterface
      */
     public function getResponseBody()
     {
-        if (!empty($this->body)) {
-            return is_string($this->body) ? $this->body : Stream::create($this->body);
-        }
-
         switch ($this->format) {
             case ResponseFormat::JSON:
+                if (!empty($this->body)) {
+                    return strval($this->body);
+                }
                 return json_encode($this->parameters);
             case ResponseFormat::XML:
+                if (!empty($this->body)) {
+                    $xml = new \SimpleXMLElement(strval($this->body));
+                } else {
+                    $xml = new \SimpleXMLElement('<response/>');
+                }
                 // this only works for single-level arrays
-                $xml = new \SimpleXMLElement('<response/>');
                 foreach ($this->parameters as $key => $param) {
                     $xml->addChild($key, $param);
                 }
                 return $xml->asXML();
+            default:
+                if (!empty($this->body)) {
+                    return is_string($this->body) ? $this->body : Stream::create($this->body);
+                }
         }
 
         return null;
@@ -411,12 +418,13 @@ class Response implements ResponseInterface
 
     /**
      * @param bool $continue
+     * @return self
      */
-    public function send($continue = false)
+    public function send($continue = false): self
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
-            return;
+            return $this;
         }
 
         // clear buffer
@@ -459,6 +467,8 @@ class Response implements ResponseInterface
             ob_end_clean();
             throw $e;
         }
+
+        return $this;
     }
 
     /**

@@ -41,26 +41,22 @@ final class CallableRouteMiddleware implements MiddlewareInterface
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (is_callable($this->callable)) {
-            try {
-                // Get dependency resolver
-                $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
-        
-                $result = ($this->callable)(...array_merge(DI::resolveCallableDependencies(
-                    $this->callable,
-                    new $resolver($request),
-                ), $this->params));
+            // Get dependency resolver
+            $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
 
-                if ($request instanceof RequestInterface) {
-                    return $result !== false ?
-                        (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->httpResponseFormat))->handle() :
-                        throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
-                }
+            $result = ($this->callable)(...array_merge(DI::resolveCallableDependencies(
+                $this->callable,
+                new $resolver($request),
+            ), $this->params));
+
+            if ($request instanceof RequestInterface) {
                 return $result !== false ?
-                    (new ResponseHandler(data: $result, format: app()->config->httpResponseFormat))->handle() :
-                    throw new NotFoundException("Resource not found");
-            } catch (TypeError $th) {
-                throw new BadRequestException("Invalid parameter(s): " . $th->getMessage());
+                    (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->httpResponseFormat))->handle() :
+                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->path()));
             }
+            return $result !== false ?
+                (new ResponseHandler(data: $result, format: app()->config->httpResponseFormat))->handle() :
+                throw new NotFoundException("Resource not found");
         }
         throw new SystemError("Callable route can't be executed");
     }

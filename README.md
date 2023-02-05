@@ -37,7 +37,7 @@ App folders can be structured in whatever pattern you wish.
 You can use PHP server built-in server to test:
 
 ```bash
-$ php -S localhost:8181 -t public
+$ php -S localhost:8181 -t tests/TestServer
 ```
 
 ### Multi Tenancy
@@ -57,7 +57,7 @@ $ php -S localhost:8181 -t public
     # ../myapp/public/index.php
 
     /**
-     * @var Busarm\PhpMini\Interfaces\RequestInterface $request Capture Server request
+     * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
      */
 
     require __DIR__ . '/../vendor/autoload.php';
@@ -67,7 +67,7 @@ $ php -S localhost:8181 -t public
         ->setConfigPath('Configs')
         ->setViewPath('Views');
     $app = new App($config);
-    return $app->run($request ?? null);
+    return $app->run(Request::capture($request ?? null));
 ```
 
 ## Configs

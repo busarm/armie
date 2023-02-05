@@ -127,8 +127,9 @@ interface ResponseInterface extends Stringable
 
     /**
      * @param bool $continue
+     * @return self
      */
-    public function send($continue = false);
+    public function send($continue = false): self;
 
     /**
      * @param array $data

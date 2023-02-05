@@ -405,7 +405,7 @@ abstract class Model extends BaseDto
                 ->load($result)
                 ->setIsNew(false)
                 ->processAutoLoadRelations()
-                ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns));
+                ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns));
         }
         return null;
     }
@@ -456,7 +456,7 @@ abstract class Model extends BaseDto
             return $this->processEagerLoadRelations(array_map(fn ($result) => $this->clone()
                 ->load($result)
                 ->setIsNew(false)
-                ->select($this->mergeColumnsRelations(!empty($this->selectedAttrs) && !in_array('*', $this->selectedAttrs) ? $this->selectedAttrs : $columns)), $results));
+                ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns)), $results));
         }
 
         return [];

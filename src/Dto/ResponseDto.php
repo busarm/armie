@@ -146,7 +146,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setErrorTrace($errorTrace)
+    public function setErrorTrace(array $errorTrace)
     {
         $this->errorTrace = $errorTrace;
 

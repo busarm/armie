@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.9]
+
+### Added
+
+-   Support for muti tenency services and service request
+
 ## [1.3.8]
 
 ### Added

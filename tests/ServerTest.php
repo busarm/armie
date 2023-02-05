@@ -38,7 +38,7 @@ final class ServerTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->server = new Server();
+        $this->server = new Server("Test Server");
         $config = (new Config())
             ->setAppPath(__DIR__ . '/TestApp')
             ->setConfigPath('Configs')

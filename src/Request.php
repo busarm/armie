@@ -19,7 +19,7 @@ use Busarm\PhpMini\Traits\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-use function Busarm\PhpMini\Helpers\app;
+use function Busarm\PhpMini\Helpers\config;
 use function Busarm\PhpMini\Helpers\is_cli;
 
 /**
@@ -37,56 +37,80 @@ class Request implements RequestInterface
 {
     use Container;
 
-    protected string|null $ip           =   NULL;
-    protected string|null $scheme       =   NULL;
-    protected string|null $domain       =   NULL;
-    protected string|null $host         =   NULL;
-    protected string|null $baseUrl      =   NULL;
-    protected string|null $uri          =   NULL;
-    protected string|null $currentUrl   =   NULL;
-    protected string|null $method       =   NULL;
-    protected string|null $contentType  =   NULL;
-    protected string|null $protocol     =   NULL;
-    protected mixed $content  =   NUll;
-    protected UploadBagInterface|StorageBagInterface|null $files      =   null;
-    protected SessionStoreInterface|null $session   =   null;
-    protected StorageBagInterface|null $request     =   null;
-    protected StorageBagInterface|null $query       =   null;
-    protected StorageBagInterface|null $server      =   null;
-    protected StorageBagInterface|null $cookies     =   null;
-    protected StorageBagInterface|null $headers     =   null;
+    protected string|null $_ip              =   NULL;
+    protected string|null $_scheme          =   NULL;
+    protected string|null $_domain          =   NULL;
+    protected string|null $_host            =   NULL;
+    protected string|null $_baseUrl         =   NULL;
+    protected string|null $_path            =   NULL;
+    protected string|null $_currentUrl      =   NULL;
+    protected string|null $_method          =   NULL;
+    protected string|null $_contentType     =   NULL;
+    protected string|null $_protocol        =   NULL;
+    protected mixed $_content               =   NUll;
+    protected ServerRequestInterface|null $_psr      =   NUll;
+    protected SessionStoreInterface|null $_session   =   null;
+    protected StorageBagInterface|null $_request     =   null;
+    protected StorageBagInterface|null $_query       =   null;
+    protected StorageBagInterface|null $_server      =   null;
+    protected StorageBagInterface|null $_cookies     =   null;
+    protected StorageBagInterface|null $_headers     =   null;
+    protected UploadBagInterface|StorageBagInterface|null $_files      =   null;
 
-    protected ServerRequestInterface|null $psr      =   NUll;
-
-    private array $sessionOptions   =   [];
-    private array $cookieOptions    =   [];
+    private array $_sessionOptions   =   [];
+    private array $_cookieOptions    =   [];
 
     /**
      * Constructor.
      */
     protected function __construct()
     {
-        $this->sessionOptions = [
-            'cookie_lifetime' => app()->config->cookieDuration,
-            'cookie_path' => app()->config->cookiePath,
-            'cookie_domain' => app()->config->cookieDomain,
-            'cookie_secure' => app()->config->cookieSecure,
-            'cookie_httponly' => app()->config->cookieHttpOnly,
-            'cookie_samesite' => app()->config->cookieSameSite,
-            'cache_expire' => app()->config->cookieDuration / 60,
-            'cache_limiter' => app()->config->cacheLimiter,
-            'save_path' => app()->config->sessionPath,
-            'name' => str_replace(' ', '_', strtolower(app()->config->name)) . '_' . crc32(app()->config->sessionPath) . '_sess'
+        $this->setup();
+    }
+
+    /**
+     * Set up request
+     * 
+     * @return void
+     */
+    public function setUp()
+    {
+        $this->_sessionOptions = [
+            'cookie_lifetime' => config('cookieDuration'),
+            'cookie_path' => config('cookiePath'),
+            'cookie_domain' => config('cookieDomain'),
+            'cookie_secure' => config('cookieSecure'),
+            'cookie_httponly' => config('cookieHttpOnly'),
+            'cookie_samesite' => config('cookieSameSite'),
+            'cache_expire' => config('cookieDuration') / 60,
+            'cache_limiter' => config('cacheLimiter'),
+            'save_path' => config('sessionPath'),
+            'name' => str_replace(' ', '_', strtolower(config('name'))) . '_' . crc32(config('sessionPath')) . '_sess'
         ];
 
-        $this->cookieOptions = [
-            'expires' => time() + app()->config->cookieDuration,
-            'path' => app()->config->cookiePath,
-            'domain' => app()->config->cookieDomain,
-            'secure' => app()->config->cookieSecure,
-            'httponly' => app()->config->cookieHttpOnly,
-            'samesite' => app()->config->cookieSameSite,
+        $this->_cookieOptions = [
+            'expires' => time() + config('cookieDuration'),
+            'path' => config('cookiePath'),
+            'domain' => config('cookieDomain'),
+            'secure' => config('cookieSecure'),
+            'httponly' => config('cookieHttpOnly'),
+            'samesite' => config('cookieSameSite'),
         ];
+    }
+
+    /**
+     * Capture server request or create using Globals
+     * 
+     * @param ServerRequestInterface|null $psr
+     * @return self
+     */
+    public static function capture(ServerRequestInterface|null $psr = null): self
+    {
+        if (isset($psr)) {
+            return self::fromPsr($psr);
+        } else {
+            return self::fromGlobal();
+        }
     }
 
     /**
@@ -104,19 +128,19 @@ class Request implements RequestInterface
             $request->initialize(
                 (new Query)->setQuery($uri->getQuery()),
                 (new Attribute),
-                (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? '')),
-                (new PHPSession($request->sessionOptions)),
+                (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? '')),
+                (new PHPSession($request->_sessionOptions)),
                 (new Attribute),
                 (new Attribute)
             );
 
-            $request->method = $method;
-            $request->scheme = $uri->getScheme();
-            $request->domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
-            $request->host = $request->scheme  . "://" . $request->domain;
-            $request->uri = '/' . ltrim($uri->getPath(), '/');
-            $request->baseUrl = $request->host;
-            $request->currentUrl = $request->baseUrl . $request->uri;
+            $request->_method = $method;
+            $request->_scheme = $uri->getScheme();
+            $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
+            $request->_host = $request->_scheme  . "://" . $request->_domain;
+            $request->_path = '/' . ltrim($uri->getPath(), '/');
+            $request->_baseUrl = $request->_host;
+            $request->_currentUrl = $request->_baseUrl . $request->_path;
             return $request;
         } else {
             throw new SystemError("'$url' is not a valid URL");
@@ -134,8 +158,8 @@ class Request implements RequestInterface
         $request->initialize(
             (new Query)->mirror($_GET),
             (new Attribute)->mirror($_POST),
-            (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->mirror($_COOKIE),
-            (new PHPSession($request->sessionOptions)),
+            (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? ''))->mirror($_COOKIE),
+            (new PHPSession($request->_sessionOptions)),
             (new Attribute)->mirror($_FILES),
             new Attribute($_SERVER)
         );
@@ -150,22 +174,22 @@ class Request implements RequestInterface
     public static function fromPsr(ServerRequestInterface $psr): self
     {
         $request = new self;
-        $request->psr = $psr;
+        $request->_psr = $psr;
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
-            (new Cookie($request->cookieOptions, app()->config->cookieEncrypt, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
-            (new PHPSession($request->sessionOptions)),
+            (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
+            (new PHPSession($request->_sessionOptions)),
             new Upload($psr->getUploadedFiles()),
             new Attribute($psr->getServerParams())
         );
 
-        $request->scheme = $psr->getUri()->getScheme();
-        $request->domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost() . ':' . $psr->getUri()->getPort() : $psr->getUri()->getHost();
-        $request->host = $request->scheme  . "://" . $request->domain;
-        $request->uri = '/' . ltrim($psr->getUri()->getPath(), '/');
-        $request->baseUrl = $request->host;
-        $request->currentUrl = $request->baseUrl . $request->uri;
+        $request->_scheme = $psr->getUri()->getScheme();
+        $request->_domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost() . ':' . $psr->getUri()->getPort() : $psr->getUri()->getHost();
+        $request->_host = $request->_scheme  . "://" . $request->_domain;
+        $request->_path = '/' . ltrim($psr->getUri()->getPath(), '/');
+        $request->_baseUrl = $request->_host;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
         return $request;
     }
 
@@ -196,55 +220,56 @@ class Request implements RequestInterface
         $content = null
     ): self {
 
-        $this->request  =   $request ?: $this->request;
-        $this->query    =   $query ?: $this->query;
-        $this->session  =   $session ?: $this->session;
-        $this->cookies  =   $cookies ?: $this->cookies;
-        $this->files    =   $files ?: $this->files;
-        $this->server   =   $server ?: $this->server;
-        $this->content  =   $content ?: $this->content;
+        $this->_request  =   $request ?: $this->_request;
+        $this->_query    =   $query ?: $this->_query;
+        $this->_session  =   $session ?: $this->_session;
+        $this->_cookies  =   $cookies ?: $this->_cookies;
+        $this->_files    =   $files ?: $this->_files;
+        $this->_server   =   $server ?: $this->_server;
+        $this->_content  =   $content ?: $this->_content;
 
         // Load data from server vars
-        if ($this->server) {
+        if ($this->_server) {
 
-            $this->headers  =   $headers ?: new Attribute(array_change_key_case($this->getHeadersFromServer($this->server->all())));
-
-            $this->contentType  = $this->contentType ?: $this->server->get('CONTENT_TYPE', '');
-            $this->method       = $this->method ?: $this->server->get('REQUEST_METHOD', HttpMethod::GET);
-            $this->protocol     = $this->protocol ?: $this->getServerPotocol();
+            $this->_headers  =   $headers ?: new Attribute(array_change_key_case(
+                array_merge($this->getHeadersFromServer($this->_server->all()), $this->_headers ? $this->_headers->all() : [])
+            ));
+            $this->_contentType  = $this->_contentType ?: $this->_server->get('CONTENT_TYPE', '');
+            $this->_method       = $this->_method ?: $this->_server->get('REQUEST_METHOD', HttpMethod::GET);
+            $this->_protocol     = $this->_protocol ?: $this->getServerPotocol();
 
             // Load request body
             if (
-                (!$this->request || empty($this->request->all())) &&
-                0 === strpos($this->contentType, 'application/x-www-form-urlencoded') &&
-                in_array(strtoupper($this->method), array(HttpMethod::PUT, HttpMethod::DELETE))
+                (!$this->_request || empty($this->_request->all())) &&
+                0 === strpos($this->_contentType, 'application/x-www-form-urlencoded') &&
+                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 parse_str($this->getContent(), $data);
-                $this->request = new Attribute($data);
-            } elseif (
-                (!$this->request || empty($this->request->all())) &&
-                0 === strpos($this->contentType, 'application/json') &&
-                in_array(strtoupper($this->method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
+                $this->_request = new Attribute($data);
+            } else if (
+                (!$this->_request || empty($this->_request->all())) &&
+                0 === strpos($this->_contentType, 'application/json') &&
+                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 $data = json_decode($this->getContent(), true);
-                $this->request = new Attribute($data);
+                $this->_request = new Attribute($data);
             }
 
-            $this->scheme = $this->scheme ?: ($this->isHttps() ? "https" : "http");
-            $this->ip = $this->ip ?: $this->getIpAddress();
-            $this->domain = $this->domain ?: $this->server->get('HTTP_HOST');
-            $this->host = $this->host ?: $this->scheme  . "://" . $this->domain;
-            if (!$this->uri) {
-                $this->uri = '/' . ltrim($this->server->get('REQUEST_URI') ?: ($this->server->get('PATH_INFO') ?: $this->server->get('ORIG_PATH_INFO') ?: ''), '/');
-                $this->uri = rawurldecode(explode('?', $this->uri ?? '', 2)[0]);
+            $this->_scheme = $this->_scheme ?: ($this->isHttps() ? "https" : "http");
+            $this->_ip = $this->_ip ?: $this->getIpAddress();
+            $this->_domain = $this->_domain ?: $this->_server->get('HTTP_HOST');
+            $this->_host = $this->_host ?: $this->_scheme  . "://" . $this->_domain;
+            if (!$this->_path) {
+                $this->_path = '/' . ltrim($this->_server->get('REQUEST_URI') ?: ($this->_server->get('PATH_INFO') ?: $this->_server->get('ORIG_PATH_INFO') ?: ''), '/');
+                $this->_path = rawurldecode(explode('?', $this->_path ?? '', 2)[0]);
             }
-            $this->baseUrl = $this->baseUrl ?: $this->host;
-            $this->currentUrl = $this->currentUrl ?: $this->baseUrl . $this->uri;
+            $this->_baseUrl = $this->_baseUrl ?: $this->_host;
+            $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
         }
 
         // Start session
-        if ($this->session && app()->config->httpSessionAutoStart) {
-            !is_cli() && $this->session->start();
+        if ($this->_session && config('httpSessionAutoStart')) {
+            !is_cli() && $this->_session->start();
         }
 
         return $this;
@@ -259,12 +284,12 @@ class Request implements RequestInterface
     public function withUri(UriInterface $uri): self
     {
         $request = clone $this;
-        $request->scheme = $uri->getScheme();
-        $request->domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
-        $request->host = $request->scheme  . "://" . $request->domain;
-        $request->uri = '/' . ltrim($uri->getPath(), '/');
-        $request->baseUrl = $request->host;
-        $request->currentUrl = $request->baseUrl . $request->uri;
+        $request->_scheme = $uri->getScheme();
+        $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
+        $request->_host = $request->_scheme  . "://" . $request->_domain;
+        $request->_path = '/' . ltrim($uri->getPath(), '/');
+        $request->_baseUrl = $request->_host;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
         return $request;
     }
 
@@ -278,21 +303,21 @@ class Request implements RequestInterface
      */
     public function getContent($asResource = false)
     {
-        if (false === $this->content || (true === $asResource && null !== $this->content)) {
+        if (false === $this->_content || (true === $asResource && null !== $this->_content)) {
             throw new LogicException('getContent() can only be called once when using the resource return type.');
         }
 
         if (true === $asResource) {
-            $this->content = false;
+            $this->_content = false;
 
             return fopen('php://input', 'rb');
         }
 
-        if (null === $this->content) {
-            $this->content = file_get_contents('php://input');
+        if (null === $this->_content) {
+            $this->_content = file_get_contents('php://input');
         }
 
-        return $this->content;
+        return $this->_content;
     }
 
     /**
@@ -302,8 +327,8 @@ class Request implements RequestInterface
      */
     private function getServerPotocol()
     {
-        return (!empty($this->server->get('SERVER_PROTOCOL')) && in_array($this->server->get('SERVER_PROTOCOL'), array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'), TRUE))
-            ? $this->server->get('SERVER_PROTOCOL') : 'HTTP/1.1';
+        return (!empty($this->_server->get('SERVER_PROTOCOL')) && in_array($this->_server->get('SERVER_PROTOCOL'), array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'), TRUE))
+            ? $this->_server->get('SERVER_PROTOCOL') : 'HTTP/1.1';
     }
 
     /**
@@ -313,11 +338,11 @@ class Request implements RequestInterface
      */
     protected function isHttps()
     {
-        if (!empty($this->server->get('HTTPS')) && strtolower($this->server->get('HTTPS')) !== 'off') {
+        if (!empty($this->_server->get('HTTPS')) && strtolower($this->_server->get('HTTPS')) !== 'off') {
             return TRUE;
-        } elseif (!empty($this->server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
+        } elseif (!empty($this->_server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->_server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
             return TRUE;
-        } elseif (!empty($this->server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
+        } elseif (!empty($this->_server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->_server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
             return TRUE;
         }
         return FALSE;
@@ -331,37 +356,37 @@ class Request implements RequestInterface
     protected function getIpAddress()
     {
         // check for shared internet/ISP IP
-        if (!empty($this->server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->server->get('HTTP_CLIENT_IP'))) {
-            return $this->server->get('HTTP_CLIENT_IP');
+        if (!empty($this->_server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_CLIENT_IP'))) {
+            return $this->_server->get('HTTP_CLIENT_IP');
         }
         // check for IPs passing through proxies
-        if (!empty($this->server->get('HTTP_X_FORWARDED_FOR'))) {
+        if (!empty($this->_server->get('HTTP_X_FORWARDED_FOR'))) {
             // check if multiple ips exist in var
-            if (strpos($this->server->get('HTTP_X_FORWARDED_FOR'), ',') !== false) {
-                $iplist = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR') ?? '', 20);
+            if (strpos($this->_server->get('HTTP_X_FORWARDED_FOR'), ',') !== false) {
+                $iplist = explode(',', $this->_server->get('HTTP_X_FORWARDED_FOR') ?? '', 20);
                 foreach ($iplist as $ip) {
                     if ($this->validateIpAddress($ip))
                         return $ip;
                 }
             } else {
-                if ($this->validateIpAddress($this->server->get('HTTP_X_FORWARDED_FOR')))
-                    return $this->server->get('HTTP_X_FORWARDED_FOR');
+                if ($this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED_FOR')))
+                    return $this->_server->get('HTTP_X_FORWARDED_FOR');
             }
         }
-        if (!empty($this->server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($this->server->get('HTTP_X_FORWARDED')))
-            return $this->server->get('HTTP_X_FORWARDED');
+        if (!empty($this->_server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED')))
+            return $this->_server->get('HTTP_X_FORWARDED');
 
-        if (!empty($this->server->get('HTTP_X_CLUSTER_CLIENT_IP')) && $this->validateIpAddress($this->server->get('HTTP_X_CLUSTER_CLIENT_IP')))
-            return $this->server->get('HTTP_X_CLUSTER_CLIENT_IP');
+        if (!empty($this->_server->get('HTTP_X_CLUSTER_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_X_CLUSTER_CLIENT_IP')))
+            return $this->_server->get('HTTP_X_CLUSTER_CLIENT_IP');
 
-        if (!empty($this->server->get('HTTP_FORWARDED_FOR')) && $this->validateIpAddress($this->server->get('HTTP_FORWARDED_FOR')))
-            return $this->server->get('HTTP_FORWARDED_FOR');
+        if (!empty($this->_server->get('HTTP_FORWARDED_FOR')) && $this->validateIpAddress($this->_server->get('HTTP_FORWARDED_FOR')))
+            return $this->_server->get('HTTP_FORWARDED_FOR');
 
-        if (!empty($this->server->get('HTTP_FORWARDED')) && $this->validateIpAddress($this->server->get('HTTP_FORWARDED')))
-            return $this->server->get('HTTP_FORWARDED');
+        if (!empty($this->_server->get('HTTP_FORWARDED')) && $this->validateIpAddress($this->_server->get('HTTP_FORWARDED')))
+            return $this->_server->get('HTTP_FORWARDED');
 
         // return unreliable ip since all else failed
-        return $this->server->get('REMOTE_ADDR');
+        return $this->_server->get('REMOTE_ADDR');
     }
 
     /**
@@ -477,7 +502,7 @@ class Request implements RequestInterface
      */
     public function ip()
     {
-        return $this->ip;
+        return $this->_ip;
     }
 
     /**
@@ -485,7 +510,7 @@ class Request implements RequestInterface
      */
     public function scheme()
     {
-        return $this->scheme;
+        return $this->_scheme;
     }
 
     /**
@@ -493,7 +518,7 @@ class Request implements RequestInterface
      */
     public function domain()
     {
-        return $this->domain;
+        return $this->_domain;
     }
 
     /**
@@ -501,7 +526,7 @@ class Request implements RequestInterface
      */
     public function host()
     {
-        return $this->host;
+        return $this->_host;
     }
 
     /**
@@ -509,15 +534,15 @@ class Request implements RequestInterface
      */
     public function baseUrl()
     {
-        return $this->baseUrl;
+        return $this->_baseUrl;
     }
 
     /**
      * @return string
      */
-    public function uri()
+    public function path()
     {
-        return $this->uri;
+        return $this->_path;
     }
 
     /**
@@ -525,7 +550,7 @@ class Request implements RequestInterface
      */
     public function currentUrl()
     {
-        return $this->currentUrl;
+        return $this->_currentUrl;
     }
 
     /**
@@ -533,7 +558,7 @@ class Request implements RequestInterface
      */
     public function method()
     {
-        return $this->method;
+        return $this->_method;
     }
 
     /**
@@ -541,7 +566,7 @@ class Request implements RequestInterface
      */
     public function contentType()
     {
-        return $this->contentType;
+        return $this->_contentType;
     }
 
     /**
@@ -549,7 +574,7 @@ class Request implements RequestInterface
      */
     public function content()
     {
-        return $this->content;
+        return $this->_content;
     }
 
     /**
@@ -559,7 +584,7 @@ class Request implements RequestInterface
      */
     public function segments()
     {
-        $segments = explode('/', $this->uri() ?? '', 100);
+        $segments = explode('/', $this->path() ?? '', 100);
         return array_values(array_filter($segments, function ($value) {
             return $value !== '';
         }));
@@ -569,9 +594,9 @@ class Request implements RequestInterface
      *
      * @return StorageBagInterface
      */
-    public function file(): StorageBagInterface
+    public function file(): UploadBagInterface|StorageBagInterface
     {
-        return $this->files;
+        return $this->_files;
     }
 
     /**
@@ -580,7 +605,7 @@ class Request implements RequestInterface
      */
     public function session(): SessionStoreInterface
     {
-        return $this->session;
+        return $this->_session;
     }
 
     /**
@@ -589,7 +614,7 @@ class Request implements RequestInterface
      */
     public function cookie(): StorageBagInterface
     {
-        return $this->cookies;
+        return $this->_cookies;
     }
 
     /**
@@ -598,7 +623,7 @@ class Request implements RequestInterface
      */
     public function query(): StorageBagInterface
     {
-        return $this->query;
+        return $this->_query;
     }
 
     /**
@@ -607,7 +632,7 @@ class Request implements RequestInterface
      */
     public function request(): StorageBagInterface
     {
-        return $this->request;
+        return $this->_request;
     }
 
     /**
@@ -616,7 +641,7 @@ class Request implements RequestInterface
      */
     public function server(): StorageBagInterface
     {
-        return $this->server;
+        return $this->_server;
     }
 
     /**
@@ -625,7 +650,7 @@ class Request implements RequestInterface
      */
     public function header(): StorageBagInterface
     {
-        return $this->headers;
+        return $this->_headers;
     }
 
     /**
@@ -633,7 +658,7 @@ class Request implements RequestInterface
      */
     public function version()
     {
-        return $this->protocol ? str_replace('HTTP/', '', $this->protocol) : '1.1';
+        return $this->_protocol ? str_replace('HTTP/', '', $this->_protocol) : '1.1';
     }
 
     /**
@@ -643,7 +668,7 @@ class Request implements RequestInterface
      */
     public function setSession(SessionStoreInterface $session)
     {
-        $this->session = $session;
+        $this->_session = $session;
 
         return $this;
     }
@@ -655,7 +680,7 @@ class Request implements RequestInterface
      */
     public function setRequest(StorageBagInterface $request)
     {
-        $this->request = $request;
+        $this->_request = $request;
 
         return $this;
     }
@@ -667,7 +692,7 @@ class Request implements RequestInterface
      */
     public function setQuery(StorageBagInterface $query)
     {
-        $this->query = $query;
+        $this->_query = $query;
 
         return $this;
     }
@@ -679,7 +704,7 @@ class Request implements RequestInterface
      */
     public function setServer(StorageBagInterface $server)
     {
-        $this->server = $server;
+        $this->_server = $server;
 
         return $this;
     }
@@ -691,7 +716,7 @@ class Request implements RequestInterface
      */
     public function setFiles(UploadBagInterface|StorageBagInterface $files)
     {
-        $this->files = $files;
+        $this->_files = $files;
 
         return $this;
     }
@@ -703,7 +728,7 @@ class Request implements RequestInterface
      */
     public function setCookies(StorageBagInterface $cookies)
     {
-        $this->cookies = $cookies;
+        $this->_cookies = $cookies;
 
         return $this;
     }
@@ -715,7 +740,7 @@ class Request implements RequestInterface
      */
     public function setHeaders(StorageBagInterface $headers)
     {
-        $this->headers = $headers;
+        $this->_headers = $headers;
 
         return $this;
     }
@@ -727,14 +752,17 @@ class Request implements RequestInterface
      */
     function toPsr(): ServerRequestInterface
     {
-        $request = $this->psr ?? new \Nyholm\Psr7\ServerRequest(
-            $this->method,
-            (new Uri($this->currentUrl))->withQuery(strval($this->query)),
-            $this->headers ? $this->headers->all() : [],
-            $this->content ?: strval($this->request),
+        $request = $this->_psr ?? (new \Nyholm\Psr7\ServerRequest(
+            $this->_method,
+            (new Uri($this->_currentUrl))->withQuery(strval($this->_query)),
+            $this->_headers ? $this->_headers->all() : [],
+            $this->_content ?: strval($this->_request),
             $this->version(),
-            $this->server ? $this->server->all() : [],
-        );
+            $this->_server ? $this->_server->all() : []
+        ))
+            ->withProtocolVersion($this->version())
+            ->withUploadedFiles($this->file()->all())
+            ->withCookieParams($this->cookie()->all());
         return $request;
     }
 }

@@ -804,7 +804,7 @@ class Config
      */
     public function get(string $name, $default = null)
     {
-        return $this->custom[$name] ?? $default;
+        return $this->custom[$name] ?? $this->{$name} ?? $default;
     }
 
     /**

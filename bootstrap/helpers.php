@@ -161,7 +161,11 @@ function app(): \Busarm\PhpMini\App
  */
 function config($name, $value = null)
 {
-    return app()->config->get($name) ?? ($value ? app()->config->set($name, $value) : null);
+    try {
+        return app()->config->get($name) ?? ($value ? app()->config->set($name, $value) : null);
+    } catch (\Throwable $th) {
+        return null;
+    }
 }
 
 /**

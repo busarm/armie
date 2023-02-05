@@ -99,7 +99,7 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * @param Config $config App configuration object
-     * @param string $env App environment. @see Busarm\PhpMini\Enums\Env
+     * @param string $env App environment. @see \Busarm\PhpMini\Enums\Env
      * @param bool $stateless If app is running in stateless mode. E.g Using Swoole. 
      * Do not use static variables for user specific data when runing on stateless mode.
      * 
@@ -194,7 +194,7 @@ class App implements HttpServerInterface, ContainerInterface
             } else {
                 $this->reporter->reportException($e);
                 $trace = array_map(function ($instance) {
-                    return (new ErrorTraceDto($instance))->toArray();
+                    return (new ErrorTraceDto($instance));
                 }, $e->getTrace());
                 !$this->isCli && $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
             }
@@ -215,20 +215,24 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
-        $response = ($request instanceof RequestInterface) ? new Response(version: $request->version(), format: $this->config->httpResponseFormat) : new Response(format: $this->config->httpResponseFormat);
 
         // Run start hook
         $this->triggerStartHook($request);
 
         // Set shutdown hook
-        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request, ResponseInterface $response) {
+        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request) {
             if ($app->status !== AppStatus::STOPPED) {
+                if ($request instanceof RequestInterface) {
+                    $response = new Response(version: $request->version(), format: $this->config->httpResponseFormat);
+                } else {
+                    $response = new Response(format: $this->config->httpResponseFormat);
+                }
                 $app->triggerCompleteHook($request, $response);
             }
-        }, $this, $request, $response);
+        }, $this, $request);
 
         // Process route request
-        $response = $this->processMiddleware($request, $response, array_merge($this->middlewares, $this->router->process($request)));
+        $response = $this->processMiddleware($request);
 
         // Run complete hook
         $this->triggerCompleteHook($request, $response);
@@ -236,25 +240,22 @@ class App implements HttpServerInterface, ContainerInterface
         $this->status = AppStatus::STOPPED;
         $request = NULL;
 
-        return $this->isCli ? $response : ($response->send($this->config->httpSendAndContinue) ?? $response);
+        return $response;
     }
 
     /**
      * Process middleware
      *
      * @param RequestInterface|RouteInterface $request
-     * @param ResponseInterface $response
-     * @param MiddlewareInterface[] $middlewares
      * @return ResponseInterface
      */
-    protected function processMiddleware(RequestInterface|RouteInterface $request, ResponseInterface $response, array $middlewares): ResponseInterface
+    protected function processMiddleware(RequestInterface|RouteInterface $request): ResponseInterface
     {
         // Add default response handler
         $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
-            $response->html("Not found - " . ($request->method() . ' ' . $request->uri()), 404) :
-            $response->html("Resource not found", 404);
+            (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html("Not found - " . ($request->method() . ' ' . $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
 
-        foreach (array_reverse($middlewares) as $middleware) {
+        foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
             $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
         }
 
@@ -589,7 +590,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $response->errorCode = !empty($errorCode) ? $errorCode : null;
                 $response->errorLine = !empty($errorLine) ? $errorLine : null;
                 $response->errorFile = !empty($errorFile) ? $errorFile : null;
-                $response->errorTrace = !empty($errorTrace) ? $errorTrace : null;
+                $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
                 $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 

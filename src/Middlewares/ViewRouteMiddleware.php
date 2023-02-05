@@ -56,7 +56,7 @@ final class ViewRouteMiddleware implements MiddlewareInterface
             if ($request instanceof RequestInterface) {
                 return $result !== false ?
                     (new ResponseHandler(data: $result, version: $request->version(), format: ResponseFormat::HTML))->handle() :
-                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
+                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->path()));
             }
             return $result !== false ?
                 (new ResponseHandler(data: $result, format: ResponseFormat::HTML))->handle() :

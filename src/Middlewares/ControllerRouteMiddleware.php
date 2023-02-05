@@ -52,27 +52,23 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     && method_exists($object, $this->function)
                     && is_callable(array($object, $this->function))
                 ) {
-                    try {
-                        $result = call_user_func_array(
-                            array($object, $this->function),
-                            array_merge(DI::resolveMethodDependencies(
-                                $this->controller,
-                                $this->function,
-                                new $resolver($request),
-                            ), $this->params)
-                        );
+                    $result = call_user_func_array(
+                        array($object, $this->function),
+                        array_merge(DI::resolveMethodDependencies(
+                            $this->controller,
+                            $this->function,
+                            new $resolver($request),
+                        ), $this->params)
+                    );
 
-                        if ($request instanceof RequestInterface) {
-                            return $result !== false ?
-                                (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->httpResponseFormat))->handle() :
-                                throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->uri()));
-                        }
+                    if ($request instanceof RequestInterface) {
                         return $result !== false ?
-                            (new ResponseHandler(data: $result, format: app()->config->httpResponseFormat))->handle() :
-                            throw new NotFoundException("Resource not found");
-                    } catch (TypeError $th) {
-                        throw new BadRequestException("Invalid parameter(s): " . $th->getMessage());
+                            (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->httpResponseFormat))->handle() :
+                            throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->path()));
                     }
+                    return $result !== false ?
+                        (new ResponseHandler(data: $result, format: app()->config->httpResponseFormat))->handle() :
+                        throw new NotFoundException("Resource not found");
                 }
                 throw new SystemError("Function not found or can't be executed: " . $this->controller . '::' . $this->function);
             }

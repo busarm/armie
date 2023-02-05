@@ -44,17 +44,17 @@ interface RequestInterface extends ContainerInterface
     /**
      * @return string
      */
-    public function uri();
+    public function currentUrl();
+
+    /**
+     * @return string
+     */
+    public function path();
 
     /**
      * @return array
      */
     public function segments();
-
-    /**
-     * @return string
-     */
-    public function currentUrl();
 
     /**
      * @return string

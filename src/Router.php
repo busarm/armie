@@ -163,7 +163,7 @@ class Router implements RouterInterface
                 // Find route
                 if (
                     strtoupper($route->getMethod()) == strtoupper($request->method()) &&
-                    ($params = $this->isMatch($request->uri(), $route->getPath()))
+                    ($params = $this->isMatch($request->path(), $route->getPath()))
                 ) {
                     // Set current route
                     $route->params(is_array($params) ? $params : []);

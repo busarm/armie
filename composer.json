@@ -37,10 +37,6 @@
         "test-pdo-edit": "composer run phpunit -- --group pdo-edit",
         "test-pdo-get": "composer run phpunit -- --group pdo-get"
     },
-    "test": [
-        "Composer\\Config::disableProcessTimeout",
-        "start-dev"
-    ],
     "keywords": [
         "php",
         "framework",

@@ -2,9 +2,6 @@
 
 namespace Busarm\PhpMini\Bags;
 
-use Busarm\PhpMini\Crypto;
-
-use function Busarm\PhpMini\Helpers\app;
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
 /**

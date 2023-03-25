@@ -7,12 +7,14 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Traits\SingletonStateless;
+use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\RequestOptions;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
+
+use function Busarm\PhpMini\Helpers\http_parse_query;
 
 /**
  * 
@@ -23,34 +25,28 @@ use Psr\Http\Message\ResponseInterface;
  */
 class RemoteService extends BaseService
 {
-    use SingletonStateless;
-
-    public function __construct(private RequestInterface $request, private $timeout = 10)
+    public function __construct(private ?ServiceDiscoverynterface $discovery = null, private $timeout = 10)
     {
-        parent::__construct($request);
     }
 
     /**
-     * Call service
-     * 
-     * @param ServiceRequestDto $dto
+     * @inheritDoc
      * @return ResponseInterface
      */
-    public function call(ServiceRequestDto $dto)
+    public function call(ServiceRequestDto $dto, RequestInterface $request): ResponseInterface
     {
-        $url = $this->get($dto->name);
+        $url = $dto->location ?? $this->getLocation($dto->name);
 
         if (empty($url)) {
             throw new SystemError(self::class . ": Location for client `$dto->name` not found");
         }
 
-        if (!($url = filter_var($this->get($dto->name), FILTER_VALIDATE_URL))) {
+        if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
             throw new SystemError(self::class . ": Location for client `$dto->name` is not a valid remote url");
         }
 
-        if ($dto->name == $this->getCurrentServiceName()) {
-            throw new SystemError(self::class . ": Circular request to current service `$dto->name` not allowed");
-        }
+        $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
+        $query = http_parse_query($uri->getQuery());
 
         $client = new Client([
             'timeout'  => $this->timeout,
@@ -62,15 +58,16 @@ class RemoteService extends BaseService
                 ServiceType::DELETE => HttpMethod::DELETE,
                 default   => HttpMethod::GET,
             },
-            new Uri($url),
-            $dto->type != ServiceType::READ ?
+            $uri,
+            $dto->type == ServiceType::READ ?
                 [
-                    RequestOptions::BODY => $dto->params,
+                    RequestOptions::QUERY => array_merge($dto->params, $query),
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false
                 ] :
                 [
-                    RequestOptions::QUERY => $dto->params,
+                    RequestOptions::QUERY => $query,
+                    RequestOptions::BODY => $dto->params,
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false
                 ]
@@ -78,26 +75,24 @@ class RemoteService extends BaseService
     }
 
     /**
-     * Call service asynchronously
-     * 
-     * @param ServiceRequestDto $dto
+     * @inheritDoc
      * @return PromiseInterface
      */
-    public function callAsync(ServiceRequestDto $dto)
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request): PromiseInterface
     {
-        $url = $this->get($dto->name);
+
+        $url = $dto->location ?? $this->getLocation($dto->name);
 
         if (empty($url)) {
             throw new SystemError(self::class . ": Location for client `$dto->name` not found");
         }
 
-        if (!($url = filter_var($this->get($dto->name), FILTER_VALIDATE_URL))) {
+        if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
             throw new SystemError(self::class . ": Location for client `$dto->name` is not a valid remote url");
         }
 
-        if ($dto->name == $this->getCurrentServiceName()) {
-            throw new SystemError(self::class . ": Circular request to current service `$dto->name` not allowed");
-        }
+        $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
+        $query = http_parse_query($uri->getQuery());
 
         $client = new Client([
             'timeout'  => $this->timeout,
@@ -109,18 +104,34 @@ class RemoteService extends BaseService
                 ServiceType::DELETE => HttpMethod::DELETE,
                 default   => HttpMethod::GET,
             },
-            new Uri($url),
-            $dto->type != ServiceType::READ ?
+            $uri,
+            $dto->type == ServiceType::READ ?
                 [
-                    RequestOptions::BODY => $dto->params,
+                    RequestOptions::QUERY => array_merge($dto->params, $query),
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false
                 ] :
                 [
-                    RequestOptions::QUERY => $dto->params,
+                    RequestOptions::QUERY => $query,
+                    RequestOptions::BODY => $dto->params,
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false
                 ]
         );
+    }
+
+    /**
+     * Get service location for name
+     * 
+     * @param string $name
+     * @return string|null
+     */
+    public function getLocation($name)
+    {
+        $client = $this->discovery?->getServiceClient($name);
+        if ($client) {
+            return $client->getLocation();
+        }
+        return null;
     }
 }

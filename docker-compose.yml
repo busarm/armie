@@ -1,11 +1,85 @@
 version: '3.7'
 
-volumes:
-  build-volume:
-    name: php-mini-build-volume
-    
 services:
-  phpdoc:
+  # PHP Server
+  php:
+    image: webdevops/php:8.0-alpine
+    expose:
+      - 9000
+    volumes:
+      - .:/var/www:rw
+    environment:
+      # PHP
+      PHP_MEMORY_LIMIT: 512M
+      PHP_DATE_TIMEZONE: UTC
+      PHP_DISPLAY_ERRORS: 1
+
+  # Main Server - Nginx
+  server:
+    image: webdevops/nginx:alpine
+    depends_on:
+      - php
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www:ro
+    environment:
+      # NGINX
+      WEB_DOCUMENT_ROOT: '/var/www/tests/TestServer'
+      WEB_DOCUMENT_INDEX: index.php
+      # `php` service name + exposed port
+      WEB_PHP_SOCKET: 'php:9000'
+
+  # V1 Server - Nginx
+  v1:
+    image: webdevops/nginx:alpine
+    depends_on:
+      - php
+    ports:
+      - 81:80
+    volumes:
+      - .:/var/www:ro
+    environment:
+      # NGINX
+      WEB_DOCUMENT_ROOT: '/var/www/tests/TestApp'
+      WEB_DOCUMENT_INDEX: index.php
+      # `php` service name + exposed port
+      WEB_PHP_SOCKET: 'php:9000'
+
+  # V2 Server - Nginx
+  v2:
+    image: webdevops/nginx:alpine
+    depends_on:
+      - php
+    ports:
+      - 82:80
+    volumes:
+      - .:/var/www:ro
+    environment:
+      # NGINX
+      WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV2'
+      WEB_DOCUMENT_INDEX: index.php
+      # `php` service name + exposed port
+      WEB_PHP_SOCKET: 'php:9000'
+
+  # V3 Server - Nginx
+  v3:
+    image: webdevops/nginx:alpine
+    depends_on:
+      - php
+    ports:
+      - 83:80
+    volumes:
+      - .:/var/www:ro
+    environment:
+      # NGINX
+      WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV3'
+      WEB_DOCUMENT_INDEX: index.php
+      # `php` service name + exposed port
+      WEB_PHP_SOCKET: 'php:9000'
+
+  # PHP Docs
+  docs:
     image: phpdoc/phpdoc
     volumes:
-        - ./:/data:rw
+      - ./:/data:rw

@@ -111,7 +111,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">22</span>
+    <span class="phpdocumentor-element-found-in__line">36</span>
 
     </aside>
 
@@ -157,7 +157,28 @@
 </h3>
 
 <dl class="phpdocumentor-table-of-contents">
-                    <dt class="phpdocumentor-table-of-contents__entry -property -private">
+                    <dt class="phpdocumentor-table-of-contents__entry -property -public">
+    <a href="classes/Busarm-PhpMini-Server.html#property_env">$env</a>
+    <span>
+                        &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -public">
+    <a href="classes/Busarm-PhpMini-Server.html#property_name">$name</a>
+    <span>
+                        &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Server.html#property_correlationId">$correlationId</a>
+    <span>
+                        &nbsp;: string            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
     <a href="classes/Busarm-PhpMini-Server.html#property_domainApps">$domainApps</a>
     <span>
                         &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-App.html"><abbr title="\Busarm\PhpMini\App">App</abbr></a>&gt;            </span>
@@ -168,6 +189,20 @@
     <a href="classes/Busarm-PhpMini-Server.html#property_domainPaths">$domainPaths</a>
     <span>
                         &nbsp;: array&lt;string|int, string&gt;            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Server.html#property_domainStatics">$domainStatics</a>
+    <span>
+                        &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&gt;            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Server.html#property_reporter">$reporter</a>
+    <span>
+                        &nbsp;: <a href="classes/Busarm-PhpMini-ErrorReporter.html"><abbr title="\Busarm\PhpMini\ErrorReporter">ErrorReporter</abbr></a>            </span>
 </dt>
 <dd></dd>
 
@@ -185,12 +220,40 @@
 </dt>
 <dd></dd>
 
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Server.html#property_routeStatics">$routeStatics</a>
+    <span>
+                        &nbsp;: array&lt;string|int, <a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&gt;            </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a href="classes/Busarm-PhpMini-Server.html#property_serviceDiscovery">$serviceDiscovery</a>
+    <span>
+                        &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceDiscoverynterface">ServiceDiscoverynterface</abbr></a>            </span>
+</dt>
+<dd></dd>
+
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method___construct">__construct()</a>
+    <span>
+                                &nbsp;: mixed    </span>
+</dt>
+<dd></dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Server.html#method_addDomainApp">addDomainApp()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
 <dd>Map domain to a particular app. (Not recommended for production)</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method_addDomainAppList">addDomainAppList()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Map list of: domain to a particular app</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Server.html#method_addDomainPath">addDomainPath()</a>
@@ -207,11 +270,25 @@
 <dd>Map list of domain to a particular app path</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method_addDomainStatic">addDomainStatic()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Map domain to a static response.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Server.html#method_addRouteApp">addRouteApp()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
 <dd>Map route to a particular app. (Not recommended for production)</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method_addRouteAppList">addRouteAppList()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Map list of: route to a particular app</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Server.html#method_addRoutePath">addRoutePath()</a>
@@ -225,12 +302,26 @@
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd>Map list of route to a particular app path</dd>
+<dd>Map list of: route to a particular app path</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method_addRouteStatic">addRouteStatic()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Map route to a static response.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Server.html#method_addServiceDiscovery">addServiceDiscovery()</a>
+    <span>
+                                &nbsp;: self    </span>
+</dt>
+<dd>Add service discovery for routes</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Server.html#method_run">run()</a>
     <span>
-                                &nbsp;: <abbr title="\Psr\Http\Message\ResponseInterface">ResponseInterface</abbr>|bool    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|null    </span>
 </dt>
 <dd>Run server</dd>
 
@@ -244,9 +335,16 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -protected">
     <a href="classes/Busarm-PhpMini-Server.html#method_runRoute">runRoute()</a>
     <span>
-                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|bool|null    </span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null    </span>
 </dt>
 <dd>Run for route</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -protected">
+    <a href="classes/Busarm-PhpMini-Server.html#method_runServiceClient">runServiceClient()</a>
+    <span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null    </span>
+</dt>
+<dd>Run for service client</dd>
 
         </dl>
 
@@ -264,6 +362,126 @@
         class="
             phpdocumentor-element
             -property
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_env">
+        $env
+        <a href="classes/Busarm-PhpMini-Server.html#property_env" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">71</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$env</span>
+     = <span class="phpdocumentor-signature__default-value">Env::LOCAL</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_name">
+        $name
+        <a href="classes/Busarm-PhpMini-Server.html#property_name" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">71</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$name</span>
+    </code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_correlationId">
+        $correlationId
+        <a href="classes/Busarm-PhpMini-Server.html#property_correlationId" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">67</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">string</span>
+    <span class="phpdocumentor-signature__name">$correlationId</span>
+    </code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
             -private
                                                         "
 >
@@ -276,7 +494,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">35</span>
+    <span class="phpdocumentor-element-found-in__line">53</span>
 
     </aside>
 
@@ -314,7 +532,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">39</span>
+    <span class="phpdocumentor-element-found-in__line">61</span>
 
     </aside>
 
@@ -343,6 +561,84 @@
             -private
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="property_domainStatics">
+        $domainStatics
+        <a href="classes/Busarm-PhpMini-Server.html#property_domainStatics" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">57</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&gt;</span>
+    <span class="phpdocumentor-signature__name">$domainStatics</span>
+     = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_reporter">
+        $reporter
+        <a href="classes/Busarm-PhpMini-Server.html#property_reporter" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">69</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-ErrorReporter.html"><abbr title="\Busarm\PhpMini\ErrorReporter">ErrorReporter</abbr></a></span>
+    <span class="phpdocumentor-signature__name">$reporter</span>
+    </code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <section class="phpdocumentor-description"></section>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="property_routeApps">
         $routeApps
         <a href="classes/Busarm-PhpMini-Server.html#property_routeApps" class="headerlink"><i class="fas fa-link"></i></a>
@@ -352,7 +648,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">27</span>
+    <span class="phpdocumentor-element-found-in__line">41</span>
 
     </aside>
 
@@ -390,7 +686,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">31</span>
+    <span class="phpdocumentor-element-found-in__line">49</span>
 
     </aside>
 
@@ -400,6 +696,82 @@
         <span class="phpdocumentor-signature__type">array&lt;string|int, string&gt;</span>
     <span class="phpdocumentor-signature__name">$routePaths</span>
      = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_routeStatics">
+        $routeStatics
+        <a href="classes/Busarm-PhpMini-Server.html#property_routeStatics" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">45</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&gt;</span>
+    <span class="phpdocumentor-signature__name">$routeStatics</span>
+     = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+    
+    
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_serviceDiscovery">
+        $serviceDiscovery
+        <a href="classes/Busarm-PhpMini-Server.html#property_serviceDiscovery" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">65</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__type"><a href="classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceDiscoverynterface">ServiceDiscoverynterface</abbr></a></span>
+    <span class="phpdocumentor-signature__name">$serviceDiscovery</span>
+     = <span class="phpdocumentor-signature__default-value">null</span></code>
 
     
     
@@ -425,6 +797,64 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method___construct">
+        __construct()
+        <a href="classes/Busarm-PhpMini-Server.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">71</span>
+
+    </aside>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">__construct</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$name</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$env</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">Env::LOCAL</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">mixed</span></code>
+
+        <section class="phpdocumentor-description"></section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$name</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$env</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">Env::LOCAL</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"></section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">mixed</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_addDomainApp">
         addDomainApp()
         <a href="classes/Busarm-PhpMini-Server.html#method_addDomainApp" class="headerlink"><i class="fas fa-link"></i></a>
@@ -432,7 +862,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">87</span>
+    <span class="phpdocumentor-element-found-in__line">180</span>
 
     </aside>
 
@@ -483,6 +913,57 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_addDomainAppList">
+        addDomainAppList()
+        <a href="classes/Busarm-PhpMini-Server.html#method_addDomainAppList" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">205</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Map list of: domain to a particular app</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addDomainAppList</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string, <a href="classes/Busarm-PhpMini-App.html"><abbr title="\Busarm\PhpMini\App">App</abbr></a>&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$list</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$list</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string, <a href="classes/Busarm-PhpMini-App.html"><abbr title="\Busarm\PhpMini\App">App</abbr></a>&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Array of <code class="prettyprint">$domain =&gt; App::class</code>. see <code class="prettyprint">self::addRouteApp</code></p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_addDomainPath">
         addDomainPath()
         <a href="classes/Busarm-PhpMini-Server.html#method_addDomainPath" class="headerlink"><i class="fas fa-link"></i></a>
@@ -490,7 +971,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">101</span>
+    <span class="phpdocumentor-element-found-in__line">219</span>
 
     </aside>
 
@@ -551,7 +1032,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">113</span>
+    <span class="phpdocumentor-element-found-in__line">231</span>
 
     </aside>
 
@@ -595,6 +1076,64 @@ If path is a directory, '/index.php' will be appended to the path</p>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_addDomainStatic">
+        addDomainStatic()
+        <a href="classes/Busarm-PhpMini-Server.html#method_addDomainStatic" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">193</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Map domain to a static response.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addDomainStatic</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$domain</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$response</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$domain</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Domain name. e.g myap.com, dev.myapp.com</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$response</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_addRouteApp">
         addRouteApp()
         <a href="classes/Busarm-PhpMini-Server.html#method_addRouteApp" class="headerlink"><i class="fas fa-link"></i></a>
@@ -602,7 +1141,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">48</span>
+    <span class="phpdocumentor-element-found-in__line">116</span>
 
     </aside>
 
@@ -653,6 +1192,57 @@ If path is a directory, '/index.php' will be appended to the path</p>
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_addRouteAppList">
+        addRouteAppList()
+        <a href="classes/Busarm-PhpMini-Server.html#method_addRouteAppList" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">141</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Map list of: route to a particular app</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addRouteAppList</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string, <a href="classes/Busarm-PhpMini-App.html"><abbr title="\Busarm\PhpMini\App">App</abbr></a>&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$list</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$list</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string, <a href="classes/Busarm-PhpMini-App.html"><abbr title="\Busarm\PhpMini\App">App</abbr></a>&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Array of <code class="prettyprint">$route =&gt; App::class</code>. see <code class="prettyprint">self::addRouteApp</code></p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_addRoutePath">
         addRoutePath()
         <a href="classes/Busarm-PhpMini-Server.html#method_addRoutePath" class="headerlink"><i class="fas fa-link"></i></a>
@@ -660,7 +1250,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">62</span>
+    <span class="phpdocumentor-element-found-in__line">155</span>
 
     </aside>
 
@@ -721,25 +1311,152 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">74</span>
+    <span class="phpdocumentor-element-found-in__line">167</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Map list of route to a particular app path</p>
+        <p class="phpdocumentor-summary">Map list of: route to a particular app path</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">addRoutePathList</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$list</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+                    <span class="phpdocumentor-signature__name">addRoutePathList</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string, string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$list</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
                 <span class="phpdocumentor-signature__argument__name">$list</span>
-                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string, string&gt;</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
                     <section class="phpdocumentor-description"><p>Array of <code class="prettyprint">$route =&gt; $path</code>. see <code class="prettyprint">self::addRoutePath</code></p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_addRouteStatic">
+        addRouteStatic()
+        <a href="classes/Busarm-PhpMini-Server.html#method_addRouteStatic" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">129</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Map route to a static response.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addRouteStatic</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$route</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$response</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$route</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Route path to app. e.g v1</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$response</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Response.html"><abbr title="\Busarm\PhpMini\Response">Response</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">self</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_addServiceDiscovery">
+        addServiceDiscovery()
+        <a href="classes/Busarm-PhpMini-Server.html#method_addServiceDiscovery" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">245</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Add service discovery for routes</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addServiceDiscovery</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceDiscoverynterface">ServiceDiscoverynterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$serviceDiscovery</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expose</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">true</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$exposePath</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">&#039;discover&#039;</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$serviceDiscovery</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceDiscoverynterface">ServiceDiscoverynterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Service Discovery</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expose</span>
+                : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">true</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Expose service discovery to public.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$exposePath</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">&#039;discover&#039;</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Public path to expose service discovery. Default: <code class="prettyprint">/discover</code></p>
 </section>
 
             </dd>
@@ -772,7 +1489,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">125</span>
+    <span class="phpdocumentor-element-found-in__line">261</span>
 
     </aside>
 
@@ -780,7 +1497,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                    <span class="phpdocumentor-signature__name">run</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type"><abbr title="\Psr\Http\Message\ServerRequestInterface">ServerRequestInterface</abbr>|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><abbr title="\Psr\Http\Message\ResponseInterface">ResponseInterface</abbr>|bool</span></code>
+                    <span class="phpdocumentor-signature__name">run</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__return-type"><abbr title="\Psr\Http\Message\ServerRequestInterface">ServerRequestInterface</abbr>|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|null</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -803,11 +1520,9 @@ If path is a directory, '/index.php' will be appended to the path</p>
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><abbr title="\Psr\Http\Message\ResponseInterface">ResponseInterface</abbr>|bool</span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|null</span>
             &mdash;
-            <section class="phpdocumentor-description"><p>True if successful. ResponseInterface if failed</p>
-</section>
-
+        
     
 </article>
                     <article
@@ -823,7 +1538,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">177</span>
+    <span class="phpdocumentor-element-found-in__line">328</span>
 
     </aside>
 
@@ -874,7 +1589,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">142</span>
+    <span class="phpdocumentor-element-found-in__line">282</span>
 
     </aside>
 
@@ -882,7 +1597,7 @@ If path is a directory, '/index.php' will be appended to the path</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">protected</span>
-                    <span class="phpdocumentor-signature__name">runRoute</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|bool|null</span></code>
+                    <span class="phpdocumentor-signature__name">runRoute</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null</span></code>
 
     
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
@@ -905,7 +1620,72 @@ If path is a directory, '/index.php' will be appended to the path</p>
                                 </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|bool|null</span>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null</span>
+            &mdash;
+            <section class="phpdocumentor-description"><p>False if failed</p>
+</section>
+
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -protected
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_runServiceClient">
+        runServiceClient()
+        <a href="classes/Busarm-PhpMini-Server.html#method_runServiceClient" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Server.php"><a href="files/src-server.html"><abbr title="src/Server.php">Server.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">373</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Run for service client</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">protected</span>
+                    <span class="phpdocumentor-signature__name">runServiceClient</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$request</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceClientInterface">ServiceClientInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$client</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$uri</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null</span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$request</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RequestInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RequestInterface">RequestInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$client</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ServiceClientInterface">ServiceClientInterface</abbr></a></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$uri</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-ResponseInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\ResponseInterface">ResponseInterface</abbr></a>|false|null</span>
             &mdash;
             <section class="phpdocumentor-description"><p>False if failed</p>
 </section>

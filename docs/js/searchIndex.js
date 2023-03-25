@@ -1,6 +1,26 @@
 Search.appendIndex(
     [
                 {
+            "fqsen": "\\Busarm\\PhpMini\\Constants\\VAR_SERVER_NAME",
+            "name": "VAR_SERVER_NAME",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-constants.html#constant_VAR_SERVER_NAME"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Constants\\VAR_CORRELATION_ID",
+            "name": "VAR_CORRELATION_ID",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-constants.html#constant_VAR_CORRELATION_ID"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Constants\\VAR_SERVICE_NAME",
+            "name": "VAR_SERVICE_NAME",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-constants.html#constant_VAR_SERVICE_NAME"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Constants\\VAR_SERVICE_CLIENT_PREFIX",
+            "name": "VAR_SERVICE_CLIENT_PREFIX",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-constants.html#constant_VAR_SERVICE_CLIENT_PREFIX"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Helpers\\unit_convert\u0028\u0029",
             "name": "unit_convert",
             "summary": "Convert\u0020to\u0020proper\u0020unit",
@@ -216,6 +236,11 @@ Search.appendIndex(
             "summary": "Set\u0020error\u0020reporter",
             "url": "classes/Busarm-PhpMini-App.html#method_setErrorReporter"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AsetServiceDiscovery\u0028\u0029",
+            "name": "setServiceDiscovery",
+            "summary": "Set\u0020service\u0020discovery",
+            "url": "classes/Busarm-PhpMini-App.html#method_setServiceDiscovery"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003Aget\u0028\u0029",
             "name": "get",
             "summary": "Set\u0020HTTP\u0020GET\u0020routes",
@@ -245,6 +270,11 @@ Search.appendIndex(
             "name": "head",
             "summary": "Set\u0020HTTP\u0020HEAD\u0020routes",
             "url": "classes/Busarm-PhpMini-App.html#method_head"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003Acrud\u0028\u0029",
+            "name": "crud",
+            "summary": "Set\u0020HTTP\u0020CRUD\u0020\u0028CREATE\/READ\/UPDATE\/DELETE\u0029\u0020routes\u0020for\u0020controller",
+            "url": "classes/Busarm-PhpMini-App.html#method_crud"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003AshowMessage\u0028\u0029",
             "name": "showMessage",
@@ -281,15 +311,20 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-App.html#property_reporter"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024startTimeMs",
-            "name": "startTimeMs",
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024serviceDiscovery",
+            "name": "serviceDiscovery",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-App.html#property_startTimeMs"
+            "url": "classes/Busarm-PhpMini-App.html#property_serviceDiscovery"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024isCli",
             "name": "isCli",
             "summary": "",
             "url": "classes/Busarm-PhpMini-App.html#property_isCli"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024startTimeMs",
+            "name": "startTimeMs",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-App.html#property_startTimeMs"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\App\u003A\u003A\u0024middlewares",
             "name": "middlewares",
@@ -406,6 +441,61 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Bags-Attribute.html#property_attributes"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie",
+            "name": "Cookie",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aload\u0028\u0029",
+            "name": "load",
+            "summary": "Load\u0020cookies",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_load"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aset\u0028\u0029",
+            "name": "set",
+            "summary": "Set\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_set"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aremove\u0028\u0029",
+            "name": "remove",
+            "summary": "Remove\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_remove"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aclear\u0028\u0029",
+            "name": "clear",
+            "summary": "Remove\u0020all\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_clear"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024options",
+            "name": "options",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_options"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024encrypt",
+            "name": "encrypt",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_encrypt"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024id",
+            "name": "id",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_id"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024prefix",
+            "name": "prefix",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_prefix"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Bags\\Query",
             "name": "Query",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -420,6 +510,66 @@ Search.appendIndex(
             "name": "__toString",
             "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
             "url": "classes/Busarm-PhpMini-Bags-Query.html#method___toString"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload",
+            "name": "Upload",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aset\u0028\u0029",
+            "name": "set",
+            "summary": "Set\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_set"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Ahas\u0028\u0029",
+            "name": "has",
+            "summary": "Checks\u0020if\u0020an\u0020uploaded\u0020file\u0020exists",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_has"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Apull\u0028\u0029",
+            "name": "pull",
+            "summary": "Pull\u0020uploaded\u0020file\u003A\u0020Get\u0020and\u0020delete",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_pull"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aall\u0028\u0029",
+            "name": "all",
+            "summary": "Get\u0020all\u0020uploads",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_all"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Areplace\u0028\u0029",
+            "name": "replace",
+            "summary": "Set\u0020bulk\u0020uploaded\u0020files",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_replace"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aremove\u0028\u0029",
+            "name": "remove",
+            "summary": "Remove\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_remove"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aclear\u0028\u0029",
+            "name": "clear",
+            "summary": "Remove\u0020all\u0020uploaded\u0020files",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_clear"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method___toString"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A\u0024uploads",
+            "name": "uploads",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Bags-Upload.html#property_uploads"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Config",
             "name": "Config",
@@ -1071,6 +1221,76 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Data-PDO-ConnectionConfig.html#property_options"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller",
+            "name": "Controller",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020by\u0020id",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003Alist\u0028\u0029",
+            "name": "list",
+            "summary": "Get\u0020list",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_list"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003ApaginatedList\u0028\u0029",
+            "name": "paginatedList",
+            "summary": "Get\u0020paginated\u0020list",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_paginatedList"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003Acreate\u0028\u0029",
+            "name": "create",
+            "summary": "Create\u0020record",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_create"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003AcreateBulk\u0028\u0029",
+            "name": "createBulk",
+            "summary": "Create\u0020bulk\u0020records",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_createBulk"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003Aupdate\u0028\u0029",
+            "name": "update",
+            "summary": "Update\u0020record\u0020by\u0020id",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_update"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003AupdateBulk\u0028\u0029",
+            "name": "updateBulk",
+            "summary": "Update\u0020bulk\u0020records",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_updateBulk"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003Adelete\u0028\u0029",
+            "name": "delete",
+            "summary": "Delete\u0020record\u0020by\u0020id",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_delete"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003AdeleteBulk\u0028\u0029",
+            "name": "deleteBulk",
+            "summary": "Delete\u0020bulk\u0020records",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#method_deleteBulk"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003A\u0024repository",
+            "name": "repository",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#property_repository"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003A\u0024request",
+            "name": "request",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#property_request"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Controller\u003A\u003A\u0024response",
+            "name": "response",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Controller.html#property_response"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Field",
             "name": "Field",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -1396,11 +1616,6 @@ Search.appendIndex(
             "summary": "Load\u0020dto\u0020with\u0020array\u0020of\u0020custom\u0020data",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_withCustom"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003AtoArray\u0028\u0029",
-            "name": "toArray",
-            "summary": "Convert\u0020dto\u0020to\u0020array",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#method_toArray"
-        },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Model\u003A\u003Aattributes\u0028\u0029",
             "name": "attributes",
             "summary": "Get\u0020dto\u0020attribute\u0020names\u0020\u0026\u0020types",
@@ -1470,6 +1685,51 @@ Search.appendIndex(
             "name": "requestedRelations",
             "summary": "Requested\u0020relations.\u0020Only\u0020these\u0020relation\u0020names\u0020will\u0020loaded\u0020if\u0020auto\u0020load\u0020relations\u0020not\u0020enabled.",
             "url": "classes/Busarm-PhpMini-Data-PDO-Model.html#property_requestedRelations"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference",
+            "name": "Reference",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetModel\u0028\u0029",
+            "name": "getModel",
+            "summary": "Get\u0020reference",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getModel"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetKeys\u0028\u0029",
+            "name": "getKeys",
+            "summary": "Get\u0020reference\u0020keys",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getKeys"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetName\u0028\u0029",
+            "name": "getName",
+            "summary": "Get\u0020reference\u0020name",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A__toString\u0028\u0029",
+            "name": "__toString",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method___toString"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024model",
+            "name": "model",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_model"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024keys",
+            "name": "keys",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_keys"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024name",
+            "name": "name",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_name"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Relation",
             "name": "Relation",
@@ -1931,6 +2191,11 @@ Search.appendIndex(
             "summary": "Load\u0020data\u0020from\u0020array\u0020with\u0020custom\u0020values",
             "url": "classes/Busarm-PhpMini-Dto-BaseDto.html#method_loadCustom"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\BaseDto\u003A\u003Aselected\u0028\u0029",
+            "name": "selected",
+            "summary": "Get\u0020explicitly\u0020selected\u0020attributes",
+            "url": "classes/Busarm-PhpMini-Dto-BaseDto.html#method_selected"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Dto\\BaseDto\u003A\u003Aselect\u0028\u0029",
             "name": "select",
             "summary": "Explicitly\u0020select\u0020attributes",
@@ -2371,6 +2636,71 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Dto-ResponseDto.html#property_errorTrace"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto",
+            "name": "ServiceRequestDto",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetName\u0028\u0029",
+            "name": "setName",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020name",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetLocation\u0028\u0029",
+            "name": "setLocation",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020location",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetRoute\u0028\u0029",
+            "name": "setRoute",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020route",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setRoute"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetType\u0028\u0029",
+            "name": "setType",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020type",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setType"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetParams\u0028\u0029",
+            "name": "setParams",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020params",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setParams"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003AsetHeaders\u0028\u0029",
+            "name": "setHeaders",
+            "summary": "Set\u0020the\u0020value\u0020of\u0020headers",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#method_setHeaders"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024name",
+            "name": "name",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_name"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024location",
+            "name": "location",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_location"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024route",
+            "name": "route",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_route"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024type",
+            "name": "type",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_type"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024params",
+            "name": "params",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_params"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Dto\\ServiceRequestDto\u003A\u003A\u0024headers",
+            "name": "headers",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Dto-ServiceRequestDto.html#property_headers"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Enums\\AppStatus",
             "name": "AppStatus",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -2631,6 +2961,31 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Enums-SameSite.html#constant_NONE"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\ServiceType",
+            "name": "ServiceType",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Enums-ServiceType.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\ServiceType\u003A\u003ACREATE",
+            "name": "CREATE",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-ServiceType.html#constant_CREATE"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\ServiceType\u003A\u003AREAD",
+            "name": "READ",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-ServiceType.html#constant_READ"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\ServiceType\u003A\u003AUPDATE",
+            "name": "UPDATE",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-ServiceType.html#constant_UPDATE"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Enums\\ServiceType\u003A\u003ADELETE",
+            "name": "DELETE",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Enums-ServiceType.html#constant_DELETE"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Enums\\Verbose",
             "name": "Verbose",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -2860,6 +3215,66 @@ Search.appendIndex(
             "name": "next",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Handlers-ServerRequestHandler.html#property_next"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Parser",
+            "name": "Parser",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Helpers-Parser.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Parser\u003A\u003AparseQueryParamKeys\u0028\u0029",
+            "name": "parseQueryParamKeys",
+            "summary": "Parse\u0020params\u0020for\u0020query\u0020and\u0020return\u0020param\u0020keys\u0020with\u0020placeholders\u0020\u0028\u003F\u0029",
+            "url": "classes/Busarm-PhpMini-Helpers-Parser.html#method_parseQueryParamKeys"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Parser\u003A\u003AparseQueryParamValues\u0028\u0029",
+            "name": "parseQueryParamValues",
+            "summary": "Parse\u0020params\u0020for\u0020query\u0020and\u0020return\u0020param\u0020values\u0020only",
+            "url": "classes/Busarm-PhpMini-Helpers-Parser.html#method_parseQueryParamValues"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security",
+            "name": "Security",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003Aclean\u0028\u0029",
+            "name": "clean",
+            "summary": "Clean\u0020params",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_clean"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AcleanParams\u0028\u0029",
+            "name": "cleanParams",
+            "summary": "Clean\u0020params",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_cleanParams"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AcleanQueryParamKeys\u0028\u0029",
+            "name": "cleanQueryParamKeys",
+            "summary": "Clean\u0020params\u0020for\u0020query\u0020and\u0020return\u0020param\u0020keys\u0020with\u0020placeholders",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_cleanQueryParamKeys"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AcleanQueryParamValues\u0028\u0029",
+            "name": "cleanQueryParamValues",
+            "summary": "Clean\u0020params\u0020for\u0020query\u0020and\u0020return\u0020param\u0020values",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_cleanQueryParamValues"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AcleanInput\u0028\u0029",
+            "name": "cleanInput",
+            "summary": "Strip\u0020risky\u0020elements",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_cleanInput"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AcleanBase64\u0028\u0029",
+            "name": "cleanBase64",
+            "summary": "Focuses\u0020on\u0020stripping\u0020entities\u0020from\u0020Base64\u0020encoded\u0020strings",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_cleanBase64"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AstripEncodedEntities\u0028\u0029",
+            "name": "stripEncodedEntities",
+            "summary": "Focuses\u0020on\u0020stripping\u0020encoded\u0020entities\n\u002A\u002A\u002A\u0020This\u0020appears\u0020to\u0020be\u0020why\u0020people\u0020use\u0020this\u0020sample\u0020code.\u0020Unclear\u0020how\u0020well\u0020Kses\u0020does\u0020this\u0020\u002A\u002A\u002A",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_stripEncodedEntities"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Helpers\\Security\u003A\u003AstripTags\u0028\u0029",
+            "name": "stripTags",
+            "summary": "Focuses\u0020on\u0020stripping\u0020unencoded\u0020HTML\u0020tags\u0020\u0026\u0020namespaces",
+            "url": "classes/Busarm-PhpMini-Helpers-Security.html#method_stripTags"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Helpers\\StringableDateTime",
             "name": "StringableDateTime",
@@ -3116,6 +3531,11 @@ Search.appendIndex(
             "summary": "Set\u0020HTTP\u0020HEAD\u0020routes",
             "url": "classes/Busarm-PhpMini-Interfaces-HttpServerInterface.html#method_head"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\HttpServerInterface\u003A\u003Acrud\u0028\u0029",
+            "name": "crud",
+            "summary": "Set\u0020HTTP\u0020CRUD\u0020\u0028CREATE\/READ\/UPDATE\/DELETE\u0029\u0020routes\u0020for\u0020controller",
+            "url": "classes/Busarm-PhpMini-Interfaces-HttpServerInterface.html#method_crud"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\LoaderInterface",
             "name": "LoaderInterface",
             "summary": "PHP\u0020Mini\u0020Framework",
@@ -3181,20 +3601,20 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_baseUrl"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Auri\u0028\u0029",
-            "name": "uri",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003AcurrentUrl\u0028\u0029",
+            "name": "currentUrl",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_uri"
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_currentUrl"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Apath\u0028\u0029",
+            "name": "path",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_path"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Asegments\u0028\u0029",
             "name": "segments",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_segments"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003AcurrentUrl\u0028\u0029",
-            "name": "currentUrl",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Interfaces-RequestInterface.html#method_currentUrl"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RequestInterface\u003A\u003Amethod\u0028\u0029",
             "name": "method",
@@ -3578,13 +3998,18 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouterInterface\u003A\u003AaddRoute\u0028\u0029",
             "name": "addRoute",
-            "summary": "",
+            "summary": "Add\u0020single\u0020route",
             "url": "classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addRoute"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouterInterface\u003A\u003AaddRoutes\u0028\u0029",
             "name": "addRoutes",
-            "summary": "",
+            "summary": "Add\u0020list\u0020of\u0020routes",
             "url": "classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addRoutes"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouterInterface\u003A\u003AaddCrudRoutes\u0028\u0029",
+            "name": "addCrudRoutes",
+            "summary": "Add\u0020CRUD\u0020\u0028CREATE\/READ\/UPDATE\/DELETE\u0029\u0020routes\u0020for\u0020controller",
+            "url": "classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addCrudRoutes"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\RouterInterface\u003A\u003AgetRoutes\u0028\u0029",
             "name": "getRoutes",
@@ -3600,6 +4025,101 @@ Search.appendIndex(
             "name": "isMatch",
             "summary": "Check\u0020if\u0020path\u0020matches",
             "url": "classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_isMatch"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceClientInterface",
+            "name": "ServiceClientInterface",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceClientInterface\u003A\u003AgetName\u0028\u0029",
+            "name": "getName",
+            "summary": "Get\u0020service\u0020name",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html#method_getName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceClientInterface\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020service\u0020location.\u0020e.g\u0020path,\u0020url,\u0020ip\u0020etc.",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface",
+            "name": "ServiceDiscoverynterface",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClient\u0028\u0029",
+            "name": "getServiceClient",
+            "summary": "Get\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClient"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClients\u0028\u0029",
+            "name": "getServiceClients",
+            "summary": "Get\u0020list\u0020of\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClients"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClientsMap\u0028\u0029",
+            "name": "getServiceClientsMap",
+            "summary": "Get\u0020\u0060name\u003D\u003Elocation\u0060\u0020map\u0020list\u0020of\u0020service\u0020clienta",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClientsMap"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceProviderInterface",
+            "name": "ServiceProviderInterface",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceProviderInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceProviderInterface\u003A\u003Acall\u0028\u0029",
+            "name": "call",
+            "summary": "Call\u0020service",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceProviderInterface.html#method_call"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceProviderInterface\u003A\u003AcallAsync\u0028\u0029",
+            "name": "callAsync",
+            "summary": "Call\u0020service\u0020asynchronously",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceProviderInterface.html#method_callAsync"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceProviderInterface\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020service\u0020location\u0020for\u0020name",
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceProviderInterface.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface",
+            "name": "SessionStoreInterface",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Astart\u0028\u0029",
+            "name": "start",
+            "summary": "Start\u0020session",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_start"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AgetName\u0028\u0029",
+            "name": "getName",
+            "summary": "Get\u0020session\u0020store\u0020name.",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_getName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AgetId\u0028\u0029",
+            "name": "getId",
+            "summary": "Get\u0020current\u0020session\u0020ID.",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_getId"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AsetId\u0028\u0029",
+            "name": "setId",
+            "summary": "Set\u0020current\u0020session\u0020ID.",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_setId"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Atouch\u0028\u0029",
+            "name": "touch",
+            "summary": "Touch\u0020session\u0020to\u0020update\u0020last\u0020access\u0020date",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_touch"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Aregenerate\u0028\u0029",
+            "name": "regenerate",
+            "summary": "Regenerate\u0020session\u0020ID",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_regenerate"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Adestroy\u0028\u0029",
+            "name": "destroy",
+            "summary": "Destroy\u0020session",
+            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_destroy"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SingletonInterface",
             "name": "SingletonInterface",
@@ -3620,6 +4140,96 @@ Search.appendIndex(
             "name": "make",
             "summary": "Create\u0020\/\u0020Retrieve\u0020stateless\u0020singleton\u0020instance",
             "url": "classes/Busarm-PhpMini-Interfaces-SingletonStatelessInterface.html#method_make"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface",
+            "name": "StorageBagInterface",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aset\u0028\u0029",
+            "name": "set",
+            "summary": "Set\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_set"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Ahas\u0028\u0029",
+            "name": "has",
+            "summary": "Checks\u0020if\u0020an\u0020attribute\u0020exists",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_has"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Apull\u0028\u0029",
+            "name": "pull",
+            "summary": "Pull\u0020attribute\u003A\u0020Get\u0020and\u0020delete",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_pull"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aall\u0028\u0029",
+            "name": "all",
+            "summary": "Get\u0020all\u0020attributes",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_all"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Areplace\u0028\u0029",
+            "name": "replace",
+            "summary": "Set\u0020bulk\u0020attributes",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_replace"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aremove\u0028\u0029",
+            "name": "remove",
+            "summary": "Remove\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_remove"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aclear\u0028\u0029",
+            "name": "clear",
+            "summary": "Remove\u0020all\u0020attribute",
+            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_clear"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface",
+            "name": "UploadBagInterface",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aset\u0028\u0029",
+            "name": "set",
+            "summary": "Set\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_set"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Ahas\u0028\u0029",
+            "name": "has",
+            "summary": "Checks\u0020if\u0020an\u0020uploaded\u0020file\u0020exists",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_has"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Apull\u0028\u0029",
+            "name": "pull",
+            "summary": "Pull\u0020uploaded\u0020file\u003A\u0020Get\u0020and\u0020delete",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_pull"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aall\u0028\u0029",
+            "name": "all",
+            "summary": "Get\u0020all\u0020uploaded\u0020files",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_all"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Areplace\u0028\u0029",
+            "name": "replace",
+            "summary": "Set\u0020bulk\u0020uploaded\u0020files",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_replace"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aremove\u0028\u0029",
+            "name": "remove",
+            "summary": "Remove\u0020uploaded\u0020file",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_remove"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aclear\u0028\u0029",
+            "name": "clear",
+            "summary": "Remove\u0020all\u0020uploaded\u0020files",
+            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_clear"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Loader",
             "name": "Loader",
@@ -3796,6 +4406,51 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Middlewares-PsrMiddleware.html#property_psr"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware",
+            "name": "SessionMiddleware",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
+            "summary": "Middleware\u0020handler",
+            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#method_process"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003A\u0024store",
+            "name": "store",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#property_store"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware",
+            "name": "ViewRouteMiddleware",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003Aprocess\u0028\u0029",
+            "name": "process",
+            "summary": "Middleware\u0020handler",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method_process"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024viewPathOrClass",
+            "name": "viewPathOrClass",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_viewPathOrClass"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024params",
+            "name": "params",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_params"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Request",
             "name": "Request",
             "summary": "HTTP\u0020Request\u0020Provider",
@@ -3805,6 +4460,16 @@ Search.appendIndex(
             "name": "__construct",
             "summary": "Constructor.",
             "url": "classes/Busarm-PhpMini-Request.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "Set\u0020up\u0020request",
+            "url": "classes/Busarm-PhpMini-Request.html#method_setUp"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Acapture\u0028\u0029",
+            "name": "capture",
+            "summary": "Capture\u0020server\u0020request\u0020or\u0020create\u0020using\u0020Globals",
+            "url": "classes/Busarm-PhpMini-Request.html#method_capture"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AfromUrl\u0028\u0029",
             "name": "fromUrl",
@@ -3861,55 +4526,55 @@ Search.appendIndex(
             "summary": "Get\u0020request\u0020headers\u0020from\u0020Server\u0020Variables",
             "url": "classes/Busarm-PhpMini-Request.html#method_getHeadersFromServer"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024ip",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Aip\u0028\u0029",
             "name": "ip",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_ip"
+            "url": "classes/Busarm-PhpMini-Request.html#method_ip"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024scheme",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Ascheme\u0028\u0029",
             "name": "scheme",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_scheme"
+            "url": "classes/Busarm-PhpMini-Request.html#method_scheme"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024domain",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Adomain\u0028\u0029",
             "name": "domain",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_domain"
+            "url": "classes/Busarm-PhpMini-Request.html#method_domain"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024host",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Ahost\u0028\u0029",
             "name": "host",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_host"
+            "url": "classes/Busarm-PhpMini-Request.html#method_host"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024baseUrl",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AbaseUrl\u0028\u0029",
             "name": "baseUrl",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_baseUrl"
+            "url": "classes/Busarm-PhpMini-Request.html#method_baseUrl"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024uri",
-            "name": "uri",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Apath\u0028\u0029",
+            "name": "path",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_uri"
+            "url": "classes/Busarm-PhpMini-Request.html#method_path"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024currentUrl",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AcurrentUrl\u0028\u0029",
             "name": "currentUrl",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_currentUrl"
+            "url": "classes/Busarm-PhpMini-Request.html#method_currentUrl"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024method",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Amethod\u0028\u0029",
             "name": "method",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_method"
+            "url": "classes/Busarm-PhpMini-Request.html#method_method"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024contentType",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003AcontentType\u0028\u0029",
             "name": "contentType",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_contentType"
+            "url": "classes/Busarm-PhpMini-Request.html#method_contentType"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024content",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Acontent\u0028\u0029",
             "name": "content",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_content"
+            "url": "classes/Busarm-PhpMini-Request.html#method_content"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Asegments\u0028\u0029",
             "name": "segments",
@@ -3921,30 +4586,30 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Request.html#method_file"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024session",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Asession\u0028\u0029",
             "name": "session",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_session"
+            "url": "classes/Busarm-PhpMini-Request.html#method_session"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Acookie\u0028\u0029",
             "name": "cookie",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Request.html#method_cookie"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024query",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Aquery\u0028\u0029",
             "name": "query",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_query"
+            "url": "classes/Busarm-PhpMini-Request.html#method_query"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024request",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Arequest\u0028\u0029",
             "name": "request",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_request"
+            "url": "classes/Busarm-PhpMini-Request.html#method_request"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024server",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Aserver\u0028\u0029",
             "name": "server",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_server"
+            "url": "classes/Busarm-PhpMini-Request.html#method_server"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003Aheader\u0028\u0029",
             "name": "header",
@@ -3996,40 +4661,110 @@ Search.appendIndex(
             "summary": "Get\u0020PSR7\u0020Server\u0020request",
             "url": "classes/Busarm-PhpMini-Request.html#method_toPsr"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024protocol",
-            "name": "protocol",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_ip",
+            "name": "_ip",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_protocol"
+            "url": "classes/Busarm-PhpMini-Request.html#property__ip"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024files",
-            "name": "files",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_scheme",
+            "name": "_scheme",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_files"
+            "url": "classes/Busarm-PhpMini-Request.html#property__scheme"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024cookies",
-            "name": "cookies",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_domain",
+            "name": "_domain",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_cookies"
+            "url": "classes/Busarm-PhpMini-Request.html#property__domain"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024headers",
-            "name": "headers",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_host",
+            "name": "_host",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_headers"
+            "url": "classes/Busarm-PhpMini-Request.html#property__host"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024psr",
-            "name": "psr",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_baseUrl",
+            "name": "_baseUrl",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_psr"
+            "url": "classes/Busarm-PhpMini-Request.html#property__baseUrl"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024sessionOptions",
-            "name": "sessionOptions",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_path",
+            "name": "_path",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_sessionOptions"
+            "url": "classes/Busarm-PhpMini-Request.html#property__path"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024cookieOptions",
-            "name": "cookieOptions",
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_currentUrl",
+            "name": "_currentUrl",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Request.html#property_cookieOptions"
+            "url": "classes/Busarm-PhpMini-Request.html#property__currentUrl"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_method",
+            "name": "_method",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__method"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_contentType",
+            "name": "_contentType",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__contentType"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_protocol",
+            "name": "_protocol",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__protocol"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_content",
+            "name": "_content",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__content"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_psr",
+            "name": "_psr",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__psr"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_session",
+            "name": "_session",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__session"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_request",
+            "name": "_request",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__request"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_query",
+            "name": "_query",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__query"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_server",
+            "name": "_server",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__server"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_cookies",
+            "name": "_cookies",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__cookies"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_headers",
+            "name": "_headers",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__headers"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_files",
+            "name": "_files",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__files"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_sessionOptions",
+            "name": "_sessionOptions",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__sessionOptions"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Request\u003A\u003A\u0024_cookieOptions",
+            "name": "_cookieOptions",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Request.html#property__cookieOptions"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Response",
             "name": "Response",
@@ -4428,13 +5163,18 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Router\u003A\u003AaddRoute\u0028\u0029",
             "name": "addRoute",
-            "summary": "",
+            "summary": "Add\u0020single\u0020route",
             "url": "classes/Busarm-PhpMini-Router.html#method_addRoute"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Router\u003A\u003AaddRoutes\u0028\u0029",
             "name": "addRoutes",
-            "summary": "",
+            "summary": "Add\u0020list\u0020of\u0020routes",
             "url": "classes/Busarm-PhpMini-Router.html#method_addRoutes"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Router\u003A\u003AaddCrudRoutes\u0028\u0029",
+            "name": "addCrudRoutes",
+            "summary": "Add\u0020CRUD\u0020\u0028CREATE\/READ\/UPDATE\/DELETE\u0029\u0020routes\u0020for\u0020controller",
+            "url": "classes/Busarm-PhpMini-Router.html#method_addCrudRoutes"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Router\u003A\u003AgetRoutes\u0028\u0029",
             "name": "getRoutes",
@@ -4486,10 +5226,25 @@ Search.appendIndex(
             "summary": "Server\u0020Instance\u0020for\u0020handling\u0020multi\u0020tenancy",
             "url": "classes/Busarm-PhpMini-Server.html"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#method___construct"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddRouteApp\u0028\u0029",
             "name": "addRouteApp",
             "summary": "Map\u0020route\u0020to\u0020a\u0020particular\u0020app.\u0020\u0028Not\u0020recommended\u0020for\u0020production\u0029",
             "url": "classes/Busarm-PhpMini-Server.html#method_addRouteApp"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddRouteStatic\u0028\u0029",
+            "name": "addRouteStatic",
+            "summary": "Map\u0020route\u0020to\u0020a\u0020static\u0020response.",
+            "url": "classes/Busarm-PhpMini-Server.html#method_addRouteStatic"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddRouteAppList\u0028\u0029",
+            "name": "addRouteAppList",
+            "summary": "Map\u0020list\u0020of\u003A\u0020route\u0020to\u0020a\u0020particular\u0020app",
+            "url": "classes/Busarm-PhpMini-Server.html#method_addRouteAppList"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddRoutePath\u0028\u0029",
             "name": "addRoutePath",
@@ -4498,13 +5253,23 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddRoutePathList\u0028\u0029",
             "name": "addRoutePathList",
-            "summary": "Map\u0020list\u0020of\u0020route\u0020to\u0020a\u0020particular\u0020app\u0020path",
+            "summary": "Map\u0020list\u0020of\u003A\u0020route\u0020to\u0020a\u0020particular\u0020app\u0020path",
             "url": "classes/Busarm-PhpMini-Server.html#method_addRoutePathList"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddDomainApp\u0028\u0029",
             "name": "addDomainApp",
             "summary": "Map\u0020domain\u0020to\u0020a\u0020particular\u0020app.\u0020\u0028Not\u0020recommended\u0020for\u0020production\u0029",
             "url": "classes/Busarm-PhpMini-Server.html#method_addDomainApp"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddDomainStatic\u0028\u0029",
+            "name": "addDomainStatic",
+            "summary": "Map\u0020domain\u0020to\u0020a\u0020static\u0020response.",
+            "url": "classes/Busarm-PhpMini-Server.html#method_addDomainStatic"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddDomainAppList\u0028\u0029",
+            "name": "addDomainAppList",
+            "summary": "Map\u0020list\u0020of\u003A\u0020domain\u0020to\u0020a\u0020particular\u0020app",
+            "url": "classes/Busarm-PhpMini-Server.html#method_addDomainAppList"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddDomainPath\u0028\u0029",
             "name": "addDomainPath",
@@ -4515,6 +5280,11 @@ Search.appendIndex(
             "name": "addDomainPathList",
             "summary": "Map\u0020list\u0020of\u0020domain\u0020to\u0020a\u0020particular\u0020app\u0020path",
             "url": "classes/Busarm-PhpMini-Server.html#method_addDomainPathList"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003AaddServiceDiscovery\u0028\u0029",
+            "name": "addServiceDiscovery",
+            "summary": "Add\u0020service\u0020discovery\u0020for\u0020routes",
+            "url": "classes/Busarm-PhpMini-Server.html#method_addServiceDiscovery"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003Arun\u0028\u0029",
             "name": "run",
@@ -4531,10 +5301,20 @@ Search.appendIndex(
             "summary": "Run\u0020for\u0020domain",
             "url": "classes/Busarm-PhpMini-Server.html#method_runDomain"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003ArunServiceClient\u0028\u0029",
+            "name": "runServiceClient",
+            "summary": "Run\u0020for\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Server.html#method_runServiceClient"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024routeApps",
             "name": "routeApps",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Server.html#property_routeApps"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024routeStatics",
+            "name": "routeStatics",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_routeStatics"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024routePaths",
             "name": "routePaths",
@@ -4546,10 +5326,260 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-Server.html#property_domainApps"
         },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024domainStatics",
+            "name": "domainStatics",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_domainStatics"
+        },                {
             "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024domainPaths",
             "name": "domainPaths",
             "summary": "",
             "url": "classes/Busarm-PhpMini-Server.html#property_domainPaths"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024serviceDiscovery",
+            "name": "serviceDiscovery",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_serviceDiscovery"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024correlationId",
+            "name": "correlationId",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_correlationId"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024reporter",
+            "name": "reporter",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_reporter"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024name",
+            "name": "name",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_name"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Server\u003A\u003A\u0024env",
+            "name": "env",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Server.html#property_env"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\BaseService",
+            "name": "BaseService",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Service-BaseService.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient",
+            "name": "LocalClient",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient\u003A\u003AgetName\u0028\u0029",
+            "name": "getName",
+            "summary": "Get\u0020service\u0020client\u0020name",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html#method_getName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020service\u0020client\u0020location.\u0020e.g\u0020path,\u0020url,\u0020ip\u0020etc.",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient\u003A\u003A\u0024name",
+            "name": "name",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html#property_name"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalClient\u003A\u003A\u0024path",
+            "name": "path",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalClient.html#property_path"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService",
+            "name": "LocalService",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService\u003A\u003Acall\u0028\u0029",
+            "name": "call",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html#method_call"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService\u003A\u003AcallAsync\u0028\u0029",
+            "name": "callAsync",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html#method_callAsync"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020service\u0020location\u0020for\u0020name",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalService\u003A\u003A\u0024discovery",
+            "name": "discovery",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalService.html#property_discovery"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery",
+            "name": "LocalServiceDiscovery",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003AgetServiceClient\u0028\u0029",
+            "name": "getServiceClient",
+            "summary": "Get\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#method_getServiceClient"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003AgetServiceClients\u0028\u0029",
+            "name": "getServiceClients",
+            "summary": "Get\u0020list\u0020of\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#method_getServiceClients"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003AgetServiceClientsMap\u0028\u0029",
+            "name": "getServiceClientsMap",
+            "summary": "Get\u0020\u0060name\u003D\u003Elocation\u0060\u0020map\u0020list\u0020of\u0020service\u0020clienta",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#method_getServiceClientsMap"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003Aload\u0028\u0029",
+            "name": "load",
+            "summary": "Load\u0020service\u0020clients",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#method_load"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\LocalServiceDiscovery\u003A\u003A\u0024pathOrList",
+            "name": "pathOrList",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-LocalServiceDiscovery.html#property_pathOrList"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient",
+            "name": "RemoteClient",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient\u003A\u003AgetName\u0028\u0029",
+            "name": "getName",
+            "summary": "Get\u0020service\u0020location.\u0020e.g\u0020path,\u0020url,\u0020ip\u0020etc.",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html#method_getName"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020the\u0020value\u0020of\u0020location",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient\u003A\u003A\u0024name",
+            "name": "name",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html#property_name"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteClient\u003A\u003A\u0024url",
+            "name": "url",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteClient.html#property_url"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService",
+            "name": "RemoteService",
+            "summary": "PHP\u0020Mini\u0020Framework",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003Acall\u0028\u0029",
+            "name": "call",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#method_call"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003AcallAsync\u0028\u0029",
+            "name": "callAsync",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#method_callAsync"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003AgetLocation\u0028\u0029",
+            "name": "getLocation",
+            "summary": "Get\u0020service\u0020location\u0020for\u0020name",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#method_getLocation"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003A\u0024discovery",
+            "name": "discovery",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#property_discovery"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteService\u003A\u003A\u0024timeout",
+            "name": "timeout",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteService.html#property_timeout"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery",
+            "name": "RemoteServiceDiscovery",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method___construct"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003Aget\u0028\u0029",
+            "name": "get",
+            "summary": "Get\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method_get"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003AgetServiceClient\u0028\u0029",
+            "name": "getServiceClient",
+            "summary": "Get\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method_getServiceClient"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003AgetServiceClients\u0028\u0029",
+            "name": "getServiceClients",
+            "summary": "Get\u0020list\u0020of\u0020service\u0020client",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method_getServiceClients"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003AgetServiceClientsMap\u0028\u0029",
+            "name": "getServiceClientsMap",
+            "summary": "Get\u0020\u0060name\u003D\u003Elocation\u0060\u0020map\u0020list\u0020of\u0020service\u0020clienta",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method_getServiceClientsMap"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003Aload\u0028\u0029",
+            "name": "load",
+            "summary": "Load\u0020service\u0020clients",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#method_load"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003A\u0024requestedAt",
+            "name": "requestedAt",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#property_requestedAt"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003A\u0024endpoint",
+            "name": "endpoint",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#property_endpoint"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003A\u0024ttl",
+            "name": "ttl",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#property_ttl"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service\\RemoteServiceDiscovery\u003A\u003A\u0024timeout",
+            "name": "timeout",
+            "summary": "",
+            "url": "classes/Busarm-PhpMini-Service-RemoteServiceDiscovery.html#property_timeout"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Session\\PHPSession",
             "name": "PHPSession",
@@ -4806,345 +5836,35 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Busarm-PhpMini-View.html#property_headers"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference",
-            "name": "Reference",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html"
+            "fqsen": "\\Busarm\\PhpMini\\Service\\BaseServiceDiscovery",
+            "name": "BaseServiceDiscovery",
+            "summary": "Error\u0020Reporting",
+            "url": "classes/Busarm-PhpMini-Service-BaseServiceDiscovery.html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Busarm\\PhpMini\\Service\\BaseServiceDiscovery\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method___construct"
+            "url": "classes/Busarm-PhpMini-Service-BaseServiceDiscovery.html#method___construct"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetModel\u0028\u0029",
-            "name": "getModel",
-            "summary": "Get\u0020reference",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getModel"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetKeys\u0028\u0029",
-            "name": "getKeys",
-            "summary": "Get\u0020reference\u0020keys",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getKeys"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003AgetName\u0028\u0029",
-            "name": "getName",
-            "summary": "Get\u0020reference\u0020name",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method_getName"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A__toString\u0028\u0029",
-            "name": "__toString",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#method___toString"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024model",
-            "name": "model",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_model"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024keys",
-            "name": "keys",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_keys"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Data\\PDO\\Reference\u003A\u003A\u0024name",
-            "name": "name",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Data-PDO-Reference.html#property_name"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie",
-            "name": "Cookie",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method___construct"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aload\u0028\u0029",
+            "fqsen": "\\Busarm\\PhpMini\\Service\\BaseServiceDiscovery\u003A\u003Aload\u0028\u0029",
             "name": "load",
-            "summary": "Load\u0020cookies",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_load"
+            "summary": "Load\u0020service\u0020clients",
+            "url": "classes/Busarm-PhpMini-Service-BaseServiceDiscovery.html#method_load"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aset\u0028\u0029",
-            "name": "set",
-            "summary": "Set\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_set"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aget\u0028\u0029",
-            "name": "get",
-            "summary": "Get\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_get"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aremove\u0028\u0029",
-            "name": "remove",
-            "summary": "Remove\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_remove"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003Aclear\u0028\u0029",
-            "name": "clear",
-            "summary": "Remove\u0020all\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#method_clear"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024options",
-            "name": "options",
+            "fqsen": "\\Busarm\\PhpMini\\Service\\BaseServiceDiscovery\u003A\u003A\u0024services",
+            "name": "services",
             "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_options"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024encrypt",
-            "name": "encrypt",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_encrypt"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024id",
-            "name": "id",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_id"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Cookie\u003A\u003A\u0024prefix",
-            "name": "prefix",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Cookie.html#property_prefix"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload",
-            "name": "Upload",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method___construct"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aset\u0028\u0029",
-            "name": "set",
-            "summary": "Set\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_set"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Ahas\u0028\u0029",
-            "name": "has",
-            "summary": "Checks\u0020if\u0020an\u0020uploaded\u0020file\u0020exists",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_has"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aget\u0028\u0029",
-            "name": "get",
-            "summary": "Get\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_get"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Apull\u0028\u0029",
-            "name": "pull",
-            "summary": "Pull\u0020uploaded\u0020file\u003A\u0020Get\u0020and\u0020delete",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_pull"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aall\u0028\u0029",
-            "name": "all",
-            "summary": "Get\u0020all\u0020uploads",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_all"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Areplace\u0028\u0029",
-            "name": "replace",
-            "summary": "Set\u0020bulk\u0020uploaded\u0020files",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_replace"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aremove\u0028\u0029",
-            "name": "remove",
-            "summary": "Remove\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_remove"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003Aclear\u0028\u0029",
-            "name": "clear",
-            "summary": "Remove\u0020all\u0020uploaded\u0020files",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method_clear"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A__toString\u0028\u0029",
-            "name": "__toString",
-            "summary": "Gets\u0020a\u0020string\u0020representation\u0020of\u0020the\u0020object",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#method___toString"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Bags\\Upload\u003A\u003A\u0024uploads",
-            "name": "uploads",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Bags-Upload.html#property_uploads"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface",
-            "name": "SessionStoreInterface",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Astart\u0028\u0029",
-            "name": "start",
-            "summary": "Start\u0020session",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_start"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AgetName\u0028\u0029",
-            "name": "getName",
-            "summary": "Get\u0020session\u0020store\u0020name.",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_getName"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AgetId\u0028\u0029",
-            "name": "getId",
-            "summary": "Get\u0020current\u0020session\u0020ID.",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_getId"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003AsetId\u0028\u0029",
-            "name": "setId",
-            "summary": "Set\u0020current\u0020session\u0020ID.",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_setId"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Atouch\u0028\u0029",
-            "name": "touch",
-            "summary": "Touch\u0020session\u0020to\u0020update\u0020last\u0020access\u0020date",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_touch"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Aregenerate\u0028\u0029",
-            "name": "regenerate",
-            "summary": "Regenerate\u0020session\u0020ID",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_regenerate"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\SessionStoreInterface\u003A\u003Adestroy\u0028\u0029",
-            "name": "destroy",
-            "summary": "Destroy\u0020session",
-            "url": "classes/Busarm-PhpMini-Interfaces-SessionStoreInterface.html#method_destroy"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface",
-            "name": "StorageBagInterface",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aset\u0028\u0029",
-            "name": "set",
-            "summary": "Set\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_set"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Ahas\u0028\u0029",
-            "name": "has",
-            "summary": "Checks\u0020if\u0020an\u0020attribute\u0020exists",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_has"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aget\u0028\u0029",
-            "name": "get",
-            "summary": "Get\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_get"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Apull\u0028\u0029",
-            "name": "pull",
-            "summary": "Pull\u0020attribute\u003A\u0020Get\u0020and\u0020delete",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_pull"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aall\u0028\u0029",
-            "name": "all",
-            "summary": "Get\u0020all\u0020attributes",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_all"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Areplace\u0028\u0029",
-            "name": "replace",
-            "summary": "Set\u0020bulk\u0020attributes",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_replace"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aremove\u0028\u0029",
-            "name": "remove",
-            "summary": "Remove\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_remove"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\StorageBagInterface\u003A\u003Aclear\u0028\u0029",
-            "name": "clear",
-            "summary": "Remove\u0020all\u0020attribute",
-            "url": "classes/Busarm-PhpMini-Interfaces-StorageBagInterface.html#method_clear"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface",
-            "name": "UploadBagInterface",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aset\u0028\u0029",
-            "name": "set",
-            "summary": "Set\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_set"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Ahas\u0028\u0029",
-            "name": "has",
-            "summary": "Checks\u0020if\u0020an\u0020uploaded\u0020file\u0020exists",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_has"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aget\u0028\u0029",
-            "name": "get",
-            "summary": "Get\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_get"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Apull\u0028\u0029",
-            "name": "pull",
-            "summary": "Pull\u0020uploaded\u0020file\u003A\u0020Get\u0020and\u0020delete",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_pull"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aall\u0028\u0029",
-            "name": "all",
-            "summary": "Get\u0020all\u0020uploaded\u0020files",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_all"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Areplace\u0028\u0029",
-            "name": "replace",
-            "summary": "Set\u0020bulk\u0020uploaded\u0020files",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_replace"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aremove\u0028\u0029",
-            "name": "remove",
-            "summary": "Remove\u0020uploaded\u0020file",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_remove"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\UploadBagInterface\u003A\u003Aclear\u0028\u0029",
-            "name": "clear",
-            "summary": "Remove\u0020all\u0020uploaded\u0020files",
-            "url": "classes/Busarm-PhpMini-Interfaces-UploadBagInterface.html#method_clear"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware",
-            "name": "SessionMiddleware",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#method___construct"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003Aprocess\u0028\u0029",
-            "name": "process",
-            "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#method_process"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\SessionMiddleware\u003A\u003A\u0024store",
-            "name": "store",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Middlewares-SessionMiddleware.html#property_store"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware",
-            "name": "ViewRouteMiddleware",
-            "summary": "PHP\u0020Mini\u0020Framework",
-            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method___construct"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003Aprocess\u0028\u0029",
-            "name": "process",
-            "summary": "Middleware\u0020handler",
-            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#method_process"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024viewPathOrClass",
-            "name": "viewPathOrClass",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_viewPathOrClass"
-        },                {
-            "fqsen": "\\Busarm\\PhpMini\\Middlewares\\ViewRouteMiddleware\u003A\u003A\u0024params",
-            "name": "params",
-            "summary": "",
-            "url": "classes/Busarm-PhpMini-Middlewares-ViewRouteMiddleware.html#property_params"
+            "url": "classes/Busarm-PhpMini-Service-BaseServiceDiscovery.html#property_services"
         },                {
             "fqsen": "\\",
             "name": "\\",
             "summary": "",
             "url": "namespaces/default.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Constants",
+            "name": "Constants",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-constants.html"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Helpers",
             "name": "Helpers",
@@ -5220,6 +5940,11 @@ Search.appendIndex(
             "name": "Middlewares",
             "summary": "",
             "url": "namespaces/busarm-phpmini-middlewares.html"
+        },                {
+            "fqsen": "\\Busarm\\PhpMini\\Service",
+            "name": "Service",
+            "summary": "",
+            "url": "namespaces/busarm-phpmini-service.html"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Session",
             "name": "Session",

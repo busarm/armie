@@ -9,9 +9,12 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Server;
+use Nyholm\Psr7\Uri;
+
+use function Busarm\PhpMini\Helpers\http_parse_query;
 
 /**
  * 
@@ -22,20 +25,16 @@ use Busarm\PhpMini\Server;
  */
 class LocalService extends BaseService
 {
-    public function __construct(private RequestInterface $request)
+    public function __construct(private ?ServiceDiscoverynterface $discovery = null)
     {
-        parent::__construct($request);
     }
 
     /**
-     * Call service
-     * 
-     * @param ServiceRequestDto $dto
-     * @return mixed
+     * @inheritDoc
      */
-    public function call(ServiceRequestDto $dto)
+    public function call(ServiceRequestDto $dto, RequestInterface $request)
     {
-        $path = $this->get($dto->name);
+        $path = $dto->location ?? $this->getLocation($dto->name);
         if (empty($path)) {
             throw new SystemError(self::class . ": Location for client $dto->name not found");
         }
@@ -45,15 +44,13 @@ class LocalService extends BaseService
             throw new SystemError(self::class . ": Client $dto->name App file not found: $path");
         }
 
-        if ($dto->name == $this->getCurrentServiceName()) {
-            throw new SystemError(self::class . ": Circular request to current service `$dto->name` not allowed");
-        }
+        $uri = (new Uri(rtrim($request->baseUrl(), '/') . '/' . ltrim($dto->route, '/')));
+        $query = http_parse_query($uri->getQuery());
 
-        $server[Server::HEADER_SERVICE_NAME] = $dto->name;
         return Loader::require($path, [
             'request' =>
             Request::fromUrl(
-                $this->request->baseUrl() . '/' . $dto->route,
+                strval($uri),
                 match ($dto->type) {
                     ServiceType::CREATE => HttpMethod::POST,
                     ServiceType::UPDATE => HttpMethod::PUT,
@@ -62,26 +59,38 @@ class LocalService extends BaseService
                 }
             )
                 ->initialize(
-                    new Query($dto->type == ServiceType::READ ? $dto->params : []),
-                    new Attribute($dto->type == ServiceType::READ ? $dto->params : []),
-                    $this->request->cookie(),
-                    $this->request->session(),
-                    $this->request->file(),
-                    new Attribute(array_merge($this->request->server()->all(), $server)),
-                    new Attribute(array_merge($this->request->header()->all(), $dto->headers)),
-                    $this->request->content()
+                    new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
+                    new Attribute($dto->type != ServiceType::READ ? $dto->params : []),
+                    $request->cookie(),
+                    $request->session(),
+                    $request->file(),
+                    $request->server(),
+                    new Attribute(array_merge($request->header()->all(), $dto->headers)),
+                    $request->content()
                 )->toPsr()
         ]);
     }
 
     /**
-     * Call service asynchronously
-     * 
-     * @param ServiceRequestDto $dto
-     * @return mixed
+     * @inheritDoc
      */
-    public function callAsync(ServiceRequestDto $dto)
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request)
     {
         throw new SystemError("Async local service request not currently supported.");
+    }
+
+    /**
+     * Get service location for name
+     * 
+     * @param string $name
+     * @return string|null
+     */
+    public function getLocation($name)
+    {
+        $client = $this->discovery?->getServiceClient($name);
+        if ($client) {
+            return $client->getLocation();
+        }
+        return null;
     }
 }

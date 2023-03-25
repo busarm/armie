@@ -11,14 +11,16 @@ namespace Busarm\PhpMini\Dto;
 class ServiceRequestDto extends BaseDto
 {
     /** @var string */
-    public string|null $name;
+    public string|null $name = null;
     /** @var string */
-    public string|null $route;
+    public string|null $location = null;
+    /** @var string */
+    public string|null $route = null;
     /** @var string @see \Busarm\PhpMini\Enums\ServiceType */
-    public string|null $type;
+    public string|null $type = null;
     /** @var array */
-    public array|null $params;
-    public array|null $headers;
+    public array|null $params = [];
+    public array|null $headers = [];
 
 
     /**
@@ -29,6 +31,18 @@ class ServiceRequestDto extends BaseDto
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of location
+     *
+     * @return  self
+     */
+    public function setLocation($location)
+    {
+        $this->location = $location;
 
         return $this;
     }

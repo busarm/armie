@@ -160,18 +160,25 @@
 
 <dl class="phpdocumentor-table-of-contents">
                         <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addCrudRoutes">addCrudRoutes()</a>
+    <span>
+                                &nbsp;: <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouterInterface">RouterInterface</abbr></a>    </span>
+</dt>
+<dd>Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addRoute">addRoute()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd></dd>
+<dd>Add single route</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addRoutes">addRoutes()</a>
     <span>
                                 &nbsp;: self    </span>
 </dt>
-<dd></dd>
+<dd>Add list of routes</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_createRoute">createRoute()</a>
@@ -218,6 +225,66 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_addCrudRoutes">
+        addCrudRoutes()
+        <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addCrudRoutes" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">44</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">addCrudRoutes</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$path</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$controller</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouterInterface">RouterInterface</abbr></a></span></code>
+
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$path</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>HTTP path. e.g /home. See <code class="prettyprint">Router::MATCHER_REGX</code> for list of parameters matching keywords</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$controller</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Application Controller class name e.g Home</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                </dl>
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouterInterface">RouterInterface</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_addRoute">
         addRoute()
         <a href="classes/Busarm-PhpMini-Interfaces-RouterInterface.html#method_addRoute" class="headerlink"><i class="fas fa-link"></i></a>
@@ -225,11 +292,12 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">25</span>
+    <span class="phpdocumentor-element-found-in__line">27</span>
 
     </aside>
 
-    
+        <p class="phpdocumentor-summary">Add single route</p>
+
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
                     <span class="phpdocumentor-signature__name">addRoute</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$route</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
@@ -273,11 +341,12 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">31</span>
+    <span class="phpdocumentor-element-found-in__line">35</span>
 
     </aside>
 
-    
+        <p class="phpdocumentor-summary">Add list of routes</p>
+
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
                     <span class="phpdocumentor-signature__name">addRoutes</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, <a href="classes/Busarm-PhpMini-Interfaces-RouteInterface.html"><abbr title="\Busarm\PhpMini\Interfaces\RouteInterface">RouteInterface</abbr></a>&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$routes</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">self</span></code>
@@ -376,7 +445,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">36</span>
+    <span class="phpdocumentor-element-found-in__line">49</span>
 
     </aside>
 
@@ -414,7 +483,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">56</span>
+    <span class="phpdocumentor-element-found-in__line">69</span>
 
     </aside>
 
@@ -491,7 +560,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/Interfaces/RouterInterface.php"><a href="files/src-interfaces-routerinterface.html"><abbr title="src/Interfaces/RouterInterface.php">RouterInterface.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">45</span>
+    <span class="phpdocumentor-element-found-in__line">58</span>
 
     </aside>
 

@@ -24,7 +24,7 @@ trait SingletonStateless
      * @param array $params
      * @return static
      */
-    public static function make(RequestInterface|RouteInterface $request, array $params = []): self
+    public static function make(RequestInterface|RouteInterface $request, array $params = []): static
     {
         return app()->make(static::class, $params, $request);
     }

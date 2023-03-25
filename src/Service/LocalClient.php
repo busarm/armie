@@ -19,7 +19,7 @@ class LocalClient implements ServiceClientInterface
     }
 
     /**
-     * Get service location. e.g path, url, ip etc.
+     * Get service client name
      */
     public function getName()
     {
@@ -27,7 +27,7 @@ class LocalClient implements ServiceClientInterface
     }
 
     /**
-     * Get the value of location
+     * Get service client location. e.g path, url, ip etc.
      */
     public function getLocation()
     {

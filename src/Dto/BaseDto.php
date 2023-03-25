@@ -121,7 +121,6 @@ class BaseDto implements Arrayable, Stringable
     /**
      * Get explicitly selected attributes
      *
-     * @param array $attributes
      * @return array
      */
     public function selected(): array

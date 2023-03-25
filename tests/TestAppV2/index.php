@@ -2,12 +2,14 @@
 
 /**
  * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
+ * @var \Busarm\PhpMini\Interfaces\ServiceDiscoverynterface|null $discovery Capture Service discovery
  */
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Request;
+use Busarm\PhpMini\Service\RemoteServiceDiscovery;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -22,13 +24,16 @@ $config = (new Config())
     ->setHttpSendAndContinue(false)
     ->setHttpSessionAutoStart(false);
 $app = new App($config);
+$app->setServiceDiscovery($discovery ?? new RemoteServiceDiscovery('https://server/discover'));
 
 $app->get('ping')->call(function (App $app) {
-    return 'success-callable-' . $app->env;
+    return 'success-v2-' . $app->env;
 });
 
-$app->get('test')->call(function (RequestInterface $req) {
+$app->get('test')->call(function (RequestInterface $req, App $app) {
     return [
+        'name' => 'v2',
+        'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
         'headers' => $req->header()->all(),
         'server' => $req->server()->all(),
         'cookies' => $req->cookie()->all(),

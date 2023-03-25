@@ -17,24 +17,26 @@ interface ServiceProviderInterface
     /**
      * Call service
      * 
-     * @param ServiceRequestDto $dto
+     * @param ServiceRequestDto $dto  Service Request DTO
+     * @param RequestInterface $request Current HTTP Request
      * @return mixed
      */
-    public function call(ServiceRequestDto $dto);
+    public function call(ServiceRequestDto $dto, RequestInterface $request);
 
     /**
      * Call service asynchronously
      * 
-     * @param ServiceRequestDto $dto
+     * @param ServiceRequestDto $dto  Service Request DTO
+     * @param RequestInterface $request Current HTTP Request
      * @return mixed
      */
-    public function callAsync(ServiceRequestDto $dto);
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request);
 
     /**
      * Get service location for name
      * 
      * @param string $name
-     * @return string
+     * @return string|null
      */
-    public function get($name);
+    public function getLocation($name);
 }

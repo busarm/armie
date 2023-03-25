@@ -218,7 +218,7 @@ function log_message($level, $message, array $context = [])
     try {
         app()->logger->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     } catch (\Throwable $th) {
-        (new ConsoleLogger(new ConsoleOutput()))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
+        (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
     }
 }
 

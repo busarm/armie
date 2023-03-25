@@ -23,11 +23,13 @@ use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
+use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
 use Busarm\PhpMini\Traits\Container;
@@ -59,25 +61,30 @@ class App implements HttpServerInterface, ContainerInterface
     use Container;
 
     /** @var static App instance */
-    public static $__instance;
+    public static $__instance = null;
 
     /** @var RouterInterface */
-    public $router;
+    public $router = null;
 
     /** @var LoggerInterface */
-    public $logger;
+    public $logger = null;
 
-    /** @var \Busarm\PhpMini\Interfaces\LoaderInterface */
-    public $loader;
+    /** @var LoaderInterface */
+    public $loader = null;
 
     /** @var ErrorReportingInterface */
-    public $reporter;
+    public $reporter = null;
+    /**
+     * @var ServiceDiscoverynterface
+     */
+    public $serviceDiscovery = null;
 
-    /** @var int Request start time in milliseconds */
-    public $startTimeMs;
 
     /** @var bool */
     public $isCli;
+
+    /** @var int Request start time in milliseconds */
+    public $startTimeMs;
 
 
     /** @var MiddlewareInterface[] */
@@ -442,6 +449,17 @@ class App implements HttpServerInterface, ContainerInterface
         return $this;
     }
 
+    /**
+     * Set service discovery
+     * 
+     * @param ServiceDiscoverynterface $serviceDiscovery Service Discovery
+     * @return self
+     */
+    public function setServiceDiscovery(ServiceDiscoverynterface $serviceDiscovery): self
+    {
+        $this->serviceDiscovery = $serviceDiscovery;
+        return $this;
+    }
 
     ############################
     # HTTP Server Endpoints

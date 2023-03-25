@@ -20,7 +20,7 @@ trait Singleton
      * @param array $params
      * @return static
      */
-    public static function make(array $params = []): self
+    public static function make(array $params = []): static
     {
         return app()->make(static::class, $params);
     }

@@ -11,6 +11,7 @@
     ],
     "autoload": {
         "files": [
+            "bootstrap/constants.php",
             "bootstrap/helpers.php"
         ],
         "psr-4": {
@@ -55,12 +56,23 @@
         "symfony/console": "^6.0",
         "symfony/process": "^6.0",
         "nyholm/psr7": "^1.5",
-        "guzzlehttp/guzzle": "^7.5"
+        "guzzlehttp/guzzle": "^7.5",
+        "psr/cache": "^3.0"
     },
     "require-dev": {
         "middlewares/firewall": "^2.0",
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan": "^1.8",
         "fakerphp/faker": "^1.20"
+    },
+    "extra": {
+        "hooks": {
+            "pre-commit": [
+                "echo committing as $(git config user.name)",
+                "composer run test"
+            ],
+            "pre-push": [],
+            "post-merge": "composer update"
+        }
     }
 }

@@ -141,6 +141,7 @@ class Request implements RequestInterface
             $request->_path = '/' . ltrim($uri->getPath(), '/');
             $request->_baseUrl = $request->_host;
             $request->_currentUrl = $request->_baseUrl . $request->_path;
+            $request->_psr = null;
             return $request;
         } else {
             throw new SystemError("'$url' is not a valid URL");
@@ -163,6 +164,7 @@ class Request implements RequestInterface
             (new Attribute)->mirror($_FILES),
             new Attribute($_SERVER)
         );
+        $request->_psr = null;
         return $request;
     }
 
@@ -174,7 +176,6 @@ class Request implements RequestInterface
     public static function fromPsr(ServerRequestInterface $psr): self
     {
         $request = new self;
-        $request->_psr = $psr;
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
@@ -190,6 +191,26 @@ class Request implements RequestInterface
         $request->_path = '/' . ltrim($psr->getUri()->getPath(), '/');
         $request->_baseUrl = $request->_host;
         $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_psr = $psr;
+        return $request;
+    }
+
+    /**
+     * Change request's url. Clone request with new url
+     * 
+     * @param UriInterface $uri
+     * @return self
+     */
+    public function withUri(UriInterface $uri): self
+    {
+        $request = clone $this;
+        $request->_scheme = $uri->getScheme();
+        $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
+        $request->_host = $request->_scheme  . "://" . $request->_domain;
+        $request->_path = '/' . ltrim($uri->getPath(), '/');
+        $request->_baseUrl = $request->_host;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_psr = null;
         return $request;
     }
 
@@ -273,24 +294,6 @@ class Request implements RequestInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Change request's url. Clone request with new url
-     * 
-     * @param UriInterface $uri
-     * @return self
-     */
-    public function withUri(UriInterface $uri): self
-    {
-        $request = clone $this;
-        $request->_scheme = $uri->getScheme();
-        $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
-        $request->_host = $request->_scheme  . "://" . $request->_domain;
-        $request->_path = '/' . ltrim($uri->getPath(), '/');
-        $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl . $request->_path;
-        return $request;
     }
 
     /**

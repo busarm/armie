@@ -255,9 +255,9 @@ class Server
      * Run server
      *
      * @param ServerRequestInterface|null $request
-     * @return ResponseInterface|null
+     * @return ResponseInterface
      */
-    public function run(ServerRequestInterface|null $request = null): ResponseInterface|null
+    public function run(ServerRequestInterface|null $request = null): ResponseInterface
     {
         $request = $request ? Request::fromPsr($request) : Request::fromGlobal();
 
@@ -282,7 +282,7 @@ class Server
     {
         foreach ($request->segments() as $route) {
 
-            $uri = preg_replace("/^(\/)*$route(\/)*/im", "", $request->path());
+            $uri = preg_replace("/^(\/+)$route(\/+)/im", "", $request->path());
 
             // Check route apps
             if (array_key_exists($route, $this->routeApps)) {
@@ -303,6 +303,7 @@ class Server
                 if (!file_exists($path)) {
                     throw new SystemError("App file not found: $path");
                 }
+                $psr = $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr();
                 return Loader::require($path, [
                     'request' => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr(),
                     'discovery' => $this->serviceDiscovery,

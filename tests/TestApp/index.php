@@ -8,12 +8,10 @@
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Service\RemoteServiceDiscovery;
+use Busarm\PhpMini\Service\LocalServiceDiscovery;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Middlewares\Firewall;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -27,13 +25,7 @@ $config = (new Config())
     ->setHttpAllowedCorsMethods(['GET'])
     ->setHttpSessionAutoStart(false);
 $app = new App($config);
-// $app->addMiddleware(new CorsMiddleware());
-$app->addMiddleware((new Firewall(['::1', '0.0.0.0', '127.0.0.1', '192.168.*']))
-    ->blacklist([
-        '192.168.0.1',
-        '192.168.1.1',
-    ]));
-$app->setServiceDiscovery($discovery ?? new RemoteServiceDiscovery('https://server/discover'));
+$app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {

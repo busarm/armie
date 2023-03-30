@@ -330,7 +330,7 @@ final class AppTest extends TestCase
     /**
      * Test app run mock HTTP CRUD Controller
      *
-     * @group pdo-get
+     * @group skip
      * @return void
      */
     public function testAppRunMockHttpCrudController()

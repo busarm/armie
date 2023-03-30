@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Helpers;
 use Busarm\PhpMini\Errors\SystemError;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Process\Process;
 
 /**
  * PHP Mini Framework
@@ -225,17 +226,21 @@ function log_message($level, $message, array $context = [])
 /**
  * @param mixed $message
  */
-function log_emergency($message)
+function log_emergency(...$message)
 {
-    log_message(\Psr\Log\LogLevel::EMERGENCY, $message);
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::EMERGENCY, $log);
+    }
 }
 
 /**
  * @param mixed $message
  */
-function log_error($message)
+function log_error(...$message)
 {
-    log_message(\Psr\Log\LogLevel::ERROR, $message);
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::ERROR, $log);
+    }
 }
 
 /**
@@ -249,25 +254,31 @@ function log_exception($exception)
 /**
  * @param mixed $message
  */
-function log_info($message)
+function log_info(...$message)
 {
-    log_message(\Psr\Log\LogLevel::INFO, $message);
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::INFO, $log);
+    }
 }
 
 /**
  * @param mixed $message
  */
-function log_debug($message)
+function log_debug(...$message)
 {
-    log_message(\Psr\Log\LogLevel::DEBUG, $message);
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::DEBUG, $log);
+    }
 }
 
 /**
  * @param mixed $message
  */
-function log_warning($message)
+function log_warning(...$message)
 {
-    log_message(\Psr\Log\LogLevel::WARNING, $message);
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::WARNING, $log);
+    }
 }
 
 /**
@@ -283,14 +294,14 @@ function log_warning($message)
 function run(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600, $wait = true)
 {
     $output->getFormatter()->setStyle('error', new \Symfony\Component\Console\Formatter\OutputFormatterStyle('red'));
-    $process = new \Symfony\Component\Process\Process([
+    $process = new Process([
         $command,
         ...array_filter($params, fn ($arg) => !empty($arg))
     ]);
     $process->setTimeout($timeout);
     if ($wait) {
         $process->run(function ($type, $data) use ($output) {
-            if ($type == \Symfony\Component\Process\Process::ERR) {
+            if ($type == Process::ERR) {
                 $output->writeln('<error>' . $data . '</error>');
             } else {
                 $output->writeln('<comment>' . $data . '</comment>');
@@ -298,7 +309,7 @@ function run(string $command, array $params, \Symfony\Component\Console\Output\O
         });
     } else {
         $process->start(function ($type, $data) use ($output) {
-            if ($type == \Symfony\Component\Process\Process::ERR) {
+            if ($type == Process::ERR) {
                 $output->writeln('<error>' . $data . '</error>');
             } else {
                 $output->writeln('<comment>' . $data . '</comment>');

@@ -5,4 +5,5 @@
 .phpdoc.*
 .tmp/
 .vscode/
+.docs/
 

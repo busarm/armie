@@ -41,7 +41,11 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
+use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
+
 use function Busarm\PhpMini\Helpers\is_cli;
+use function Busarm\PhpMini\Helpers\log_debug;
 
 // TODO Event Manager Interface - Handle sync and async dispatch
 // TODO Queue Manager Interface - Handle sync and async jobs
@@ -223,6 +227,15 @@ class App implements HttpServerInterface, ContainerInterface
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
 
+        log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), microtime(true)));
+
+        // Leave crumbs for error tracking
+        $this->reporter->leaveCrumbs('request', [
+            'correlationId' => $request->correlationId(),
+            'ipAddress' => $request->ip(),
+            'url' => $request->currentUrl(),
+        ]);
+
         // Run start hook
         $this->triggerStartHook($request);
 
@@ -245,6 +258,9 @@ class App implements HttpServerInterface, ContainerInterface
         $this->triggerCompleteHook($request, $response);
 
         $this->status = AppStatus::STOPPED;
+
+        log_debug(sprintf("Request completed for id: %s, time: %s", $request->correlationId(), microtime(true)));
+
         $request = NULL;
 
         return $response;

@@ -41,8 +41,8 @@ class ErrorReporter implements ErrorReportingInterface
     public function leaveCrumbs($title, array $metadata = [])
     {
         $this->breadCrumbs[] = [
-            'Title' => $title,
-            'Metadata' => $metadata,
+            'title' => $title,
+            'metadata' => $metadata,
         ];
     }
 
@@ -61,8 +61,8 @@ class ErrorReporter implements ErrorReportingInterface
         if ($file) $contexts[] = $file . ':' . ($line ?? 0);
         log_error($message);
         log_debug($this->toString([
-            'Crumbs' => $this->breadCrumbs,
-            'Contexts' => $contexts,
+            'crumbs' => $this->breadCrumbs,
+            'contexts' => $contexts,
         ]));
     }
 
@@ -79,8 +79,8 @@ class ErrorReporter implements ErrorReportingInterface
         }, $exception->getTrace());
         log_exception($exception);
         log_debug($this->toString([
-            'Crumbs' => $this->breadCrumbs,
-            'Contexts' => $contexts,
+            'crumbs' => $this->breadCrumbs,
+            'contexts' => $contexts,
         ]));
     }
 

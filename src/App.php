@@ -227,14 +227,15 @@ class App implements HttpServerInterface, ContainerInterface
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
 
-        log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), microtime(true)));
-
-        // Leave crumbs for error tracking
-        $this->reporter->leaveCrumbs('request', [
-            'correlationId' => $request->correlationId(),
-            'ipAddress' => $request->ip(),
-            'url' => $request->currentUrl(),
-        ]);
+        // Leave logs & crumbs for error tracking
+        if ($request instanceof RequestInterface) {
+            log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), microtime(true)));
+            $this->reporter->leaveCrumbs('request', [
+                'correlationId' => $request->correlationId(),
+                'ipAddress' => $request->ip(),
+                'url' => $request->currentUrl(),
+            ]);
+        }
 
         // Run start hook
         $this->triggerStartHook($request);
@@ -259,7 +260,10 @@ class App implements HttpServerInterface, ContainerInterface
 
         $this->status = AppStatus::STOPPED;
 
-        log_debug(sprintf("Request completed for id: %s, time: %s", $request->correlationId(), microtime(true)));
+        // Leave logs for error tracking
+        if ($request instanceof RequestInterface) {
+            log_debug(sprintf("Request completed for id: %s, time: %s", $request->correlationId(), microtime(true)));
+        }
 
         $request = NULL;
 

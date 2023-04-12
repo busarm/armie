@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Dto\ServiceRequestDto;
 use Busarm\PhpMini\Enums\HttpMethod;
@@ -12,7 +13,10 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
+use Busarm\PhpMini\Session\PHPSession;
 use Nyholm\Psr7\Uri;
+
+use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
 
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
@@ -47,6 +51,9 @@ class LocalService extends BaseService
         $uri = (new Uri(rtrim($request->baseUrl(), '/') . '/' . ltrim($dto->route, '/')));
         $query = http_parse_query($uri->getQuery());
 
+        $dto->headers = $dto->headers ?? [];
+        $dto->headers[VAR_CORRELATION_ID] = $request->correlationId();
+
         return Loader::require($path, [
             'request' =>
             Request::fromUrl(
@@ -61,12 +68,12 @@ class LocalService extends BaseService
                 ->initialize(
                     new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
                     new Attribute($dto->type != ServiceType::READ ? $dto->params : []),
-                    $request->cookie(),
-                    $request->session(),
-                    $request->file(),
-                    $request->server(),
-                    new Attribute(array_merge($request->header()->all(), $dto->headers)),
-                    $request->content()
+                    null,
+                    null,
+                    new Attribute($dto->files),
+                    null,
+                    new Attribute($dto->headers),
+                    null,
                 )->toPsr()
         ]);
     }

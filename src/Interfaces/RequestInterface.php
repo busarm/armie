@@ -19,6 +19,11 @@ interface RequestInterface extends ContainerInterface
     /**
      * @return string
      */
+    public function correlationId();
+
+    /**
+     * @return string
+     */
     public function ip();
 
     /**

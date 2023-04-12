@@ -74,7 +74,7 @@ abstract class Model extends BaseDto
      */
     protected array $requestedRelations = [];
 
-    final public function __construct(Connection $db = null)
+    public function __construct(Connection $db = null)
     {
         $this->db = $db ?? Connection::make();
         $this->setUp();

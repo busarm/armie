@@ -17,7 +17,7 @@ interface SingletonInterface
      * Create / Retrieve singleton instance 
      *
      * @param array<string, mixed> $params
-     * @return self
+     * @return static
      */
-    public static function make(array $params = []): self;
+    public static function make(array $params = []): static;
 }

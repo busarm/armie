@@ -19,6 +19,8 @@ use Busarm\PhpMini\Traits\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
+use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
+
 use function Busarm\PhpMini\Helpers\config;
 use function Busarm\PhpMini\Helpers\is_cli;
 
@@ -37,6 +39,7 @@ class Request implements RequestInterface
 {
     use Container;
 
+    protected string|null $_correlationId   =   NULL;
     protected string|null $_ip              =   NULL;
     protected string|null $_scheme          =   NULL;
     protected string|null $_domain          =   NULL;
@@ -240,7 +243,6 @@ class Request implements RequestInterface
         StorageBagInterface $headers = NULL,
         $content = null
     ): self {
-
         $this->_request  =   $request ?: $this->_request;
         $this->_query    =   $query ?: $this->_query;
         $this->_session  =   $session ?: $this->_session;
@@ -252,7 +254,7 @@ class Request implements RequestInterface
         // Load data from server vars
         if ($this->_server) {
 
-            $this->_headers  =   $headers ?: new Attribute(array_change_key_case(
+            $this->_headers  =  $headers ?: new Attribute(array_change_key_case(
                 array_merge($this->getHeadersFromServer($this->_server->all()), $this->_headers ? $this->_headers->all() : [])
             ));
             $this->_contentType  = $this->_contentType ?: $this->_server->get('CONTENT_TYPE', '');
@@ -286,6 +288,14 @@ class Request implements RequestInterface
             }
             $this->_baseUrl = $this->_baseUrl ?: $this->_host;
             $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
+
+            $this->_correlationId = ($this->_server->get(VAR_CORRELATION_ID) ??
+                $this->_headers->get(strtolower(VAR_CORRELATION_ID)) ??
+                $this->_headers->get('request-id') ??
+                $this->_headers->get('x-request-id') ??
+                $this->_headers->get('x-trace-id') ??
+                $this->_headers->get('x-correlation-id'))
+                ?: md5(uniqid()) . '.' . microtime(true);
         }
 
         // Start session
@@ -501,7 +511,15 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return mixed
+     * @return string
+     */
+    public function correlationId()
+    {
+        return $this->_correlationId;
+    }
+
+    /**
+     * @return string
      */
     public function ip()
     {

@@ -21,16 +21,16 @@ interface ContainerInterface
      * 
      * @param string $className
      * @param object|null $object
-     * @return self
+     * @return static
      */
-    public function addSingleton(string $className, &$object);
+    public function addSingleton(string $className, &$object): static;
 
     /**
      * Get singleton
      *
      * @param string $className
      * @param object $default
-     * @return self
+     * @return object
      */
     public function getSingleton(string $className, $default = null);
 }

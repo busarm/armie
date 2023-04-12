@@ -360,9 +360,9 @@ class App implements HttpServerInterface, ContainerInterface
      * 
      * @param string $className
      * @param object|null $object
-     * @return self
+     * @return static
      */
-    public function addSingleton(string $className, &$object)
+    public function addSingleton(string $className, &$object): static
     {
         if ($this->status === AppStatus::RUNNNIG && $this->stateless) return $this;
         $this->singletons[$className] = $object;

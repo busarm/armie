@@ -10,17 +10,20 @@ namespace Busarm\PhpMini\Dto;
  */
 class ServiceRequestDto extends BaseDto
 {
-    /** @var string */
+    /** @var string Name of service */
     public string|null $name = null;
-    /** @var string */
+    /** @var string Location endpoint of service if available */
     public string|null $location = null;
-    /** @var string */
+    /** @var string Route pathe to resource in service */
     public string|null $route = null;
-    /** @var string @see \Busarm\PhpMini\Enums\ServiceType */
+    /** @var string Service resource request type @see \Busarm\PhpMini\Enums\ServiceType */
     public string|null $type = null;
-    /** @var array */
-    public array|null $params = [];
-    public array|null $headers = [];
+    /** @var array<string,string> Service params */
+    public array $params = [];
+    /** @var array<string,string> Service headers */
+    public array $headers = [];
+    /** @var array<string,\Psr\Http\Message\StreamInterface|resource|string> Service files */
+    public array $files = [];
 
 
     /**

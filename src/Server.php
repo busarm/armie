@@ -22,7 +22,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Uri;
 use Throwable;
 
-use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
 use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
 
 /**
@@ -64,13 +63,10 @@ class Server
      */
     private $serviceDiscovery = null;
 
-    private string $correlationId;
-
     private ErrorReporter $reporter;
 
     public function __construct(public string $name, public string $env = Env::LOCAL)
     {
-        $this->correlationId = md5(uniqid()) . '.' . microtime(true);
         $this->reporter = (new ErrorReporter);
 
         // Set up error handler
@@ -262,7 +258,6 @@ class Server
         $request = $request ? Request::fromPsr($request) : Request::fromGlobal();
 
         $request->server()->set(VAR_SERVER_NAME, $this->name);
-        $request->server()->set(VAR_CORRELATION_ID, $request->header()->get(strtolower(VAR_CORRELATION_ID), $this->correlationId, true));
 
         if (($response = $this->runRoute($request)) !== false) {
             return $response ? $response : (new Response())->setStatusCode(500);
@@ -303,7 +298,6 @@ class Server
                 if (!file_exists($path)) {
                     throw new SystemError("App file not found: $path");
                 }
-                $psr = $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr();
                 return Loader::require($path, [
                     'request' => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr(),
                     'discovery' => $this->serviceDiscovery,
@@ -404,7 +398,6 @@ class Server
                     ->setParams($request->request()->all())
                     ->setHeaders([
                         VAR_SERVER_NAME => $this->name,
-                        VAR_CORRELATION_ID => $this->correlationId,
                     ]),
                 $request
             );

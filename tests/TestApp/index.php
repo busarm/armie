@@ -2,7 +2,7 @@
 
 /**
  * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
- * @var \Busarm\PhpMini\Interfaces\ServiceDiscoverynterface|null $discovery Capture Service discovery
+ * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
  */
 
 use Busarm\PhpMini\App;

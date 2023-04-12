@@ -29,7 +29,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
 use Busarm\PhpMini\Traits\Container;
@@ -75,7 +75,7 @@ class App implements HttpServerInterface, ContainerInterface
     /** @var ErrorReportingInterface */
     public $reporter = null;
     /**
-     * @var ServiceDiscoverynterface
+     * @var ServiceDiscoveryInterface
      */
     public $serviceDiscovery = null;
 
@@ -452,10 +452,10 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Set service discovery
      * 
-     * @param ServiceDiscoverynterface $serviceDiscovery Service Discovery
+     * @param ServiceDiscoveryInterface $serviceDiscovery Service Discovery
      * @return self
      */
-    public function setServiceDiscovery(ServiceDiscoverynterface $serviceDiscovery): self
+    public function setServiceDiscovery(ServiceDiscoveryInterface $serviceDiscovery): self
     {
         $this->serviceDiscovery = $serviceDiscovery;
         return $this;

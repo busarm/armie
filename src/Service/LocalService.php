@@ -9,7 +9,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
 use Nyholm\Psr7\Uri;
@@ -25,7 +25,7 @@ use function Busarm\PhpMini\Helpers\http_parse_query;
  */
 class LocalService extends BaseService
 {
-    public function __construct(private ?ServiceDiscoverynterface $discovery = null)
+    public function __construct(private ?ServiceDiscoveryInterface $discovery = null)
     {
     }
 

@@ -10,7 +10,7 @@ namespace Busarm\PhpMini\Interfaces;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-interface ServiceDiscoverynterface
+interface ServiceDiscoveryInterface
 {
     /**
      * Get service client

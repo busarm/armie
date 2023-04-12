@@ -12,7 +12,7 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Service\LocalClient;
 use Busarm\PhpMini\Service\LocalService;
 use Busarm\PhpMini\Service\RemoteClient;
@@ -60,7 +60,7 @@ class Server
      */
     private $domainPaths = [];
     /**
-     * @var ServiceDiscoverynterface
+     * @var ServiceDiscoveryInterface
      */
     private $serviceDiscovery = null;
 
@@ -237,12 +237,12 @@ class Server
     /**
      * Add service discovery for routes
      * 
-     * @param ServiceDiscoverynterface $serviceDiscovery Service Discovery
+     * @param ServiceDiscoveryInterface $serviceDiscovery Service Discovery
      * @param boolean $expose Expose service discovery to public.
      * @param string $exposePath Public path to expose service discovery. Default: `/discover`
      * @return self
      */
-    public function addServiceDiscovery(ServiceDiscoverynterface $serviceDiscovery, $expose = true, $exposePath = 'discover'): self
+    public function addServiceDiscovery(ServiceDiscoveryInterface $serviceDiscovery, $expose = true, $exposePath = 'discover'): self
     {
         $this->serviceDiscovery = $serviceDiscovery;
         if ($expose) {

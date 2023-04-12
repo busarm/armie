@@ -7,7 +7,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\RequestOptions;
@@ -25,7 +25,7 @@ use function Busarm\PhpMini\Helpers\http_parse_query;
  */
 class RemoteService extends BaseService
 {
-    public function __construct(private ?ServiceDiscoverynterface $discovery = null, private $timeout = 10)
+    public function __construct(private ?ServiceDiscoveryInterface $discovery = null, private $timeout = 10)
     {
     }
 

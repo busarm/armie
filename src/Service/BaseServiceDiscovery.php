@@ -3,7 +3,7 @@
 namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 
 /**
  * Error Reporting
@@ -13,7 +13,7 @@ use Busarm\PhpMini\Interfaces\ServiceDiscoverynterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class BaseServiceDiscovery implements ServiceDiscoverynterface
+abstract class BaseServiceDiscovery implements ServiceDiscoveryInterface
 {
     /**
      *

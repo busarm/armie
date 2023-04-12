@@ -4041,25 +4041,25 @@ Search.appendIndex(
             "summary": "Get\u0020service\u0020location.\u0020e.g\u0020path,\u0020url,\u0020ip\u0020etc.",
             "url": "classes/Busarm-PhpMini-Interfaces-ServiceClientInterface.html#method_getLocation"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface",
-            "name": "ServiceDiscoverynterface",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoveryInterface",
+            "name": "ServiceDiscoveryInterface",
             "summary": "Error\u0020Reporting",
-            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html"
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoveryInterface.html"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClient\u0028\u0029",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoveryInterface\u003A\u003AgetServiceClient\u0028\u0029",
             "name": "getServiceClient",
             "summary": "Get\u0020service\u0020client",
-            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClient"
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoveryInterface.html#method_getServiceClient"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClients\u0028\u0029",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoveryInterface\u003A\u003AgetServiceClients\u0028\u0029",
             "name": "getServiceClients",
             "summary": "Get\u0020list\u0020of\u0020service\u0020client",
-            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClients"
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoveryInterface.html#method_getServiceClients"
         },                {
-            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoverynterface\u003A\u003AgetServiceClientsMap\u0028\u0029",
+            "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceDiscoveryInterface\u003A\u003AgetServiceClientsMap\u0028\u0029",
             "name": "getServiceClientsMap",
             "summary": "Get\u0020\u0060name\u003D\u003Elocation\u0060\u0020map\u0020list\u0020of\u0020service\u0020clienta",
-            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoverynterface.html#method_getServiceClientsMap"
+            "url": "classes/Busarm-PhpMini-Interfaces-ServiceDiscoveryInterface.html#method_getServiceClientsMap"
         },                {
             "fqsen": "\\Busarm\\PhpMini\\Interfaces\\ServiceProviderInterface",
             "name": "ServiceProviderInterface",

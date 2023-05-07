@@ -124,7 +124,7 @@ class Route implements RouteInterface
     /**
      * Set controller route destination
      * 
-     * @param string $controller Application Controller class name e.g Home
+     * @param string $controller Application Controller class name e.g Home::class
      * @param string $function Application Controller (public) function. e.g index
      * @return self
      */
@@ -146,7 +146,7 @@ class Route implements RouteInterface
     {
         if (class_exists($viewPathOrClass)) {
             if (!in_array(View::class, class_parents($viewPathOrClass))) {
-                throw new SystemError(sprintf("Route destination view class must be an instance of '%s'", View::class));
+                throw new SystemError(sprintf('Route destination view class must be an instance of "%s"', View::class));
             }
         }
 

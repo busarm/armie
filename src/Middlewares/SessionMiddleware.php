@@ -2,8 +2,6 @@
 
 namespace Busarm\PhpMini\Middlewares;
 
-use Busarm\PhpMini\Handlers\RequestHandler;
-use Busarm\PhpMini\Handlers\ServerRequestHandler;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;

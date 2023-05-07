@@ -15,11 +15,13 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Router;
+use Busarm\PhpMini\Service\BaseServiceDiscovery;
 use Nyholm\Psr7\Request as Psr7Request;
 use Nyholm\Psr7\Response as Psr7Response;
 use Psr\Http\Message\RequestInterface as MessageRequestInterface;
@@ -45,11 +47,7 @@ class DependencyResolver implements DependencyResolverInterface
     }
 
     /**
-     * Resolve dependency for class name
-     *
-     * @param string $className
-     *
-     * @return mixed
+     * @inheritDoc
      */
     public function resolveDependency(string $className): mixed
     {
@@ -76,16 +74,13 @@ class DependencyResolver implements DependencyResolverInterface
                 ->setPersist(app()->config->pdoConnectionPersist)
                 ->setErrorMode(app()->config->pdoConnectionErrorMode)
                 ->setOptions(app()->config->pdoConnectionOptions),
+            BaseServiceDiscovery::class, ServiceDiscoveryInterface::class => app()->serviceDiscovery,
             default => ($this->request ? $this->request->getSingleton($className) : null) ?: app()->getSingleton($className)
         };
     }
 
     /**
-     * Customize dependency
-     *
-     * @param mixed $instance
-     *
-     * @return mixed
+     * @inheritDoc
      */
     public function customizeDependency(mixed &$instance): mixed
     {

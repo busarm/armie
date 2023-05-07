@@ -4,73 +4,54 @@ namespace Busarm\PhpMini\Dto;
 
 use ArrayIterator;
 use ArrayObject;
-use Busarm\PhpMini\Helpers\Security;
 use InvalidArgumentException;
 use OutOfRangeException;
+use Stringable;
 use Traversable;
 
 use Busarm\PhpMini\Interfaces\Arrayable;
+use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Traits\TypeResolver;
-use DateTime;
-use Stringable;
 
 use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework
  *
- * @see https://stackoverflow.com/a/54096881
- * 
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @see https://stackoverflow.com/a/54096881
+ * 
+ * @template T Item type template
  */
 class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
 {
     use TypeResolver;
 
-    /**
-     * Define the class that will be used for all items in the array.
-     * To be defined in each sub-class.
-     */
-    private $itemClass = NULL;
 
     /**
      * Constructor
      *
      * Store the required array type prior to parental construction.
      *
-     * @param array|object $input Any data to preset the array to.
-     * @param int $flags The flags to control the behaviour of the ArrayObject.
-     * @param string $iteratorClass Specify the class that will be used for iteration of the ArrayObject object. ArrayIterator is the default class used.
-     *
+     * @param array<T>|object $input Any data to preset the array to.
+     * @param class-string<T>|null $itemClass Define the class that will be used for all items in the array.
+     * 
      * @throws InvalidArgumentException
      */
-    protected function __construct($input = [], $flags = 0, $iteratorClass = ArrayIterator::class)
+    protected function __construct($input = [],  private $itemClass = null)
     {
         // Create an empty array.
-        parent::__construct([], $flags, $iteratorClass);
+        parent::__construct([], 0, ArrayIterator::class);
 
         // Load data
         $this->load($input);
     }
 
-
-    /**
-     * Set define the class that will be used for all items in the array.
-     *
-     * @return  self
-     */
-    public function setItemClass($itemClass)
-    {
-        $this->itemClass = $itemClass;
-
-        return $this;
-    }
-
     /**
      * Load data
      *
-     * @param array|Traversable $data
+     * @param array<T>|Traversable $data
      * @param bool $sanitize
      * @return self
      */
@@ -85,7 +66,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         foreach ($data as $key => $value) {
             // Validate Item type if available
             if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
-                throw new InvalidArgumentException('Items of $input must be an instance of ' . $this->itemClass);
+                throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
             }
             $this[$key] = $sanitize ? Security::clean($value) : $value;
         }
@@ -127,7 +108,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param int $offset
      * @param int|null $length
-     * @param null $replacement
+     * @param mixed $replacement
      *
      * @return self
      */
@@ -251,14 +232,14 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * @param callable $mapper Will be called as $mapper(mixed $item)
      *
-     * @return ArrayObject A collection of the results of $mapper(mixed $item)
+     * @return self A collection of the results of $mapper(mixed $item)
      */
     public function map(callable $mapper): ArrayObject
     {
         $data = $this->getArrayCopy();
         $result = array_map($mapper, $data);
 
-        return new self($result);
+        return new self($result, $this->itemClass);
     }
 
     /**
@@ -279,7 +260,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param int $index
      *
-     * @return mixed
+     * @return T
      *
      * @throws InvalidArgumentException
      * @throws OutOfRangeException
@@ -344,7 +325,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param callable $callback
      *
-     * @return mixed Element Found in the Array or null
+     * @return T Element Found in the Array or null
      */
     public function find(callable $callback)
     {
@@ -379,7 +360,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Reset the array pointer to the first element and return the element.
      *
-     * @return mixed
+     * @return T
      *
      * @throws \OutOfBoundsException
      */
@@ -395,7 +376,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Reset the array pointer to the last element and return the element.
      *
-     * @return mixed
+     * @return T
      *
      * @throws \OutOfBoundsException
      */
@@ -422,6 +403,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         return new self(array_reverse($this->getArrayCopy(), $preserveKeys));
     }
 
+    /**
+     * Get list of keys
+     * 
+     * @return array
+     */
     public function keys(): array
     {
         return array_keys($this->getArrayCopy());
@@ -488,13 +474,13 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Load dto with array
      *
-     * @param array|object $data
-     * @param string $itemClass
+     * @param array<T>|object $data
+     * @param class-string<T>|null $itemClass
      * @return self
      */
     public static function of(array|object $data, string $itemClass = null): self
     {
-        return (new self($data))->setItemClass($itemClass);
+        return new self($data, $itemClass);
     }
 
     /**

@@ -11,7 +11,6 @@ use Closure;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @link https://github.com/josantonius/php-session
  */
 class Attribute implements StorageBagInterface
 {

@@ -154,24 +154,21 @@ class Config
     /**
      * Cookie Same Site Policy
      * 
-     * @see \Busarm\PhpMini\Enums\SameSite
-     * @var string
+     * @var \Busarm\PhpMini\Enums\SameSite::*
      */
     public string $cookieSameSite = SameSite::LAX;
 
     /**
      * Cache Limiter
      *
-     * @see \Busarm\PhpMini\Enums\CacheLimiter
-     * @var string
+     * @var \Busarm\PhpMini\Enums\CacheLimiter::*
      */
     public string $cacheLimiter = CacheLimiter::NO_CACHE;
 
     /**
      * Logger verbosity
      * 
-     * @see \Busarm\PhpMini\Enums\Verbose
-     * @var int
+     * @var \Busarm\PhpMini\Enums\Verbose::*
      */
     public int $loggerVerborsity = Verbose::DEBUG;
 
@@ -246,8 +243,7 @@ class Config
     /**
      * HTPP default response format
      * 
-     * @see \Busarm\PhpMini\Enums\ResponseFormat
-     * @var string
+     * @var \Busarm\PhpMini\Enums\ResponseFormat::*
      */
     public string $httpResponseFormat = ResponseFormat::JSON;
 
@@ -591,7 +587,7 @@ class Config
     /**
      * Set cookie Same Site Policy
      *
-     * @param  string  $cookieSameSite  Cookie Same Site Policy
+     * @param  \Busarm\PhpMini\Enums\SameSite::*  $cookieSameSite  Cookie Same Site Policy
      *
      * @return  self
      */
@@ -605,7 +601,7 @@ class Config
     /**
      * Set cache Limiter
      *
-     * @param  string  $cacheLimiter  Cache Limiter
+     * @param  \Busarm\PhpMini\Enums\CacheLimiter::*  $cacheLimiter  Cache Limiter
      *
      * @return  self
      */
@@ -619,8 +615,7 @@ class Config
     /**
      * Set logger verbosity
      * 
-     * @see \Busarm\PhpMini\Enums\Verbose
-     * @param  int  $loggerVerborsity  Logger verbosity
+     * @param  \Busarm\PhpMini\Enums\Verbose::*  $loggerVerborsity  Logger verbosity
      *
      * @return  self
      */

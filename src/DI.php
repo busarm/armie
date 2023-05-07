@@ -27,10 +27,11 @@ class DI
     /**
      * Instantiate class with dependencies
      *
-     * @param string $class
+     * @param class-string<T> $class
      * @param DependencyResolverInterface|null $resolver Custom resolver to extend class resolution
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
-     * @return object
+     * @return T
+     * @template T Item type template
      */
     public static function instantiate(string $class, DependencyResolverInterface|null $resolver = null, array $params = [])
     {
@@ -126,9 +127,10 @@ class DI
     /**
      * Process dependecy resolver
      *
-     * @param string $class
+     * @param class-string<T> $class
      * @param DependencyResolverInterface|null $resolver
-     * @return mixed
+     * @return T
+     * @template T Item type template
      */
     protected static function processResolver(string $class, DependencyResolverInterface|null $resolver = null)
     {

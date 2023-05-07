@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Data\PDO;
 
 use Busarm\PhpMini\Data\PDO\Model;
+use Busarm\PhpMini\Interfaces\Data\RelationInterface;
 
 /**
  * PHP Mini Framework
@@ -10,7 +11,7 @@ use Busarm\PhpMini\Data\PDO\Model;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class Relation extends Field
+abstract class Relation extends Field implements RelationInterface
 {
     protected array $conditions = [];
     protected array $params = [];

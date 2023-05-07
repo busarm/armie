@@ -16,16 +16,18 @@ interface DependencyResolverInterface
     /**
      * Resolve dependency for class name
      *
-     * @param string $className
-     * @return mixed
+     * @param class-string<T> $className
+     * @return T
+     * @template T Item type template
      */
     public function resolveDependency(string $className): mixed;
 
     /**
      * Customize dependency
      *
-     * @param mixed $instance
-     * @return mixed
+     * @param T $instance
+     * @return T
+     * @template T Item type template
      */
     public function customizeDependency(mixed &$instance): mixed;
 }

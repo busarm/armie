@@ -10,10 +10,7 @@ use DateTimeInterface;
 use ReflectionNamedType;
 use ReflectionUnionType;
 
-
-/**
- * Manage Singletons
- *  
+/**  
  * PHP Mini Framework
  *
  * @copyright busarm.com
@@ -38,7 +35,7 @@ trait TypeResolver
                 DataType::BOOL, DataType::BOOLEAN => boolval($data),
                 DataType::FLOAT => floatval($data),
                 DataType::DOUBLE => doubleval($data),
-                DataType::ARRAY => is_string($data) ? json_decode($data, true) : (array) $data,
+                DataType::ARRAY => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : (array) $data,
                 DataType::OBJECT, DataType::JSON => is_string($data) ? json_decode($data) : (object) $data,
                 DataType::STRING => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
                 ArrayObject::class => new ArrayObject(is_string($data) ? json_decode($data, true) : (array) $data),
@@ -47,12 +44,7 @@ trait TypeResolver
             };
         }
 
-        return match ($type) {
-            DataType::BOOL, DataType::BOOLEAN => false,
-            DataType::ARRAY => [],
-            ArrayObject::class => new ArrayObject([]),
-            default => $data
-        };
+        return null;
     }
 
     /**
@@ -60,7 +52,7 @@ trait TypeResolver
      *
      * @param mixed $data
      * @param ReflectionNamedType[] $types
-     * @return string
+     * @return \Busarm\PhpMini\Enums\DataType::*|string
      */
     public function findType($data, $types = [])
     {
@@ -76,7 +68,7 @@ trait TypeResolver
                 is_float($data) => DataType::FLOAT,
                 is_array($data) => DataType::ARRAY,
                 is_object($data) => DataType::OBJECT,
-                is_string($data) => $this->checkDate($data) ? DataType::DATETIME : DataType::STRING,
+                is_string($data) => $this->isDate($data) ? DataType::DATETIME : DataType::STRING,
             };
         }
         return $types[0] ?? DataType::MIXED;
@@ -89,7 +81,7 @@ trait TypeResolver
      * @param mixed $data
      * @return string 
      */
-    private function getTypeName($type, $data)
+    public function getTypeName($type, $data = null)
     {
         if ($type instanceof ReflectionUnionType) {
             $type = $this->findType($data, $type->getTypes());
@@ -102,47 +94,49 @@ trait TypeResolver
     }
 
     /**
-     * Validate and resolve date
-     *
-     * @param string $str
-     * @return DateTime|bool
-     */
-    public function validateDate($str)
-    {
-        // Contains datetime separators
-        if (!$this->checkDate($str)) return false;
-
-        $formats = [
-            DateTime::ATOM,
-            DateTime::COOKIE,
-            DateTime::ISO8601,
-            DateTime::RFC1036,
-            DateTime::RFC1123,
-            DateTime::RFC2822,
-            DateTime::RFC3339,
-            DateTime::RFC3339_EXTENDED,
-            DateTime::RFC7231,
-            DateTime::RFC822,
-            DateTime::RFC850,
-            DateTime::RSS,
-            DateTime::W3C,
-        ];
-        foreach ($formats as $format) {
-            if ($date = DateTime::createFromFormat($format, $str)) {
-                return $date;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if string is a data
+     * Check if string is a date
      *
      * @param string $str
      * @return bool
      */
-    private function checkDate($str)
+    private function isDate($str)
     {
-        return !preg_match("(:|-|\/)", $str) && strtotime($str);
+        return preg_match("(:|-|\/)", $str) && strtotime($str);
+    }
+
+    /**
+     * Resolve json data
+     *
+     * @param string $data
+     * @return array|null
+     */
+    private function resolveArrayJson($data)
+    {
+        $result = $data ? json_decode($data, true) : null;
+        return !empty($result) ? $result : null;
+    }
+
+    /**
+     * Resolve comma separated data
+     *
+     * @param string $data
+     * @return array|null
+     */
+    private function resolveArrayCSV($data)
+    {
+        $result = $data ? explode(",", $data) : null;
+        return !empty($result) ? $result : null;
+    }
+
+    /**
+     * Resolve space separated data
+     *
+     * @param string $data
+     * @return array|null
+     */
+    private function resolveArraySSV($data)
+    {
+        $result = $data ? explode(" ", $data) : null;
+        return !empty($result) ? $result : null;
     }
 }

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.1]
+
+### Added
+
+-   Support for Providers: To inject custom features on init
+-   Auth resolvers for request
+-   Enum Type inferrence using php docs
+
+### Changed
+
+-   Folder structure
+
 ## [1.4.0]
 
 ### Added

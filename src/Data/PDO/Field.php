@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
-use Stringable;
+use Busarm\PhpMini\Interfaces\Data\FieldInterface;
 
 /**
  * PHP Mini Framework
@@ -10,11 +10,11 @@ use Stringable;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class Field implements Stringable
+class Field implements FieldInterface
 {
     /**
      * @param string $name Field name
-     * @param string $type Field type @see \Busarm\PhpMini\Enums\DataType::class
+     * @param \Busarm\PhpMini\Enums\DataType::* $type Field type
      */
     public function __construct(private string $name, private string $type)
     {

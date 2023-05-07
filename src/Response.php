@@ -532,6 +532,24 @@ class Response implements ResponseInterface
     }
 
     /**
+     * @param string $path
+     * @param string $name
+     * @param bool $inline
+     * @param string $contentType
+     * @return self
+     */
+    public function downloadFile(string $path, $name = null, $inline = false, $contentType = null): self
+    {
+        $this->setParameters([]);
+        $this->setBody(file_exists($path) ? fopen($path, 'rb') : null);
+        if ($name) $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"$name\"");
+        else $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"download-" . time() . "\"");
+        if ($contentType) $this->setHttpHeader('Content-Type', $contentType);
+        $this->setFormat(ResponseFormat::BIN);
+        return $this;
+    }
+
+    /**
      * @return boolean
      *
      * @api

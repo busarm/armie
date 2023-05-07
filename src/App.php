@@ -19,12 +19,13 @@ use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\RequestHandler;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
-use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Busarm\PhpMini\Interfaces\ProviderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
@@ -41,9 +42,6 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
-use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
-
 use function Busarm\PhpMini\Helpers\is_cli;
 use function Busarm\PhpMini\Helpers\log_debug;
 
@@ -52,6 +50,9 @@ use function Busarm\PhpMini\Helpers\log_debug;
 // TODO PSR Cache Interface
 // TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
 // TODO Restructure folders to be self contained - class + it's interface
+// TODO Add Attributes handling in DI. Add Attributes to controller http request params
+// TODO Add Attributes for validating dto
+
 /**
  * Application Factory
  * 
@@ -84,12 +85,24 @@ class App implements HttpServerInterface, ContainerInterface
     public $serviceDiscovery = null;
 
 
-    /** @var bool */
+    /** @var boolean App is running in CLI mode*/
     public $isCli;
 
-    /** @var int Request start time in milliseconds */
+    /** @var int|float App start time in milliseconds */
     public $startTimeMs;
 
+    /** @var boolean 
+     * If app is running in stateless mode. E.g Using Swoole or Event other loops. 
+     * Do not use static variables for user specific data when runing on stateless mode.
+     * 
+     * Stateless mode does not support adding:
+     * - Application-wide singletons
+     * */
+    public bool $stateless = false;
+
+
+    /** @var ProviderInterface[] */
+    protected $providers = [];
 
     /** @var MiddlewareInterface[] */
     protected $middlewares = [];
@@ -100,7 +113,7 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * App current status
      *
-     * @var int @see \Busarm\PhpMini\Enums\AppStatus
+     * @var \Busarm\PhpMini\Enums\AppStatus::*
      */
     protected int $status = AppStatus::INITIALIZING;
 
@@ -110,23 +123,18 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * @param Config $config App configuration object
-     * @param string $env App environment. @see \Busarm\PhpMini\Enums\Env
-     * @param bool $stateless If app is running in stateless mode. E.g Using Swoole. 
-     * Do not use static variables for user specific data when runing on stateless mode.
-     * 
-     * Stateless mode does not support adding:
-     * - Application-wide Singletons
+     * @param \Busarm\PhpMini\Enums\Env::* $env App environment
      */
-    public function __construct(public Config $config, public string $env = Env::LOCAL, public bool $stateless = false)
+    public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
         // Set app instance
         self::$__instance = &$this;
 
-        // Set cli state
-        $this->isCli = is_cli();
-
         // Benchmark start time
         $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
+
+        // Set cli state
+        $this->isCli = is_cli();
 
         // Set error reporter
         $this->reporter = new ErrorReporter();
@@ -152,6 +160,9 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Load custom configs
         $this->loadConfigs();
+
+        // Load custom providers
+        $this->loadProviders();
     }
 
     ############################
@@ -184,6 +195,18 @@ class App implements HttpServerInterface, ContainerInterface
         if (!empty($this->config->files)) {
             foreach ($this->config->files as $config) {
                 $this->loadConfig((string) $config);
+            }
+        }
+    }
+
+    /**
+     * Load providers
+     */
+    private function loadProviders()
+    {
+        if (!empty($this->providers)) {
+            foreach ($this->providers as $provider) {
+                $provider->process($this);
             }
         }
     }
@@ -223,17 +246,20 @@ class App implements HttpServerInterface, ContainerInterface
         // Set current app instance
         self::$__instance = &$this;
         $this->status = AppStatus::RUNNNIG;
+        $startTime = $this->stateless ? microtime(true) * 1000 : $this->startTimeMs;
 
         // Set request & response & router
         $request = $request ?? Request::fromGlobal();
 
         // Leave logs & crumbs for error tracking
         if ($request instanceof RequestInterface) {
-            log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), microtime(true)));
+            log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), $startTime));
             $this->reporter->leaveCrumbs('request', [
                 'correlationId' => $request->correlationId(),
                 'ipAddress' => $request->ip(),
                 'url' => $request->currentUrl(),
+                'method' => $request->method(),
+                'time' => $startTime
             ]);
         }
 
@@ -262,7 +288,8 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Leave logs for error tracking
         if ($request instanceof RequestInterface) {
-            log_debug(sprintf("Request completed for id: %s, time: %s", $request->correlationId(), microtime(true)));
+            $endTime = microtime(true) * 1000;
+            log_debug(sprintf("Request completed for id: %s, time: %s, duration-ms: %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
         }
 
         $request = NULL;
@@ -347,10 +374,11 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Instantiate class with dependencies
      * 
-     * @param string $className
+     * @param class-string<T> $className
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @param RequestInterface|RouteInterface|null $request HTTP request/route instance
-     * @return mixed
+     * @return T
+     * @template T Item type template
      */
     public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null)
     {
@@ -378,9 +406,7 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Add singleton
      * 
-     * @param string $className
-     * @param object|null $object
-     * @return static
+     * @inheritDoc
      */
     public function addSingleton(string $className, &$object): static
     {
@@ -418,6 +444,18 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
+     * Add provider
+     *
+     * @param ProviderInterface $provider
+     * @return self
+     */
+    public function addProvider(ProviderInterface $provider)
+    {
+        $this->providers[] = $provider;
+        return $this;
+    }
+
+    /**
      * Add middleware
      *
      * @param MiddlewareInterface|ServerMiddlewareInterface $middleware
@@ -430,6 +468,18 @@ class App implements HttpServerInterface, ContainerInterface
         } else {
             $this->middlewares[] = $middleware;
         }
+        return $this;
+    }
+
+    /**
+     * Set if app is running in stateless mode. E.g Using Swoole or Event other loops.
+     *
+     * @return  self
+     */
+    public function setStateless($stateless)
+    {
+        $this->stateless = $stateless;
+
         return $this;
     }
 
@@ -559,9 +609,19 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * Set HTTP CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * Creates the following routes:
+     * - GET    $path/list
+     * - GET    $path/paginate
+     * - GET    $path/{id}
+     * - POST   $path/bulk
+     * - POST   $path
+     * - PUT    $path/bulk
+     * - PUT    $path/{id}
+     * - DELETE $path/bulk
+     * - DELETE $path/{id}
      *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @param string $controller Application Controller class name e.g Home
+     * @param string $controller Application Controller class name e.g Home. Controller class must implement [CrudControllerInterface]
      * @return mixed
      */
     public function crud(string $path, string $controller)
@@ -629,7 +689,6 @@ class App implements HttpServerInterface, ContainerInterface
                 $response->errorLine = !empty($errorLine) ? $errorLine : null;
                 $response->errorFile = !empty($errorFile) ? $errorFile : null;
                 $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
-                $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
             }
 
             (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->httpSendAndContinue);
@@ -656,7 +715,6 @@ class App implements HttpServerInterface, ContainerInterface
                 $response = new ResponseDto();
                 $response->success = $status < 300;
                 $response->message = $data;
-                $response->duration = (int)(floor(microtime(true) * 1000) - $this->startTimeMs);
                 $data = $response->toArray();
             }
         }

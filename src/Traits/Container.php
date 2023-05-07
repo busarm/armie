@@ -17,9 +17,10 @@ trait Container
     /**
      * Add singleton
      * 
-     * @param string $className
-     * @param object|null $object
+     * @param class-string<T> $className
+     * @param T|null $object
      * @return static
+     * @template T Item type template
      */
     public function addSingleton(string $className, &$object): static
     {
@@ -30,9 +31,10 @@ trait Container
     /**
      * Get singleton
      *
-     * @param string $className
-     * @param object $default
-     * @return object
+     * @param class-string<T> $className
+     * @param T|null $default
+     * @return T
+     * @template T Item type template
      */
     public function getSingleton(string $className, $default = null)
     {

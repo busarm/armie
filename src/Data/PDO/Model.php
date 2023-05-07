@@ -2,10 +2,12 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
+use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Data\PDO\Connection;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Helpers\StringableDateTime;
 
+use Busarm\PhpMini\Interfaces\Data\ModelInterface;
 use function Busarm\PhpMini\Helpers\is_list;
 
 /**
@@ -14,16 +16,19 @@ use function Busarm\PhpMini\Helpers\is_list;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class Model extends BaseDto
+abstract class Model extends BaseDto implements ModelInterface
 {
-    const EVENT_BEFORE_CREATE = 'before_create';
-    const EVENT_AFTER_CREATE = 'after_create';
-    const EVENT_BEFORE_UPDATE = 'before_update';
-    const EVENT_AFTER_UPDATE = 'after_update';
-    const EVENT_BEFORE_DELETE = 'before_delete';
-    const EVENT_AFTER_DELETE = 'after_delete';
+    const EVENT_BEFORE_CREATE   =   'before_create';
+    const EVENT_AFTER_CREATE    =   'after_create';
+    const EVENT_BEFORE_UPDATE   =   'before_update';
+    const EVENT_AFTER_UPDATE    =   'after_update';
+    const EVENT_BEFORE_DELETE   =   'before_delete';
+    const EVENT_AFTER_DELETE    =   'after_delete';
 
-    protected array $events = [
+    /**
+     * @var array<string,callable[]>
+     */
+    protected static array $events = [
         self::EVENT_BEFORE_CREATE => [],
         self::EVENT_AFTER_CREATE => [],
         self::EVENT_BEFORE_UPDATE => [],
@@ -35,9 +40,9 @@ abstract class Model extends BaseDto
     /**
      * Database connection instance.
      *
-     * @var Connection
+     * @var Connection|null
      */
-    protected Connection $db;
+    protected Connection|null $db;
 
     /**
      * Max number of items to return in list.
@@ -74,9 +79,9 @@ abstract class Model extends BaseDto
      */
     protected array $requestedRelations = [];
 
-    final public function __construct(Connection $db = null)
+    final public function __construct(Connection|null $db = null)
     {
-        $this->db = $db;
+        $this->db = $db ?: Connection::make();
         $this->setUp();
     }
 
@@ -88,16 +93,13 @@ abstract class Model extends BaseDto
      */
     public function setUp(): static
     {
-        if (!$this->db) {
-            $this->db = Connection::make();
-        }
         return $this;
     }
 
     /**
      * Get the database connection
      */
-    public function getDb(): Connection
+    public function getDatabase(): Connection
     {
         return $this->db;
     }
@@ -161,27 +163,6 @@ abstract class Model extends BaseDto
     {
         $this->autoLoadRelations = $autoLoadRelations;
 
-        return $this;
-    }
-
-    /**
-     * Set Events
-     *
-     * @param array $events Map of events. e.g `[Model::EVENT_BEFORE_CREATE => fn() or [ fn(), fn() ]]`
-     * @return self
-     */
-    public function setEvents(array $events = []): self
-    {
-        $this->events = [];
-        foreach ($events as $key => $event) {
-            if (is_array($event)) {
-                foreach ($event as $e) {
-                    $this->listen($key, $e);
-                }
-            } else {
-                $this->listen($key, $event);
-            }
-        }
         return $this;
     }
 
@@ -319,7 +300,6 @@ abstract class Model extends BaseDto
         return !empty($this->getSoftDeleteDateName()) && isset($this->{$this->getSoftDeleteDateName()});
     }
 
-
     /**
      * Count total number of model items.
      *
@@ -329,9 +309,9 @@ abstract class Model extends BaseDto
      */
     public function count(string|null $query = null, $params = array()): int
     {
-        $query = $query ? $this->getDb()->applyCount($query) : sprintf("SELECT COUNT(*) FROM %s", $this->getTableName());
+        $query = $query ? $this->getDatabase()->applyCount($query) : sprintf("SELECT COUNT(*) FROM %s", $this->getTableName());
         if ($query) {
-            $stmt = $this->getDb()->prepare($query);
+            $stmt = $this->getDatabase()->prepare($query);
             if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchColumn())) {
                 return intval($result);
             }
@@ -406,10 +386,11 @@ abstract class Model extends BaseDto
             !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         ));
 
-        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
-            return $this->clone()
-                ->load($result)
+        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchObject(static::class))) {
+            return $result
                 ->setIsNew(false)
+                ->setPerPage($this->getPerPage())
+                ->setAutoLoadRelations($this->getAutoLoadRelations())
                 ->processAutoLoadRelations()
                 ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns));
         }
@@ -458,11 +439,16 @@ abstract class Model extends BaseDto
             $this->perPage >= 0 ? 'LIMIT ' . $this->perPage : ''
         ));
 
-        if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_ASSOC)) {
-            return $this->processEagerLoadRelations(array_map(fn ($result) => $this->clone()
-                ->load($result)
-                ->setIsNew(false)
-                ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns)), $results));
+        if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class)) {
+            return $this->processEagerLoadRelations(array_map(
+                fn (self $result) => $result
+                    ->setIsNew(false)
+                    ->setPerPage($this->getPerPage())
+                    ->setAutoLoadRelations($this->getAutoLoadRelations())
+                    ->processAutoLoadRelations()
+                    ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns)),
+                $results
+            ));
         }
 
         return [];
@@ -485,7 +471,7 @@ abstract class Model extends BaseDto
         // Permanent delete
         else {
 
-            $this->emit(self::EVENT_BEFORE_DELETE);
+            self::emit(self::EVENT_BEFORE_DELETE, $this);
 
             $stmt = $this->db->prepare(sprintf(
                 "DELETE FROM %s WHERE %s = ?",
@@ -495,7 +481,7 @@ abstract class Model extends BaseDto
             if ($stmt) {
                 $stmt->execute([$this->{$this->getKeyName()}]);
                 if ($stmt->rowCount() > 0) {
-                    $this->emit(self::EVENT_AFTER_DELETE);
+                    self::emit(self::EVENT_AFTER_DELETE, $this);
                     return true;
                 }
             }
@@ -528,7 +514,7 @@ abstract class Model extends BaseDto
         // Create
         if ($this->isNew || !isset($this->{$this->getKeyName()})) {
 
-            $this->emit(self::EVENT_BEFORE_CREATE);
+            self::emit(self::EVENT_BEFORE_CREATE, $this);
 
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName()) && !isset($this->{$this->getCreatedDateName()})) {
@@ -557,13 +543,13 @@ abstract class Model extends BaseDto
                 $this->{$this->getKeyName()} = $id;
             }
 
-            $this->emit(self::EVENT_AFTER_CREATE);
+            self::emit(self::EVENT_AFTER_CREATE, $this);
         }
 
         // Update
         else {
 
-            $this->emit(self::EVENT_BEFORE_UPDATE);
+            self::emit(self::EVENT_BEFORE_UPDATE, $this);
 
             // Add updated date if not available
             if (!empty($this->getUpdatedDateName()) && !isset($this->{$this->getUpdatedDateName()})) {
@@ -583,7 +569,7 @@ abstract class Model extends BaseDto
 
             if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) return false;
 
-            $this->emit(self::EVENT_AFTER_UPDATE);
+            self::emit(self::EVENT_AFTER_UPDATE, $this);
         }
 
         $this->isNew = false;
@@ -768,7 +754,7 @@ abstract class Model extends BaseDto
                         break;
                     }
                 } else {
-                    $cols[] = is_numeric($key) ? "`$col`" : sprintf("`%s` AS %s", $key, $col);
+                    $cols[] = is_numeric($key) ? "`$col`" : sprintf("`%s` AS %s", $this->cleanCond($key), $this->cleanCond($col));
                 }
             }
         }
@@ -801,24 +787,23 @@ abstract class Model extends BaseDto
                 $result . " AND " . sprintf("%s", $this->parseConditions($cond)) :
                 sprintf("%s", $this->parseConditions($cond));
         };
-
         $parseString = function ($result, $cond) {
             return $result ?
-                $result . " AND " . sprintf("(%s)", $cond) :
-                sprintf("(%s)", $cond);
+                $result . " AND " . sprintf("(%s)", $this->cleanCond($cond)) :
+                sprintf("(%s)", $this->cleanCond($cond));
         };
         $parseKeyedString = function ($result, $key, $cond) {
             // Key is a conditional operator 
             if (in_array(strtoupper($key), ['AND', 'OR'])) {
                 return $result ?
-                    $result  . sprintf(" %s (%s)", strtoupper($key), $cond) :
-                    sprintf("(%s)", $cond);
+                    $result  . sprintf(" %s (%s)", strtoupper($key), $this->cleanCond($cond)) :
+                    sprintf("(%s)", $this->cleanCond($cond));
             }
             // Key is a conditional (NOT) operator 
             else if (strtoupper($key) == 'NOT') {
                 return $result ?
-                    $result  . sprintf("(%s)", $cond) :
-                    sprintf("%s (%s)", $key, $cond);
+                    $result  . sprintf("(%s)", $this->cleanCond($cond)) :
+                    sprintf("%s (%s)", $key, $this->cleanCond($cond));
             }
             // Key is a parameter
             else {
@@ -881,37 +866,17 @@ abstract class Model extends BaseDto
         return $cond == '?' || str_starts_with($cond, ':') ? $cond : "'$cond'";
     }
 
-
-    ##### Events #####
-
     /**
-     * Listen to model event
+     * Remove undesirable values from condition
      *
-     * @param string $event
-     * @param callable $fn
-     * @return void
+     * @param string $cond
+     * @return string
      */
-    public function listen(string $event, callable $fn)
+    private function cleanCond(string $cond): string
     {
-        if (isset($this->events[$event])) {
-            $this->events[$event][] = $fn;
-        }
+        return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '',  $cond));
     }
 
-    /**
-     * Trigger model events
-     *
-     * @param string $event
-     * @return void
-     */
-    public function emit(string $event)
-    {
-        if (isset($this->events[$event])) {
-            foreach ($this->events[$event] as $fn) {
-                $fn($this);
-            }
-        }
-    }
 
     ##### Statics #####
 
@@ -1006,6 +971,35 @@ abstract class Model extends BaseDto
         return $model->allTrashed($conditions, $params, $columns);
     }
 
+    /**
+     * Listen to model event
+     *
+     * @param string $event
+     * @param callable $fn
+     * @return void
+     */
+    public static function listen(string $event, callable $fn)
+    {
+        if (isset(self::$events[$event])) {
+            self::$events[$event][] = $fn;
+        }
+    }
+
+    /**
+     * Trigger model events
+     *
+     * @param string $event
+     * @param self $model
+     * @return void
+     */
+    public static function emit(string $event, self $model)
+    {
+        if (isset(self::$events[$event])) {
+            foreach (self::$events[$event] as $fn) {
+                $fn($model);
+            }
+        }
+    }
 
     ##### Clones #####
 
@@ -1018,17 +1012,6 @@ abstract class Model extends BaseDto
     {
         $model = (clone $this);
         return $model;
-    }
-
-    /**
-     * Set events to be loaded with model
-     *
-     * @param array $events
-     * @return self
-     */
-    public function withEvents(array $events): self
-    {
-        return $this->clone()->setEvents($events);
     }
 
     /**

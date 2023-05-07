@@ -42,17 +42,8 @@ class BaseDto implements Arrayable, Stringable
         foreach ($reflectClass->getProperties() as $property) {
             if ($all || $property->isPublic() && (!$trim || $property->isInitialized($this))) {
                 $type = $property->getType();
-                if ($type) {
-                    if ($type instanceof \ReflectionUnionType) {
-                        $attributes[$property->getName()] =  ($type->getTypes()[0])?->getName();
-                    } else if (
-                        $type instanceof \ReflectionNamedType
-                    ) {
-                        $attributes[$property->getName()] = $type->getName();
-                    } else {
-                        $attributes[$property->getName()] = strval($type);
-                    }
-                } else $attributes[$property->getName()] = null;
+                if ($type) $attributes[$property->getName()] = $this->getTypeName($type);
+                else $attributes[$property->getName()] = null;
             }
         }
         return $attributes;
@@ -186,9 +177,11 @@ class BaseDto implements Arrayable, Stringable
                 } else if ($value instanceof self) {
                     $result[$attr] = $value->toArray($trim);
                 } else if (is_array($value)) {
-                    $result[$attr] = is_list($value) ? (CollectionBaseDto::of($value, static::class))->toArray($trim) : (self::with($value))->toArray($trim);
+                    $result[$attr] = is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim) : (self::with($value))->toArray($trim);
                 } else {
-                    $value = $this->resolveType($type ?: $this->findType($value), $value);
+                    $value = $this->resolveType($type ?
+                        $this->getTypeName($type) :
+                        $this->findType($value), $value);
                     if ($value instanceof Stringable) {
                         $result[$attr] = strval($value);
                     } else {

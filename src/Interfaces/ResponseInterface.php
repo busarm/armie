@@ -162,6 +162,15 @@ interface ResponseInterface extends Stringable
     public function download($data, $name = null, $inline = false, $contentType = null): self;
 
     /**
+     * @param string $path
+     * @param string $name
+     * @param bool $inline
+     * @param string $contentType
+     * @return self
+     */
+    public function downloadFile(string $path, $name = null, $inline = false, $contentType = null): self;
+
+    /**
      * @return boolean
      *
      * @api

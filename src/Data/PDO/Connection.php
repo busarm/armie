@@ -161,4 +161,25 @@ class Connection extends PDO implements SingletonInterface
         $regexp = "/limit\s*([0-9]+(,\s*[0-9])*)/im";
         return preg_match($regexp, $query) ? $regexp : false;
     }
+
+    /**
+     * Execute query.
+     *
+     * @param string $query Model Provider Query. e.g SQL query
+     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
+     * @return int|bool Returns row count for modification query or boolean success status
+     */
+    public function executeQuery(string $query, array $params = array()): int|bool
+    {
+        if (!empty($query)) {
+            $stmt = $this->prepare($query);
+            if ($stmt && $stmt->execute($params)) {
+                $isEdit = $this->matchInsertQuery($query) ||
+                    $this->matchUpdateQuery($query) ||
+                    $this->matchDeleteQuery($query);
+                return $isEdit ? $stmt->rowCount() : true;
+            }
+        }
+        return false;
+    }
 }

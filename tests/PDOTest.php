@@ -5,13 +5,15 @@ namespace Busarm\PhpMini\Test;
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Data\PDO\Relation;
-use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
+use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
 use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+
+use function Busarm\PhpMini\Helpers\log_debug;
 
 /**
  * PHP Mini Framework
@@ -32,6 +34,11 @@ final class PDOTest extends TestCase
     private static App|null $app = NULL;
     private Generator|null $faker = NULL;
 
+    public static function setupBeforeClass(): void
+    {
+        ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
+        defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
+    }
     /**
      * This method is called before each test.
      */
@@ -226,7 +233,9 @@ final class PDOTest extends TestCase
                 'OR' => "ISNULL(updatedAt)"
             ]
         ]);
+        $collection = CollectionBaseDto::of($result, ProductTestModel::class);
         $this->assertNotEmpty($result);
+        $this->assertInstanceOf(ProductTestModel::class, $collection->at(0));
     }
 
     /**

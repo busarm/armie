@@ -1,13 +1,13 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO;
+namespace Busarm\PhpMini\HTTP;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Helpers\Parser;
 use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
-use Busarm\PhpMini\Interfaces\Crud\CrudRepositoryInterface;
+use Busarm\PhpMini\Interfaces\Data\RepositoryInterface;
+use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
@@ -17,20 +17,17 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class Controller implements CrudControllerInterface
+abstract class CrudController implements CrudControllerInterface
 {
     public function __construct(
-        private CrudRepositoryInterface $repository,
+        private RepositoryInterface $repository,
         private RequestInterface $request,
         private ResponseInterface $response
     ) {
     }
 
     /**
-     * Get by id
-     * 
-     * @param int|string $id
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function get(int|string $id): ResponseInterface
     {
@@ -44,9 +41,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Get list
-     * 
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function list(): ResponseInterface
     {
@@ -58,9 +53,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Get paginated list
-     * 
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function paginatedList(): ResponseInterface
     {
@@ -74,10 +67,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Create record
-     * 
-     * @param BaseDto $dto
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function create(BaseDto $dto): ResponseInterface
     {
@@ -86,10 +76,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Create bulk records
-     * 
-     * @param CollectionBaseDto $dto
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function createBulk(CollectionBaseDto $dto): ResponseInterface
     {
@@ -98,11 +85,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Update record by id
-     * 
-     * @param int|string $id
-     * @param BaseDto $dto
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function update(int|string $id, BaseDto $dto): ResponseInterface
     {
@@ -111,10 +94,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Update bulk records
-     * 
-     * @param CollectionBaseDto $dto
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function updateBulk(CollectionBaseDto $dto): ResponseInterface
     {
@@ -123,10 +103,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Delete record by id
-     * 
-     * @param int|string $id
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function delete(int|string $id): ResponseInterface
     {
@@ -135,10 +112,7 @@ abstract class Controller implements CrudControllerInterface
     }
 
     /**
-     * Delete bulk records
-     * 
-     * @param CollectionBaseDto $dto
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function deleteBulk(CollectionBaseDto $dto): ResponseInterface
     {

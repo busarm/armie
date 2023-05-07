@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Interfaces\Auth\AuthResolver;
+use Busarm\PhpMini\Interfaces\Auth\AuthUserResolver;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -117,6 +119,12 @@ interface RequestInterface extends ContainerInterface
     public function header(): StorageBagInterface;
 
     /**
+     * @return AuthUserResolver|null
+     */
+    public function user(): AuthUserResolver|null;
+
+
+    /**
      * Set the value of session
      *
      * @return  self
@@ -164,6 +172,13 @@ interface RequestInterface extends ContainerInterface
      * @return  self
      */
     public function setHeaders(StorageBagInterface $headers);
+
+    /**
+     * Set the value of user
+     *
+     * @return  self
+     */
+    public function setUser(AuthUserResolver $auth);
 
     /**
      * @param UriInterface $uri

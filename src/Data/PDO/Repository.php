@@ -6,7 +6,7 @@ use Busarm\PhpMini\Data\PDO\Model;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\PaginatedCollectionDto;
-use Busarm\PhpMini\Interfaces\Crud\CrudRepositoryInterface;
+use Busarm\PhpMini\Interfaces\Data\QueryRepositoryInterface;
 
 /**
  * PHP Mini Framework
@@ -14,20 +14,20 @@ use Busarm\PhpMini\Interfaces\Crud\CrudRepositoryInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class Repository implements CrudRepositoryInterface
+class Repository implements QueryRepositoryInterface
 {
     public function __construct(private Model $model)
     {
     }
 
     /**
-     * Count number of rows in query
+     * Count number of rows or rows in query
      *
-     * @param string $query Model Provider Query. e.g SQL query
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
+     * @param string|null $query Model Provider Query. e.g SQL query
+     * @param array $params Query Params. e.g SQL query params
      * @return int
      */
-    public function count(string $query, $params = array()): int
+    public function count(string|null $query = null, $params = array()): int
     {
         return $this->model->count($query, $params);
     }
@@ -41,16 +41,7 @@ class Repository implements CrudRepositoryInterface
      */
     public function query(string $query, array $params = array()): int|bool
     {
-        if (!empty($query)) {
-            $stmt = $this->model->getDb()->prepare($query);
-            if ($stmt && $stmt->execute($params)) {
-                $isEdit = $this->model->getDb()->matchInsertQuery($query) ||
-                    $this->model->getDb()->matchUpdateQuery($query) ||
-                    $this->model->getDb()->matchDeleteQuery($query);
-                return $isEdit ? $stmt->rowCount() : true;
-            }
-        }
-        return false;
+        return $this->model->getDatabase()->executeQuery($query, $params);
     }
 
     /**
@@ -62,8 +53,8 @@ class Repository implements CrudRepositoryInterface
      */
     public function querySingle(string $query, $params = array()): ?BaseDto
     {
-        if (!empty($query) && $this->model->getDb()->matchSelectQuery($query)) {
-            $stmt = $this->model->getDb()->prepare($query);
+        if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+            $stmt = $this->model->getDatabase()->prepare($query);
             if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
                 return BaseDto::with($result);
             }
@@ -80,8 +71,8 @@ class Repository implements CrudRepositoryInterface
      */
     public function queryList(string $query, $params = array()): CollectionBaseDto
     {
-        if (!empty($query) && $this->model->getDb()->matchSelectQuery($query)) {
-            $stmt = $this->model->getDb()->prepare($query);
+        if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+            $stmt = $this->model->getDatabase()->prepare($query);
             if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
                 return CollectionBaseDto::of($result);
             }
@@ -100,11 +91,11 @@ class Repository implements CrudRepositoryInterface
      */
     public function queryPaginate(string $query, $params = array(), int $page = 1, int $limit = 0): PaginatedCollectionDto
     {
-        if (empty($query) && $this->model->getDb()->matchSelectQuery($query)) return new PaginatedCollectionDto;
+        if (empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) return new PaginatedCollectionDto;
 
         $limit = $limit > 0 ? $limit : $this->model->getPerPage();
         $total = $this->count($query, $params);
-        $data = $this->queryList($this->model->getDb()->applyLimit($query, $page, $limit), $params);
+        $data = $this->queryList($this->model->getDatabase()->applyLimit($query, $page, $limit), $params);
         return (new PaginatedCollectionDto($data, $page, $limit, $total, $data->count()));
     }
 
@@ -163,7 +154,7 @@ class Repository implements CrudRepositoryInterface
 
         $limit = $limit > 0 ? $limit : $this->model->getPerPage();
         $total = $this->count($query, $params);
-        $data = $this->queryList($this->model->getDb()->applyLimit($query, $page, $limit), $params);
+        $data = $this->queryList($this->model->getDatabase()->applyLimit($query, $page, $limit), $params);
         return (new PaginatedCollectionDto($data, $page, $limit, $total, $data->count()));
     }
 
@@ -225,7 +216,7 @@ class Repository implements CrudRepositoryInterface
         return $this->model->transaction(function () use ($data) {
             foreach ($data as $item) {
                 if (!$this->create($item)) {
-                    $this->model->getDb()->rollBack();
+                    $this->model->getDatabase()->rollBack();
                     return false;
                 }
             }
@@ -296,7 +287,7 @@ class Repository implements CrudRepositoryInterface
         return $this->model->transaction(function () use ($ids, $force) {
             foreach ($ids as $id) {
                 if (!$this->deleteById($id, $force)) {
-                    $this->model->getDb()->rollBack();
+                    $this->model->getDatabase()->rollBack();
                     return false;
                 }
             }
@@ -327,13 +318,13 @@ class Repository implements CrudRepositoryInterface
      */
     public function restoreBulk(array $ids): bool
     {
-        $this->model->getDb()->beginTransaction();
+        $this->model->getDatabase()->beginTransaction();
         foreach ($ids as $id) {
             if (!$this->restoreById($id)) {
-                $this->model->getDb()->rollBack();
+                $this->model->getDatabase()->rollBack();
                 return false;
             }
         }
-        return $this->model->getDb()->commit();
+        return $this->model->getDatabase()->commit();
     }
 }

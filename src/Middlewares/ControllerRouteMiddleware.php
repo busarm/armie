@@ -4,7 +4,6 @@ namespace Busarm\PhpMini\Middlewares;
 
 use Busarm\PhpMini\DI;
 use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\ResponseHandler;
@@ -14,7 +13,6 @@ use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
-use TypeError;
 
 use function Busarm\PhpMini\Helpers\app;
 

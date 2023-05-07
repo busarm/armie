@@ -6,7 +6,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
-use Busarm\PhpMini\Interfaces\Crud\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -48,7 +48,7 @@ class Router implements RouterInterface
     protected array $routes = [];
 
     /**
-     * @param string $method @see \Busarm\PhpMini\Enums\HttpMethod
+     * @param \Busarm\PhpMini\Enums\HttpMethod::* $method
      * @param string $path
      * @return RouteInterface
      */
@@ -93,8 +93,8 @@ class Router implements RouterInterface
     /**
      * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
      * 
-     * @param string $path HTTP path. e.g /home. See "Router::MATCHER_REGX" for list of parameters matching keywords
-     * @param string $controller Application Controller class name e.g Home
+     * @param string $path HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
+     * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home
      * @return RouterInterface
      */
     public function addCrudRoutes(string $path, string $controller): RouterInterface

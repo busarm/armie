@@ -10,6 +10,33 @@ namespace Busarm\PhpMini\Helpers;
  */
 class Security
 {
+    /**
+     * Generate password hash using PASSWORD_BCRYPT algo
+     * @see https://www.php.net/manual/en/function.password-hash.php
+     *
+     * @param string|integer $password
+     * @param string $hmacKey Default: md5($password)
+     * @return string
+     */
+    public static function hashPassword(string|int $password, $hmacKey = null)
+    {
+        $pwd = hash_hmac("sha256", $password, $hmacKey || md5($password));
+        return password_hash($pwd, PASSWORD_BCRYPT);
+    }
+
+    /**
+     * Verify password against password hash created with `self::hashPassword`
+     *
+     * @param string|integer $password
+     * @param string $passwordHash
+     * @param string $hmacKey Default: md5($password)
+     * @return bool
+     */
+    public static function verifyPassword(string|int $password, string $passwordHash, $hmacKey = null)
+    {
+        $pwd = hash_hmac("sha256", $password, $hmacKey || md5($password));
+        return password_verify($pwd, $passwordHash);
+    }
 
     /**
      * Clean params

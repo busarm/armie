@@ -16,7 +16,7 @@ class ServiceRequestDto extends BaseDto
     public string|null $location = null;
     /** @var string Route pathe to resource in service */
     public string|null $route = null;
-    /** @var string Service resource request type @see \Busarm\PhpMini\Enums\ServiceType */
+    /** @var \Busarm\PhpMini\Enums\ServiceType::* Service resource request type */
     public string|null $type = null;
     /** @var array<string,string> Service params */
     public array $params = [];
@@ -65,7 +65,7 @@ class ServiceRequestDto extends BaseDto
     /**
      * Set the value of type
      * 
-     * @param string $type @see \Busarm\PhpMini\Enums\ServiceType
+     * @param \Busarm\PhpMini\Enums\ServiceType::* $type
      * @return  self
      */
     public function setType($type)

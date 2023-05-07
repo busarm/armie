@@ -2,12 +2,11 @@
 
 namespace Busarm\PhpMini\Handlers;
 
+use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Request;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-
-use function Busarm\PhpMini\Helpers\app;
+use Psr\Http\Server\RequestHandlerInterface as PsrServerRequestHandlerInterface;
 
 /**
  * PHP Mini Framework
@@ -15,9 +14,9 @@ use function Busarm\PhpMini\Helpers\app;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-final class ServerRequestHandler implements RequestHandlerInterface
+final class PsrServerRequestHandler implements PsrServerRequestHandlerInterface
 {
-    public function __construct(private RequestHandler $next)
+    public function __construct(private RequestHandlerInterface $next)
     {
     }
 

@@ -10,6 +10,7 @@ use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Bags\Upload;
+use Busarm\PhpMini\Interfaces\Auth\AuthUserResolver;
 use Busarm\PhpMini\Session\PHPSession;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
@@ -31,6 +32,8 @@ use function Busarm\PhpMini\Helpers\is_cli;
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the Symfony package.
  * See Symfony\Component\HttpFoundation\Request (https://github.com/symfony/symfony)
+ * 
+ * @see Busarm\PhpMini\Interface\RequestInterface
  * 
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
@@ -59,6 +62,7 @@ class Request implements RequestInterface
     protected StorageBagInterface|null $_cookies     =   null;
     protected StorageBagInterface|null $_headers     =   null;
     protected UploadBagInterface|StorageBagInterface|null $_files      =   null;
+    protected AuthUserResolver|null $_user           =   null;
 
     private array $_sessionOptions   =   [];
     private array $_cookieOptions    =   [];
@@ -295,7 +299,7 @@ class Request implements RequestInterface
                 $this->_headers->get('x-request-id') ??
                 $this->_headers->get('x-trace-id') ??
                 $this->_headers->get('x-correlation-id'))
-                ?: md5(uniqid()) . '.' . microtime(true);
+                ?:  floor(microtime(true) * 1000) . '.' . md5(uniqid());
         }
 
         // Start session
@@ -657,6 +661,14 @@ class Request implements RequestInterface
     }
 
     /**
+     * @return AuthUserResolver|null
+     */
+    public function user(): AuthUserResolver|null
+    {
+        return $this->_user;
+    }
+
+    /**
      *
      * @return StorageBagInterface
      */
@@ -762,6 +774,18 @@ class Request implements RequestInterface
     public function setHeaders(StorageBagInterface $headers)
     {
         $this->_headers = $headers;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of user
+     *
+     * @return  self
+     */
+    public function setUser(AuthUserResolver $user)
+    {
+        $this->_user = $user;
 
         return $this;
     }

@@ -12,6 +12,7 @@ use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
+use ReflectionFunction;
 
 use function Busarm\PhpMini\Helpers\app;
 
@@ -40,10 +41,16 @@ final class CallableRouteMiddleware implements MiddlewareInterface
 
             $injector = (new DI(app()));
 
-            $result = ($this->callable)(...array_merge($injector->resolveCallableDependencies(
-                $this->callable,
-                $request,
-            ), $this->params));
+            $function = new ReflectionFunction($this->callable);
+            $result = $injector->processFunctionAttributes($function, $request);
+            if (!isset($result)) {
+                $result = $function->invoke(
+                    ...array_merge($injector->resolveCallableDependencies(
+                        $function,
+                        $request,
+                    ), $this->params)
+                );
+            }
 
             if ($request instanceof RequestInterface) {
                 return $result !== false ?

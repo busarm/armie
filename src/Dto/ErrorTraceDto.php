@@ -12,8 +12,8 @@ class ErrorTraceDto extends BaseDto
 {
     /** @var string */
     public string|null $class;
-    /** @var string */
-    public string|null $line;
+    /** @var int */
+    public int|null $line;
     /** @var string */
     public string|null $file;
     /** @var string */

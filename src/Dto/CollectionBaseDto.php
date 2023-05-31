@@ -456,7 +456,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
                     }
                     // Item class not provided - load with custom data
                     else {
-                        $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : BaseDto::withCustom($item)->toArray($trim);
+                        $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
                     }
                 } else {
                     $value = $this->resolveType($this->findType($item), $item);

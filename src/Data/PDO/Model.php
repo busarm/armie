@@ -255,7 +255,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public function getFieldNames(): array
     {
         $fields = $this->getFields();
-        $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys($this->attributes());
+        $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys($this->fields());
         $relationNames = $this->getRelationNames();
         return array_diff($fieldNames, $relationNames);
     }
@@ -732,7 +732,7 @@ abstract class Model extends BaseDto implements ModelInterface
     {
         $cols = [];
         $relationCols = [];
-        $validCols = array_keys($this->attributes(false));
+        $validCols = array_keys($this->fields(false));
 
         // If all cols not selected:
         // Always include relation cols
@@ -1057,17 +1057,7 @@ abstract class Model extends BaseDto implements ModelInterface
     /**
      * @inheritDoc
      */
-    public static function withCustom(array|object|null $data, $sanitize = false): self
-    {
-        $dto = new static;
-        if ($data) $dto->loadCustom((array)$data);
-        return $dto;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function attributes($all = false, $trim = false): array
+    public function fields($all = false, $trim = false): array
     {
         if (!empty($fields = $this->getFields())) {
             $attrs = [];
@@ -1081,6 +1071,6 @@ abstract class Model extends BaseDto implements ModelInterface
             }
             return $attrs;
         }
-        return parent::attributes($all, $trim);
+        return parent::fields($all, $trim);
     }
 }

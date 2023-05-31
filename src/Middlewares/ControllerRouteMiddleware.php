@@ -11,6 +11,7 @@ use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
+use ReflectionMethod;
 
 use function Busarm\PhpMini\Helpers\app;
 
@@ -49,14 +50,18 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     && method_exists($object, $this->function)
                     && is_callable(array($object, $this->function))
                 ) {
-                    $result = call_user_func_array(
-                        array($object, $this->function),
-                        array_merge($injector->resolveMethodDependencies(
-                            $this->controller,
-                            $this->function,
-                            $request,
-                        ), $this->params)
-                    );
+
+                    $method = new ReflectionMethod($this->controller, $this->function);
+                    $result = $injector->processMethodAttributes($method, $request);
+                    if (!isset($result)) {
+                        $result = $method->invoke(
+                            $object,
+                            ...array_merge($injector->resolveMethodDependencies(
+                                $method,
+                                $request,
+                            ), $this->params)
+                        );
+                    }
 
                     if ($request instanceof RequestInterface) {
                         return $result !== false ?

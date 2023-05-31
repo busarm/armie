@@ -22,7 +22,6 @@ use Psr\Http\Message\UriInterface;
 
 use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
 
-use function Busarm\PhpMini\Helpers\config;
 use function Busarm\PhpMini\Helpers\is_cli;
 
 /**

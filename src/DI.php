@@ -4,12 +4,17 @@ namespace Busarm\PhpMini;
 
 use Closure;
 use Busarm\PhpMini\Errors\DependencyError;
-use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
+use Busarm\PhpMini\Interfaces\Attribute\ClassAttributeInterface;
+use Busarm\PhpMini\Interfaces\Attribute\FunctionAttributeInterface;
+use Busarm\PhpMini\Interfaces\Attribute\MethodAttributeInterface;
+use Busarm\PhpMini\Interfaces\Attribute\ParameterAttributeInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
+use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
-
-use function Busarm\PhpMini\Helpers\app;
+use ReflectionParameter;
 
 /**
  * Dependency Injector
@@ -29,21 +34,30 @@ class DI
     /**
      * Instantiate class with dependencies
      *
-     * @param class-string<T> $class
+     * @param ReflectionClass|class-string<T> $class
      * @param RequestInterface|RouteInterface|null $request Request
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return T
      * @template T Item type template
      */
-    public function instantiate(string $class, RequestInterface|RouteInterface|null $request = null, array $params = [])
+    public function instantiate(ReflectionClass|string $class, RequestInterface|RouteInterface|null $request = null, array $params = [])
     {
+        if (!($class instanceof ReflectionClass)) {
+            $class = new ReflectionClass($class);
+            $this->processClassAttributes(new ReflectionClass($class->getName()), $request);
+        }
+
         // Resolve with custom resolver
-        if (!($instance = $this->app->resolver->resolve($class, $request))) {
-            if (method_exists($class, '__construct')) {
-                if ((new ReflectionMethod($class, '__construct'))->isPublic()) {
-                    $instance = new $class(...$this->resolveMethodDependencies($class, '__construct', $request, $params));
-                } else throw new DependencyError("Failed to instantiate non-public constructor for class " . $class);
-            } else $instance = new $class;
+        if (!($instance = $this->app->resolver->resolve($class->getName(), $request)) && $class->isInstantiable()) {
+            // Resolve constructor method if available
+            if (method_exists($class->getName(), '__construct')) {
+                $method = new ReflectionMethod($class->getName(), '__construct');
+                $this->processMethodAttributes($method, $request);
+
+                $instance = $class->newInstance(...$this->resolveMethodDependencies($method, $request, $params));
+            } else {
+                $instance = $class->newInstance();
+            }
         }
         return $instance;
     }
@@ -51,41 +65,52 @@ class DI
     /**
      * Resolve dependendies for class method
      *
-     * @param string $class
-     * @param string $method
+     * @param ReflectionMethod $method
      * @param RequestInterface|RouteInterface|null $request Request
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
-    public function resolveMethodDependencies(string $class, string $method, RequestInterface|RouteInterface|null $request = null, array $params = [])
+    public function resolveMethodDependencies(ReflectionMethod $method, RequestInterface|RouteInterface|null $request = null, array $params = [])
     {
-        $reflection = new ReflectionMethod($class, $method);
         // Detect circular dependencies
-        $parameters = array_map(fn ($param) => strval($param->getType()), $reflection->getParameters());
-        if (in_array($class, $parameters)) {
-            throw new DependencyError(sprintf("Circular dependency detected in %s::&s", $class, $method));
+        $parameters = array_filter($method->getParameters(), fn ($param) => strval($param->getType()) == $method->getDeclaringClass()->getName());
+        if (!empty($parameters)) {
+            throw new DependencyError(sprintf("Circular dependency detected in %s::%s", $method->getDeclaringClass()->getName(), $method));
         }
-        return $this->resolveDependencies($reflection->getParameters(), $request, $params);
+
+        return $this->resolveDependencies($method->getParameters(), $request, $params);
     }
 
     /**
      * Resolve dependendies for class method
      *
-     * @param Closure $callable
+     * @param ReflectionFunction|Closure $callable
      * @param RequestInterface|RouteInterface|null $request Request
      * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return array
      */
-    public function resolveCallableDependencies(Closure $callable, RequestInterface|RouteInterface|null $request = null, array $params = [])
+    public function resolveCallableDependencies(ReflectionFunction|Closure $callable, RequestInterface|RouteInterface|null $request = null, array $params = [])
     {
-        $reflection = new \ReflectionFunction($callable);
-        return $this->resolveDependencies($reflection->getParameters(), $request, $params);
+        if (!($callable instanceof ReflectionFunction)) {
+            $callable = new ReflectionFunction($callable);
+            $this->processFunctionAttributes($callable, $request);
+        }
+
+        // Detect circular dependencies
+        if ($callable->getClosureScopeClass()) {
+            $parameters = array_filter($callable->getParameters(), fn ($param) => strval($param->getType()) == $callable->getClosureScopeClass()->getName());
+            if (!empty($parameters)) {
+                throw new DependencyError(sprintf("Circular dependency detected in %s::%s", $callable->getClosureScopeClass()->getName(), $callable));
+            }
+        }
+
+        return $this->resolveDependencies($callable->getParameters(), $request, $params);
     }
 
     /**
      * Resolve dependendies
      *
-     * @param \ReflectionParameter[] $parameters
+     * @param ReflectionParameter[] $parameters
      * @param RequestInterface|RouteInterface|null $request
      * @param array<string, mixed> $params
      * @return array
@@ -94,10 +119,15 @@ class DI
     {
         $paramKeys = array_keys($params);
         foreach ($parameters as $param) {
-            if (!in_array($param->getName(), $paramKeys) && ($type = $param->getType()) && ($name = strval($type))) {
+            if (!in_array($param->getName(), $paramKeys)) {
+
+                $instance = NULL;
 
                 // Resolve with custom resolver
-                if (!($instance = $this->app->resolver->resolve($name, $request))) {
+                if (($type = $param->getType())
+                    && ($name = strval($type))
+                    && is_null($instance = $this->app->resolver->resolve($name, $request))
+                ) {
 
                     // If type can be instantiated
                     if ($this->instatiatable($type)) {
@@ -120,7 +150,10 @@ class DI
                     $instance = $this->app->resolver->customize($instance, $request) ?: $instance;
                 }
 
-                $params[$param->getName()] = $instance;
+                // Process attributes if available
+                $instance = $this->processParameterAttributes($param, $instance, $request);
+
+                $params[$param->getName()] = $instance ?? ($param->isOptional() ? $param->getDefaultValue() : null);
             }
         }
         return $params;
@@ -138,5 +171,82 @@ class DI
         // This is to ensure that the type is an existing class.
         $name = strval($type);
         return $name != Closure::class && !is_callable($name) && class_exists($name);
+    }
+
+    /**
+     * Process Class Attributes
+     *
+     * @param ReflectionClass $class
+     * @param RequestInterface|RouteInterface|null $request
+     * @return void
+     */
+    public function processClassAttributes(ReflectionClass $class, RequestInterface|RouteInterface|null $request = null)
+    {
+        foreach ($class->getAttributes() as $attribute) {
+            $instance = $attribute->newInstance();
+            if ($instance instanceof ClassAttributeInterface) {
+                $instance->processClass($class, $this->app, $request);
+            }
+        }
+    }
+
+    /**
+     * Process Method Attributes
+     *
+     * @param ReflectionMethod $method
+     * @param RequestInterface|RouteInterface|null $request
+     * @return mixed
+     */
+    public function processMethodAttributes(ReflectionMethod $method, RequestInterface|RouteInterface|null $request = null): mixed
+    {
+
+        $result = null;
+        foreach ($method->getAttributes() as $attribute) {
+            $instance = $attribute->newInstance();
+            if ($instance instanceof MethodAttributeInterface) {
+                $result = $instance->processMethod($method, $this->app, $request);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Process Callable Attributes
+     *
+     * @param ReflectionFunction $function
+     * @param RequestInterface|RouteInterface|null $request
+     * @return mixed
+     */
+    public function processFunctionAttributes(ReflectionFunction $function, RequestInterface|RouteInterface|null $request = null): mixed
+    {
+        $result = null;
+        foreach ($function->getAttributes() as $attribute) {
+            $instance = $attribute->newInstance();
+            if ($instance instanceof FunctionAttributeInterface) {
+                $result = $instance->processFunction($function, $this->app, $request);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Process Parameter Attributes
+     *
+     * @param ReflectionParameter $parameter
+     * @param T|null $value
+     * @param RequestInterface|RouteInterface|null $request
+     * @return T|null
+     * @template T
+     */
+    public function processParameterAttributes(ReflectionParameter $parameter, mixed $value = null, RequestInterface|RouteInterface|null $request = null)
+    {
+        $result = $value;
+        foreach ($parameter->getAttributes() as $attribute) {
+            $instance = $attribute->newInstance();
+            if ($instance instanceof ParameterAttributeInterface) {
+                $result = $instance->processParameter($parameter, $value, $this->app, $request) ?? $result;
+            }
+        }
+        return $result;
     }
 }

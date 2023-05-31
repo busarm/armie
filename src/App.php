@@ -49,8 +49,6 @@ use function Busarm\PhpMini\Helpers\log_debug;
 // TODO PSR Cache Interface
 // TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
 // TODO Restructure folders to be self contained - class + it's interface
-// TODO Add Attributes handling in DI. Add Attributes to controller http request params
-// TODO Add Attributes for validating dto
 
 /**
  * Application Factory
@@ -235,19 +233,17 @@ class App implements HttpServerInterface, ContainerInterface
     {
         set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
             $this->reporter->reportError("Internal Server Error", $errstr, $errfile, $errline);
-            !$this->isCli && $this->showMessage(500, sprintf("Error: %s", $errstr), $errno, $errline, $errfile);
+            $this->showMessage(500, sprintf("Error: %s", $errstr), $errno, $errline, $errfile);
         });
         set_exception_handler(function (Throwable $e) {
-            if ($e instanceof SystemError) {
-                $e->handler($this);
-            } else if ($e instanceof HttpException) {
-                $e->handler($this);
+            if ($e instanceof HttpException) {
+                $e->handler($this)->send($this->config->httpSendAndContinue);
             } else {
                 $this->reporter->reportException($e);
                 $trace = array_map(function ($instance) {
                     return (new ErrorTraceDto($instance));
                 }, $e->getTrace());
-                !$this->isCli && $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
+                $this->showMessage(500, sprintf("%s: %s", get_class($e), $e->getMessage()), $e->getCode(), $e->getLine(), $e->getFile(), $trace);
             }
         });
     }
@@ -282,7 +278,7 @@ class App implements HttpServerInterface, ContainerInterface
         $this->triggerStartHook($request);
 
         // Set shutdown hook
-        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request) {
+        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request) use ($startTime) {
             // If shutdown before app stopped running
             if ($app->status !== AppStatus::STOPPED) {
                 if ($request instanceof RequestInterface) {
@@ -291,6 +287,9 @@ class App implements HttpServerInterface, ContainerInterface
                     $response = new Response(format: $this->config->httpResponseFormat);
                 }
                 $app->triggerCompleteHook($request, $response);
+
+                $endTime = microtime(true) * 1000;
+                log_debug(sprintf("Request completed for id: %s, time: %s, duration-ms: %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
             }
         }, $this, $request);
 
@@ -321,15 +320,38 @@ class App implements HttpServerInterface, ContainerInterface
      */
     protected function processMiddleware(RequestInterface|RouteInterface $request): ResponseInterface
     {
-        // Add default response handler
-        $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
-            (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html("Not found - " . ($request->method() . ' ' . $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
+        try {
+            // Add default response handler
+            $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
+                (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html("Not found - " . ($request->method() . ' ' . $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
 
-        foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
-            $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
+            foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
+                $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
+            }
+            return ($action)($request);
+        } catch (HttpException $e) {
+            return $e->handler($this);
+        } catch (Throwable $e) {
+
+            $trace = array_map(function ($instance) {
+                return (new ErrorTraceDto($instance));
+            }, $e->getTrace());
+
+            $response = new ResponseDto();
+            $response->success = false;
+            $response->message = $e->getMessage();
+            $response->env = $this->env;
+            $response->version = $this->config->version;
+
+            // Show more info if not production
+            if (!$response->success && $this->env !== Env::PROD) {
+                $response->errorLine = $e->getLine();
+                $response->errorFile = $e->getFile();
+                $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
+            }
+
+            return (new Response())->json($response->toArray(), 500);
         }
-
-        return ($action)($request);
     }
 
     /**
@@ -677,13 +699,19 @@ class App implements HttpServerInterface, ContainerInterface
      * @param int $status Status Code
      * @param string $message Message
      * @param string $errorCode 
-     * @param string $errorLine 
+     * @param int $errorLine 
      * @param string $errorFile 
      * @param array $errorTrace 
      * @return void
      */
-    public function showMessage($status, $message = null, $errorCode = null, $errorLine = null, $errorFile = null,  $errorTrace = [])
-    {
+    public function showMessage(
+        $status,
+        string|null $message = null,
+        string|null $errorCode = null,
+        int|null $errorLine = null,
+        string|null $errorFile = null,
+        array $errorTrace = []
+    ) {
         if ($this->isCli) {
             if ($status !== 200 || $status !== 201) {
                 $this->logger->error(
@@ -723,7 +751,7 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Send HTTP JSON Response
      * @param int $status Status Code
-     * @param BaseDto|array|object|string $data Data
+     * @param CollectionBaseDto|BaseDto|array|object|string|null $data Data
      * @param array $headers Headers
      * @return void
      */

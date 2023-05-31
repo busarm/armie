@@ -5,8 +5,10 @@ namespace Busarm\PhpMini\Dto;
 use Busarm\PhpMini\Helpers\Security;
 use ReflectionObject;
 use Busarm\PhpMini\Interfaces\Arrayable;
+use Busarm\PhpMini\Interfaces\Attribute\PropertyAttributeInterface;
 use Busarm\PhpMini\Traits\TypeResolver;
 use InvalidArgumentException;
+use ReflectionProperty;
 use Stringable;
 
 use function Busarm\PhpMini\Helpers\is_list;
@@ -22,35 +24,51 @@ class BaseDto implements Arrayable, Stringable
     use TypeResolver;
 
     /**
-     * Explicitly selected attributes
+     * Explicitly selected fields
      *
-     * @var array|null
+     * @var array<string>|null
      */
-    private array|null $selectedAttrs = NULL;
+    private array|null $_selected = NULL;
 
     /**
-     * Get dto attribute names & types
+     * Original properties
      *
-     * @param bool $all - Get all or only public attributes
-     * @param bool $trim - Get only initialized attributes
-     * @return array<string,string> - `[name => type]`. eg. `['id' => 'int']`
+     * @var array<string,mixed>|null
      */
-    public function attributes($all = true, $trim = false): array
+    private array|null $_original = NULL;
+
+    /**
+     * Get dto properties
+     *
+     * @return ReflectionProperty[]
+     */
+    public function properties(): array
     {
-        $attributes = [];
-        $reflectClass = new ReflectionObject($this);
-        foreach ($reflectClass->getProperties() as $property) {
-            if ($all || $property->isPublic() && (!$trim || $property->isInitialized($this))) {
-                $type = $property->getType();
-                if ($type) $attributes[$property->getName()] = $this->getTypeName($type);
-                else $attributes[$property->getName()] = null;
-            }
-        }
-        return $attributes;
+        return (new ReflectionObject($this))->getProperties();
     }
 
     /**
-     * Load data from array with class attributes
+     * Get dto field names & types
+     *
+     * @param bool $all Get all or only public field
+     * @param bool $trim Get only initialized field
+     * @return array<string,string> `[name => type]`. eg. `['id' => 'int']`
+     */
+    public function fields($all = true, $trim = false): array
+    {
+        $fields = [];
+        foreach ($this->properties() as $property) {
+            if ($all || $property->isPublic() && (!$trim || $property->isInitialized($this))) {
+                $type = $property->getType();
+                if ($type) $fields[$property->getName()] = $this->getTypeName($type);
+                else $fields[$property->getName()] = null;
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * Load data from array to class properties
      *
      * @param array $data
      * @param bool $sanitize
@@ -62,72 +80,67 @@ class BaseDto implements Arrayable, Stringable
             $data = Security::clean($data);
 
         if ($data) {
-            foreach ($this->attributes() as $attr => $type) {
-                if (array_key_exists($attr, $data)) {
+            foreach ($this->properties() as $property) {
+
+                $name = $property->getName();
+                $type = $this->getTypeName($property->getType());
+                $value = $property->getValue() ?? $this->{$name} ?? null;
+
+                if (array_key_exists($name, $data)) {
+                    $value = $data[$name];
                     if ($type == self::class) {
-                        if (!is_array($data[$attr])) {
-                            throw new InvalidArgumentException("$attr must be an array or object");
+                        if (!is_array($value)) {
+                            throw new InvalidArgumentException("$name must be an array or object");
                         }
-                        $this->{$attr} = self::with($data[$attr]);
+                        $value = self::with($value);
                     } else if ($type == CollectionBaseDto::class) {
-                        if (!is_array($data[$attr])) {
-                            throw new InvalidArgumentException("$attr must be an array");
+                        if (!is_array($value)) {
+                            throw new InvalidArgumentException("$name must be an array");
                         }
-                        $this->{$attr} = CollectionBaseDto::of($data[$attr]);
+                        $value = CollectionBaseDto::of($value);
                     } else {
-                        $this->{$attr} = $this->resolveType($type ?: $this->findType($data[$attr]), $data[$attr]);
+                        $value = $this->resolveType($type ?: $this->findType($value), $value);
                     }
-                } else if (!isset($this->{$attr})) {
-                    $this->{$attr} = null;
                 }
+                
+                // Process attributes if available
+                $value = $this->processAttributes($property, $value);
+
+                $this->{$name} = $value;
             }
         }
         return $this;
     }
 
     /**
-     * Load data from array with custom values
+     * Get original properties
      *
-     * @param array $data
-     * @param bool $sanitize
-     * @return self
+     * @return array
      */
-    public function loadCustom(array $data, $sanitize = false): self
+    public function original(): array
     {
-        if ($sanitize)
-            $data = Security::clean($data);
-
-        if ($data) {
-            $attibutes = $this->attributes();
-            $attibutesKeys = array_keys($this->attributes());
-            foreach ($data as $key => $value) {
-                if (empty($attibutesKeys) || in_array($key, $attibutesKeys)) {
-                    $this->{$key} = $this->resolveType($attibutes[$key] ?? $this->findType($value), $value);
-                }
-            }
-        }
-        return $this;
+        return $this->_original ?? [];
     }
 
     /**
-     * Get explicitly selected attributes
+     * Get explicitly selected fields
      *
      * @return array
      */
     public function selected(): array
     {
-        return $this->selectedAttrs ?? [];
+        return $this->_selected ?? [];
     }
 
     /**
-     * Explicitly select attributes
+     * Explicitly select fields
      *
-     * @param array $attributes
+     * @param array $fields
      * @return static
      */
-    public function select(array $attributes): static
+    public function select(array $fields): static
     {
-        $this->selectedAttrs = $attributes;
+        $this->_selected = $fields;
         return $this;
     }
 
@@ -165,9 +178,9 @@ class BaseDto implements Arrayable, Stringable
     public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
-        foreach ($this->attributes() as $attr => $type) {
+        foreach ($this->fields() as $attr => $type) {
             if (
-                (empty($this->selectedAttrs) || in_array('*', $this->selectedAttrs) || in_array($attr, $this->selectedAttrs)) &&
+                (empty($this->_selected) || in_array('*', $this->_selected) || in_array($attr, $this->_selected)) &&
                 property_exists($this, $attr) &&
                 (!$trim || isset($this->{$attr}))
             ) {
@@ -194,6 +207,26 @@ class BaseDto implements Arrayable, Stringable
     }
 
     /**
+     * Process Method Attributes
+     *
+     * @param ReflectionProperty $property
+     * @param T|null $value
+     * @return T|null
+     * @template T
+     */
+    protected function processAttributes(ReflectionProperty $property, mixed $value = null)
+    {
+        $result = $value;
+        foreach ($property->getAttributes() as $field) {
+            $instance = $field->newInstance();
+            if ($instance instanceof PropertyAttributeInterface) {
+                $result = $instance->processProperty($property, $value);
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Load dto with array of class attibutes
      *
      * @param array|object|null $data
@@ -210,20 +243,6 @@ class BaseDto implements Arrayable, Stringable
                 $dto->load((array)$data, $sanitize);
             }
         }
-        return $dto;
-    }
-
-    /**
-     * Load dto with array of custom data
-     *
-     * @param array|object|null $data
-     * @param bool $sanitize
-     * @return static|self
-     */
-    public static function withCustom(array|object|null $data, $sanitize = false): self
-    {
-        $dto = new self;
-        if ($data) $dto->loadCustom((array)$data, $sanitize);
         return $dto;
     }
 

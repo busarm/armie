@@ -3,6 +3,11 @@
 namespace Busarm\PhpMini\Exceptions;
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Dto\ErrorTraceDto;
+use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Response;
 use Exception;
 
 /**
@@ -20,7 +25,7 @@ class HttpException extends Exception
      * @param integer $statusCode
      * @param integer $errorCode
      */
-    public function __construct($message, int $statusCode, $errorCode = 0)
+    public function __construct($message, int $statusCode, int $errorCode = 0)
     {
         parent::__construct($message, $errorCode);
         $this->statusCode = $statusCode;
@@ -32,22 +37,33 @@ class HttpException extends Exception
     }
 
     /**
-     * Exception handler
-     *
+     * Error handler
+     * 
      * @param App $app
-     * @return void
+     * @return ResponseInterface
      */
-    public function handler(App $app)
+    public function handler(App $app): ResponseInterface
     {
-        if ($this->getStatusCode() >= 500) $app->reporter->reportException($this);
+        $this->getStatusCode() >= 500 and $app->reporter->reportException($this);
+
         $trace = array_map(function ($instance) {
-            return [
-                'file' => $instance['file'] ?? null,
-                'line' => $instance['line'] ?? null,
-                'class' => $instance['class'] ?? null,
-                'function' => $instance['function'] ?? null,
-            ];
+            return (new ErrorTraceDto($instance));
         }, $this->getTrace());
-        !$app->isCli && $app->showMessage($this->getStatusCode(), $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+
+        $response = new ResponseDto();
+        $response->success = false;
+        $response->message = $this->getMessage();
+        $response->env = $app->env;
+        $response->version = $app->config->version;
+
+        // Show more info if not production
+        if (!$response->success && $app->env !== Env::PROD) {
+            $response->errorCode = (string)$this->getCode() ?: null;
+            $response->errorLine = $this->getLine();
+            $response->errorFile = $this->getFile();
+            $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
+        }
+
+        return (new Response())->json($response->toArray(), $this->getStatusCode());
     }
 }

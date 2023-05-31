@@ -26,8 +26,8 @@ class ResponseDto extends BaseDto
     public int|null $duration;
     /** @var string */
     public string|null $errorCode;
-    /** @var string */
-    public string|null $errorLine;
+    /** @var int */
+    public int|null $errorLine;
     /** @var string */
     public string|null $errorFile;
     /** @var ErrorTraceDto[]|array */

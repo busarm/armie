@@ -15,6 +15,7 @@ use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
 use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
@@ -371,5 +372,41 @@ final class AppTest extends TestCase
         $this->assertNotNull($response);
         $this->assertNotNull($response->getParameters());
         $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * Test attribute auth Ok
+     *
+     * @covers \Busarm\PhpMini\Interfaces\Attributes
+     * @covers \Busarm\PhpMini\Interfaces\Attributes
+     * @covers \Busarm\PhpMini\Test\TestApp\Attributes
+     * @return void
+     */
+    public function testAttributeAuthOk()
+    {
+        $this->app->get('auth/test')->to(AuthTestController::class, 'test');
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/auth/test', HttpMethod::GET, $this->app->config)
+            ->setServer((new Attribute([
+                'HTTP_AUTHORIZATION' => 'php112233445566'
+            ])))->initialize());
+        $this->assertNotNull($response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('authorized', $response->getBody());
+    }
+
+    /**
+     * Test attribute auth failed
+     *
+     * @covers \Busarm\PhpMini\Interfaces\Attributes
+     * @covers \Busarm\PhpMini\Interfaces\Attributes
+     * @covers \Busarm\PhpMini\Test\TestApp\Attributes
+     * @return void
+     */
+    public function testAttributeAuthFailed()
+    {
+        $this->app->get('auth/test')->to(AuthTestController::class, 'test');
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/auth/test', HttpMethod::GET, $this->app->config));
+        $this->assertNotNull($response);
+        $this->assertEquals(401, $response->getStatusCode());
     }
 }

@@ -11,6 +11,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
+use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -31,6 +32,7 @@ $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
     return 'success-' . $app->env;
 });
+$app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     return [
         'name' => 'v1',

@@ -3,6 +3,12 @@
 namespace Busarm\PhpMini\Errors;
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Dto\ErrorTraceDto;
+use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Exceptions\HttpException;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Busarm\PhpMini\Response;
 use Error;
 
 /**
@@ -11,26 +17,15 @@ use Error;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class SystemError extends Error
+class SystemError extends HttpException
 {
 
     /**
-     * Error handler
-     * 
-     * @param App $app
-     * @return void
+     * @param string $message
+     * @param integer $errorCode
      */
-    public function handler(App $app)
+    public function __construct($message, int $errorCode = 0)
     {
-        $app->reporter->reportException($this);
-        $trace = array_map(function ($instance) {
-            return [
-                'file' => $instance['file'] ?? null,
-                'line' => $instance['line'] ?? null,
-                'class' => $instance['class'] ?? null,
-                'function' => $instance['function'] ?? null,
-            ];
-        }, $this->getTrace());
-        !$app->isCli && $app->showMessage(500, $this->getMessage(), $this->getCode(), $this->getLine(), $this->getFile(), $trace);
+        parent::__construct($message, 500, $errorCode);
     }
 }

@@ -80,7 +80,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunCLI()
     {
-        $response = $this->app->run(Route::cli(HomeTestController::class, 'ping'));
+        $response = $this->app->run(Route::init()->to(HomeTestController::class, 'ping'));
         $this->assertNotNull($response);
         $this->assertEquals('success-' . $this->app->env, strval($response->getBody()));
     }
@@ -93,7 +93,7 @@ final class AppTest extends TestCase
     public function testAppRunMockHttp()
     {
         $this->app->get('pingHtml')->to(HomeTestController::class, 'pingHtml');
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success-' . $this->app->env, $response->getBody());
@@ -107,7 +107,7 @@ final class AppTest extends TestCase
     public function testAppRunMockHttpView()
     {
         $this->app->get('pingHtml')->view(TestViewPage::class);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString("Test View Component", strval($response->getBody()));
@@ -125,7 +125,11 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $response = $this->app->run(Request::fromUrl(
+            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+            HttpMethod::OPTIONS,
+            $this->app->config
+        ));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
@@ -147,7 +151,8 @@ final class AppTest extends TestCase
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
-                HttpMethod::OPTIONS
+                HttpMethod::OPTIONS,
+                $this->app->config
             )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:81'
             ])))->initialize()
@@ -177,7 +182,8 @@ final class AppTest extends TestCase
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
-                HttpMethod::OPTIONS
+                HttpMethod::OPTIONS,
+                $this->app->config
             )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:81'
             ])))->initialize()
@@ -207,7 +213,8 @@ final class AppTest extends TestCase
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
-                HttpMethod::OPTIONS
+                HttpMethod::OPTIONS,
+                $this->app->config
             )->setServer((new Attribute([
                 'HTTP_ORIGIN' => 'localhost:8080'
             ])))->initialize()
@@ -230,7 +237,11 @@ final class AppTest extends TestCase
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::OPTIONS));
+        $response = $this->app->run(Request::fromUrl(
+            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
+            HttpMethod::OPTIONS,
+            $this->app->config
+        ));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
@@ -275,7 +286,7 @@ final class AppTest extends TestCase
             $this->assertNotNull($newMockService);
             $this->assertNotEquals($mockService->id, $newMockService->id);
         });
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
     }
 
     /**
@@ -301,7 +312,7 @@ final class AppTest extends TestCase
             $this->assertNotNull($newMockService);
             $this->assertEquals($mockService->id, $newMockService->id);
         });
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml'));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
     }
 
     /**
@@ -318,7 +329,8 @@ final class AppTest extends TestCase
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
-                HttpMethod::GET
+                HttpMethod::GET,
+                $this->app->config
             )->setServer((new Attribute([
                 'REMOTE_ADDR' => '127.0.0.2'
             ])))->initialize()
@@ -352,7 +364,8 @@ final class AppTest extends TestCase
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/product/paginate?limit=2&page=10',
-                HttpMethod::GET
+                HttpMethod::GET,
+                $this->app->config
             )
         );
         $this->assertNotNull($response);

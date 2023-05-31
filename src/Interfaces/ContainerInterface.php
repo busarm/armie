@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\App;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Closure;

@@ -47,6 +47,7 @@ class Router implements RouterInterface
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
 
+
     /**
      * @param \Busarm\PhpMini\Enums\HttpMethod::* $method
      * @param string $path
@@ -91,7 +92,10 @@ class Router implements RouterInterface
     }
 
     /**
-     * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller. 
+     * Controller must implement CrudControllerInterface
+     * 
+     * @see CrudControllerInterface
      * 
      * @param string $path HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
      * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home

@@ -5,9 +5,7 @@ namespace Busarm\PhpMini\Middlewares;
 use Busarm\PhpMini\DI;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\NotFoundException;
-use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\ResponseHandler;
-use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -38,12 +36,13 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if (class_exists($this->controller)) {
-            // Get dependency resolver
-            $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
+
+            $injector = (new DI(app()));
 
             // Load controller
-            $object = DI::instantiate($this->controller, new $resolver($request));
+            $object = $injector->instantiate($this->controller, $request);
             if ($object) {
+
                 // Load method
                 if (
                     $object
@@ -52,10 +51,10 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                 ) {
                     $result = call_user_func_array(
                         array($object, $this->function),
-                        array_merge(DI::resolveMethodDependencies(
+                        array_merge($injector->resolveMethodDependencies(
                             $this->controller,
                             $this->function,
-                            new $resolver($request),
+                            $request,
                         ), $this->params)
                     );
 

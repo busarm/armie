@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Auth\AuthResolver;
 use Busarm\PhpMini\Interfaces\Auth\AuthUserResolver;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;

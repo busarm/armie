@@ -4,7 +4,6 @@ namespace Busarm\PhpMini\Bags;
 
 use Busarm\PhpMini\Crypto;
 
-use function Busarm\PhpMini\Helpers\app;
 use function Busarm\PhpMini\Helpers\config;
 
 /**
@@ -27,11 +26,10 @@ class Cookie extends Attribute
      * * samesite: ""
      * * secure: "0"
      * 
-     * @param boolean $encrypt Encrypt Cookie
-     * @param string $id Unique id for Encrypted cookie. Use to bind cookies to specific user. E.g Ip address
-     * @param string $prefix Prefix for cookies
+     * @param string|null $prefix Prefix for cookies
+     * @param string|null $secret Cookie Secret for encryption
      */
-    public function __construct(private array $options = [], private bool $encrypt = true, private string $id = '', private string $prefix = '')
+    public function __construct(private array $options = [], private string|null $prefix = '', private string|null $secret = null)
     {
         parent::__construct([]);
 
@@ -62,8 +60,8 @@ class Cookie extends Attribute
     {
         $name = str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
         $value = !empty($value) ?
-            ($this->encrypt && !empty(app()->config->encryptionKey) ?
-                Crypto::encrypt(app()->config->encryptionKey . ($this->id ? md5($this->id) : ''), $value) :
+            (!empty($this->secret) ?
+                Crypto::encrypt($this->secret, $value) :
                 $value) :
             "";
         $options = is_int($options) ?
@@ -85,8 +83,8 @@ class Cookie extends Attribute
         $name = $this->prefix . '_' . $name;
         $value = $this->has($name) ? $this->attributes[$name] : null;
         if (!empty($value)) {
-            return ($this->encrypt && !empty(app()->config->encryptionKey)) ?
-                (Crypto::decrypt(app()->config->encryptionKey . ($this->id ? md5($this->id) : ''), $value) ?: NULL) :
+            return !empty($this->secret) ?
+                (Crypto::decrypt($this->secret, $value) ?: NULL) :
                 $value;
         }
         return $default;

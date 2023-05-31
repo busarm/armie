@@ -376,7 +376,7 @@ class Server
 
         // Local Client Service
         if ($client instanceof LocalClient) {
-            return (new LocalService())->call(
+            return (new LocalService($this->serviceDiscovery))->call(
                 (new ServiceRequestDto)
                     ->setName($client->getName())
                     ->setLocation($client->getLocation())
@@ -389,7 +389,7 @@ class Server
         }
         // Remote Client Service
         if ($client instanceof RemoteClient) {
-            $response = (new RemoteService())->call(
+            $response = (new RemoteService($this->serviceDiscovery))->call(
                 (new ServiceRequestDto)
                     ->setName($client->getName())
                     ->setLocation($client->getLocation())

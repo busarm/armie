@@ -90,7 +90,7 @@ class ErrorReporter implements ErrorReportingInterface
      * @param array|object|null $msg
      * @return string|null
      */
-    private function toString(array|object|null $msg): string|null
+    protected function toString(array|object|null $msg): string|null
     {
         if (is_array($msg) || is_object($msg)) {
             return json_encode($msg, JSON_PRETTY_PRINT);

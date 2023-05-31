@@ -114,24 +114,28 @@ class Config
      * @var string|null
      */
     public string|null $cookiePrefix = NULL;
+    
     /**
      * Cookie Duration in seconds
      *
      * @var int
      */
     public int $cookieDuration = 3600;
+
     /**
      * Cookie Path
      *
      * @var string
      */
     public string $cookiePath = '/';
+
     /**
      * Cookie Domain
      *
      * @var string
      */
     public string $cookieDomain = '';
+
     /**
      * Cookie Secure: Use with secure HTTPS connections only
      *
@@ -151,6 +155,7 @@ class Config
      * @var bool
      */
     public bool $cookieEncrypt = true;
+    
     /**
      * Cookie Same Site Policy
      * 

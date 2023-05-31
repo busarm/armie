@@ -16,7 +16,6 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
-use Busarm\PhpMini\Handlers\DependencyResolver;
 use Busarm\PhpMini\Handlers\RequestHandler;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
 use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
@@ -66,7 +65,7 @@ class App implements HttpServerInterface, ContainerInterface
     use Container;
 
     /** @var static App instance */
-    public static $__instance = null;
+    private static $__instance = null;
 
     /** @var RouterInterface */
     public $router = null;
@@ -79,6 +78,10 @@ class App implements HttpServerInterface, ContainerInterface
 
     /** @var ErrorReportingInterface */
     public $reporter = null;
+
+    /** @var DependencyResolverInterface */
+    public $resolver = null;
+
     /**
      * @var ServiceDiscoveryInterface
      */
@@ -92,7 +95,7 @@ class App implements HttpServerInterface, ContainerInterface
     public $startTimeMs;
 
     /** @var boolean 
-     * If app is running in stateless mode. E.g Using Swoole or Event other loops. 
+     * If app is running in stateless mode. E.g Using Swoole or other Event loops. 
      * Do not use static variables for user specific data when runing on stateless mode.
      * 
      * Stateless mode does not support adding:
@@ -115,7 +118,7 @@ class App implements HttpServerInterface, ContainerInterface
      *
      * @var \Busarm\PhpMini\Enums\AppStatus::*
      */
-    protected int $status = AppStatus::INITIALIZING;
+    protected int $status = AppStatus::STOPPED;
 
     // SYSTEM HOOKS 
     protected Closure|null $startHook = null;
@@ -127,6 +130,8 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function __construct(public Config $config, public string $env = Env::LOCAL)
     {
+        $this->status = AppStatus::INITIALIZING;
+
         // Set app instance
         self::$__instance = &$this;
 
@@ -137,13 +142,16 @@ class App implements HttpServerInterface, ContainerInterface
         $this->isCli = is_cli();
 
         // Set error reporter
-        $this->reporter = new ErrorReporter();
+        $this->reporter = new ErrorReporter;
 
         // Set router
         $this->router = new Router;
 
+        // Set dependency resolver
+        $this->resolver = new Resolver($this);
+
         // Set Loader
-        $this->loader = Loader::withConfig($this->config);
+        $this->loader = new Loader($this->config);
 
         // Set logger
         $this->logger = new ConsoleLogger(new ConsoleOutput(match ($this->config->loggerVerborsity) {
@@ -163,6 +171,15 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Load custom providers
         $this->loadProviders();
+    }
+
+    /**  
+     * Get application instance
+     * @return self 
+     */
+    public static function &getInstance(): self
+    {
+        return self::$__instance;
     }
 
     ############################
@@ -243,13 +260,11 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function run(RequestInterface|RouteInterface|null $request = null): ResponseInterface
     {
-        // Set current app instance
-        self::$__instance = &$this;
         $this->status = AppStatus::RUNNNIG;
         $startTime = $this->stateless ? microtime(true) * 1000 : $this->startTimeMs;
 
         // Set request & response & router
-        $request = $request ?? Request::fromGlobal();
+        $request = $request ?? Request::fromGlobal($this->config);
 
         // Leave logs & crumbs for error tracking
         if ($request instanceof RequestInterface) {
@@ -268,6 +283,7 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Set shutdown hook
         register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request) {
+            // If shutdown before app stopped running
             if ($app->status !== AppStatus::STOPPED) {
                 if ($request instanceof RequestInterface) {
                     $response = new Response(version: $request->version(), format: $this->config->httpResponseFormat);
@@ -364,7 +380,7 @@ class App implements HttpServerInterface, ContainerInterface
      * @param ResponseInterface $response
      * @return void
      */
-    public function triggerCompleteHook(RequestInterface|RouteInterface $request, ResponseInterface $response)
+    private function triggerCompleteHook(RequestInterface|RouteInterface $request, ResponseInterface $response)
     {
         if ($this->completeHook) {
             ($this->completeHook)($this, $request, $response);
@@ -382,13 +398,10 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function make(string $className, array $params = [], RequestInterface|RouteInterface|null $request = null)
     {
-        // Get dependency resolver
-        $resolver = $this->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
-
         // Instantiate class
-        $instance = DI::instantiate(
+        $instance = (new DI($this))->instantiate(
             $className,
-            new $resolver($request),
+            $request,
             $params
         );
 
@@ -464,7 +477,7 @@ class App implements HttpServerInterface, ContainerInterface
     public function addMiddleware(MiddlewareInterface|ServerMiddlewareInterface $middleware)
     {
         if ($middleware instanceof ServerMiddlewareInterface) {
-            $this->middlewares[] = new PsrMiddleware($middleware);
+            $this->middlewares[] = new PsrMiddleware($middleware, $this->config);
         } else {
             $this->middlewares[] = $middleware;
         }
@@ -472,7 +485,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set if app is running in stateless mode. E.g Using Swoole or Event other loops.
+     * Set if app is running in stateless mode. E.g Using Swoole or other Event loops.
      *
      * @return  self
      */
@@ -516,6 +529,18 @@ class App implements HttpServerInterface, ContainerInterface
     public function setErrorReporter(ErrorReportingInterface $reporter)
     {
         $this->reporter = $reporter;
+        return $this;
+    }
+
+    /**
+     * Set dependency resolver
+     * 
+     * @param DependencyResolverInterface $resolver
+     * @return self
+     */
+    public function setDependencyResolver(DependencyResolverInterface $resolver)
+    {
+        $this->resolver = $resolver;
         return $this;
     }
 
@@ -621,7 +646,7 @@ class App implements HttpServerInterface, ContainerInterface
      * - DELETE $path/{id}
      *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @param string $controller Application Controller class name e.g Home. Controller class must implement [CrudControllerInterface]
+     * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home
      * @return mixed
      */
     public function crud(string $path, string $controller)

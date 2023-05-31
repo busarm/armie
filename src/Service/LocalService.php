@@ -3,7 +3,6 @@
 namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Bags\Attribute;
-use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Dto\ServiceRequestDto;
 use Busarm\PhpMini\Enums\HttpMethod;
@@ -13,7 +12,6 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Session\PHPSession;
 use Nyholm\Psr7\Uri;
 
 use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
@@ -74,7 +72,8 @@ class LocalService extends BaseService
                     null,
                     new Attribute($dto->headers),
                     null,
-                )->toPsr()
+                )->toPsr(),
+            'discovery' => $this->discovery,
         ]);
     }
 

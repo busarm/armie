@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Middlewares;
 
+use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Handlers\PsrServerRequestHandler;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
@@ -19,7 +20,7 @@ use Psr\Http\Server\MiddlewareInterface as PsrMiddlewareInterface;
  */
 final class PsrMiddleware implements MiddlewareInterface
 {
-    public function __construct(private PsrMiddlewareInterface $psr)
+    public function __construct(private PsrMiddlewareInterface $psr, private Config|null $config = null)
     {
     }
 
@@ -33,7 +34,7 @@ final class PsrMiddleware implements MiddlewareInterface
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($request instanceof RequestInterface) {
-            return Response::fromPsr($this->psr->process($request->toPsr(), new PsrServerRequestHandler($handler)));
+            return Response::fromPsr($this->psr->process($request->toPsr(), new PsrServerRequestHandler($handler, $this->config)));
         }
         return $handler->handle($request);
     }

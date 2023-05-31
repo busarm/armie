@@ -17,17 +17,19 @@ interface DependencyResolverInterface
      * Resolve dependency for class name
      *
      * @param class-string<T> $className
+     * @param RequestInterface|RouteInterface $request
      * @return T
      * @template T Item type template
      */
-    public function resolveDependency(string $className): mixed;
+    public function resolve(string $className, RequestInterface|RouteInterface|null $request = null): mixed;
 
     /**
      * Customize dependency
      *
      * @param T $instance
+     * @param RequestInterface|RouteInterface $request
      * @return T
      * @template T Item type template
      */
-    public function customizeDependency(mixed &$instance): mixed;
+    public function customize(mixed $instance, RequestInterface|RouteInterface|null $request = null): mixed;
 }

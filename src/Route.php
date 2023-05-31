@@ -126,9 +126,10 @@ class Route implements RouteInterface
      * 
      * @param string $controller Application Controller class name e.g Home::class
      * @param string $function Application Controller (public) function. e.g index
+     * @param array<string, mixed> $params Default function params
      * @return self
      */
-    public function to(string $controller, string $function): self
+    public function to(string $controller, string $function, array $params = []): self
     {
         $this->controller = $controller;
         $this->function = $function;
@@ -179,20 +180,13 @@ class Route implements RouteInterface
     }
 
     /**
-     * Set CLI route
+     * Initialize empty route
      *
-     * @param string $controller
-     * @param string $function
-     * @param array<string, mixed> $params
      * @return self
      */
-    public static function cli(string $controller, string $function, array $params = []): self
+    public static function init(): self
     {
-        $route = new Route;
-        $route->controller = $controller;
-        $route->function = $function;
-        $route->params = $params;
-        return $route;
+        return new Route;
     }
 
     /**

@@ -10,7 +10,7 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Stringable;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\app;
+use function Busarm\PhpMini\Helpers\view;
 
 /**
  * Application View Provider 
@@ -79,7 +79,7 @@ class View implements ResponseHandlerInterface, Stringable
         else if (is_array($this->data) || is_object($this->data)) $params = (array) $this->data;
         else if (is_string($this->data)) $params  = ['data' => $this->data];
 
-        $content = app()->loader->view($path, $params, $return);
+        $content = view($path, $params, $return);
 
         if (!$return) {
             echo $content;

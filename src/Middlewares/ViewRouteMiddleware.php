@@ -3,13 +3,10 @@
 namespace Busarm\PhpMini\Middlewares;
 
 use Busarm\PhpMini\Handlers\ResponseHandler;
-use Closure;
 use Busarm\PhpMini\DI;
 use Busarm\PhpMini\Enums\ResponseFormat;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\NotFoundException;
-use Busarm\PhpMini\Handlers\DependencyResolver;
-use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -42,10 +39,10 @@ final class ViewRouteMiddleware implements MiddlewareInterface
     {
         // View Class
         if (class_exists($this->viewPathOrClass)) {
-            // Get dependency resolver
-            $resolver = app()->getBinding(DependencyResolverInterface::class, DependencyResolver::class);
 
-            $result = DI::instantiate($this->viewPathOrClass, new $resolver($request));
+            $injector = (new DI(app()));
+
+            $result = $injector->instantiate($this->viewPathOrClass, $request);
         }
         // View Component
         else {

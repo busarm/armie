@@ -13,5 +13,5 @@ class AppStatus
 {
     const INITIALIZING  =   -1;
     const RUNNNIG       =   1;
-    const STOPPED     =   0;
+    const STOPPED       =   0;
 }

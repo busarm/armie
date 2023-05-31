@@ -149,7 +149,7 @@ function out($data = null, $responseCode = 500)
  */
 function app(): \Busarm\PhpMini\App
 {
-    return \Busarm\PhpMini\App::$__instance ?? throw new SystemError('Failed to get current app instance');
+    return \Busarm\PhpMini\App::getInstance() ?? throw new SystemError('Failed to get current app instance');
 }
 
 /**

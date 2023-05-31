@@ -42,7 +42,7 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
 });
 
 $app->get('download')->call(function (Response $response) {
-    return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', false);
+    return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
-return $app->run(Request::capture($request ?? null))->send($config->httpSendAndContinue);
+return $app->run(Request::capture($request ?? null, $config))->send($config->httpSendAndContinue);

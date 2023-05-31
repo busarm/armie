@@ -70,7 +70,7 @@ class Request implements RequestInterface
     /**
      * Constructor.
      */
-    protected function __construct()
+    protected function __construct(protected Config|null $config = null)
     {
         $this->setup();
     }
@@ -82,41 +82,44 @@ class Request implements RequestInterface
      */
     public function setUp()
     {
-        $this->_sessionOptions = [
-            'cookie_lifetime' => config('cookieDuration'),
-            'cookie_path' => config('cookiePath'),
-            'cookie_domain' => config('cookieDomain'),
-            'cookie_secure' => config('cookieSecure'),
-            'cookie_httponly' => config('cookieHttpOnly'),
-            'cookie_samesite' => config('cookieSameSite'),
-            'cache_expire' => config('cookieDuration') / 60,
-            'cache_limiter' => config('cacheLimiter'),
-            'save_path' => config('sessionPath'),
-            'name' => str_replace(' ', '_', strtolower(config('name'))) . '_' . crc32(config('sessionPath')) . '_sess'
-        ];
+        if ($this->config) {
+            $this->_sessionOptions = [
+                'cookie_lifetime' => $this->config->cookieDuration,
+                'cookie_path' => $this->config->cookiePath,
+                'cookie_domain' => $this->config->cookieDomain,
+                'cookie_secure' => $this->config->cookieSecure,
+                'cookie_httponly' => $this->config->cookieHttpOnly,
+                'cookie_samesite' => $this->config->cookieSameSite,
+                'cache_expire' => $this->config->cookieDuration / 60,
+                'cache_limiter' => $this->config->cacheLimiter,
+                'save_path' => $this->config->sessionPath,
+                'name' => str_replace(' ', '_', strtolower($this->config->name)) . '_' . crc32($this->config->sessionPath) . '_sess'
+            ];
 
-        $this->_cookieOptions = [
-            'expires' => time() + config('cookieDuration'),
-            'path' => config('cookiePath'),
-            'domain' => config('cookieDomain'),
-            'secure' => config('cookieSecure'),
-            'httponly' => config('cookieHttpOnly'),
-            'samesite' => config('cookieSameSite'),
-        ];
+            $this->_cookieOptions = [
+                'expires' => time() + $this->config->cookieDuration,
+                'path' => $this->config->cookiePath,
+                'domain' => $this->config->cookieDomain,
+                'secure' => $this->config->cookieSecure,
+                'httponly' => $this->config->cookieHttpOnly,
+                'samesite' => $this->config->cookieSameSite,
+            ];
+        }
     }
 
     /**
      * Capture server request or create using Globals
      * 
      * @param ServerRequestInterface|null $psr
+     * @param Config|null $config
      * @return self
      */
-    public static function capture(ServerRequestInterface|null $psr = null): self
+    public static function capture(ServerRequestInterface|null $psr = null, Config|null $config = null): self
     {
         if (isset($psr)) {
-            return self::fromPsr($psr);
+            return self::fromPsr($psr, $config);
         } else {
-            return self::fromGlobal();
+            return self::fromGlobal($config);
         }
     }
 
@@ -124,18 +127,19 @@ class Request implements RequestInterface
      * Create request object using custom URL
      *
      * @param string $url
-     * @param string $method
+     * @param HttpMethod::* $method
+     * @param Config|null $config
      * @return self
      */
-    public static function fromUrl($url, $method = HttpMethod::GET): self
+    public static function fromUrl(string $url, string $method = HttpMethod::GET, Config|null $config = null): self
     {
         if ($validUrl = filter_var($url, FILTER_VALIDATE_URL)) {
             $uri = new Uri($validUrl);
-            $request = new self();
+            $request = new self($config);
             $request->initialize(
                 (new Query)->setQuery($uri->getQuery()),
                 (new Attribute),
-                (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? '')),
+                (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey)),
                 (new PHPSession($request->_sessionOptions)),
                 (new Attribute),
                 (new Attribute)
@@ -158,15 +162,16 @@ class Request implements RequestInterface
     /**
      * Create request object from Globals
      * 
+     * @param Config|null $config
      * @return self
      */
-    public static function fromGlobal(): self
+    public static function fromGlobal(Config|null $config = null): self
     {
-        $request = new self;
+        $request = new self($config);
         $request->initialize(
             (new Query)->mirror($_GET),
             (new Attribute)->mirror($_POST),
-            (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? ''))->mirror($_COOKIE),
+            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))->mirror($_COOKIE),
             (new PHPSession($request->_sessionOptions)),
             (new Attribute)->mirror($_FILES),
             new Attribute($_SERVER)
@@ -178,15 +183,17 @@ class Request implements RequestInterface
     /**
      * Create request object from PSR7 Server request
      * 
+     * @param ServerRequestInterface $psr
+     * @param Config|null $config
      * @return self
      */
-    public static function fromPsr(ServerRequestInterface $psr): self
+    public static function fromPsr(ServerRequestInterface $psr, Config|null $config = null): self
     {
-        $request = new self;
+        $request = new self($config);
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
-            (new Cookie($request->_cookieOptions, config('cookieEncrypt') ?? false, $request->ip() ?? ''))->load($psr->getCookieParams() ?? []),
+            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))->load($psr->getCookieParams() ?? []),
             (new PHPSession($request->_sessionOptions)),
             new Upload($psr->getUploadedFiles()),
             new Attribute($psr->getServerParams())
@@ -303,7 +310,7 @@ class Request implements RequestInterface
         }
 
         // Start session
-        if ($this->_session && config('httpSessionAutoStart')) {
+        if ($this->_session && $this->config && $this->config->httpSessionAutoStart) {
             !is_cli() && $this->_session->start();
         }
 
@@ -372,10 +379,6 @@ class Request implements RequestInterface
      */
     protected function getIpAddress()
     {
-        // check for shared internet/ISP IP
-        if (!empty($this->_server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_CLIENT_IP'))) {
-            return $this->_server->get('HTTP_CLIENT_IP');
-        }
         // check for IPs passing through proxies
         if (!empty($this->_server->get('HTTP_X_FORWARDED_FOR'))) {
             // check if multiple ips exist in var
@@ -389,6 +392,10 @@ class Request implements RequestInterface
                 if ($this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED_FOR')))
                     return $this->_server->get('HTTP_X_FORWARDED_FOR');
             }
+        }
+        // check for shared internet/ISP IP
+        if (!empty($this->_server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_CLIENT_IP'))) {
+            return $this->_server->get('HTTP_CLIENT_IP');
         }
         if (!empty($this->_server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED')))
             return $this->_server->get('HTTP_X_FORWARDED');
@@ -409,38 +416,34 @@ class Request implements RequestInterface
     /**
      * Ensures an ip address is both a valid IP and does not fall within
      * a private network range.
-     * // TODO Validate ipv6
      * 
-     * @param $ip
+     * @param string|null$ip
+     * @param 'ipv4'|'ipv6'|null $type
      * @return bool
      */
-    protected function validateIpAddress($ip)
+    protected function validateIpAddress(string|null $ip, string|null $type = null)
     {
-        if (strtolower($ip) === 'unknown') return false;
+        if (!$ip || strtolower($ip) === 'unknown') return false;
 
-        // generate ipv4 network address
-        $ip = ip2long($ip);
+        $isValid = false;
 
-        // if the ip is set and not equivalent to 255.255.255.255
-        if ($ip !== false && $ip !== -1) {
-
-            // make sure to get unsigned long representation of ip
-            // due to discrepancies between 32 and 64 bit OSes and
-            // signed numbers (ints default to signed in PHP)
-            $ip = sprintf('%u', $ip);
-
-            // do private network range checking
-            if ($ip >= 0 && $ip <= 50331647) return false;
-            if ($ip >= 167772160 && $ip <= 184549375) return false;
-            if ($ip >= 2130706432 && $ip <= 2147483647) return false;
-            if ($ip >= 2851995648 && $ip <= 2852061183) return false;
-            if ($ip >= 2886729728 && $ip <= 2887778303) return false;
-            if ($ip >= 3221225984 && $ip <= 3221226239) return false;
-            if ($ip >= 3232235520 && $ip <= 3232301055) return false;
-            if ($ip >= 4294967040) return false;
+        if ($type == 'ipv4') {
+            // Validates IPV4
+            $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+        } elseif ($type == 'ipv6') {
+            // Validates IPV6
+            $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+        } else {
+            // Validates IPV4 and IPV6
+            $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
         }
 
-        return true;
+        if ($isValid == $ip) {
+
+            $isValid = true;
+        }
+
+        return $isValid;
     }
 
     /**
@@ -513,6 +516,7 @@ class Request implements RequestInterface
 
         return $headers;
     }
+
 
     /**
      * @return string

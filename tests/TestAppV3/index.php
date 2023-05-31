@@ -39,4 +39,4 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'cookies' => $req->cookie()->all(),
     ];
 });
-return $app->run(Request::capture($request ?? null))->send($config->httpSendAndContinue);
+return $app->run(Request::capture($request ?? null, $config))->send($config->httpSendAndContinue);

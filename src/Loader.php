@@ -16,28 +16,8 @@ use Throwable;
  */
 class Loader implements LoaderInterface
 {
-
-    /** @var string */
-    protected string|null $appPath = null;
-    /** @var string */
-    protected string|null $viewPath = null;
-    /** @var string */
-    protected string|null $configPath = null;
-
-    protected function __construct()
+    public function __construct(protected Config $config)
     {
-    }
-
-    /**
-     * @return self
-     */
-    public static function withConfig(Config $config): self
-    {
-        $loader = new self;
-        $loader->appPath = $config->appPath;
-        $loader->viewPath = $config->viewPath;
-        $loader->configPath = $config->configPath;
-        return $loader;
     }
 
     /**
@@ -63,19 +43,6 @@ class Loader implements LoaderInterface
     }
 
     /**
-     * Require file
-     *
-     * @param string $path
-     * @param array $data
-     * @return mixed
-     */
-    public static function require($path, $data = null)
-    {
-        if (is_array($data)) extract($data);
-        return require $path;
-    }
-
-    /**
      * Load View File
      * 
      * @param $path
@@ -87,7 +54,9 @@ class Loader implements LoaderInterface
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
-        $path = (str_starts_with($this->viewPath, $this->appPath) ? $this->viewPath : $this->appPath . DIRECTORY_SEPARATOR . $this->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
+        $path = (str_starts_with($this->config->viewPath, $this->config->appPath) ?
+            $this->config->viewPath :
+            $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             $content = self::load($path, $vars);
             if ($return) return $content;
@@ -107,11 +76,28 @@ class Loader implements LoaderInterface
      */
     public function config($path): mixed
     {
-        $path = (str_starts_with($this->configPath, $this->appPath) ? $this->configPath : $this->appPath . DIRECTORY_SEPARATOR . $this->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
+        $path = (str_starts_with($this->config->configPath, $this->config->appPath) ?
+            $this->config->configPath :
+            $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             return require_once $path;
         } else {
             throw new LoaderError("Config file '$path' not found");
         }
+    }
+
+    ################# STATICS ##################
+
+    /**
+     * Require file
+     *
+     * @param string $path
+     * @param array $data
+     * @return mixed
+     */
+    public static function require($path, $data = null)
+    {
+        if (is_array($data)) extract($data);
+        return require $path;
     }
 }

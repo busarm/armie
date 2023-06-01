@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
-use Busarm\PhpMini\Bags\Attribute;
 use Busarm\PhpMini\Data\PDO\Connection;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Helpers\StringableDateTime;

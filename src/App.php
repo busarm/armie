@@ -323,7 +323,7 @@ class App implements HttpServerInterface, ContainerInterface
         try {
             // Add default response handler
             $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
-                (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html("Not found - " . ($request->method() . ' ' . $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
+                (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html(sprintf("Not found - %s %s", $request->method(), $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
 
             foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
                 $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));

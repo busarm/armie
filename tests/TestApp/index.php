@@ -40,6 +40,8 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'headers' => $req->header()->all(),
         'server' => $req->server()->all(),
         'cookies' => $req->cookie()->all(),
+        'currentUrl' => $req->currentUrl(),
+        'baseUrl' => $req->baseUrl(),
     ];
 });
 

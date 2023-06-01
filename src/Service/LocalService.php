@@ -17,6 +17,7 @@ use Nyholm\Psr7\Uri;
 use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
 
 use function Busarm\PhpMini\Helpers\http_parse_query;
+use function Busarm\PhpMini\Helpers\run;
 
 /**
  * 
@@ -52,6 +53,10 @@ class LocalService extends BaseService
         $dto->headers = $dto->headers ?? [];
         $dto->headers[VAR_CORRELATION_ID] = $request->correlationId();
 
+        $server = $request->server();
+        $server->set('REQUEST_URI', '/' . $dto->route);
+        $server->set('PATH_INFO', '/' . $dto->route);
+
         return Loader::require($path, [
             'request' =>
             Request::fromUrl(
@@ -66,10 +71,10 @@ class LocalService extends BaseService
                 ->initialize(
                     new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
                     new Attribute($dto->type != ServiceType::READ ? $dto->params : []),
-                    null,
-                    null,
+                    $request->cookie(),
+                    $request->session(),
                     new Attribute($dto->files),
-                    null,
+                    $server,
                     new Attribute($dto->headers),
                     null,
                 )->toPsr(),

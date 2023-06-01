@@ -6,6 +6,8 @@ use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
 
+use function Busarm\PhpMini\Helpers\log_info;
+
 /**
  * PHP Mini Framework
  *
@@ -17,9 +19,11 @@ class Attribute implements StorageBagInterface
 
 	protected Closure|null $onChange = null;
 	protected Closure|null $onDelete = null;
+	protected array $keys = [];
 
 	public function __construct(protected array $attributes = [])
 	{
+		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
 	}
 
 	/**
@@ -30,6 +34,7 @@ class Attribute implements StorageBagInterface
 	public function mirror(&$attributes): self
 	{
 		$this->attributes = $attributes;
+		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
 		return $this;
 	}
 
@@ -65,6 +70,7 @@ class Attribute implements StorageBagInterface
 	 */
 	public function set(string $name, mixed $value, $options = NULL): bool
 	{
+		$this->keys[strtolower($name)] = $name;
 		$this->attributes[$name] = $value;
 		if ($this->onChange) ($this->onChange)($name, $value);
 		return true;
@@ -78,7 +84,18 @@ class Attribute implements StorageBagInterface
 	 */
 	public function has(string $name): bool
 	{
-		return isset($this->attributes[$name]);
+		return array_key_exists($this->key($name), $this->attributes);
+	}
+
+	/**
+	 * Get key exact key for name
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public function key(string $name): string
+	{
+		return $this->keys[strtolower($name)] ?? $name;
 	}
 
 	/**
@@ -91,8 +108,9 @@ class Attribute implements StorageBagInterface
 	 */
 	public function get(string $name, $default = null, $sanitize = false): mixed
 	{
-		return $this->has($name) ?
-			($sanitize ? Security::clean($this->attributes[$name]) : $this->attributes[$name]) :
+		$value = $this->attributes[$this->key($name)] ??  null;
+		return isset($value) ?
+			($sanitize ? Security::clean($value) : $value) :
 			$default;
 	}
 
@@ -130,6 +148,7 @@ class Attribute implements StorageBagInterface
 	public function replace(array $data)
 	{
 		$this->attributes = array_merge($this->attributes, $data);
+		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
 		if ($this->onChange) foreach ($data as $name => $value) ($this->onChange)($name, $value);
 	}
 
@@ -141,7 +160,10 @@ class Attribute implements StorageBagInterface
 	 */
 	public function remove(string $name)
 	{
-		if ($this->has($name)) unset($this->attributes[$name]);
+		if ($this->has($name)) {
+			unset($this->attributes[$this->key($name)]);
+			unset($this->keys[strtolower($name)]);
+		};
 		if ($this->onDelete) ($this->onDelete)($name);
 	}
 
@@ -154,6 +176,7 @@ class Attribute implements StorageBagInterface
 	{
 		$data = $this->attributes;
 		$this->attributes = [];
+		$this->keys = [];
 		if ($this->onDelete) foreach (array_keys($data) as $name) ($this->onDelete)($name);
 	}
 

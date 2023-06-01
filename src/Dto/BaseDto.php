@@ -37,6 +37,11 @@ class BaseDto implements Arrayable, Stringable
      */
     private array|null $_original = NULL;
 
+    /** Default excluded fields */
+    private const EXCLUDED_FILEDS = [
+        '_selected', '_original'
+    ];
+
     /**
      * Get dto properties
      *
@@ -58,7 +63,10 @@ class BaseDto implements Arrayable, Stringable
     {
         $fields = [];
         foreach ($this->properties() as $property) {
-            if ($all || $property->isPublic() && (!$trim || $property->isInitialized($this))) {
+            if (($all || $property->isPublic())
+                && (!$trim || $property->isInitialized($this))
+                && !in_array($property->getName(), self::EXCLUDED_FILEDS)
+            ) {
                 $type = $property->getType();
                 if ($type) $fields[$property->getName()] = $this->getTypeName($type);
                 else $fields[$property->getName()] = null;
@@ -83,32 +91,38 @@ class BaseDto implements Arrayable, Stringable
             foreach ($this->properties() as $property) {
 
                 $name = $property->getName();
-                $type = $this->getTypeName($property->getType());
-                $value = $property->getValue() ?? $this->{$name} ?? null;
 
-                if (array_key_exists($name, $data)) {
-                    $value = $data[$name];
-                    if ($type == self::class) {
-                        if (!is_array($value)) {
-                            throw new InvalidArgumentException("$name must be an array or object");
+                if (!in_array($name, self::EXCLUDED_FILEDS)) {
+
+                    $type = $this->getTypeName($property->getType());
+                    $value = $property->getValue() ?? $this->{$name} ?? null;
+
+                    if (array_key_exists($name, $data)) {
+                        $value = $data[$name];
+                        if ($type == self::class || is_subclass_of($type, self::class)) {
+                            if (!is_array($value)) {
+                                throw new InvalidArgumentException(sprintf("Value of '$name' in '%s' must be an array or object %s given", static::class, gettype($value)));
+                            }
+                            $value = $type::with($value);
+                        } else if ($type == CollectionBaseDto::class || is_subclass_of($type, self::class)) {
+                            if (!is_array($value)) {
+                                throw new InvalidArgumentException(sprintf("Value of '$name' must be an array or object %s given", gettype($value)));
+                            }
+                            $value = $type::of($value);
+                        } else {
+                            $value = $this->resolveType($type ?: $this->findType($value), $value);
                         }
-                        $value = self::with($value);
-                    } else if ($type == CollectionBaseDto::class) {
-                        if (!is_array($value)) {
-                            throw new InvalidArgumentException("$name must be an array");
-                        }
-                        $value = CollectionBaseDto::of($value);
-                    } else {
-                        $value = $this->resolveType($type ?: $this->findType($value), $value);
                     }
-                }
-                
-                // Process attributes if available
-                $value = $this->processAttributes($property, $value);
 
-                $this->{$name} = $value;
+                    // Process attributes if available
+                    $value = $this->processFieldAttributes($property, $value);
+
+                    $this->{$name} = $value;
+                }
             }
         }
+
+        $this->_original = $this->fields(false);
         return $this;
     }
 
@@ -180,9 +194,9 @@ class BaseDto implements Arrayable, Stringable
         $result = [];
         foreach ($this->fields() as $attr => $type) {
             if (
-                (empty($this->_selected) || in_array('*', $this->_selected) || in_array($attr, $this->_selected)) &&
-                property_exists($this, $attr) &&
-                (!$trim || isset($this->{$attr}))
+                (empty($this->_selected) || in_array('*', $this->_selected) || in_array($attr, $this->_selected))
+                && property_exists($this, $attr)
+                && (!$trim || isset($this->{$attr}))
             ) {
                 $value = $this->{$attr} ?? null;
                 if ($value instanceof CollectionBaseDto) {
@@ -207,14 +221,14 @@ class BaseDto implements Arrayable, Stringable
     }
 
     /**
-     * Process Method Attributes
+     * Process Field's Attributes
      *
      * @param ReflectionProperty $property
      * @param T|null $value
      * @return T|null
      * @template T
      */
-    protected function processAttributes(ReflectionProperty $property, mixed $value = null)
+    protected function processFieldAttributes(ReflectionProperty $property, mixed $value = null)
     {
         $result = $value;
         foreach ($property->getAttributes() as $field) {

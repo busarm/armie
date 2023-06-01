@@ -9,7 +9,6 @@ use Busarm\PhpMini\Interfaces\Attribute\FunctionAttributeInterface;
 use Busarm\PhpMini\Interfaces\Attribute\MethodAttributeInterface;
 use Busarm\PhpMini\Interfaces\Attribute\ParameterAttributeInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use ReflectionClass;
 use ReflectionFunction;

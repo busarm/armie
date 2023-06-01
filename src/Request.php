@@ -192,10 +192,12 @@ class Request implements RequestInterface
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
-            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))->load($psr->getCookieParams() ?? []),
+            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))
+                ->load($psr->getCookieParams() ?? []),
             (new PHPSession($request->_sessionOptions)),
             new Upload($psr->getUploadedFiles()),
-            new Attribute($psr->getServerParams())
+            new Attribute($psr->getServerParams()),
+            new Attribute(array_map(fn ($header) => $header[0] ?? null, $psr->getHeaders()))
         );
 
         $request->_scheme = $psr->getUri()->getScheme();
@@ -264,9 +266,7 @@ class Request implements RequestInterface
         // Load data from server vars
         if ($this->_server) {
 
-            $this->_headers  =  $headers ?: new Attribute(array_change_key_case(
-                array_merge($this->getHeadersFromServer($this->_server->all()), $this->_headers ? $this->_headers->all() : [])
-            ));
+            $this->_headers  =  $headers ?: new Attribute(array_merge($this->getHeadersFromServer($this->_server->all()), $this->_headers ? $this->_headers->all() : []));
             $this->_contentType  = $this->_contentType ?: $this->_server->get('CONTENT_TYPE', '');
             $this->_method       = $this->_method ?: $this->_server->get('REQUEST_METHOD', HttpMethod::GET);
             $this->_protocol     = $this->_protocol ?: $this->getServerPotocol();
@@ -300,7 +300,7 @@ class Request implements RequestInterface
             $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
 
             $this->_correlationId = ($this->_server->get(VAR_CORRELATION_ID) ??
-                $this->_headers->get(strtolower(VAR_CORRELATION_ID)) ??
+                $this->_headers->get(VAR_CORRELATION_ID) ??
                 $this->_headers->get('request-id') ??
                 $this->_headers->get('x-request-id') ??
                 $this->_headers->get('x-trace-id') ??

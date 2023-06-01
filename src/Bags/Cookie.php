@@ -4,8 +4,6 @@ namespace Busarm\PhpMini\Bags;
 
 use Busarm\PhpMini\Crypto;
 
-use function Busarm\PhpMini\Helpers\config;
-
 /**
  * PHP Mini Framework
  *
@@ -32,10 +30,6 @@ class Cookie extends Attribute
     public function __construct(private array $options = [], private string|null $prefix = '', private string|null $secret = null)
     {
         parent::__construct([]);
-
-        $this->prefix = !empty($prefix) ? $prefix : (!empty(config('cookiePrefix')) ?
-            config('cookiePrefix') :
-            str_replace(' ', '_', strtolower(config('name'))));
     }
 
     /**

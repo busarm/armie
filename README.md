@@ -5,7 +5,7 @@
 
 # PHP Mini
 
-A micro php framework designed to provide highly performance with elegance and optimal developer experience.
+A micro php framework with asynchronous event driven support; designed to provide highly performance with elegance and optimal developer experience.
 
 ## Installation
 

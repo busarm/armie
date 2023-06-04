@@ -49,7 +49,7 @@ final class WorkermanSessionHandler implements SessionHandlerInterface
      */
     public function gc($max_lifetime): int|false
     {
-        return $this->handler->gc($max_lifetime);
+        return $this->handler->gc($max_lifetime) ?: false;
     }
 
     /**
@@ -76,7 +76,7 @@ final class WorkermanSessionHandler implements SessionHandlerInterface
     {
         $data = $this->handler->read($id);
         if ($this->key && $data) {
-            return Crypto::decrypt($this->key, $data);
+            return Crypto::decrypt($this->key, $data) ?: false;
         }
         return $data;
     }

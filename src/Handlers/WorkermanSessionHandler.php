@@ -49,7 +49,8 @@ final class WorkermanSessionHandler implements SessionHandlerInterface
      */
     public function gc($max_lifetime): int|false
     {
-        return $this->handler->gc($max_lifetime) ?: false;
+        $done = $this->handler->gc($max_lifetime);
+        return is_int($done) ? $done : false;
     }
 
     /**

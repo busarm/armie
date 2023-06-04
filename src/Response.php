@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Throwable;
 
 use Nyholm\Psr7\Stream;
+use Workerman\Protocols\Http\Response as HttpResponse;
 
 /**
  * HTTP Response Provider
@@ -240,7 +241,7 @@ class Response implements ResponseInterface
      */
     public function getBody(): mixed
     {
-        return $this->body;
+        return $this->body ?? $this->getResponseBody();
     }
 
     /**
@@ -297,17 +298,7 @@ class Response implements ResponseInterface
      */
     public function addHttpHeaders(array $httpHeaders): self
     {
-        $headers = [];
-        foreach ($httpHeaders as $key => $value) {
-            if (is_array($value)) {
-                if (count($value) == 2) {
-                    $headers[strtolower($value[0])] = $value[1];
-                }
-            } else {
-                $headers[strtolower($key)] = $value;
-            }
-        }
-        $this->httpHeaders = array_merge($this->httpHeaders, $headers);
+        $this->httpHeaders = array_merge($this->httpHeaders, $httpHeaders);
         return $this;
     }
 
@@ -317,17 +308,7 @@ class Response implements ResponseInterface
      */
     public function setHttpHeaders(array $httpHeaders): self
     {
-        $headers = [];
-        foreach ($httpHeaders as $key => $value) {
-            if (is_array($value)) {
-                if (count($value) == 2) {
-                    $headers[strtolower($value[0])] = $value[1];
-                }
-            } else {
-                $headers[strtolower($key)] = $value;
-            }
-        }
-        $this->httpHeaders = $headers;
+        $this->httpHeaders = $httpHeaders;
         return $this;
     }
 
@@ -338,7 +319,7 @@ class Response implements ResponseInterface
      */
     public function setHttpHeader($name, $value): self
     {
-        $this->httpHeaders[strtolower($name)] = $value;
+        $this->httpHeaders[$name] = $value;
         return $this;
     }
 
@@ -349,7 +330,7 @@ class Response implements ResponseInterface
      */
     public function getHttpHeader($name, $default = null): mixed
     {
-        return isset($this->httpHeaders[strtolower($name)]) ? $this->httpHeaders[strtolower($name)] : $default;
+        return isset($this->httpHeaders[$name]) ? $this->httpHeaders[$name] : $default;
     }
 
     /**
@@ -422,7 +403,7 @@ class Response implements ResponseInterface
      */
     public function send($continue = false): self
     {
-        // headers have already been sent by the developer
+        // headers have already been sent
         if (headers_sent()) {
             return $this;
         }
@@ -437,25 +418,18 @@ class Response implements ResponseInterface
         try {
             // start buffer
             ob_start();
-            switch ($this->format) {
-                case ResponseFormat::JSON:
-                    $this->setHttpHeader('Content-Type', 'application/json');
-                    break;
-                case ResponseFormat::XML:
-                    $this->setHttpHeader('Content-Type', 'text/xml');
-                    break;
-                case ResponseFormat::HTML:
-                    $this->setHttpHeader('Content-Type', 'text/html');
-                    break;
-                default:
-                    if (!$this->getHttpHeader('Content-Type'))
-                        $this->setHttpHeader('Content-Type', 'application/octet-stream');
-            }
-
+            $this->prepare();
             // status
             header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
+            // headers
             foreach ($this->getHttpHeaders() as $name => $header) {
-                header(sprintf('%s: %s', $name, $header));
+                if (is_array($header) || is_object($header)) {
+                    foreach ((array)$header as $value) {
+                        header(sprintf('%s: %s', $name, $value));
+                    }
+                } else {
+                    header(sprintf('%s: %s', $name, $header));
+                }
             }
             echo $this->getResponseBody();
             ob_end_flush();
@@ -468,6 +442,28 @@ class Response implements ResponseInterface
             throw $e;
         }
 
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function prepare(): self
+    {
+        switch ($this->format) {
+            case ResponseFormat::JSON:
+                $this->setHttpHeader('Content-Type', 'application/json');
+                break;
+            case ResponseFormat::XML:
+                $this->setHttpHeader('Content-Type', 'text/xml');
+                break;
+            case ResponseFormat::HTML:
+                $this->setHttpHeader('Content-Type', 'text/html');
+                break;
+            default:
+                if (!$this->getHttpHeader('Content-Type'))
+                    $this->setHttpHeader('Content-Type', 'application/octet-stream');
+        }
         return $this;
     }
 
@@ -671,6 +667,18 @@ class Response implements ResponseInterface
             $this->version,
             $this->statusText
         );
+        return $response;
+    }
+
+    /**
+     * Get Workerman response
+     * 
+     * @return HttpResponse
+     */
+    public function toWorkerman(): HttpResponse
+    {
+        // TODO set response cookies
+        $response = new HttpResponse(500, $this->getHttpHeaders(), $this->getBody());
         return $response;
     }
 }

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0]
+
+### Added
+
+-   Event Loop Support with Workerman
+-   Support for stateless sessions and cookies
+-   Support encrypted sessions
+-   Bug fixes
+
 ## [1.4.3]
 
 ### Added

@@ -1,10 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini\Session;
+namespace Busarm\PhpMini\Bags;
 
 use Busarm\PhpMini\Errors\SessionError;
+use Busarm\PhpMini\Handlers\EncryptedSessionHandler;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
+
+use SessionHandler;
+use SessionHandlerInterface;
 
 /**
  * PHP Mini Framework
@@ -13,8 +17,10 @@ use Busarm\PhpMini\Interfaces\SessionStoreInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class PHPSession implements SessionStoreInterface
+final class Session implements SessionStoreInterface
 {
+    protected array $original = [];
+
     /**
      * @param array $options
      * List of available `$options` with their default values:
@@ -45,199 +51,46 @@ class PHPSession implements SessionStoreInterface
      * * use_only_cookies: "1"
      * * use_strict_mode: "0"
      * * use_trans_sid: "0"
-     * 
+     * @param string $secret Encryption key
+     * @param SessionHandler|SessionHandlerInterface|null $handler Session handler
      * @throws SessionError
      */
-    public function __construct(private array $options = [])
+    public function __construct(private array $options = [], string|null $secret = null, SessionHandler|SessionHandlerInterface|null $handler = null)
     {
         $this->throwIfHasWrongOptions($this->options);
+        $this->setHandler($handler ?? new EncryptedSessionHandler($secret));
     }
 
     /**
      * Start session
      *
-     * @throws SessionError
+     * @param string $id
      * @return bool
      */
-    function start(): bool
+    public function start($id = null): bool
     {
         $this->throwIfHeadersSent();
         $this->throwIfStarted();
-        return session_start($this->options);
+
+        if ($id) {
+            $this->setId($id);
+        }
+
+        $done = session_start($this->options);
+        if ($done) {
+            $this->original = $this->all();
+        }
+        return $done;
     }
 
     /**
-     * Get session store name.
-     * 
-     * @return string
-     */
-    public function getName(): string
-    {
-        $name = session_name();
-
-        return $name ? $name : '';
-    }
-
-    /**
-     * Get current session ID.
-     * 
-     * @return string
-     */
-    public function getId(): string
-    {
-        return session_id();
-    }
-
-    /**
-     * Set current session ID.
+     * Save session
      *
-     * @param string $sessionId
-     * 
-     * @throws SessionError
-     * @return void
-     */
-    public function setId(string $sessionId): void
-    {
-        $this->throwIfNotStarted();
-
-        session_id($sessionId);
-    }
-
-    /**
-     * Touch session to update last access or expiry date
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    function touch(string $name)
-    {
-    }
-
-    /**
-     * Deletes an attribute by name and returns its value.
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     *
-     * @throws SessionError
-     * @return mixed
-     */
-    public function pull(string $name, $default = null, $sanitize = false): mixed
-    {
-        $this->throwIfNotStarted();
-
-        $value = ($sanitize ? Security::clean($_SESSION[$name]) : $_SESSION[$name]) ?? $default;
-
-        unset($_SESSION[$name]);
-
-        return $value;
-    }
-
-    /**
-     * Regenerate session
-     *
-     * @param bool $deleteOld
      * @return bool
      */
-    function regenerate(bool $deleteOld = false): bool
+    public function save(): bool
     {
-        return session_regenerate_id($deleteOld);
-    }
-
-    /**
-     * Set attribute
-     *
-     * @param string $name
-     * @param mixed $value
-     * @param mixed $options
-     *
-     * @throws SessionError
-     * @return bool
-     */
-    function set(string $name, mixed $value, $options = NULL): bool
-    {
-        $this->throwIfNotStarted();
-
-        $_SESSION[$name] = $value;
         return true;
-    }
-
-    /**
-     * Checks if an attribute exists
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    function has(string $name): bool
-    {
-        return isset($_SESSION[$name]);
-    }
-
-    /**
-     * Get attribute
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     * @return mixed
-     */
-    public function get(string $name, $default = null, $sanitize = false): mixed
-    {
-        return ($sanitize ? Security::clean($_SESSION[$name]) : $_SESSION[$name]) ?? $default;
-    }
-
-    /**
-     * Get all attributes
-     *
-     * @return array
-     */
-    function all(): array
-    {
-        return $_SESSION ?? [];
-    }
-
-    /**
-     * Set bulk attributes
-     *
-     * @param array $data
-     *
-     * @throws SessionError
-     * @return void
-     */
-    function replace(array $data)
-    {
-        $this->throwIfNotStarted();
-
-        $_SESSION = array_merge($_SESSION, $data);
-    }
-
-    /**
-     * Remove attribute
-     *
-     * @param string $name
-     * 
-     * @throws SessionError
-     * @return void
-     */
-    function remove(string $name)
-    {
-        if ($this->has($name)) unset($_SESSION[$name]);
-    }
-
-    /**
-     * Remove all attribute
-     *
-     * @throws SessionError
-     * @return void
-     */
-    function clear()
-    {
-        $this->throwIfNotStarted();
-
-        session_unset();
     }
 
     /**
@@ -255,11 +108,221 @@ class PHPSession implements SessionStoreInterface
     }
 
     /**
+     * Regenerate session
+     *
+     * @param bool $deleteOld
+     * @return bool
+     */
+    public function regenerate(bool $deleteOld = false): bool
+    {
+        return session_regenerate_id($deleteOld);
+    }
+
+    /**
+     * Get session store name.
+     * 
+     * @return string
+     */
+    public function getName(): string
+    {
+        $name = session_name();
+
+        return $name ? $name : 'PHPSESS';
+    }
+
+    /**
+     * Get current session ID.
+     * 
+     * @return string
+     */
+    public function getId(): string|null
+    {
+        return session_id();
+    }
+
+    /**
+     * Set current session ID.
+     *
+     * @param string $sessionId
+     * 
+     * @throws SessionError
+     * @return self
+     */
+    public function setId(string $sessionId): self
+    {
+        $this->throwIfStarted();
+
+        session_id($sessionId);
+
+        return $this;
+    }
+
+    /**
+     * Set session handler
+     *
+     * @param SessionHandler|SessionHandlerInterface $handler
+     * @return self
+     */
+    public function setHandler(SessionHandler|SessionHandlerInterface|null $handler): self
+    {
+        if ($handler) {
+            $this->throwIfHeadersSent();
+            $this->throwIfStarted();
+            session_set_save_handler($handler);
+        }
+        return $this;
+    }
+
+
+    //--------- Manipulate Session --------//
+
+
+    /**
+     * Load attributes from external source
+     * 
+     * @param array $attributes
+     * @return self
+     */
+    public function load(array $attributes): self
+    {
+        foreach ($attributes as $key => $value) {
+            $_SESSION[$key] = $value;
+        }
+        $this->original = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Pull attribute: Get and delete
+     *
+     * @param string $name
+     * @param mixed $default
+     * @param bool $sanitize
+     * @return mixed
+     */
+    public function pull(string $name, $default = null, $sanitize = false): mixed
+    {
+        $value = $this->get($name, $default, $sanitize);
+        $this->remove($name);
+        return $value;
+    }
+
+    /**
+     * Checks if an attribute exists
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return isset($_SESSION[$name]);
+    }
+
+    /**
+     * Get attribute
+     *
+     * @param string $name
+     * @param mixed $default
+     * @param bool $sanitize
+     * @return mixed
+     */
+    public function get(string $name, $default = null, $sanitize = false): mixed
+    {
+        return $this->has($name) ? ($sanitize ? Security::clean($_SESSION[$name]) : $_SESSION[$name]) : $default;
+    }
+
+    /**
+     * Set attribute
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param mixed $options
+     *
+     * @throws SessionError
+     * @return bool
+     */
+    public function set(string $name, mixed $value, $options = NULL): bool
+    {
+        $this->throwIfNotStarted();
+
+        $_SESSION[$name] = $value;
+
+        return true;
+    }
+
+    /**
+     * Get all attributes
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        return $_SESSION ?? [];
+    }
+
+    /**
+     * Get updated attributes
+     *
+     * @return array
+     */
+    public function updates(): array
+    {
+        return array_diff($_SESSION, $this->original);
+    }
+
+    /**
+     * Set bulk attributes
+     *
+     * @param array $data
+     *
+     * @throws SessionError
+     * @return void
+     */
+    public function replace(array $data)
+    {
+        $this->throwIfNotStarted();
+
+        $_SESSION = array_merge($_SESSION, $data);
+    }
+
+    /**
+     * Remove attribute
+     *
+     * @param string $name
+     * 
+     * @throws SessionError
+     * @return void
+     */
+    public function remove(string $name)
+    {
+        if ($this->has($name)) unset($_SESSION[$name]);
+    }
+
+    /**
+     * Remove all attribute
+     *
+     * @throws SessionError
+     * @return void
+     */
+    public function clear()
+    {
+        $this->throwIfNotStarted();
+
+        session_unset();
+    }
+
+
+    //--------- Utils --------//
+
+
+    /**
      * Checks if the session is started.
      */
     public function isStarted(): bool
     {
-        return session_status() === PHP_SESSION_ACTIVE;
+        return session_status() === PHP_SESSION_ACTIVE && $this->getId() != null;
     }
 
     /**

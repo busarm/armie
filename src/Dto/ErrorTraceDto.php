@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Dto;
+namespace Busarm\PhpMini\Dto; 
 
 /**
  * PHP Mini Framework

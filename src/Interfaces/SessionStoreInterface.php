@@ -2,7 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use SessionHandler;
+use SessionHandlerInterface;
 
 /**
  * PHP Mini Framework
@@ -14,11 +15,39 @@ use Busarm\PhpMini\Interfaces\StorageBagInterface;
 interface SessionStoreInterface extends StorageBagInterface
 {
     /**
-     * Start session
+     * Check session status
      *
      * @return bool
      */
-    public function start(): bool;
+    public function isStarted(): bool;
+
+    /**
+     * Start session
+     *
+     * @param string $id
+     * @return bool
+     */
+    public function start($id = null): bool;
+    /**
+     * Save session
+     *
+     * @return bool
+     */
+    public function save(): bool;
+    /**
+     * Destroy session
+     *
+     * @return bool
+     */
+    public function destroy(): bool;
+    /**
+     * Regenerate session ID
+     *
+     * @param bool $deleteOld
+     * @return bool
+     */
+    public function regenerate(bool $deleteOld = false): bool;
+
     /**
      * Get session store name.
      * 
@@ -30,32 +59,19 @@ interface SessionStoreInterface extends StorageBagInterface
      * 
      * @return string
      */
-    public function getId(): string;
+    public function getId(): string|null;
     /**
      * Set current session ID.
      *
      * @param string $sessionId
-     * @return void
+     * @return self
      */
-    public function setId(string $sessionId): void;
+    public function setId(string $sessionId): self;
     /**
-     * Touch session to update last access date
+     * Set session handler
      *
-     * @param string $name
-     * @return void
+     * @param SessionHandler|SessionHandlerInterface $handler
+     * @return self
      */
-    public function touch(string $name);
-    /**
-     * Regenerate session ID
-     *
-     * @param bool $deleteOld
-     * @return bool
-     */
-    public function regenerate(bool $deleteOld = false): bool;
-    /**
-     * Destroy session
-     *
-     * @return bool
-     */
-    public function destroy(): bool;
+    public function setHandler(SessionHandler|SessionHandlerInterface $handler): self;
 }

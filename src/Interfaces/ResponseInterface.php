@@ -126,6 +126,13 @@ interface ResponseInterface extends Stringable
     public function redirect($uri, $refresh = false): self;
 
     /**
+     * Perform actions before sending response
+     * 
+     * @return self
+     */
+    public function prepare(): self;
+
+    /**
      * @param bool $continue
      * @return self
      */

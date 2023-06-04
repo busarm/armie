@@ -63,11 +63,11 @@ class Server
      */
     private $serviceDiscovery = null;
 
-    private ErrorReporter $reporter;
+    private Reporter $reporter;
 
     public function __construct(public string $name, public string $env = Env::LOCAL)
     {
-        $this->reporter = (new ErrorReporter);
+        $this->reporter = (new Reporter);
 
         // Set up error handler
         set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {

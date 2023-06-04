@@ -13,37 +13,37 @@ namespace Busarm\PhpMini;
 class Crypto
 {
     /**
-     * For a list of available cipher methods. Default: AES-256-CBC. @see `\openssl_get_cipher_methods` for list of supported methods
+     * For a list of available cipher methods. Default: AES-256-CBC. @see openssl_get_cipher_methods for list of supported methods
      * @var string
      */
     public static $METHOD = "AES-256-CBC";
     /**
-     * Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..). Default: md5. @see `\hash_algos` for a list of supported algorithms
+     * Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..). Default: md5. @see hash_algos for a list of supported algorithms
      * @var string
      */
     public static $KEY_HASH_ALGO = "md5";
     /**
-     * Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..). Default: sha1. @see `\hash_algos` for a list of supported algorithms
+     * Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..). Default: sha1. @see hash_algos for a list of supported algorithms
      * @var string
      */
     public static $HMAC_HASH_ALGO = "sha1";
     /**
-     * Number of key hash iterations. @see `\hash_pbkdf2`. Default: 8.
+     * Number of key hash iterations. @see hash_pbkdf2. Default: 8.
      * @var int
      */
     public static $KEY_HASH_ITERATIONS = 8;
     /**
-     * Length of key hash. @see `\hash_pbkdf2`. Default: 16.
+     * Length of key hash. @see hash_pbkdf2. Default: 16.
      * @var int
      */
     public static $KEY_HASH_LENGTH = 16;
     /**
-     * Length of key salt. @see `\openssl_random_pseudo_bytes`. Default: 8.
+     * Length of key salt. @see openssl_random_pseudo_bytes. Default: 8.
      * @var int
      */
     public static $KEY_SALT_LENGTH = 8;
     /**
-     * Length of key iv. @see `\openssl_random_pseudo_bytes`. Default: 16.
+     * Length of key iv. @see openssl_random_pseudo_bytes. Default: 16.
      * @var int
      */
     public static $KEY_IV_LENGTH = 16;
@@ -54,13 +54,13 @@ class Crypto
      * @param string $passphrase  Encryption Key
      * @param string $plain Data to encrypt
      * @param array $configs Encryption configs
-     * - `METHOD` - Default: AES-256-CBC. @see `\openssl_get_cipher_methods`
-     * - `KEY_HASH_ALGO` - Default: md5. @see `\hash_algos`
-     * - `HMAC_HASH_ALGO` - Default: sha1. @see `\hash_algos`
-     * - `KEY_HASH_ITERATIONS` - Default: 8. @see `\hash_pbkdf2`
-     * - `KEY_HASH_LENGTH` - Default: 16. @see `\hash_pbkdf2`
-     * - `KEY_SALT_LENGTH` - Default: 8. @see `\openssl_random_pseudo_bytes`
-     * - `KEY_IV_LENGTH` - Default: 16. @see `\openssl_random_pseudo_bytes`
+     * - `METHOD` - Default: AES-256-CBC. @see openssl_get_cipher_methods
+     * - `KEY_HASH_ALGO` - Default: md5. @see hash_algos
+     * - `HMAC_HASH_ALGO` - Default: sha1. @see hash_algos
+     * - `KEY_HASH_ITERATIONS` - Default: 8. @see hash_pbkdf2
+     * - `KEY_HASH_LENGTH` - Default: 16. @see hash_pbkdf2
+     * - `KEY_SALT_LENGTH` - Default: 8. @see openssl_random_pseudo_bytes
+     * - `KEY_IV_LENGTH` - Default: 16. @see openssl_random_pseudo_bytes
      * @return mixed Base64 encoded result of encrypted data
      */
     public static function encrypt(string|null $passphrase, string|null $plain, array $configs = [])
@@ -92,11 +92,11 @@ class Crypto
      * @param string $passphrase  Encryption Key
      * @param string $cipher Data to decrypt
      * @param array $configs Encryption configs
-     * - `METHOD` - Default: AES-256-CBC. @see `\openssl_get_cipher_methods`
-     * - `KEY_HASH_ALGO` - Default: md5. @see `\hash_algos`
-     * - `HMAC_HASH_ALGO` - Default: sha1. @see `\hash_algos`
-     * - `KEY_HASH_ITERATIONS` - Default: 8. @see `\hash_pbkdf2`
-     * - `KEY_HASH_LENGTH` - Default: 16. @see `\hash_pbkdf2`
+     * - `METHOD` - Default: AES-256-CBC. @see openssl_get_cipher_methods
+     * - `KEY_HASH_ALGO` - Default: md5. @see hash_algos
+     * - `HMAC_HASH_ALGO` - Default: sha1. @see hash_algos
+     * - `KEY_HASH_ITERATIONS` - Default: 8. @see hash_pbkdf2
+     * - `KEY_HASH_LENGTH` - Default: 16. @see hash_pbkdf2
      * @return string|boolean
      */
     public static function decrypt(string|null $passphrase, string|null $cipher, array $configs = [])
@@ -131,7 +131,7 @@ class Crypto
      * 
      * @param string $data String Data 
      * @param string $key hmac key
-     * @param string $algo hmac algo. @see `\hash_algos`
+     * @param string $algo hmac algo. @see hash_algos
      * @return string|boolean
      */
     public static function digest(string $data, string $key, string |null $algo = NULL)

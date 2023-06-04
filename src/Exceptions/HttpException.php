@@ -45,25 +45,6 @@ class HttpException extends Exception
     public function handler(App $app): ResponseInterface
     {
         $this->getStatusCode() >= 500 and $app->reporter->reportException($this);
-
-        $trace = array_map(function ($instance) {
-            return (new ErrorTraceDto($instance));
-        }, $this->getTrace());
-
-        $response = new ResponseDto();
-        $response->success = false;
-        $response->message = $this->getMessage();
-        $response->env = $app->env;
-        $response->version = $app->config->version;
-
-        // Show more info if not production
-        if (!$response->success && $app->env !== Env::PROD) {
-            $response->errorCode = (string)$this->getCode() ?: null;
-            $response->errorLine = $this->getLine();
-            $response->errorFile = $this->getFile();
-            $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
-        }
-
-        return (new Response())->json($response->toArray(), $this->getStatusCode());
+        return (new Response)->json(ResponseDto::fromError($this, $app->env, $app->config->version)->toArray(), $this->getStatusCode());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Middlewares;
 
+use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
@@ -9,8 +10,6 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Response;
-
-use function Busarm\PhpMini\Helpers\app;
 
 /**
  * PHP Mini Framework
@@ -20,14 +19,8 @@ use function Busarm\PhpMini\Helpers\app;
  */
 class CorsMiddleware implements MiddlewareInterface
 {
-    public function __construct(
-        private array $allowedOrigins = [],
-        private array $allowedHeaders = [],
-        private array $exposedHeaders = [],
-        private array $allowedMethods = [],
-        private int $maxAge = 0
-
-    ) {
+    public function __construct(private Config $config)
+    {
     }
 
     /**
@@ -78,23 +71,23 @@ class CorsMiddleware implements MiddlewareInterface
         $response = $response ?: new Response(version: $request->version());
 
         // Check for CORS access request
-        if (app()->config->httpCheckCors == TRUE) {
+        if ($this->config->httpCheckCors == TRUE) {
 
-            $this->maxAge           =   !empty($this->maxAge) ? $this->maxAge : app()->config->httpCorsMaxAge;
-            $this->allowedOrigins   =   app()->config->httpAllowAnyCorsDomain ? ['*'] : (!empty($this->allowedOrigins) ? $this->allowedOrigins : app()->config->httpAllowedCorsOrigins);
-            $this->allowedHeaders   =   !empty($this->allowedHeaders) ? $this->allowedHeaders : app()->config->httpAllowedCorsHeaders;
-            $this->exposedHeaders   =   !empty($this->exposedHeaders) ? $this->exposedHeaders : app()->config->httpExposedCorsHeaders;
-            $this->allowedMethods   =   !empty($this->allowedMethods) ? $this->allowedMethods : app()->config->httpAllowedCorsMethods;
+            $maxAge           =   $this->config->httpCorsMaxAge;
+            $allowedOrigins   =   $this->config->httpAllowAnyCorsDomain ? ['*'] : $this->config->httpAllowedCorsOrigins;
+            $allowedHeaders   =   $this->config->httpAllowedCorsHeaders;
+            $exposedHeaders   =   $this->config->httpExposedCorsHeaders;
+            $allowedMethods   =   $this->config->httpAllowedCorsMethods;
 
             $origin = trim($request->server()->get('HTTP_ORIGIN') ?: $request->server()->get('HTTP_REFERER') ?: '', "/");
 
             // Allow any domain access
-            if (in_array('*', $this->allowedOrigins)) {
+            if (in_array('*', $allowedOrigins)) {
                 $response->setHttpHeader('Access-Control-Allow-Origin', $origin ?: '*');
             }
             // Allow only certain domains access
             // If the origin domain is in the allowed cors origins list, then add the Access Control header
-            elseif (is_array($this->allowedOrigins) && in_array($origin, $this->allowedOrigins)) {
+            elseif (is_array($allowedOrigins) && in_array($origin, $allowedOrigins)) {
                 $response->setHttpHeader('Access-Control-Allow-Origin', $origin);
             }
             // Reject request if not from same origin host
@@ -103,13 +96,13 @@ class CorsMiddleware implements MiddlewareInterface
                 return $response;
             }
 
-            $response->setHttpHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods));
-            $response->setHttpHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders));
-            $response->setHttpHeader('Access-Control-Expose-Headers', implode(', ', $this->exposedHeaders));
-            $response->setHttpHeader('Access-Control-Allow-Max-Age', $this->maxAge);
+            $response->setHttpHeader('Access-Control-Allow-Methods', implode(', ', $allowedMethods));
+            $response->setHttpHeader('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
+            $response->setHttpHeader('Access-Control-Expose-Headers', implode(', ', $exposedHeaders));
+            $response->setHttpHeader('Access-Control-Allow-Max-Age', $maxAge);
 
             if (strtoupper($request->method()) === HttpMethod::OPTIONS) {
-                $response->setHttpHeader('Cache-Control', "max-age=" . $this->maxAge);
+                $response->setHttpHeader('Cache-Control', "max-age=" . $maxAge);
                 $response->html("Preflight Ok");
             }
         } elseif (strtoupper($request->method()) === HttpMethod::OPTIONS) {

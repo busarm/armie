@@ -13,7 +13,7 @@ use Closure;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class Upload implements UploadBagInterface
+final class Upload implements UploadBagInterface
 {
 
 	/**

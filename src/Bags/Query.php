@@ -11,7 +11,7 @@ use function Busarm\PhpMini\Helpers\http_parse_query;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-class Query extends Attribute
+final class Query extends Attribute
 {
     /**
      * Set attributes from query string

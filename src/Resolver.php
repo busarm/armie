@@ -7,9 +7,10 @@ use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Data\PDO\ConnectionConfig;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\ErrorReporter;
+use Busarm\PhpMini\Reporter;
+use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
-use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
+use Busarm\PhpMini\Interfaces\ReportingInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
@@ -50,9 +51,9 @@ class Resolver implements DependencyResolverInterface
     {
         return match ($className) {
             App::class => $this->app,
-            Config::class => $this->app->config,
+            Config::class, ConfigurationInterface::class => $this->app->config,
             Router::class, RouterInterface::class => $this->app->router,
-            ErrorReporter::class, ErrorReportingInterface::class => $this->app->reporter,
+            Reporter::class, ReportingInterface::class => $this->app->reporter,
             ConsoleLogger::class, LoggerInterface::class => $this->app->logger,
             Loader::class, LoaderInterface::class => $this->app->loader,
             Route::class, RouteInterface::class => $request && $request instanceof RouteInterface ? $request : null,

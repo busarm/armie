@@ -15,6 +15,7 @@ use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
 use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
@@ -53,7 +54,8 @@ final class AppTest extends TestCase
         $config = (new Config())
             ->setAppPath(__DIR__ . '/TestApp')
             ->setConfigPath('Configs')
-            ->setViewPath('Views');
+            ->setViewPath('Views')
+            ->setLogRequest(false);
         $this->app = new App($config);
     }
 
@@ -122,7 +124,7 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORS()
     {
-        $this->app->addMiddleware(new CorsMiddleware());
+        $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -143,9 +145,9 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActive()
     {
-        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(true);
         $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -158,6 +160,7 @@ final class AppTest extends TestCase
                 'HTTP_ORIGIN' => 'localhost:81'
             ])))->initialize()
         );
+
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Preflight Ok', $response->getBody());
@@ -171,12 +174,12 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActiveOrigin()
     {
-        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(true);
         $this->app->config->setHttpAllowAnyCorsDomain(false);
         $this->app->config->setHttpAllowedCorsOrigins([
             'localhost:81'
         ]);
+        $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -202,12 +205,12 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActiveOriginFailed()
     {
-        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(true);
         $this->app->config->setHttpAllowAnyCorsDomain(false);
         $this->app->config->setHttpAllowedCorsOrigins([
             'localhost:81'
         ]);
+        $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -232,9 +235,9 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSInactive()
     {
-        $this->app->addMiddleware(new CorsMiddleware());
         $this->app->config->setHttpCheckCors(false);
         $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
         ]);
@@ -267,7 +270,7 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app singletons on stateless requests - should not be sopported
+     * Test app singletons on stateless requests - should not be supported
      *
      * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
      * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
@@ -278,16 +281,15 @@ final class AppTest extends TestCase
     {
         $this->app->stateless = true;
         $this->app->router->addRoutes([
-            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+            Route::get('ping')->call(function () {
+                $mockService = MockService::make(['id' => uniqid()]);
+                $newMockService = MockService::make(['id' => uniqid()]);
+                $this->assertNotNull($mockService);
+                $this->assertNotNull($newMockService);
+                $this->assertNotEquals($mockService->id, $newMockService->id);
+            })
         ]);
-        $this->app->beforeStart(function () {
-            $mockService = MockService::make(['id' => uniqid()]);
-            $newMockService = MockService::make(['id' => uniqid()]);
-            $this->assertNotNull($mockService);
-            $this->assertNotNull($newMockService);
-            $this->assertNotEquals($mockService->id, $newMockService->id);
-        });
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping', HttpMethod::GET, $this->app->config));
     }
 
     /**
@@ -303,17 +305,16 @@ final class AppTest extends TestCase
     {
         $this->app->stateless = true;
         $this->app->router->addRoutes([
-            Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
+            Route::get('ping')->call(function (App $app, RequestInterface $request) {
+                $mockService = MockStatelessService::make($request, ['id' => uniqid()]);
+                $newMockService = MockStatelessService::make($request, ['id' => uniqid()]);
+                $this->assertNull($app->getSingleton(MockStatelessService::class));
+                $this->assertNotNull($mockService);
+                $this->assertNotNull($newMockService);
+                $this->assertEquals($mockService->id, $newMockService->id);
+            })
         ]);
-        $this->app->beforeStart(function (App $app, $req) {
-            $mockService = MockStatelessService::make($req, ['id' => uniqid()]);
-            $newMockService = MockStatelessService::make($req, ['id' => uniqid()]);
-            $this->assertNull($app->getSingleton(MockStatelessService::class));
-            $this->assertNotNull($mockService);
-            $this->assertNotNull($newMockService);
-            $this->assertEquals($mockService->id, $newMockService->id);
-        });
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping', HttpMethod::GET, $this->app->config));
     }
 
     /**

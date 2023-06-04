@@ -6,8 +6,6 @@ use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
 
-use function Busarm\PhpMini\Helpers\log_info;
-
 /**
  * PHP Mini Framework
  *
@@ -20,20 +18,38 @@ class Attribute implements StorageBagInterface
 	protected Closure|null $onChange = null;
 	protected Closure|null $onDelete = null;
 	protected array $keys = [];
+	protected array $original = [];
 
-	public function __construct(protected array $attributes = [])
+	public function __construct(protected  array $attributes = [])
 	{
+		$this->original = $this->attributes;
 		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
 	}
 
 	/**
 	 * Mirror attributes with external source
 	 *
+	 * @param array $attributes
 	 * @return self
 	 */
 	public function mirror(&$attributes): self
 	{
+		$this->attributes = &$attributes;
+		$this->original = $this->attributes;
+		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
+		return $this;
+	}
+
+	/**
+	 * Load attributes
+	 * 
+	 * @param array $attributes
+	 * @return self
+	 */
+	public function load(array $attributes): self
+	{
 		$this->attributes = $attributes;
+		$this->original = $this->attributes;
 		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
 		return $this;
 	}
@@ -71,7 +87,7 @@ class Attribute implements StorageBagInterface
 	public function set(string $name, mixed $value, $options = NULL): bool
 	{
 		$this->keys[strtolower($name)] = $name;
-		$this->attributes[$name] = $value;
+		$this->attributes[$this->key($name)] = $value;
 		if ($this->onChange) ($this->onChange)($name, $value);
 		return true;
 	}
@@ -140,6 +156,16 @@ class Attribute implements StorageBagInterface
 	}
 
 	/**
+	 * Get updated attributes
+	 *
+	 * @return array
+	 */
+	public function updates(): array
+	{
+		return array_diff($this->attributes, $this->original);
+	}
+
+	/**
 	 * Set bulk attributes
 	 *
 	 * @param array $data
@@ -187,6 +213,6 @@ class Attribute implements StorageBagInterface
 	 */
 	public function __toString()
 	{
-		return json_encode($this->attributes);
+		return json_encode($this->all());
 	}
 }

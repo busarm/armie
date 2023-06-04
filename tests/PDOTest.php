@@ -56,7 +56,8 @@ final class PDOTest extends TestCase
                 ->setPdoConnectionUsername("root")
                 ->setPdoConnectionPassword("root")
                 ->setPdoConnectionPersist(false)
-                ->setPdoConnectionErrorMode(true);
+                ->setPdoConnectionErrorMode(true)
+                ->setLogRequest(false);
             self::$app = new App($config);
         }
         $this->faker = Factory::create();

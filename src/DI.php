@@ -47,7 +47,12 @@ class DI
         }
 
         // Resolve with custom resolver
-        if (!($instance = $this->app->resolver->resolve($class->getName(), $request)) && $class->isInstantiable()) {
+        if (
+            !(($instance = $this->app->resolver->resolve($class->getName(), $request))
+                || ($class->getParentClass()
+                    && ($instance = $this->app->resolver->resolve($class->getParentClass()->getName(), $request))))
+            && $class->isInstantiable()
+        ) {
             // Resolve constructor method if available
             if (method_exists($class->getName(), '__construct')) {
                 $method = new ReflectionMethod($class->getName(), '__construct');

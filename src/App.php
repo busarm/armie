@@ -2,8 +2,7 @@
 
 namespace Busarm\PhpMini;
 
-use Busarm\PhpMini\Middlewares\PsrMiddleware;
-use Closure;
+use Busarm\PhpMini\Middlewares\StatelessCookieMiddleware;
 use Throwable;
 
 use Busarm\PhpMini\Dto\BaseDto;
@@ -17,10 +16,11 @@ use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Handlers\RequestHandler;
+use Busarm\PhpMini\Handlers\WorkermanSessionHandler;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
 use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
-use Busarm\PhpMini\Interfaces\ErrorReportingInterface;
+use Busarm\PhpMini\Interfaces\ReportingInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
@@ -32,14 +32,19 @@ use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
+use Busarm\PhpMini\Middlewares\PsrMiddleware;
+use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
 use Busarm\PhpMini\Traits\Container;
-
 use Psr\Log\LoggerInterface;
 use Psr\Http\Server\MiddlewareInterface as ServerMiddlewareInterface;
 
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Workerman\Connection\TcpConnection;
+use Workerman\Protocols\Http\Response as HttpResponse;
+use Workerman\Protocols\Http\Session\FileSessionHandler;
+use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\is_cli;
 use function Busarm\PhpMini\Helpers\log_debug;
@@ -74,7 +79,7 @@ class App implements HttpServerInterface, ContainerInterface
     /** @var LoaderInterface */
     public $loader = null;
 
-    /** @var ErrorReportingInterface */
+    /** @var ReportingInterface */
     public $reporter = null;
 
     /** @var DependencyResolverInterface */
@@ -101,6 +106,13 @@ class App implements HttpServerInterface, ContainerInterface
      * */
     public bool $stateless = false;
 
+    /**
+     * Application main worker - when using event loop (stateless) mode
+     *
+     * @var Worker|null
+     */
+    public Worker|null $worker = null;
+
 
     /** @var ProviderInterface[] */
     protected $providers = [];
@@ -118,10 +130,6 @@ class App implements HttpServerInterface, ContainerInterface
      */
     protected int $status = AppStatus::STOPPED;
 
-    // SYSTEM HOOKS 
-    protected Closure|null $startHook = null;
-    protected Closure|null $completeHook = null;
-
     /**
      * @param Config $config App configuration object
      * @param \Busarm\PhpMini\Enums\Env::* $env App environment
@@ -132,15 +140,16 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Set app instance
         self::$__instance = &$this;
+        $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
+
 
         // Benchmark start time
-        $this->startTimeMs = defined('APP_START_TIME') ? APP_START_TIME : floor(microtime(true) * 1000);
 
         // Set cli state
         $this->isCli = is_cli();
 
         // Set error reporter
-        $this->reporter = new ErrorReporter;
+        $this->reporter = new Reporter;
 
         // Set router
         $this->router = new Router;
@@ -262,54 +271,108 @@ class App implements HttpServerInterface, ContainerInterface
         // Set request & response & router
         $request = $request ?? Request::fromGlobal($this->config);
 
-        // Leave logs & crumbs for error tracking
-        if ($request instanceof RequestInterface) {
-            log_debug(sprintf("Processing request for id: %s, time: %s", $request->correlationId(), $startTime));
-            $this->reporter->leaveCrumbs('request', [
+        // Leave logs for tracing
+        if ($this->config->logRequest && $request instanceof RequestInterface) {
+            log_debug(sprintf("Request started: id = %s, time = %s", $request->correlationId(), $startTime));
+            $this->reporter->reportInfo([
+                'time' => $startTime,
                 'correlationId' => $request->correlationId(),
-                'ipAddress' => $request->ip(),
+                'ip' => $request->ip(),
                 'url' => $request->currentUrl(),
                 'method' => $request->method(),
-                'time' => $startTime
+                'query' => $request->query()->all(),
+                'body' => $request->request()->all(),
+                'headers' => $request->request()->all(),
             ]);
         }
 
-        // Run start hook
-        $this->triggerStartHook($request);
-
         // Set shutdown hook
-        register_shutdown_function(function (App $app, RequestInterface|RouteInterface $request) use ($startTime) {
-            // If shutdown before app stopped running
-            if ($app->status !== AppStatus::STOPPED) {
-                if ($request instanceof RequestInterface) {
-                    $response = new Response(version: $request->version(), format: $this->config->httpResponseFormat);
-                } else {
-                    $response = new Response(format: $this->config->httpResponseFormat);
+        register_shutdown_function(function () use ($request, $startTime) {
+            if ($request) {
+                // Leave logs for tracing
+                if ($this->config->logRequest && $request instanceof RequestInterface) {
+                    $endTime = microtime(true) * 1000;
+                    log_debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
                 }
-                $app->triggerCompleteHook($request, $response);
-
-                $endTime = microtime(true) * 1000;
-                log_debug(sprintf("Request completed for id: %s, time: %s, duration-ms: %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                // Clean up request
+                $request = NULL;
             }
-        }, $this, $request);
+            $this->status = AppStatus::STOPPED;
+        });
 
         // Process route request
         $response = $this->processMiddleware($request);
 
-        // Run complete hook
-        $this->triggerCompleteHook($request, $response);
-
-        $this->status = AppStatus::STOPPED;
-
-        // Leave logs for error tracking
-        if ($request instanceof RequestInterface) {
+        // Leave logs for tracing
+        if ($this->config->logRequest && $request instanceof RequestInterface) {
             $endTime = microtime(true) * 1000;
-            log_debug(sprintf("Request completed for id: %s, time: %s, duration-ms: %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+            log_debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
         }
 
+        // Clean up request
         $request = NULL;
 
         return $response;
+    }
+
+
+    /**
+     * Start application with event loop
+     *
+     * @param string $host
+     * @param integer $port
+     * @param integer $workers
+     * @return void
+     */
+    public function start(string $host, int $port = 80, $workers = 1)
+    {
+        // Set workerman log file
+        Worker::$logFile = $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+
+        // TODO  Add workers for background jobs
+
+        //------- Add Custom Middlewares -------//
+
+        $this->addMiddleware(new StatelessCookieMiddleware($this->config));
+        $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkermanSessionHandler(
+            new FileSessionHandler($this->config->getSessionConfigs()),
+            $this->config->encryptionKey
+        )));
+
+        //---- Main HTTP worker -----//
+
+        $this->worker = new Worker('http://' . $host . ':' . $port);
+        $this->worker->name = $this->config->name . ' v' . $this->config->version;
+        $this->worker->count = $workers;
+
+        $this->worker->onMessage = function (TcpConnection $connection, \Workerman\Protocols\Http\Request $request) {
+            try {
+                $request = Request::fromWorkerman($request, $this->config);
+                $response = $this->run($request)->prepare();
+                $connection->send(new HttpResponse($response->getStatusCode(), $response->getHttpHeaders(), $response->getBody()));
+            } catch (Throwable $e) {
+                $this->reporter->reportException($e);
+                $response = (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500)->prepare();
+                $connection->send(new HttpResponse($response->getStatusCode(), $response->getHttpHeaders(), $response->getBody()));
+            }
+        };
+        $this->worker->onWorkerStart = function () {
+            $this->status = AppStatus::RUNNNIG;
+            $this->startTimeMs = floor(microtime(true) * 1000);
+        };
+        $this->worker->onWorkerStop = function () {
+            $this->status = AppStatus::STOPPED;
+            log_debug(sprintf("Worker %s stopped", $this->worker->name));
+        };
+        $this->worker->onWorkerExit = function () {
+            $this->status = AppStatus::STOPPED;
+            log_debug(sprintf("Worker %s exited", $this->worker->name));
+        };
+
+        //----- Start event loop ------//
+
+        $this->setStateless(true);
+        Worker::runAll();
     }
 
     /**
@@ -322,90 +385,18 @@ class App implements HttpServerInterface, ContainerInterface
     {
         try {
             // Add default response handler
-            $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $request instanceof RequestInterface ?
+            $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $request instanceof RequestInterface ?
                 (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html(sprintf("Not found - %s %s", $request->method(), $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
 
             foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
-                $action = fn (RequestInterface|RouteInterface $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
+                $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
             }
             return ($action)($request);
         } catch (HttpException $e) {
             return $e->handler($this);
         } catch (Throwable $e) {
-
-            $trace = array_map(function ($instance) {
-                return (new ErrorTraceDto($instance));
-            }, $e->getTrace());
-
-            $response = new ResponseDto();
-            $response->success = false;
-            $response->message = $e->getMessage();
-            $response->env = $this->env;
-            $response->version = $this->config->version;
-
-            // Show more info if not production
-            if (!$response->success && $this->env !== Env::PROD) {
-                $response->errorLine = $e->getLine();
-                $response->errorFile = $e->getFile();
-                $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
-            }
-
-            return (new Response())->json($response->toArray(), 500);
-        }
-    }
-
-    /**
-     * Hook to run before processing request.
-     * Use this do perform any pre-validations such as maintainence mode checkings.
-     *
-     * @param Closure $startHook. E.g fn (App $app, RequestInterface|RouteInterface $request, ResponseInterface $response)
-     * @return void
-     */
-    public function beforeStart(Closure $startHook)
-    {
-        $this->startHook = $startHook;
-    }
-
-    /**
-     * 
-     * Process on start request hook
-     *
-     * @param RequestInterface|RouteInterface $request
-     * @return void
-     */
-    private function triggerStartHook(RequestInterface|RouteInterface $request)
-    {
-        if ($this->startHook) {
-            ($this->startHook)($this, $request);
-        }
-    }
-
-    /**
-     * Hook to run after processing request.
-     * Use this to perform any custom post-request processing
-     * 
-     * This also registers a shutdown handler.
-     * @see \register_shutdown_function
-     *
-     * @param Closure $completeHook. E.g fn (App $app, ResponseInterface $response)
-     * @return void
-     */
-    public function afterComplete(Closure $completeHook)
-    {
-        $this->completeHook = $completeHook;
-    }
-
-    /**
-     * Process on complete hook
-     *
-     * @param RequestInterface|RouteInterface $request
-     * @param ResponseInterface $response
-     * @return void
-     */
-    private function triggerCompleteHook(RequestInterface|RouteInterface $request, ResponseInterface $response)
-    {
-        if ($this->completeHook) {
-            ($this->completeHook)($this, $request, $response);
+            $this->reporter->reportException($e);
+            return (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500);
         }
     }
 
@@ -545,10 +536,10 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Set error reporter
      * 
-     * @param ErrorReportingInterface $reporter
+     * @param ReportingInterface $reporter
      * @return self
      */
-    public function setErrorReporter(ErrorReportingInterface $reporter)
+    public function setReporter(ReportingInterface $reporter)
     {
         $this->reporter = $reporter;
         return $this;

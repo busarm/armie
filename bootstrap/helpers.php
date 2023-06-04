@@ -193,7 +193,7 @@ function &load()
 
 /**
  * Get app reporter object
- * @return \Busarm\PhpMini\Interfaces\ErrorReportingInterface
+ * @return \Busarm\PhpMini\Interfaces\ReportingInterface
  */
 function &report()
 {
@@ -383,4 +383,53 @@ function find(callable $fn, array $list): mixed
 function is_list(array $list): bool
 {
     return array_values($list) === $list;
+}
+
+
+/**
+ * Create 'Set-Cookie' header value
+ *
+ * @param string $name
+ * @param string $value
+ * @param integer $expires
+ * @param string $path
+ * @param string $domain
+ * @param string $samesite
+ * @param boolean $secure
+ * @param boolean $httponly
+ * @return string
+ */
+function createSetCookieHeader(
+    string $name,
+    string $value,
+    int $expires = 0,
+    string $path = "",
+    string $domain = "",
+    string $samesite = "",
+    bool $secure = false,
+    bool $httponly = false
+): string {
+    $value = rawurlencode($value);
+    date_default_timezone_set('UTC');
+    $date = date("D, d-M-Y H:i:s", $expires) . ' GMT';
+    $header = "{$name}={$value}";
+    if ($expires != 0) {
+        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
+    }
+    if ($path != "") {
+        $header .= "; Path=" . $path;
+    }
+    if ($domain != "") {
+        $header .= "; Domain=" . $domain;
+    }
+    if ($samesite != "") {
+        $header .= "; SameSite=" . $samesite;
+    }
+    if ($secure) {
+        $header .= "; Secure";
+    }
+    if ($httponly) {
+        $header .= "; HttpOnly";
+    }
+    return $header;
 }

@@ -5,7 +5,7 @@
 
 # PHP Mini
 
-A micro php framework designed for simple and quick application or microservice development.
+A micro php framework designed to provide highly performance with elegance and optimal developer experience.
 
 ## Installation
 
@@ -31,6 +31,9 @@ App folders can be structured in whatever pattern you wish.
             ->setConfigPath('Configs')
             ->setViewPath('Views');
     $app = new App($config);
+
+    $app->get('/product/{id}')->to(ProductController::class, 'get');
+
     $app->run();
 ```
 
@@ -58,6 +61,7 @@ $ php -S localhost:8181 -t tests/TestServer
 
     /**
      * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
+     * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
      */
 
     require __DIR__ . '/../vendor/autoload.php';
@@ -67,7 +71,33 @@ $ php -S localhost:8181 -t tests/TestServer
         ->setConfigPath('Configs')
         ->setViewPath('Views');
     $app = new App($config);
-    return $app->run(Request::capture($request ?? null));
+    $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
+
+    $app->get('/product/{id}')->to(ProductController::class, 'get');
+
+    return $app->run(Request::capture($request ?? null, $config));
+```
+
+### Event Loop _(powered by [workerman](https://github.com/walkor/workerman))_
+
+```php
+    # ./start.php
+
+    $config = (new Config())
+            ->setAppPath(dirname(__DIR__))
+            ->setConfigPath('Configs')
+            ->setViewPath('Views');
+    $app = new App($config);
+
+    $app->get('/product/{id}')->to(ProductController::class, 'get');
+
+    $app->start("localhost", 8080);
+```
+
+Run command to start application
+
+```sh
+php start.php
 ```
 
 ## Configs

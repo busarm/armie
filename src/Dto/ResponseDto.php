@@ -2,6 +2,10 @@
 
 namespace Busarm\PhpMini\Dto;
 
+use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Enums\Env;
+use Throwable;
+
 /**
  * PHP Mini Framework
  *
@@ -151,5 +155,34 @@ class ResponseDto extends BaseDto
         $this->errorTrace = $errorTrace;
 
         return $this;
+    }
+
+    /**
+     * Initialize response dto with throwable
+     *
+     * @param Throwable $e
+     * @param Env::* $env App environment
+     * @param string $version App version
+     * @return self
+     */
+    public static function fromError(Throwable $e, $env, string $version): self
+    {
+
+        $trace = array_map(fn ($instance) => new ErrorTraceDto($instance), $e->getTrace());
+
+        $response = new ResponseDto();
+        $response->success = false;
+        $response->message = $e->getMessage();
+        $response->env = $env;
+        $response->version = $version;
+
+        // Show more info if not production
+        if (!$response->success && $env !== Env::PROD) {
+            $response->errorLine = $e->getLine();
+            $response->errorFile = $e->getFile();
+            $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
+        }
+
+        return $response;
     }
 }

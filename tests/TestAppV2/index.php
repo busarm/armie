@@ -21,8 +21,7 @@ $config = (new Config())
     ->setHttpAllowAnyCorsDomain(true)
     ->setHttpAllowedCorsHeaders(['*'])
     ->setHttpAllowedCorsMethods(['GET'])
-    ->setHttpSendAndContinue(false)
-    ->setHttpSessionAutoStart(false);
+    ->setHttpSendAndContinue(false);
 $app = new App($config);
 $app->setServiceDiscovery($discovery ?? new RemoteServiceDiscovery('https://server/discover'));
 

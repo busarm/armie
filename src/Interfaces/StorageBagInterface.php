@@ -14,6 +14,13 @@ use Stringable;
 interface StorageBagInterface extends Stringable
 {
     /**
+     * Load attributes from external source
+     * 
+     * @param array $attributes
+     * @return self
+     */
+    public function load(array $attributes): self;
+    /**
      * Set attribute
      *
      * @param string $name
@@ -54,6 +61,12 @@ interface StorageBagInterface extends Stringable
      * @return array
      */
     public function all(): array;
+    /**
+     * Get updated attributes
+     *
+     * @return array
+     */
+    public function updates(): array;
     /**
      * Set bulk attributes
      *

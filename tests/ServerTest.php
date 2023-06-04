@@ -42,7 +42,8 @@ final class ServerTest extends TestCase
         $config = (new Config())
             ->setAppPath(__DIR__ . '/TestApp')
             ->setConfigPath('Configs')
-            ->setViewPath('Views');
+            ->setViewPath('Views')
+            ->setLogRequest(false);
         $this->app = new App($config);
     }
 

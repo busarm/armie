@@ -6,6 +6,8 @@ use Busarm\PhpMini\Enums\CacheLimiter;
 use Busarm\PhpMini\Enums\ResponseFormat;
 use Busarm\PhpMini\Enums\SameSite;
 use Busarm\PhpMini\Enums\Verbose;
+use Busarm\PhpMini\Interfaces\ConfigurationInterface;
+use SessionHandlerInterface;
 
 /**
  * Application Configuration
@@ -15,14 +17,14 @@ use Busarm\PhpMini\Enums\Verbose;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class Config
+class Config implements ConfigurationInterface
 {
     /** 
      * Custom configs
      * 
      * @var array 
      */
-    protected array $custom = [];
+    protected array $_custom = [];
 
     /** 
      * Custom config files
@@ -70,14 +72,6 @@ class Config
     public string $uploadPath = '';
 
     /**
-     * Path to session folder
-     * (Without trailing slash)
-     *
-     * @var string
-     */
-    public string $sessionPath = '';
-
-    /**
      * Path to app folder - relative to system base path. e.g `/var/www/html/app`
      * (Without leading or trailing slash)
      *
@@ -108,13 +102,17 @@ class Config
      */
     public string|null $encryptionKey = NULL;
 
+
+    // ------------- COOKIE -----------------//
+
+
     /**
      * Cookie Prefix
      *
      * @var string|null
      */
     public string|null $cookiePrefix = NULL;
-    
+
     /**
      * Cookie Duration in seconds
      *
@@ -155,13 +153,58 @@ class Config
      * @var bool
      */
     public bool $cookieEncrypt = true;
-    
+
     /**
      * Cookie Same Site Policy
      * 
      * @var \Busarm\PhpMini\Enums\SameSite::*
      */
     public string $cookieSameSite = SameSite::LAX;
+
+
+    // ------------- SESSION -----------------//
+
+
+    /**
+     * Session Enabled
+     *
+     * @var bool
+     */
+    public bool $sessionEnabled = false;
+
+    /**
+     * Session save path
+     * (Without trailing slash)
+     *
+     * @var string
+     */
+    public string $sessionPath = '';
+
+    /**
+     * Session Name
+     *
+     * @var string
+     */
+    public string|null $sessionName = null;
+
+
+    /**
+     * Session Lifetime (seconds). e.g 10 for 10 seconds
+     *
+     * @var int
+     */
+    public int|null $sessionLifetime = null;
+
+    /**
+     * Session Handler
+     *
+     * @var SessionHandlerInterface
+     */
+    public SessionHandlerInterface|null $sessionHandler = null;
+
+
+    // ------------- CACHE -----------------//
+
 
     /**
      * Cache Limiter
@@ -170,12 +213,27 @@ class Config
      */
     public string $cacheLimiter = CacheLimiter::NO_CACHE;
 
+
+    // ------------- LOG -----------------//
+
+
+    /**
+     * Log request info for every request
+     *
+     * @var boolean
+     */
+    public bool $logRequest = false;
+
     /**
      * Logger verbosity
      * 
      * @var \Busarm\PhpMini\Enums\Verbose::*
      */
     public int $loggerVerborsity = Verbose::DEBUG;
+
+
+    // ------------- HTTP -----------------//
+
 
     /**
      * CORS Check
@@ -252,12 +310,9 @@ class Config
      */
     public string $httpResponseFormat = ResponseFormat::JSON;
 
-    /**
-     * Auto start session for HTTP request
-     *
-     * @var bool
-     */
-    public bool $httpSessionAutoStart = true;
+
+    // ------------- PDO -----------------//
+
 
     /**
      * PDO connection dns
@@ -330,13 +385,67 @@ class Config
      */
     public array $pdoConnectionOptions = [];
 
-    function __construct()
+
+    public function __construct()
     {
         $prefix =  str_replace(' ', '_', strtolower($this->name));
         $this->setTempPath(sys_get_temp_dir() . "/$prefix");
         $this->setCachePath($this->tempPath . '/cache');
         $this->setSessionPath($this->tempPath . '/session');
         $this->setUploadPath($this->tempPath . '/upload');
+    }
+
+    /**
+     * Get cookie configs
+     *
+     * @return array
+     */
+    public function getSessionConfigs(): array
+    {
+        return [
+            'cookie_lifetime' => $this->sessionLifetime ?: $this->cookieDuration,
+            'cookie_path' => $this->cookiePath,
+            'cookie_domain' => $this->cookieDomain,
+            'cookie_secure' => $this->cookieSecure,
+            'cookie_httponly' => $this->cookieHttpOnly,
+            'cookie_samesite' => $this->cookieSameSite,
+            'cache_limiter' => $this->cacheLimiter,
+            'save_path' => $this->sessionPath,
+            'name' => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)) . '_sess'
+        ];
+    }
+
+    /**
+     * Get cookie configs
+     *
+     * @return array
+     */
+    public function getCookieConfigs(): array
+    {
+        return [
+            'expires' => time() + $this->cookieDuration,
+            'path' => $this->cookiePath,
+            'domain' => $this->cookieDomain,
+            'secure' => $this->cookieSecure,
+            'httponly' => $this->cookieHttpOnly,
+            'samesite' => $this->cookieSameSite,
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get(string $name, $default = null)
+    {
+        return $this->_custom[$name] ?? $this->{$name} ?? $default;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set(string $name, $value = null)
+    {
+        return $this->_custom[$name] = $value;
     }
 
     /**
@@ -603,6 +712,35 @@ class Config
         return $this;
     }
 
+
+    /**
+     * Set session Handler
+     *
+     * @param  SessionHandlerInterface  $sessionHandler  Session Handler
+     *
+     * @return  self
+     */
+    public function setSessionHandler(SessionHandlerInterface $sessionHandler)
+    {
+        $this->sessionHandler = $sessionHandler;
+
+        return $this;
+    }
+
+    /**
+     * Set session Name
+     *
+     * @param  string  $sessionName  Session Name
+     *
+     * @return  self
+     */
+    public function setSessionName(string $sessionName)
+    {
+        $this->sessionName = $sessionName;
+
+        return $this;
+    }
+
     /**
      * Set cache Limiter
      *
@@ -613,6 +751,21 @@ class Config
     public function setCacheLimiter(string $cacheLimiter)
     {
         $this->cacheLimiter = $cacheLimiter;
+
+        return $this;
+    }
+
+
+    /**
+     * Set log request info for every request
+     *
+     * @param  boolean  $logRequest  Log request info for every request
+     *
+     * @return  self
+     */ 
+    public function setLogRequest(bool $logRequest)
+    {
+        $this->logRequest = $logRequest;
 
         return $this;
     }
@@ -758,23 +911,9 @@ class Config
     }
 
     /**
-     * Set auto start session for HTTP request
-     *
-     * @param  bool  $httpSessionAutoStart  Auto start session for HTTP request
-     *
-     * @return  self
-     */
-    public function setHttpSessionAutoStart(bool $httpSessionAutoStart)
-    {
-        $this->httpSessionAutoStart = $httpSessionAutoStart;
-
-        return $this;
-    }
-
-    /**
      * Add custom config file
      * 
-     * @param string $config Config file name/path relative to Config Path (@see `self::setConfigPath`)
+     * @param string $config Config file name/path relative to Config Path @see self::setConfigPath
      * @return self
      */
     public function addFile(string $config)
@@ -786,37 +925,13 @@ class Config
     /**
      * Add custom config files
      * 
-     * @param array $configs List of config file name/path relative to Config Path (@see `self::setConfigPath`)
+     * @param array $configs List of config file name/path relative to Config Path @see self::setConfigPath
      * @return self
      */
     public function addFiles($configs = array())
     {
         $this->files = array_merge($this->files, $configs);
         return $this;
-    }
-
-    /**
-     * Get custom config
-     * 
-     * @param string $name
-     * @param mixed $default
-     * @return mixed Returns config value or default
-     */
-    public function get(string $name, $default = null)
-    {
-        return $this->custom[$name] ?? $this->{$name} ?? $default;
-    }
-
-    /**
-     * Set custom config
-     * 
-     * @param string $name
-     * @param mixed $value
-     * @return mixed Returns value
-     */
-    public function set(string $name, $value = null)
-    {
-        return $this->custom[$name] = $value;
     }
 
     /**
@@ -955,6 +1070,34 @@ class Config
     public function setPdoConnectionOptions(array $pdoConnectionOptions)
     {
         $this->pdoConnectionOptions = $pdoConnectionOptions;
+
+        return $this;
+    }
+
+    /**
+     * Set session lifetime (seconds). e.g 10 for 10 seconds
+     *
+     * @param  int  $sessionLifetime  Session Lifetime (seconds). e.g 10 for 10 seconds
+     *
+     * @return  self
+     */
+    public function setSessionLifetime(int $sessionLifetime)
+    {
+        $this->sessionLifetime = $sessionLifetime;
+
+        return $this;
+    }
+
+    /**
+     * Set session enabled
+     *
+     * @param  bool  $sessionEnabled  Session Enabled
+     *
+     * @return  self
+     */
+    public function setSessionEnabled(bool $sessionEnabled)
+    {
+        $this->sessionEnabled = $sessionEnabled;
 
         return $this;
     }

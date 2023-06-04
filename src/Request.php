@@ -7,11 +7,13 @@ use Nyholm\Psr7\Uri;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Bags\Attribute;
-use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Bags\Upload;
+use Busarm\PhpMini\Bags\Cookie;
 use Busarm\PhpMini\Interfaces\Auth\AuthUserResolver;
-use Busarm\PhpMini\Session\PHPSession;
+use Busarm\PhpMini\Bags\Session;
+use Busarm\PhpMini\Bags\StatelessCookie;
+use Busarm\PhpMini\Bags\StatelessSession;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -19,10 +21,9 @@ use Busarm\PhpMini\Interfaces\UploadBagInterface;
 use Busarm\PhpMini\Traits\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Workerman\Protocols\Http\Request as HttpRequest;
 
 use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
-
-use function Busarm\PhpMini\Helpers\is_cli;
 
 /**
  * HTTP Request Provider
@@ -53,58 +54,17 @@ class Request implements RequestInterface
     protected string|null $_contentType     =   NULL;
     protected string|null $_protocol        =   NULL;
     protected mixed $_content               =   NUll;
+    protected HttpRequest|null $_workerman           =   NUll;
     protected ServerRequestInterface|null $_psr      =   NUll;
     protected SessionStoreInterface|null $_session   =   null;
+    protected StorageBagInterface|null $_cookies    =   null;
     protected StorageBagInterface|null $_request     =   null;
     protected StorageBagInterface|null $_query       =   null;
     protected StorageBagInterface|null $_server      =   null;
-    protected StorageBagInterface|null $_cookies     =   null;
     protected StorageBagInterface|null $_headers     =   null;
     protected UploadBagInterface|StorageBagInterface|null $_files      =   null;
     protected AuthUserResolver|null $_user           =   null;
 
-    private array $_sessionOptions   =   [];
-    private array $_cookieOptions    =   [];
-
-    /**
-     * Constructor.
-     */
-    protected function __construct(protected Config|null $config = null)
-    {
-        $this->setup();
-    }
-
-    /**
-     * Set up request
-     * 
-     * @return void
-     */
-    public function setUp()
-    {
-        if ($this->config) {
-            $this->_sessionOptions = [
-                'cookie_lifetime' => $this->config->cookieDuration,
-                'cookie_path' => $this->config->cookiePath,
-                'cookie_domain' => $this->config->cookieDomain,
-                'cookie_secure' => $this->config->cookieSecure,
-                'cookie_httponly' => $this->config->cookieHttpOnly,
-                'cookie_samesite' => $this->config->cookieSameSite,
-                'cache_expire' => $this->config->cookieDuration / 60,
-                'cache_limiter' => $this->config->cacheLimiter,
-                'save_path' => $this->config->sessionPath,
-                'name' => str_replace(' ', '_', strtolower($this->config->name)) . '_' . crc32($this->config->sessionPath) . '_sess'
-            ];
-
-            $this->_cookieOptions = [
-                'expires' => time() + $this->config->cookieDuration,
-                'path' => $this->config->cookiePath,
-                'domain' => $this->config->cookieDomain,
-                'secure' => $this->config->cookieSecure,
-                'httponly' => $this->config->cookieHttpOnly,
-                'samesite' => $this->config->cookieSameSite,
-            ];
-        }
-    }
 
     /**
      * Capture server request or create using Globals
@@ -134,12 +94,20 @@ class Request implements RequestInterface
     {
         if ($validUrl = filter_var($url, FILTER_VALIDATE_URL)) {
             $uri = new Uri($validUrl);
-            $request = new self($config);
+            $request = new self();
             $request->initialize(
                 (new Query)->setQuery($uri->getQuery()),
                 (new Attribute),
-                (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey)),
-                (new PHPSession($request->_sessionOptions)),
+                (new Cookie(
+                    $config ? $config->getCookieConfigs() : [],
+                    $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
+                    $config?->cookieEncrypt ? $config?->encryptionKey : null
+                )),
+                $config?->sessionEnabled ? (new Session(
+                    $config ? $config->getSessionConfigs() : [],
+                    $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                    $config?->sessionHandler
+                )) : null,
                 (new Attribute),
                 (new Attribute)
             );
@@ -166,12 +134,20 @@ class Request implements RequestInterface
      */
     public static function fromGlobal(Config|null $config = null): self
     {
-        $request = new self($config);
+        $request = new self();
         $request->initialize(
             (new Query)->mirror($_GET),
             (new Attribute)->mirror($_POST),
-            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))->mirror($_COOKIE),
-            (new PHPSession($request->_sessionOptions)),
+            (new Cookie(
+                $config ? $config->getCookieConfigs() : [],
+                $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
+                $config?->cookieEncrypt ? $config?->encryptionKey : null
+            )),
+            $config?->sessionEnabled ? (new Session(
+                $config ? $config->getSessionConfigs() : [],
+                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->sessionHandler
+            )) : null,
             (new Attribute)->mirror($_FILES),
             new Attribute($_SERVER)
         );
@@ -188,13 +164,20 @@ class Request implements RequestInterface
      */
     public static function fromPsr(ServerRequestInterface $psr, Config|null $config = null): self
     {
-        $request = new self($config);
+        $request = new self();
         $request->initialize(
             (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             new Attribute((array)($psr->getParsedBody() ?? [])),
-            (new Cookie($request->_cookieOptions, $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)), $config?->encryptionKey))
-                ->load($psr->getCookieParams() ?? []),
-            (new PHPSession($request->_sessionOptions)),
+            (new Cookie(
+                $config ? $config->getCookieConfigs() : [],
+                $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
+                $config?->cookieEncrypt ? $config?->encryptionKey : null
+            ))->load($psr->getCookieParams() ?? []),
+            $config?->sessionEnabled ? (new Session(
+                $config ? $config->getSessionConfigs() : [],
+                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->sessionHandler
+            )) : null,
             new Upload($psr->getUploadedFiles()),
             new Attribute($psr->getServerParams()),
             new Attribute(array_map(fn ($header) => $header[0] ?? null, $psr->getHeaders()))
@@ -207,6 +190,46 @@ class Request implements RequestInterface
         $request->_baseUrl = $request->_host;
         $request->_currentUrl = $request->_baseUrl . $request->_path;
         $request->_psr = $psr;
+        return $request;
+    }
+
+
+    /**
+     * Create request object from Workerman HTTP request
+     * 
+     * @param HttpRequest $http
+     * @param Config|null $config
+     * @return self
+     */
+    public static function fromWorkerman(HttpRequest $http, Config|null $config = null): self
+    {
+        $request = new self();
+        $request->initialize(
+            new Query($http->get() ?? []),
+            new Attribute($http->post() ?? []),
+            (new StatelessCookie(
+                $config ? $config->getCookieConfigs() : [],
+                $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
+                $config?->cookieEncrypt ? $config?->encryptionKey : null
+            ))->load($http->cookie() ?? []),
+            $config?->sessionEnabled ? (new StatelessSession(
+                $config?->getSessionConfigs()['name'] ?? 'PHPSESS',
+                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->sessionHandler
+            )) : null,
+            new Upload($http->file()),
+            new Attribute($_SERVER),
+            new Attribute($http->header())
+        );
+
+        $request->_protocol = $http->protocolVersion();
+        $request->_host = $http->host();
+        $request->_path = $http->path();
+        $request->_baseUrl = $request->_host;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_ip = $http->connection?->getRemoteIp() ?? $request->_ip;
+        $request->_workerman = $http;
+
         return $request;
     }
 
@@ -246,14 +269,14 @@ class Request implements RequestInterface
      * @return self
      */
     public function initialize(
-        StorageBagInterface $query = NULL,
-        StorageBagInterface $request = NULL,
-        StorageBagInterface $cookies = NULL,
-        SessionStoreInterface  $session = NULL,
-        UploadBagInterface|StorageBagInterface $files = NULL,
-        StorageBagInterface $server = NULL,
-        StorageBagInterface $headers = NULL,
-        $content = null
+        StorageBagInterface|null $query = NULL,
+        StorageBagInterface|null $request = NULL,
+        StorageBagInterface|null $cookies = NULL,
+        SessionStoreInterface|null  $session = NULL,
+        UploadBagInterface|StorageBagInterface|null $files = NULL,
+        StorageBagInterface|null $server = NULL,
+        StorageBagInterface|null $headers = NULL,
+        $content = null,
     ): self {
         $this->_request  =   $request ?: $this->_request;
         $this->_query    =   $query ?: $this->_query;
@@ -306,11 +329,6 @@ class Request implements RequestInterface
                 $this->_headers->get('x-trace-id') ??
                 $this->_headers->get('x-correlation-id'))
                 ?:  floor(microtime(true) * 1000) . '.' . md5(uniqid());
-        }
-
-        // Start session
-        if ($this->_session && $this->config && $this->config->httpSessionAutoStart) {
-            !is_cli() && $this->_session->start();
         }
 
         return $this;
@@ -629,9 +647,9 @@ class Request implements RequestInterface
 
     /**
      *
-     * @return SessionStoreInterface
+     * @return ?SessionStoreInterface
      */
-    public function session(): SessionStoreInterface
+    public function session(): ?SessionStoreInterface
     {
         return $this->_session;
     }

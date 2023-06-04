@@ -88,9 +88,9 @@ interface RequestInterface extends ContainerInterface
     public function file(): UploadBagInterface|StorageBagInterface;
 
     /**
-     * @return SessionStoreInterface
+     * @return ?SessionStoreInterface Returns NULL if session is not enabled
      */
-    public function session(): SessionStoreInterface;
+    public function session(): ?SessionStoreInterface;
 
     /**
      * @return StorageBagInterface

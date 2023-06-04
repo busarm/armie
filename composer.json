@@ -40,6 +40,8 @@
     "keywords": [
         "php",
         "framework",
+        "event-loop",
+        "asynchronous",
         "microservice"
     ],
     "minimum-stability": "stable",

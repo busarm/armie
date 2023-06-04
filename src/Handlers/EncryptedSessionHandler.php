@@ -22,9 +22,9 @@ final class EncryptedSessionHandler extends SessionHandler
      * Reads the session data from the session storage, and returns the results. Called right after the session starts or when session_start() is called. Please note that before this method is called SessionHandlerInterface::open() is invoked.
      *
      * @param string $id The session id.
-     * @return bool|string Returns an encoded string of the read data. If nothing was read, it must return `false` . Note this value is returned internally to PHP for processing.
+     * @return string|false Returns an encoded string of the read data. If nothing was read, it must return `false` . Note this value is returned internally to PHP for processing.
      */
-    public function read($id): bool|string
+    public function read($id): string|false
     {
         $data = parent::read($id);
         if ($this->key && $data) {

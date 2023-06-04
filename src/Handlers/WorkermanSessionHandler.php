@@ -45,9 +45,9 @@ final class WorkermanSessionHandler implements SessionHandlerInterface
      * Cleans up expired sessions. Called by session_start(), based on session.gc_divisor , session.gc_probability and session.gc_maxlifetime settings.
      *
      * @param int $max_lifetime Sessions that have not updated for the last `max_lifetime` seconds will be removed.
-     * @return bool|int Returns the number of deleted sessions on success, or `false` on failure. Note this value is returned internally to PHP for processing.
+     * @return int|false Returns the number of deleted sessions on success, or `false` on failure. Note this value is returned internally to PHP for processing.
      */
-    public function gc($max_lifetime): bool|int
+    public function gc($max_lifetime): int|false
     {
         return $this->handler->gc($max_lifetime);
     }
@@ -70,9 +70,9 @@ final class WorkermanSessionHandler implements SessionHandlerInterface
      * Reads the session data from the session storage, and returns the results. Called right after the session starts or when session_start() is called. Please note that before this method is called SessionHandlerInterface::open() is invoked.
      *
      * @param string $id The session id.
-     * @return bool|string Returns an encoded string of the read data. If nothing was read, it must return `false` . Note this value is returned internally to PHP for processing.
+     * @return string|false Returns an encoded string of the read data. If nothing was read, it must return `false` . Note this value is returned internally to PHP for processing.
      */
-    public function read($id): bool|string
+    public function read($id): string|false
     {
         $data = $this->handler->read($id);
         if ($this->key && $data) {

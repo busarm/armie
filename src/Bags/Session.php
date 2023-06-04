@@ -90,7 +90,9 @@ final class Session implements SessionStoreInterface
      */
     public function save(): bool
     {
-        return true;
+        $this->throwIfNotStarted();
+
+        return session_write_close();
     }
 
     /**

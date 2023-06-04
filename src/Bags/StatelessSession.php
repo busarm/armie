@@ -64,7 +64,11 @@ final class StatelessSession extends Attribute implements SessionStoreInterface
      */
     public function save(): bool
     {
-        return !empty($this->updates()) ? $this->handler->write($this->id, \serialize($this->all())) : true;
+        if (!empty($this->updates())) {
+            $this->handler->write($this->id, \serialize($this->all()));
+            return $this->handler->close();
+        }
+        return true;
     }
 
     /**

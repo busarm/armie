@@ -25,16 +25,9 @@ abstract class Model extends BaseDto implements ModelInterface
     const EVENT_AFTER_DELETE    =   'after_delete';
 
     /**
-     * @var array<string,callable[]>
+     * @var array<string,callable>
      */
-    protected static array $events = [
-        self::EVENT_BEFORE_CREATE => [],
-        self::EVENT_AFTER_CREATE => [],
-        self::EVENT_BEFORE_UPDATE => [],
-        self::EVENT_AFTER_UPDATE => [],
-        self::EVENT_BEFORE_DELETE => [],
-        self::EVENT_AFTER_DELETE => [],
-    ];
+    protected static array $events = [];
 
     /**
      * Database connection instance.
@@ -55,7 +48,7 @@ abstract class Model extends BaseDto implements ModelInterface
      *
      * @var boolean
      */
-    protected bool $isNew = true;
+    protected bool $new = true;
 
     /**
      * Auto populate relations.
@@ -124,25 +117,25 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Set the value of isNew.
+     * Set the value of new.
      * Model is new - data hasn't been saved.
      *
      * @return  self
      */
-    public function setIsNew(bool $isNew)
+    public function setNew(bool $new)
     {
-        $this->isNew = $isNew;
+        $this->new = $new;
 
         return $this;
     }
 
     /**
-     * Get the value of isNew.
+     * Get the value of new.
      * Model is new - data hasn't been saved.
      */
-    public function getIsNew()
+    public function isNew()
     {
-        return $this->isNew;
+        return $this->new;
     }
 
     /**
@@ -387,7 +380,7 @@ abstract class Model extends BaseDto implements ModelInterface
 
         if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchObject(static::class))) {
             return $result
-                ->setIsNew(false)
+                ->setNew(false)
                 ->setPerPage($this->getPerPage())
                 ->setAutoLoadRelations($this->getAutoLoadRelations())
                 ->processAutoLoadRelations()
@@ -441,7 +434,7 @@ abstract class Model extends BaseDto implements ModelInterface
         if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class)) {
             return $this->processEagerLoadRelations(array_map(
                 fn (self $result) => $result
-                    ->setIsNew(false)
+                    ->setNew(false)
                     ->setPerPage($this->getPerPage())
                     ->setAutoLoadRelations($this->getAutoLoadRelations())
                     ->processAutoLoadRelations()
@@ -511,7 +504,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public function save($trim = false, $relations = true): bool
     {
         // Create
-        if ($this->isNew || !isset($this->{$this->getKeyName()})) {
+        if ($this->new || !isset($this->{$this->getKeyName()})) {
 
             self::emit(self::EVENT_BEFORE_CREATE, $this);
 
@@ -571,7 +564,7 @@ abstract class Model extends BaseDto implements ModelInterface
             self::emit(self::EVENT_AFTER_UPDATE, $this);
         }
 
-        $this->isNew = false;
+        $this->new = false;
 
         // Save relations if available
         if ($relations) {
@@ -974,14 +967,12 @@ abstract class Model extends BaseDto implements ModelInterface
      * Listen to model event
      *
      * @param string $event
-     * @param callable $fn
+     * @param callable $fn Lisner - `fn(self model) => void`
      * @return void
      */
     public static function listen(string $event, callable $fn)
     {
-        if (isset(self::$events[$event])) {
-            self::$events[$event][] = $fn;
-        }
+        self::$events[$event] = $fn;
     }
 
     /**
@@ -993,10 +984,9 @@ abstract class Model extends BaseDto implements ModelInterface
      */
     public static function emit(string $event, self $model)
     {
-        if (isset(self::$events[$event])) {
-            foreach (self::$events[$event] as $fn) {
-                $fn($model);
-            }
+        if (array_key_exists($event, self::$events)) {
+            $fn = self::$events[$event];
+            $fn($model);
         }
     }
 

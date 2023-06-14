@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Auth;
+namespace Busarm\PhpMini\Interfaces\Resolver;
 
 /**
  * PHP Mini Framework

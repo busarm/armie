@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Test;
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Data\PDO\Relation;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
@@ -49,15 +50,16 @@ final class PDOTest extends TestCase
                 ->setAppPath(__DIR__ . '/TestApp')
                 ->setConfigPath('Configs')
                 ->setViewPath('Views')
-                ->setPdoConnectionDriver("mysql")
-                ->setPdoConnectionHost("localhost")
-                ->setPdoConnectionDatabase('default')
-                ->setPdoConnectionPort(3306)
-                ->setPdoConnectionUsername("root")
-                ->setPdoConnectionPassword("root")
-                ->setPdoConnectionPersist(false)
-                ->setPdoConnectionErrorMode(true)
-                ->setLogRequest(false);
+                ->setLogRequest(false)
+                ->setDb((new PDOConfig)
+                    ->setConnectionDriver("mysql")
+                    ->setConnectionHost("localhost")
+                    ->setConnectionDatabase('default')
+                    ->setConnectionPort(3306)
+                    ->setConnectionUsername("root")
+                    ->setConnectionPassword("root")
+                    ->setConnectionPersist(false)
+                    ->setConnectionErrorMode(true));
             self::$app = new App($config);
         }
         $this->faker = Factory::create();

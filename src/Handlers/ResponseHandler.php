@@ -41,7 +41,7 @@ final class ResponseHandler implements ResponseHandlerInterface
                         $response->setParameters($this->data->toArray());
                     } elseif (is_array($this->data) || is_object($this->data)) {
                         $response->setBody(Stream::create(json_encode($this->data)));
-                    } else {
+                    } elseif ($this->data !== true) {
                         $response->html(Stream::create($this->data), 200);
                     }
                 }

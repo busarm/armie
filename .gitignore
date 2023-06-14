@@ -1,9 +1,10 @@
 /vendor/
 *.cache
 *.log
+*.pid
+*.status
 .phpunit.*
 .phpdoc.*
 .tmp/
 .vscode/
 .docs/
-

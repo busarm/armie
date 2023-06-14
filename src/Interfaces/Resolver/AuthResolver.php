@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Auth;
+namespace Busarm\PhpMini\Interfaces\Resolver;
 
 /**
  * PHP Mini Framework
@@ -14,9 +14,9 @@ interface AuthResolver
     /**
      * Get auth data. e.g Auth token, API Key
      * 
-     * @return mixed
+     * @return string
      */
-    public function getData(): mixed;
+    public function getToken(): string;
 
     /**
      * Get auth user

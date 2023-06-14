@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Enums\ResponseFormat;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
+use Workerman\Protocols\Http\Response as HttpResponse;
 use Stringable;
 
 /**
@@ -225,4 +226,9 @@ interface ResponseInterface extends Stringable
      * @return MessageResponseInterface
      */
     public function toPsr(): MessageResponseInterface;
+
+    /**
+     * @return HttpResponse
+     */
+    public function toWorkerman(): HttpResponse;
 }

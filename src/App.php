@@ -5,8 +5,6 @@ namespace Busarm\PhpMini;
 use Busarm\PhpMini\Middlewares\StatelessCookieMiddleware;
 use Throwable;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Dto\ErrorTraceDto;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\AppStatus;
@@ -35,19 +33,22 @@ use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
 use Busarm\PhpMini\Middlewares\PsrMiddleware;
 use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
 use Busarm\PhpMini\Traits\Container;
+use Psr\Http\Message\RequestInterface as MessageRequestInterface;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Server\MiddlewareInterface as ServerMiddlewareInterface;
 
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Workerman\Connection\ConnectionInterface;
 use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Response as HttpResponse;
+use Workerman\Protocols\Http\Request as HttpRequest;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
 use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 // TODO Event Manager Interface - Handle sync and async dispatch
 // TODO Queue Manager Interface - Handle sync and async jobs
@@ -66,6 +67,22 @@ use function Busarm\PhpMini\Helpers\log_debug;
 class App implements HttpServerInterface, ContainerInterface
 {
     use Container;
+
+    /**
+     * List of classes that must be handled stateless when running in stateless mode
+     */
+    public static $statelessClasses = [
+        Request::class,
+        HttpRequest::class,
+        RequestInterface::class,
+        MessageRequestInterface::class,
+        ServerRequestInterface::class,
+        Response::class,
+        ResponseInterface::class,
+        MessageResponseInterface::class,
+        Route::class,
+        RouteInterface::class
+    ];
 
     /** @var static App instance */
     private static $__instance = null;
@@ -100,10 +117,7 @@ class App implements HttpServerInterface, ContainerInterface
     /** @var boolean 
      * If app is running in stateless mode. E.g Using Swoole or other Event loops. 
      * Do not use static variables for user specific data when runing on stateless mode.
-     * 
-     * Stateless mode does not support adding:
-     * - Application-wide singletons
-     * */
+     */
     public bool $stateless = false;
 
     /**
@@ -180,6 +194,27 @@ class App implements HttpServerInterface, ContainerInterface
         $this->loadProviders();
     }
 
+    /**
+     * [RESTRICTED]
+     *
+     * @param mixed $key
+     * @param mixed $val
+     */
+    public function __set($key, $val)
+    {
+        throw new SystemError("This action has been forbidden");
+    }
+
+    /**
+     * [RESTRICTED]
+     *
+     * @param mixed $key
+     */
+    public function __get($key)
+    {
+        throw new SystemError("This action has been forbidden");
+    }
+
     /**  
      * Get application instance
      * @return self 
@@ -246,7 +281,7 @@ class App implements HttpServerInterface, ContainerInterface
         });
         set_exception_handler(function (Throwable $e) {
             if ($e instanceof HttpException) {
-                $e->handler($this)->send($this->config->httpSendAndContinue);
+                $e->handler($this)->send($this->config->http->sendAndContinue);
             } else {
                 $this->reporter->reportException($e);
                 $trace = array_map(function ($instance) {
@@ -258,7 +293,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Run application
+     * Process application request
      *
      * @param RequestInterface|RouteInterface|null $request Custom request or route object
      * @return ResponseInterface
@@ -268,12 +303,12 @@ class App implements HttpServerInterface, ContainerInterface
         $this->status = AppStatus::RUNNNIG;
         $startTime = $this->stateless ? microtime(true) * 1000 : $this->startTimeMs;
 
-        // Set request & response & router
+        // Set request
         $request = $request ?? Request::fromGlobal($this->config);
 
         // Leave logs for tracing
         if ($this->config->logRequest && $request instanceof RequestInterface) {
-            log_debug(sprintf("Request started: id = %s, time = %s", $request->correlationId(), $startTime));
+            $this->logger->debug(sprintf("Request started: id = %s, time = %s", $request->correlationId(), $startTime));
             $this->reporter->reportInfo([
                 'time' => $startTime,
                 'correlationId' => $request->correlationId(),
@@ -289,11 +324,18 @@ class App implements HttpServerInterface, ContainerInterface
         // Set shutdown hook
         register_shutdown_function(function () use ($request, $startTime) {
             if ($request) {
-                // Leave logs for tracing
-                if ($this->config->logRequest && $request instanceof RequestInterface) {
-                    $endTime = microtime(true) * 1000;
-                    log_debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                if ($request instanceof RequestInterface) {
+
+                    // Leave logs for tracing
+                    if ($this->config->logRequest && $request instanceof RequestInterface) {
+                        $endTime = microtime(true) * 1000;
+                        $this->logger->debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                    }
+
+                    // Save session
+                    $request->session()?->save();
                 }
+
                 // Clean up request
                 $request = NULL;
             }
@@ -306,7 +348,7 @@ class App implements HttpServerInterface, ContainerInterface
         // Leave logs for tracing
         if ($this->config->logRequest && $request instanceof RequestInterface) {
             $endTime = microtime(true) * 1000;
-            log_debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+            $this->logger->debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
         }
 
         // Clean up request
@@ -317,7 +359,7 @@ class App implements HttpServerInterface, ContainerInterface
 
 
     /**
-     * Start application with event loop
+     * Start async http server
      *
      * @param string $host
      * @param integer $port
@@ -328,6 +370,8 @@ class App implements HttpServerInterface, ContainerInterface
     {
         // Set workerman log file
         Worker::$logFile = $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+        Worker::$statusFile = $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
+        Worker::$pidFile = $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
 
         // TODO  Add workers for background jobs
 
@@ -341,33 +385,60 @@ class App implements HttpServerInterface, ContainerInterface
 
         //---- Main HTTP worker -----//
 
-        $this->worker = new Worker('http://' . $host . ':' . $port);
+        // Set up SSL context.
+        $ssl = $this->config->sslEnabled && $this->config->sslCertPath && $this->config->sslPkPath;
+        $context = $ssl ? [
+            'ssl' => [
+                'local_cert'  => $this->config->sslCertPath,
+                'local_pk'    => $this->config->sslPkPath,
+                'verify_peer' => $this->config->sslVerifyPeer,
+            ]
+        ] : [];
+
+        // Init Worker
+        $this->worker = new Worker($ssl ? 'https://' : 'http://' . $host . ':' . $port, $context);
         $this->worker->name = $this->config->name . ' v' . $this->config->version;
         $this->worker->count = $workers;
+        if ($ssl) $this->worker->transport = 'ssl';
 
-        $this->worker->onMessage = function (TcpConnection $connection, \Workerman\Protocols\Http\Request $request) {
+        // Add handlers
+        $this->worker->onMessage = function (TcpConnection $connection, HttpRequest $request) {
             try {
                 $request = Request::fromWorkerman($request, $this->config);
                 $response = $this->run($request)->prepare();
-                $connection->send(new HttpResponse($response->getStatusCode(), $response->getHttpHeaders(), $response->getBody()));
+                $connection->send($response->toWorkerman());
             } catch (Throwable $e) {
                 $this->reporter->reportException($e);
                 $response = (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500)->prepare();
-                $connection->send(new HttpResponse($response->getStatusCode(), $response->getHttpHeaders(), $response->getBody()));
+                $connection->send($response->toWorkerman());
             }
         };
-        $this->worker->onWorkerStart = function () {
+        $this->worker->onWorkerStart = function (Worker $worker) {
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
+            $this->logger->debug(sprintf("Worker %s process %s started", $worker->name, $worker->id));
         };
-        $this->worker->onWorkerStop = function () {
+        $this->worker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;
-            log_debug(sprintf("Worker %s stopped", $this->worker->name));
+            $this->logger->debug(sprintf("Worker %s process %s stopped", $worker->name, $worker->id));
         };
-        $this->worker->onWorkerExit = function () {
+        $this->worker->onWorkerExit = function (Worker $worker, $master, $pid) {
             $this->status = AppStatus::STOPPED;
-            log_debug(sprintf("Worker %s exited", $this->worker->name));
+            $this->logger->debug(sprintf("Worker %s master %s pid %s exited", $worker->name, $master, $pid));
         };
+        $this->worker->onConnect = function (ConnectionInterface $connection) {
+            $this->config->logRequest
+                &&  $this->logger->debug(sprintf("Connection from %s started; through %s", $connection->getRemoteIp(), $connection->getRemotePort()));
+        };
+        $this->worker->onClose = function (ConnectionInterface $connection) {
+            $this->config->logRequest
+                &&  $this->logger->debug(sprintf("Connection from %s closed; sent to %s", $connection->getRemoteIp(), $connection->getRemotePort()));
+        };
+        $this->worker->onError = function ($error) {
+            $this->logger->error(strval($error));
+        };
+
+        // TODO Add socket handler, socket request dto and socket data dto
 
         //----- Start event loop ------//
 
@@ -386,7 +457,7 @@ class App implements HttpServerInterface, ContainerInterface
         try {
             // Add default response handler
             $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $request instanceof RequestInterface ?
-                (new Response(version: $request->version(), format: $this->config->httpResponseFormat))->html(sprintf("Not found - %s %s", $request->method(), $request->path()), 404) : (new Response(format: $this->config->httpResponseFormat))->html("Resource not found", 404);
+                (new Response(version: $request->version(), format: $this->config->http->responseFormat))->html(sprintf("Not found - %s %s", $request->method(), $request->path()), 404) : (new Response(format: $this->config->http->responseFormat))->html("Resource not found", 404);
 
             foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
                 $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
@@ -436,7 +507,14 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function addSingleton(string $className, &$object): static
     {
-        if ($this->status === AppStatus::RUNNNIG && $this->stateless) return $this;
+        // Prevent setting global singletons for stateless classes
+        // with stateless mode if app is running
+        if (
+            $this->status === AppStatus::RUNNNIG
+            && $this->stateless
+            && in_array($className, self::$statelessClasses)
+        ) return $this;
+
         $this->singletons[$className] = $object;
         return $this;
     }
@@ -574,11 +652,7 @@ class App implements HttpServerInterface, ContainerInterface
     ############################
 
     /**
-     * Set HTTP GET routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function get(string $path): RouteInterface
     {
@@ -586,11 +660,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP POST routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function post(string $path): RouteInterface
     {
@@ -598,11 +668,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP PUT routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function put(string $path): RouteInterface
     {
@@ -610,11 +676,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP PATCH routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function patch(string $path): RouteInterface
     {
@@ -622,11 +684,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP DELETE routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function delete(string $path): RouteInterface
     {
@@ -634,11 +692,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP HEAD routes
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function head(string $path): RouteInterface
     {
@@ -646,21 +700,7 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set HTTP CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
-     * Creates the following routes:
-     * - GET    $path/list
-     * - GET    $path/paginate
-     * - GET    $path/{id}
-     * - POST   $path/bulk
-     * - POST   $path
-     * - PUT    $path/bulk
-     * - PUT    $path/{id}
-     * - DELETE $path/bulk
-     * - DELETE $path/{id}
-     *
-     * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home
-     * @return mixed
+     * @inheritDoc
      */
     public function crud(string $path, string $controller)
     {
@@ -735,37 +775,7 @@ class App implements HttpServerInterface, ContainerInterface
                 $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
             }
 
-            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->httpSendAndContinue);
+            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->http->sendAndContinue);
         }
-    }
-
-    /**
-     * Send HTTP JSON Response
-     * @param int $status Status Code
-     * @param CollectionBaseDto|BaseDto|array|object|string|null $data Data
-     * @param array $headers Headers
-     * @return void
-     */
-    public function sendHttpResponse($status, $data = null, $headers = [])
-    {
-        if (!is_array($data)) {
-            if ($data instanceof CollectionBaseDto) {
-                $data = $data->toArray();
-            } else if ($data instanceof BaseDto) {
-                $data = $data->toArray();
-            } else if (is_object($data)) {
-                $data = (array) $data;
-            } else {
-                $response = new ResponseDto();
-                $response->success = $status < 300;
-                $response->message = $data;
-                $data = $response->toArray();
-            }
-        }
-
-        (new Response)
-            ->addHttpHeaders($headers)
-            ->json($data, ($status >= 100 && $status < 600) ? $status : 500)
-            ->send($this->config->httpSendAndContinue);
     }
 }

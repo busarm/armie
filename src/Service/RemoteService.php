@@ -14,8 +14,6 @@ use GuzzleHttp\RequestOptions;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
 
-use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
-
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
 /**
@@ -51,7 +49,7 @@ class RemoteService extends BaseService
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
-        $dto->headers[VAR_CORRELATION_ID] = $request->correlationId();
+        $dto->headers['x-trace-id'] = $request->correlationId();
 
         $client = new Client([
             'timeout'  => $this->timeout,
@@ -69,14 +67,14 @@ class RemoteService extends BaseService
                     RequestOptions::QUERY => array_merge($dto->params, $query),
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false,
-                    RequestOptions::MULTIPART => $dto->files,
+                    RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ] :
                 [
                     RequestOptions::QUERY => $query,
                     RequestOptions::BODY => $dto->params,
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false,
-                    RequestOptions::MULTIPART => $dto->files,
+                    RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ]
         );
     }
@@ -102,7 +100,7 @@ class RemoteService extends BaseService
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
-        $dto->headers[VAR_CORRELATION_ID] = $request->correlationId();
+        $dto->headers['x-trace-id'] = $request->correlationId();
 
         $client = new Client([
             'timeout'  => $this->timeout,
@@ -120,14 +118,14 @@ class RemoteService extends BaseService
                     RequestOptions::QUERY => array_merge($dto->params, $query),
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false,
-                    RequestOptions::MULTIPART => $dto->files,
+                    RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ] :
                 [
                     RequestOptions::QUERY => $query,
                     RequestOptions::BODY => $dto->params,
                     RequestOptions::HEADERS => $dto->headers,
                     RequestOptions::VERIFY => false,
-                    RequestOptions::MULTIPART => $dto->files,
+                    RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ]
         );
     }

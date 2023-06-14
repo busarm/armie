@@ -2,6 +2,7 @@
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Response;
@@ -11,14 +12,15 @@ use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-$config = (new Config())
+$config = (new Config)
     ->setAppPath(__DIR__)
     ->setEncryptionKey("ds3d5Posdf@nZods!mfo")
     ->setCookieEncrypt(true)
-    ->setHttpCheckCors(true)
-    ->setHttpAllowAnyCorsDomain(true)
-    ->setHttpAllowedCorsHeaders(['*'])
-    ->setHttpAllowedCorsMethods(['GET'])
+    ->setHttp((new HttpConfig)
+        ->setCheckCors(true)
+        ->setAllowAnyCorsDomain(true)
+        ->setAllowedCorsHeaders(['*'])
+        ->setAllowedCorsMethods(['GET']))
     ->setLogRequest(false)
     ->setSessionEnabled(false)
     ->setSessionLifetime(60);
@@ -34,6 +36,7 @@ $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->cookie()->set("TestCookie", "test", 30);
     $req->session()?->set("TestSession", "test");
+    // $req->connection()?->getConnection()?->send("HAHAHAHA TEST");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -52,4 +55,4 @@ $app->get('download')->call(function (Response $response) {
     return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
-$app->start('localhost', 8181, 2);
+$app->start('localhost', 8181, 5);

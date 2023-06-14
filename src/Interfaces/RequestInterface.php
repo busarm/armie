@@ -2,9 +2,10 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Auth\AuthUserResolver;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
+use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
+use Busarm\PhpMini\Interfaces\Resolver\ServerConnectionResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -118,66 +119,77 @@ interface RequestInterface extends ContainerInterface
     public function header(): StorageBagInterface;
 
     /**
-     * @return AuthUserResolver|null
+     * @return AuthResolver|null
      */
-    public function user(): AuthUserResolver|null;
+    public function auth(): AuthResolver|null;
 
+    /**
+     * @return ServerConnectionResolver|null
+     */
+    public function connection(): ServerConnectionResolver|null;
 
     /**
      * Set the value of session
      *
      * @return  self
      */
-    public function setSession(SessionStoreInterface $session);
+    public function setSession(SessionStoreInterface $session): self;
 
     /**
      * Set the value of request
      *
      * @return  self
      */
-    public function setRequest(StorageBagInterface $request);
+    public function setRequest(StorageBagInterface $request): self;
 
     /**
      * Set the value of query
      *
      * @return  self
      */
-    public function setQuery(StorageBagInterface $query);
+    public function setQuery(StorageBagInterface $query): self;
 
     /**
      * Set the value of server
      *
      * @return  self
      */
-    public function setServer(StorageBagInterface $server);
+    public function setServer(StorageBagInterface $server): self;
 
     /**
      * Set the value of files
      *
      * @return  self
      */
-    public function setFiles(UploadBagInterface|StorageBagInterface $files);
+    public function setFiles(UploadBagInterface|StorageBagInterface $files): self;
 
     /**
      * Set the value of cookies
      *
      * @return  self
      */
-    public function setCookies(StorageBagInterface $cookies);
+    public function setCookies(StorageBagInterface $cookies): self;
 
     /**
      * Set the value of headers
      *
      * @return  self
      */
-    public function setHeaders(StorageBagInterface $headers);
+    public function setHeaders(StorageBagInterface $headers): self;
 
     /**
      * Set the value of user
      *
      * @return  self
      */
-    public function setUser(AuthUserResolver $auth);
+    public function setAuth(AuthResolver $auth): self;
+
+    /**
+     * Set the value of connection
+     *
+     * @return  self
+     */
+    public function setConnection(ServerConnectionResolver $connection): self;
 
     /**
      * @param UriInterface $uri

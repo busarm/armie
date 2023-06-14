@@ -14,7 +14,8 @@ use Busarm\PhpMini\Middlewares\CorsMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Bags\Bag;
+use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
@@ -145,8 +146,8 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActive()
     {
-        $this->app->config->setHttpCheckCors(true);
-        $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->config->http->setCheckCors(true);
+        $this->app->config->http->setAllowAnyCorsDomain(true);
         $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
@@ -156,7 +157,7 @@ final class AppTest extends TestCase
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
-            )->setServer((new Attribute([
+            )->setServer((new Bag([
                 'HTTP_ORIGIN' => 'localhost:81'
             ])))->initialize()
         );
@@ -174,9 +175,9 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActiveOrigin()
     {
-        $this->app->config->setHttpCheckCors(true);
-        $this->app->config->setHttpAllowAnyCorsDomain(false);
-        $this->app->config->setHttpAllowedCorsOrigins([
+        $this->app->config->http->setCheckCors(true);
+        $this->app->config->http->setAllowAnyCorsDomain(false);
+        $this->app->config->http->setAllowedCorsOrigins([
             'localhost:81'
         ]);
         $this->app->addMiddleware(new CorsMiddleware($this->app->config));
@@ -188,7 +189,7 @@ final class AppTest extends TestCase
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
-            )->setServer((new Attribute([
+            )->setServer((new Bag([
                 'HTTP_ORIGIN' => 'localhost:81'
             ])))->initialize()
         );
@@ -205,9 +206,9 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSActiveOriginFailed()
     {
-        $this->app->config->setHttpCheckCors(true);
-        $this->app->config->setHttpAllowAnyCorsDomain(false);
-        $this->app->config->setHttpAllowedCorsOrigins([
+        $this->app->config->http->setCheckCors(true);
+        $this->app->config->http->setAllowAnyCorsDomain(false);
+        $this->app->config->http->setAllowedCorsOrigins([
             'localhost:81'
         ]);
         $this->app->addMiddleware(new CorsMiddleware($this->app->config));
@@ -219,7 +220,7 @@ final class AppTest extends TestCase
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
-            )->setServer((new Attribute([
+            )->setServer((new Bag([
                 'HTTP_ORIGIN' => 'localhost:8080'
             ])))->initialize()
         );
@@ -235,8 +236,8 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpCORSInactive()
     {
-        $this->app->config->setHttpCheckCors(false);
-        $this->app->config->setHttpAllowAnyCorsDomain(true);
+        $this->app->config->http->setCheckCors(false);
+        $this->app->config->http->setAllowAnyCorsDomain(true);
         $this->app->addMiddleware(new CorsMiddleware($this->app->config));
         $this->app->router->addRoutes([
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml')
@@ -270,7 +271,7 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app singletons on stateless requests - should not be supported
+     * Test app singletons for stateless class on stateless mode - should not be supported
      *
      * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
      * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
@@ -279,6 +280,7 @@ final class AppTest extends TestCase
      */
     public function testAppSingletonNotSupportedOnStatelessRequest()
     {
+        App::$statelessClasses[] = MockService::class;
         $this->app->stateless = true;
         $this->app->router->addRoutes([
             Route::get('ping')->call(function () {
@@ -333,7 +335,7 @@ final class AppTest extends TestCase
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::GET,
                 $this->app->config
-            )->setServer((new Attribute([
+            )->setServer((new Bag([
                 'REMOTE_ADDR' => '127.0.0.2'
             ])))->initialize()
         );
@@ -353,14 +355,15 @@ final class AppTest extends TestCase
             ->setAppPath(__DIR__ . '/TestApp')
             ->setConfigPath('Configs')
             ->setViewPath('Views')
-            ->setPdoConnectionDriver("mysql")
-            ->setPdoConnectionHost("localhost")
-            ->setPdoConnectionDatabase('default')
-            ->setPdoConnectionPort(3306)
-            ->setPdoConnectionUsername("root")
-            ->setPdoConnectionPassword("root")
-            ->setPdoConnectionPersist(false)
-            ->setPdoConnectionErrorMode(true);
+            ->setDb((new PDOConfig)
+                ->setConnectionDriver("mysql")
+                ->setConnectionHost("localhost")
+                ->setConnectionDatabase('default')
+                ->setConnectionPort(3306)
+                ->setConnectionUsername("root")
+                ->setConnectionPassword("root")
+                ->setConnectionPersist(false)
+                ->setConnectionErrorMode(true));
 
         $this->app->router->addCrudRoutes('product', ProductTestController::class);
         $response = $this->app->run(
@@ -387,7 +390,7 @@ final class AppTest extends TestCase
     {
         $this->app->get('auth/test')->to(AuthTestController::class, 'test');
         $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/auth/test', HttpMethod::GET, $this->app->config)
-            ->setServer((new Attribute([
+            ->setServer((new Bag([
                 'HTTP_AUTHORIZATION' => 'php112233445566'
             ])))->initialize());
         $this->assertNotNull($response);

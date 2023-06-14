@@ -16,7 +16,7 @@ use SessionHandlerInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
-final class StatelessSession extends Attribute implements SessionStoreInterface
+final class StatelessSession extends Bag implements SessionStoreInterface
 {
     protected string|null $id = null;
     protected SessionHandler|SessionHandlerInterface|null $handler = null;
@@ -44,12 +44,12 @@ final class StatelessSession extends Attribute implements SessionStoreInterface
         $this->id = !empty($id) ? $id : sha1(uniqid(bin2hex(random_bytes(8))));
         $this->checkSessionId($this->id);
 
-        $data = $this->handler->read($id);
+        $data = $this->handler->read($this->id);
         if (!empty($data)) {
             $this->load(\unserialize($data) ?? []);
             return true;
         } else {
-            if ($this->handler->write($id, \serialize([]))) {
+            if ($this->handler->write($this->id, \serialize([]))) {
                 $this->load([]);
                 return true;
             }

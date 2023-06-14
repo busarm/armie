@@ -677,8 +677,6 @@ class Response implements ResponseInterface
      */
     public function toWorkerman(): HttpResponse
     {
-        // TODO set response cookies
-        $response = new HttpResponse(500, $this->getHttpHeaders(), $this->getBody());
-        return $response;
+        return new HttpResponse($this->getStatusCode(), $this->getHttpHeaders(), $this->getBody());
     }
 }

@@ -43,7 +43,7 @@ You can use PHP server built-in server to test:
 $ php -S localhost:8181 -t tests/TestServer
 ```
 
-### Multi Tenancy
+### Multi Tenancy Server
 
 ```php
 
@@ -78,7 +78,7 @@ $ php -S localhost:8181 -t tests/TestServer
     return $app->run(Request::capture($request ?? null, $config));
 ```
 
-### Event Loop _(powered by [workerman](https://github.com/walkor/workerman))_
+### Asynchronous HTTP Server _(powered by [workerman](https://github.com/walkor/workerman))_
 
 ```php
     # ./start.php
@@ -91,13 +91,22 @@ $ php -S localhost:8181 -t tests/TestServer
 
     $app->get('/product/{id}')->to(ProductController::class, 'get');
 
+    // With Single processes
     $app->start("localhost", 8080);
+
+    // With 5 processes
+    $app->start("localhost", 8080, 5);
+
 ```
 
 Run command to start application
 
 ```sh
+# Windows
 php start.php
+
+# Linux
+php start.php start
 ```
 
 ## Configs

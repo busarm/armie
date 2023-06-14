@@ -12,7 +12,7 @@ use Closure;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class Attribute implements StorageBagInterface
+class Bag implements StorageBagInterface
 {
 
 	protected Closure|null $onChange = null;
@@ -20,10 +20,12 @@ class Attribute implements StorageBagInterface
 	protected array $keys = [];
 	protected array $original = [];
 
-	public function __construct(protected  array $attributes = [])
+	public function __construct(protected array $attributes = [])
 	{
 		$this->original = $this->attributes;
-		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
 	}
 
 	/**
@@ -36,7 +38,10 @@ class Attribute implements StorageBagInterface
 	{
 		$this->attributes = &$attributes;
 		$this->original = $this->attributes;
-		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
+		$this->keys = [];
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
 		return $this;
 	}
 
@@ -50,7 +55,10 @@ class Attribute implements StorageBagInterface
 	{
 		$this->attributes = $attributes;
 		$this->original = $this->attributes;
-		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
+		$this->keys = [];
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
 		return $this;
 	}
 
@@ -86,7 +94,6 @@ class Attribute implements StorageBagInterface
 	 */
 	public function set(string $name, mixed $value, $options = NULL): bool
 	{
-		$this->keys[strtolower($name)] = $name;
 		$this->attributes[$this->key($name)] = $value;
 		if ($this->onChange) ($this->onChange)($name, $value);
 		return true;
@@ -100,18 +107,24 @@ class Attribute implements StorageBagInterface
 	 */
 	public function has(string $name): bool
 	{
-		return array_key_exists($this->key($name), $this->attributes);
+		return array_key_exists($this->key($name, true), $this->attributes);
 	}
 
 	/**
-	 * Get key exact key for name
+	 * Get key exact key for name or set of it doesn't exist
 	 *
-	 * @param string $name
+	 * @param string $name Name of key
+	 * @param bool $force Force retrieve key. Don't set if no available
 	 * @return string
 	 */
-	public function key(string $name): string
+	public function key(string $name, $force = false): string
 	{
-		return $this->keys[strtolower($name)] ?? $name;
+		$index = str_replace('-', '_', strtolower($name));
+		$key = $this->keys[$index] ?? NULL;
+		if (!$key && !$force) {
+			$key = $this->keys[$index] = $name;
+		}
+		return $key ?? $name;
 	}
 
 	/**
@@ -174,7 +187,10 @@ class Attribute implements StorageBagInterface
 	public function replace(array $data)
 	{
 		$this->attributes = array_merge($this->attributes, $data);
-		$this->keys = array_combine(array_keys(array_change_key_case($this->attributes)), array_keys($this->attributes));
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
+
 		if ($this->onChange) foreach ($data as $name => $value) ($this->onChange)($name, $value);
 	}
 
@@ -203,7 +219,9 @@ class Attribute implements StorageBagInterface
 		$data = $this->attributes;
 		$this->attributes = [];
 		$this->keys = [];
+
 		if ($this->onDelete) foreach (array_keys($data) as $name) ($this->onDelete)($name);
+		$data = NULL;
 	}
 
 	/**

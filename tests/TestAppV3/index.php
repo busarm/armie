@@ -7,6 +7,7 @@
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
+use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Service\RemoteServiceDiscovery;
@@ -17,11 +18,11 @@ $config = (new Config())
     ->setAppPath(__DIR__)
     ->setEncryptionKey("asdgkasdfer@jsfrtv453ds!mfo")
     ->setCookieEncrypt(false)
-    ->setHttpCheckCors(true)
-    ->setHttpAllowAnyCorsDomain(true)
-    ->setHttpAllowedCorsHeaders(['*'])
-    ->setHttpAllowedCorsMethods(['GET'])
-    ->setHttpSendAndContinue(false);
+    ->setHttp((new HttpConfig)
+        ->setCheckCors(true)
+        ->setAllowAnyCorsDomain(true)
+        ->setAllowedCorsHeaders(['*'])
+        ->setAllowedCorsMethods(['GET']));
 $app = new App($config);
 $app->setServiceDiscovery($discovery ?? new RemoteServiceDiscovery('https://server/discover'));
 
@@ -38,4 +39,4 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'cookies' => $req->cookie()->all(),
     ];
 });
-return $app->run(Request::capture($request ?? null, $config))->send($config->httpSendAndContinue);
+return $app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);

@@ -22,6 +22,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Uri;
 use Throwable;
 
+use function Busarm\PhpMini\Helpers\log_debug;
+
 use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
 
 /**
@@ -367,6 +369,7 @@ class Server
     protected function runServiceClient(RequestInterface $request, ServiceClientInterface $client, string $uri): ResponseInterface|false|null
     {
         $uri = strval((new Uri($uri))->withQuery(strval($request->query())));
+        log_debug("Service Uri", $uri);
         $type = match ($request->method()) {
             HttpMethod::POST => ServiceType::CREATE,
             HttpMethod::PUT, HttpMethod::PATCH => ServiceType::UPDATE,

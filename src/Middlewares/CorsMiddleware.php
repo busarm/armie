@@ -71,13 +71,13 @@ class CorsMiddleware implements MiddlewareInterface
         $response = $response ?: new Response(version: $request->version());
 
         // Check for CORS access request
-        if ($this->config->httpCheckCors == TRUE) {
+        if ($this->config->http->checkCors == TRUE) {
 
-            $maxAge           =   $this->config->httpCorsMaxAge;
-            $allowedOrigins   =   $this->config->httpAllowAnyCorsDomain ? ['*'] : $this->config->httpAllowedCorsOrigins;
-            $allowedHeaders   =   $this->config->httpAllowedCorsHeaders;
-            $exposedHeaders   =   $this->config->httpExposedCorsHeaders;
-            $allowedMethods   =   $this->config->httpAllowedCorsMethods;
+            $maxAge           =   $this->config->http->corsMaxAge;
+            $allowedOrigins   =   $this->config->http->allowAnyCorsDomain ? ['*'] : $this->config->http->allowedCorsOrigins;
+            $allowedHeaders   =   $this->config->http->allowedCorsHeaders;
+            $exposedHeaders   =   $this->config->http->exposedCorsHeaders;
+            $allowedMethods   =   $this->config->http->allowedCorsMethods;
 
             $origin = trim($request->server()->get('HTTP_ORIGIN') ?: $request->server()->get('HTTP_REFERER') ?: '', "/");
 

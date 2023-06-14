@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Service;
 
-use Busarm\PhpMini\Bags\Attribute;
+use Busarm\PhpMini\Bags\Bag;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Dto\ServiceRequestDto;
 use Busarm\PhpMini\Enums\HttpMethod;
@@ -14,10 +14,7 @@ use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
 use Nyholm\Psr7\Uri;
 
-use const Busarm\PhpMini\Constants\VAR_CORRELATION_ID;
-
 use function Busarm\PhpMini\Helpers\http_parse_query;
-use function Busarm\PhpMini\Helpers\run;
 
 /**
  * 
@@ -51,7 +48,7 @@ class LocalService extends BaseService
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
-        $dto->headers[VAR_CORRELATION_ID] = $request->correlationId();
+        $dto->headers['x-trace-id'] = $request->correlationId();
 
         $server = $request->server();
         $server->set('REQUEST_URI', '/' . $dto->route);
@@ -70,12 +67,12 @@ class LocalService extends BaseService
             )
                 ->initialize(
                     new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
-                    new Attribute($dto->type != ServiceType::READ ? $dto->params : []),
+                    new Bag($dto->type != ServiceType::READ ? $dto->params : []),
                     $request->cookie(),
                     $request->session(),
-                    new Attribute($dto->files),
+                    new Bag($dto->files),
                     $server,
-                    new Attribute($dto->headers),
+                    new Bag($dto->headers),
                     null,
                 )->toPsr(),
             'discovery' => $this->discovery,

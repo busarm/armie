@@ -2,11 +2,14 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Configs\HttpConfig;
+use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Enums\CacheLimiter;
 use Busarm\PhpMini\Enums\ResponseFormat;
 use Busarm\PhpMini\Enums\SameSite;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;
+use Busarm\PhpMini\Traits\CustomConfig;
 use SessionHandlerInterface;
 
 /**
@@ -19,12 +22,7 @@ use SessionHandlerInterface;
  */
 class Config implements ConfigurationInterface
 {
-    /** 
-     * Custom configs
-     * 
-     * @var array 
-     */
-    protected array $_custom = [];
+    use CustomConfig;
 
     /** 
      * Custom config files
@@ -232,158 +230,55 @@ class Config implements ConfigurationInterface
     public int $loggerVerborsity = Verbose::DEBUG;
 
 
+    // ------------- SSL -----------------//
+
+    /**
+     * SSL is enabled
+     *
+     * @var bool
+     */
+    public bool $sslEnabled = false;
+
+    /**
+     * SSL certificate path
+     *
+     * @var string|null
+     */
+    public string|null $sslCertPath = null;
+
+    /**
+     * SSL primary key path
+     *
+     * @var string|null
+     */
+    public string|null $sslPkPath = null;
+
+    /**
+     * SSL verify peer
+     *
+     * @var bool
+     */
+    public bool $sslVerifyPeer = false;
+
+
     // ------------- HTTP -----------------//
 
-
     /**
-     * CORS Check
-     * Set to TRUE to enable Cross-Origin Resource Sharing (CORS). Useful if you
-     * are hosting your API on a different domain from the application that
-     * will access it through a browser
+     * HTTP Configurations
      *
-     * @var bool
+     * @var HttpConfig
      */
-    public bool $httpCheckCors = false;
+    public HttpConfig $http;
+
+
+    // ------------- DATABASE -----------------//
 
     /**
-     * CORS Allow Any Domain
-     * Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
-     * source domain
+     * Database Configurations
      *
-     * @var bool
+     * @var PDOConfig
      */
-    public bool $httpAllowAnyCorsDomain = false;
-
-    /**
-     * CORS Allowable Domains
-     * Set the allowable domains within the array
-     * e.g. ['http://www.example.com', 'https://spa.example.com']
-     *
-     * @var array
-     */
-    public array $httpAllowedCorsOrigins = [];
-
-    /**
-     * CORS Allowable Headers
-     * If using CORS checks, set the allowable headers here
-     *
-     * @var array
-     */
-    public array $httpAllowedCorsHeaders = [];
-
-    /**
-     * CORS Allowable Methods
-     * If using CORS checks, you can set the methods you want to be allowed
-     *
-     * @var array
-     */
-    public array $httpAllowedCorsMethods = [];
-
-    /**
-     * CORS Exposed Headers
-     * If using CORS checks, set the headers permitted to be sent to client here
-     *
-     * @var array
-     */
-    public array $httpExposedCorsHeaders = [];
-
-    /**
-     * CORS Max Age
-     * How long in seconds to cache CORS preflight response in browser.
-     * -1 for disabling caching.
-     *
-     * @var int
-     */
-    public int $httpCorsMaxAge = -1;
-
-    /**
-     * Send HTTP response without exiting. `json`|`xml`
-     * 
-     * @var bool
-     */
-    public bool $httpSendAndContinue = false;
-
-    /**
-     * HTPP default response format
-     * 
-     * @var \Busarm\PhpMini\Enums\ResponseFormat::*
-     */
-    public string $httpResponseFormat = ResponseFormat::JSON;
-
-
-    // ------------- PDO -----------------//
-
-
-    /**
-     * PDO connection dns
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionDNS = null;
-
-    /**
-     * PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
-     * @see https://www.php.net/manual/en/pdo.drivers.php
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionDriver = null;
-
-    /**
-     * PDO connection host. Host IP or Url
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionHost = null;
-
-    /**
-     * PDO connection port
-     *
-     * @var int|null
-     */
-    public int|null $pdoConnectionPort = null;
-
-    /**
-     * PDO connection database name
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionDatabase = null;
-
-    /**
-     * PDO connection username
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionUsername = null;
-
-    /**
-     * PDO connection password
-     *
-     * @var string|null
-     */
-    public string|null $pdoConnectionPassword = null;
-
-    /**
-     * PDO connection persist
-     *
-     * @var bool
-     */
-    public bool $pdoConnectionPersist = false;
-
-    /**
-     * PDO connection activate error mode
-     *
-     * @var bool
-     */
-    public bool $pdoConnectionErrorMode = true;
-
-    /**
-     * PDO connection options
-     *
-     * @var array
-     */
-    public array $pdoConnectionOptions = [];
+    public PDOConfig $db;
 
 
     public function __construct()
@@ -393,6 +288,8 @@ class Config implements ConfigurationInterface
         $this->setCachePath($this->tempPath . '/cache');
         $this->setSessionPath($this->tempPath . '/session');
         $this->setUploadPath($this->tempPath . '/upload');
+        $this->setHttp(new HttpConfig);
+        $this->setDb(new PDOConfig);
     }
 
     /**
@@ -432,20 +329,32 @@ class Config implements ConfigurationInterface
         ];
     }
 
+
+    // --------------- Setters ------------------- //
+
+
     /**
-     * @inheritDoc
+     * Add custom config file
+     * 
+     * @param string $config Config file name/path relative to Config Path @see self::setConfigPath
+     * @return self
      */
-    public function get(string $name, $default = null)
+    public function addFile(string $config)
     {
-        return $this->_custom[$name] ?? $this->{$name} ?? $default;
+        $this->files[] = $config;
+        return $this;
     }
 
     /**
-     * @inheritDoc
+     * Add custom config files
+     * 
+     * @param array $configs List of config file name/path relative to Config Path @see self::setConfigPath
+     * @return self
      */
-    public function set(string $name, $value = null)
+    public function addFiles($configs = array())
     {
-        return $this->_custom[$name] = $value;
+        $this->files = array_merge($this->files, $configs);
+        return $this;
     }
 
     /**
@@ -762,314 +671,10 @@ class Config implements ConfigurationInterface
      * @param  boolean  $logRequest  Log request info for every request
      *
      * @return  self
-     */ 
+     */
     public function setLogRequest(bool $logRequest)
     {
         $this->logRequest = $logRequest;
-
-        return $this;
-    }
-
-    /**
-     * Set logger verbosity
-     * 
-     * @param  \Busarm\PhpMini\Enums\Verbose::*  $loggerVerborsity  Logger verbosity
-     *
-     * @return  self
-     */
-    public function setLoggerVerborsity($loggerVerborsity)
-    {
-        $this->loggerVerborsity = $loggerVerborsity;
-
-        return $this;
-    }
-
-    /**
-     * Set will access it through a browser
-     *
-     * @param  bool  $httpCheckCors  will access it through a browser
-     *
-     * @return  self
-     */
-    public function setHttpCheckCors($httpCheckCors)
-    {
-        $this->httpCheckCors = $httpCheckCors;
-
-        return $this;
-    }
-
-    /**
-     * Set source domain
-     *
-     * @param  bool  $httpAllowAnyCorsDomain  source domain
-     *
-     * @return  self
-     */
-    public function setHttpAllowAnyCorsDomain($httpAllowAnyCorsDomain)
-    {
-        $this->httpAllowAnyCorsDomain = $httpAllowAnyCorsDomain;
-
-        return $this;
-    }
-
-    /**
-     * Set e.g. ['http://www.example.com', 'https://spa.example.com']
-     *
-     * @param  array  $httpAllowedCorsOrigins  e.g. ['http://www.example.com', 'https://spa.example.com']
-     *
-     * @return  self
-     */
-    public function setHttpAllowedCorsOrigins($httpAllowedCorsOrigins)
-    {
-        $this->httpAllowedCorsOrigins = $httpAllowedCorsOrigins;
-
-        return $this;
-    }
-
-    /**
-     * Set if using CORS checks, you can set the methods you want to be allowed
-     *
-     * @param  array  $httpAllowedCorsMethods  If using CORS checks, you can set the methods you want to be allowed
-     *
-     * @return  self
-     */
-    public function setHttpAllowedCorsMethods($httpAllowedCorsMethods)
-    {
-        $this->httpAllowedCorsMethods = $httpAllowedCorsMethods;
-
-        return $this;
-    }
-
-    /**
-     * Set if using CORS checks, set the allowable headers here
-     *
-     * @param  array  $httpAllowedCorsHeaders  If using CORS checks, set the allowable headers here
-     *
-     * @return  self
-     */
-    public function setHttpAllowedCorsHeaders($httpAllowedCorsHeaders)
-    {
-        $this->httpAllowedCorsHeaders = $httpAllowedCorsHeaders;
-
-        return $this;
-    }
-
-    /**
-     * Set if using CORS checks, set the headers permitted to be sent to client here
-     *
-     * @param  array  $httpExposedCorsHeaders  If using CORS checks, set the headers permitted to be sent to client here
-     *
-     * @return  self
-     */
-    public function setHttpExposedCorsHeaders($httpExposedCorsHeaders)
-    {
-        $this->httpExposedCorsHeaders = $httpExposedCorsHeaders;
-
-        return $this;
-    }
-
-    /**
-     * Set -1 for disabling caching.
-     *
-     * @param  int  $httpCorsMaxAge  -1 for disabling caching.
-     *
-     * @return  self
-     */
-    public function setHttpCorsMaxAge($httpCorsMaxAge)
-    {
-        $this->httpCorsMaxAge = $httpCorsMaxAge;
-
-        return $this;
-    }
-
-    /**
-     * Set send HTTP response without exiting
-     *
-     * @param  bool  $httpSendAndContinue  Send HTTP response without exiting
-     *
-     * @return  self
-     */
-    public function setHttpSendAndContinue($httpSendAndContinue)
-    {
-        $this->httpSendAndContinue = $httpSendAndContinue;
-
-        return $this;
-    }
-
-    /**
-     * Set HTPP default response format
-     *
-     * @param  string  $httpResponseFormat  HTPP default response format. `json`|`xml`
-     *
-     * @return  self
-     */
-    public function setHttpResponseFormat($httpResponseFormat)
-    {
-        $this->httpResponseFormat = $httpResponseFormat;
-
-        return $this;
-    }
-
-    /**
-     * Add custom config file
-     * 
-     * @param string $config Config file name/path relative to Config Path @see self::setConfigPath
-     * @return self
-     */
-    public function addFile(string $config)
-    {
-        $this->files[] = $config;
-        return $this;
-    }
-
-    /**
-     * Add custom config files
-     * 
-     * @param array $configs List of config file name/path relative to Config Path @see self::setConfigPath
-     * @return self
-     */
-    public function addFiles($configs = array())
-    {
-        $this->files = array_merge($this->files, $configs);
-        return $this;
-    }
-
-    /**
-     * Set PDO connection dns
-     *
-     * @param  string|null  $pdoConnectionDNS  PDO connection dns
-     *
-     * @return  self
-     */
-    public function setPdoConnectionDNS($pdoConnectionDNS)
-    {
-        $this->pdoConnectionDNS = $pdoConnectionDNS;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
-     *
-     * @param  string|null  $pdoConnectionDriver  PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
-     *
-     * @return  self
-     */
-    public function setPdoConnectionDriver($pdoConnectionDriver)
-    {
-        $this->pdoConnectionDriver = $pdoConnectionDriver;
-
-        return $this;
-    }
-
-    /**
-     * Set pDO connection database name
-     *
-     * @param  string|null  $pdoConnectionDatabase  PDO connection database name
-     *
-     * @return  self
-     */
-    public function setPdoConnectionDatabase($pdoConnectionDatabase)
-    {
-        $this->pdoConnectionDatabase = $pdoConnectionDatabase;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection host. Host IP or Url
-     *
-     * @param  string|null  $pdoConnectionHost  PDO connection host. Host IP or Url
-     *
-     * @return  self
-     */
-    public function setPdoConnectionHost($pdoConnectionHost)
-    {
-        $this->pdoConnectionHost = $pdoConnectionHost;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection port
-     *
-     * @param  int|null  $pdoConnectionPort  PDO connection port
-     *
-     * @return  self
-     */
-    public function setPdoConnectionPort($pdoConnectionPort)
-    {
-        $this->pdoConnectionPort = $pdoConnectionPort;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection username
-     *
-     * @param  string|null  $pdoConnectionUsername  PDO connection username
-     *
-     * @return  self
-     */
-    public function setPdoConnectionUsername($pdoConnectionUsername)
-    {
-        $this->pdoConnectionUsername = $pdoConnectionUsername;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection password
-     *
-     * @param  string|null  $pdoConnectionPassword  PDO connection password
-     *
-     * @return  self
-     */
-    public function setPdoConnectionPassword($pdoConnectionPassword)
-    {
-        $this->pdoConnectionPassword = $pdoConnectionPassword;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection persist
-     *
-     * @param  bool  $pdoConnectionPersist  PDO connection persist
-     *
-     * @return  self
-     */
-    public function setPdoConnectionPersist(bool $pdoConnectionPersist)
-    {
-        $this->pdoConnectionPersist = $pdoConnectionPersist;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection activate error mode
-     *
-     * @param  bool  $pdoConnectionErrorMode  PDO connection activate error mode
-     *
-     * @return  self
-     */
-    public function setPdoConnectionErrorMode(bool $pdoConnectionErrorMode)
-    {
-        $this->pdoConnectionErrorMode = $pdoConnectionErrorMode;
-
-        return $this;
-    }
-
-    /**
-     * Set PDO connection options
-     *
-     * @param  array  $pdoConnectionOptions  PDO connection options
-     *
-     * @return  self
-     */
-    public function setPdoConnectionOptions(array $pdoConnectionOptions)
-    {
-        $this->pdoConnectionOptions = $pdoConnectionOptions;
 
         return $this;
     }
@@ -1098,6 +703,90 @@ class Config implements ConfigurationInterface
     public function setSessionEnabled(bool $sessionEnabled)
     {
         $this->sessionEnabled = $sessionEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Set sSL is enabled
+     *
+     * @param  bool  $sslEnabled  SSL is enabled
+     *
+     * @return  self
+     */
+    public function setSslEnabled(bool $sslEnabled)
+    {
+        $this->sslEnabled = $sslEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Set sSL certificate path
+     *
+     * @param  string|null  $sslCertPath  SSL certificate path
+     *
+     * @return  self
+     */
+    public function setSslCertPath($sslCertPath)
+    {
+        $this->sslCertPath = $sslCertPath;
+
+        return $this;
+    }
+
+    /**
+     * Set sSL primary key path
+     *
+     * @param  string|null  $sslPkPath  SSL primary key path
+     *
+     * @return  self
+     */
+    public function setSslPkPath($sslPkPath)
+    {
+        $this->sslPkPath = $sslPkPath;
+
+        return $this;
+    }
+
+    /**
+     * Set sSL verify peer
+     *
+     * @param  bool  $sslVerifyPeer  SSL verify peer
+     *
+     * @return  self
+     */
+    public function setSslVerifyPeer(bool $sslVerifyPeer)
+    {
+        $this->sslVerifyPeer = $sslVerifyPeer;
+
+        return $this;
+    }
+
+    /**
+     * Set hTTP Configurations
+     *
+     * @param  HttpConfig  $http  HTTP Configurations
+     *
+     * @return  self
+     */
+    public function setHttp(HttpConfig $http)
+    {
+        $this->http = $http;
+
+        return $this;
+    }
+
+    /**
+     * Set database Configurations
+     *
+     * @param  PDOConfig  $db  Database Configurations
+     *
+     * @return  self
+     */
+    public function setDb(PDOConfig $db)
+    {
+        $this->db = $db;
 
         return $this;
     }

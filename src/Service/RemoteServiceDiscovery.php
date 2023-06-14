@@ -5,7 +5,10 @@ namespace Busarm\PhpMini\Service;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+
+use function Busarm\PhpMini\Helpers\log_error;
 
 /**
  * Error Reporting
@@ -28,6 +31,7 @@ class RemoteServiceDiscovery extends BaseServiceDiscovery
      */
     public function __construct(private string $endpoint, private $ttl = 300, private $timeout = 10)
     {
+        parent::__construct();
         $this->load();
     }
 
@@ -97,24 +101,28 @@ class RemoteServiceDiscovery extends BaseServiceDiscovery
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
-        $response = $client->request(
+        $client->requestAsync(
             HttpMethod::GET,
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false
             ]
-        );
-        if ($response && $response->getBody()) {
-            $result = json_decode($response->getBody(), true) ?? [];
-            if (!empty($result)) {
-                $this->services = [];
-                foreach ($result as $name => $url) {
-                    if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
-                        $this->services[] = new RemoteClient($name, $url);
+        )->then(
+            function (Response $response) {
+                if ($response && $response->getBody()) {
+                    $result = json_decode($response->getBody(), true) ?? [];
+                    if (!empty($result)) {
+                        $this->services = [];
+                        foreach ($result as $name => $url) {
+                            if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
+                                $this->services[] = new RemoteClient($name, $url);
+                            }
+                        }
+                        $this->requestedAt = time();
                     }
                 }
-                $this->requestedAt = time();
-            }
-        }
+            },
+            fn ($reason) => log_error($reason)
+        )->wait();
     }
 }

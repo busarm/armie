@@ -11,40 +11,38 @@ namespace Busarm\PhpMini\Dto;
 class PaginatedCollectionDto extends BaseDto
 {
     /** @var CollectionBaseDto|array */
-    public CollectionBaseDto|array $data;
+    public CollectionBaseDto|array $data = [];
     /** @var int */
-    public int|null $count;
+    public int $count = 0;
     /** @var int */
-    public int|null $current;
+    public int $total = 0;
     /** @var int */
-    public int|null $next;
+    public int $current = 0;
     /** @var int */
-    public int|null $previous;
+    public int $next = 0;
     /** @var int */
-    public int|null $first;
+    public int $previous = 0;
     /** @var int */
-    public int|null $last;
+    public int $first = 0;
     /** @var int */
-    public int|null $total;
+    public int $last = 0;
 
-    public function __construct(CollectionBaseDto|array $data = null, int $page = null, int $limit = null, int $total = null, int $count = null)
+    public function __construct(CollectionBaseDto|array $data = null, int|null $page = null, int|null $limit = null, int|null $total = null)
     {
         if ($data !== null) {
             $this->setData($data);
+            $this->setCount(count($data));
         }
         if ($total !== null) {
             $this->setTotal($total);
         }
-        if ($count !== null) {
-            $this->setCount($count);
-        }
-        if ($count !== null && $total !== null && $limit !== null) {
+        if ($limit !== null && $this->count > 0 && $this->total > 0) {
             $this->setFirst(1);
-            $this->setLast($count > 0 ? ceil($total / $limit) : 1);
+            $this->setLast($this->count > 0 ? ceil($this->total / $limit) : 1);
             if ($page !== null) {
                 $this->setCurrent(min($page, $this->last));
-                $this->setNext($count > 0 ? min($page + 1, ceil($total / $limit)) : 1);
-                $this->setPrevious($count > 0 ? max($page - 1, 1) : 1);
+                $this->setNext($this->count > 0 ? min($page + 1, ceil($this->total / $limit)) : 1);
+                $this->setPrevious($this->count > 0 ? max($page - 1, 1) : 1);
             }
         }
     }

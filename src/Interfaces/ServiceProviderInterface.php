@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Interfaces;
 
 use Busarm\PhpMini\Dto\ServiceRequestDto;
+use Busarm\PhpMini\Dto\ServiceResponseDto;
 
 /**
  * Error Reporting
@@ -19,18 +20,18 @@ interface ServiceProviderInterface
      * 
      * @param ServiceRequestDto $dto  Service Request DTO
      * @param RequestInterface $request Current HTTP Request
-     * @return mixed
+     * @return ServiceResponseDto
      */
-    public function call(ServiceRequestDto $dto, RequestInterface $request);
+    public function call(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto;
 
     /**
      * Call service asynchronously
      * 
      * @param ServiceRequestDto $dto  Service Request DTO
      * @param RequestInterface $request Current HTTP Request
-     * @return mixed
+     * @return ServiceResponseDto
      */
-    public function callAsync(ServiceRequestDto $dto, RequestInterface $request);
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto;
 
     /**
      * Get service location for name

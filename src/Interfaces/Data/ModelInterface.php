@@ -115,9 +115,10 @@ interface ModelInterface
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names. 
+     * @param int $limit Query Limit. Default: 0 to disable
      * @return self[]
      */
-    public function all($conditions = [], $params = [], $columns = []): array;
+    public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array;
 
     /**
      * Get list of model. With trashed (deleted) models
@@ -125,9 +126,10 @@ interface ModelInterface
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names. 
+     * @param int $limit Query Limit. Default: 0 to disable
      * @return self[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = []): array;
+    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array;
 
     /**
      * Delete model. 

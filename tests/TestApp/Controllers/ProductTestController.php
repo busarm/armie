@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Test\TestApp\Controllers;
 
-use Busarm\PhpMini\HTTP\CrudController;
+use Busarm\PhpMini\Data\CrudController;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;

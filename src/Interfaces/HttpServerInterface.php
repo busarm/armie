@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
 
 /**
  * PHP Mini Framework

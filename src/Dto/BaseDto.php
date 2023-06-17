@@ -245,7 +245,7 @@ class BaseDto implements Arrayable, Stringable
      *
      * @param array|object|null $data
      * @param bool $sanitize
-     * @return static|self
+     * @return self
      */
     public static function with(array|object|null $data, $sanitize = false): self
     {

@@ -1,9 +1,12 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\HTTP;
+namespace Busarm\PhpMini\Interfaces\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Dto\CrudItemRequestDto;
+use Busarm\PhpMini\Dto\CrudListRequestDto;
+use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
 /**
@@ -18,35 +21,27 @@ interface CrudControllerInterface
     /**
      * Get item by id
      *
-     * @param integer|string $id
-     * @http-query array query - Reqested query conditions. E.g ['name' => 'splendy1']
-     * @http-query array columns - Reqested columns. E.g ['name', 'age']
-     * 
+     * @param CrudItemRequestDto $dto
      * @return ResponseInterface
      */
-    public function get(int|string $id): ResponseInterface;
+    public function get(CrudItemRequestDto $dto): ResponseInterface;
+
     /**
      * Get list of items
-     * 
-     * @http-query array query - Reqested query conditions. E.g ['name' => 'splendy1']
-     * @http-query array columns - Reqested columns. E.g ['name', 'age']
-     * @http-query int page - Reqested page
-     * @http-query int limit - List limit
      *
+     * @param CrudListRequestDto $dto
      * @return ResponseInterface
      */
-    public function list(): ResponseInterface;
+    public function list(CrudListRequestDto $dto): ResponseInterface;
+
     /**
      * Get paginated list of items
      * 
-     * @http-query array query - Reqested query conditions. E.g ['name' => 'splendy1']
-     * @http-query array columns - Reqested columns. E.g ['name', 'age']
-     * @http-query int page - Reqested page
-     * @http-query int limit - List limit
-     *
+     * @param CrudPaginatedListRequestDto $dto
      * @return ResponseInterface
      */
-    public function paginatedList(): ResponseInterface;
+    public function paginatedList(CrudPaginatedListRequestDto $dto): ResponseInterface;
+    
     /**
      * Create item record
      *

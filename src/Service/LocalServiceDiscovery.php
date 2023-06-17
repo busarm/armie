@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 
 /**
  * Error Reporting
@@ -12,21 +13,25 @@ use Busarm\PhpMini\Interfaces\ServiceClientInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class LocalServiceDiscovery extends BaseServiceDiscovery
+class LocalServiceDiscovery implements ServiceDiscoveryInterface
 {
     /**
-     *
-     *
+     * @var ServiceClientInterface[]
+     */
+    protected array $services = [];
+
+    /**
      * @param string|ServiceClientInterface[] $pathOrList Service discovery file path or list of services
-     * - If fiel path, then file should be a json file with the list of services. Format = `{"name" : "url"}`
+     * - If file path, then file should be a json file with the list of services. Format = `{"name" : "url", ...}`
      */
     public function __construct(private string|array $pathOrList)
     {
-        if (is_array($pathOrList)) {
-            parent::__construct($pathOrList);
+        if (is_string($this->pathOrList)) {
+            if (file_exists($this->pathOrList)) {
+                $this->services = json_decode(file_get_contents($this->pathOrList), true) ?? $this->services;
+            }
         } else {
-            parent::__construct();
-            $this->load();
+            $this->services = $pathOrList;
         }
     }
 
@@ -66,15 +71,5 @@ class LocalServiceDiscovery extends BaseServiceDiscovery
             $carry[$current->getName()] = $current->getLocation();
             return $carry;
         }, []);
-    }
-
-    /**
-     * Load service clients
-     */
-    public function load()
-    {
-        if (is_string($this->pathOrList) && file_exists($this->pathOrList)) {
-            $this->services = json_decode(file_get_contents($this->pathOrList), true) ?? $this->services;
-        }
     }
 }

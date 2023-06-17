@@ -48,9 +48,10 @@ interface QueryRepositoryInterface extends RepositoryInterface
      *
      * @param string $query Model Provider Query. e.g SQL query
      * @param array $params Query Params. e.g SQL query params
+     * @param int $limit Query Limit. Default: 0 to disable
      * @return CollectionBaseDto
      */
-    public function queryList(string $query, $params = []): CollectionBaseDto;
+    public function queryList(string $query, $params = [], int $limit = 0): CollectionBaseDto;
 
     /**
      * Find list of models with paginated query.

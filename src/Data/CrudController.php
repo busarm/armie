@@ -1,13 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\HTTP;
+namespace Busarm\PhpMini\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Helpers\Parser;
+use Busarm\PhpMini\Dto\CrudItemRequestDto;
+use Busarm\PhpMini\Dto\CrudListRequestDto;
+use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\Data\RepositoryInterface;
-use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
@@ -29,13 +31,13 @@ abstract class CrudController implements CrudControllerInterface
     /**
      * @inheritDoc
      */
-    public function get(int|string $id): ResponseInterface
+    public function get(CrudItemRequestDto $dto): ResponseInterface
     {
         $data = $this->repository->findById(
-            $id,
-            Security::cleanQueryParamKeys((array) $this->request->query()->get('query', [])),
-            Security::cleanQueryParamValues((array) $this->request->query()->get('query', [])),
-            Security::cleanParams((array) $this->request->query()->get('columns', []))
+            $dto->id,
+            Security::cleanQueryParamKeys($dto->query),
+            Security::cleanQueryParamValues($dto->query),
+            Security::cleanParams($dto->columns)
         );
         return $data ? $this->response->json($data->toArray(), 200) : $this->response->setStatusCode(404);
     }
@@ -43,26 +45,26 @@ abstract class CrudController implements CrudControllerInterface
     /**
      * @inheritDoc
      */
-    public function list(): ResponseInterface
+    public function list(CrudListRequestDto $dto): ResponseInterface
     {
         return $this->response->json($this->repository->all(
-            Security::cleanQueryParamKeys((array) $this->request->query()->get('query', [])),
-            Security::cleanQueryParamValues((array) $this->request->query()->get('query', [])),
-            Security::cleanParams((array) $this->request->query()->get('columns', [])),
+            Security::cleanQueryParamKeys($dto->query),
+            Security::cleanQueryParamValues($dto->query),
+            Security::cleanParams($dto->columns)
         )->toArray(), 200);
     }
 
     /**
      * @inheritDoc
      */
-    public function paginatedList(): ResponseInterface
+    public function paginatedList(CrudPaginatedListRequestDto $dto): ResponseInterface
     {
         return $this->response->json($this->repository->paginate(
-            (int) $this->request->query()->get('page', 1),
-            (int) $this->request->query()->get('limit', 0),
-            Parser::parseQueryParamKeys((array) $this->request->query()->get('query', [])),
-            Parser::parseQueryParamValues((array) $this->request->query()->get('query', [])),
-            Security::cleanParams((array) $this->request->query()->get('columns', [])),
+            Security::cleanQueryParamKeys($dto->query),
+            Security::cleanQueryParamValues($dto->query),
+            Security::cleanParams($dto->columns),
+            $dto->page,
+            $dto->limit
         )->toArray(), 200);
     }
 

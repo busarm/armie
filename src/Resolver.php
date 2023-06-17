@@ -7,6 +7,7 @@ use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Data\PDO\ConnectionConfig;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Reporter;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
@@ -95,13 +96,12 @@ class Resolver implements DependencyResolverInterface
         if ($request) {
             if ($instance instanceof BaseDto) {
                 if ($request instanceof RequestInterface) {
-                    return $instance->load($request->request()->all(), true);
-                } else if ($request instanceof RouteInterface) {
-                    return $instance->load($request->getParams(), true);
-                }
-            } else if ($instance instanceof CollectionBaseDto) {
-                if ($request instanceof RequestInterface) {
-                    return $instance->load($request->request()->all(), true);
+                    return $instance->load(
+                        $request->method() == HttpMethod::GET ?
+                            $request->query()->all() :
+                            $request->request()->all(),
+                        true
+                    );
                 } else if ($request instanceof RouteInterface) {
                     return $instance->load($request->getParams(), true);
                 }

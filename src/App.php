@@ -16,10 +16,11 @@ use Busarm\PhpMini\Exceptions\HttpException;
 use Busarm\PhpMini\Handlers\RequestHandler;
 use Busarm\PhpMini\Handlers\WorkermanSessionHandler;
 use Busarm\PhpMini\Interfaces\ContainerInterface;
-use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
-use Busarm\PhpMini\Interfaces\ReportingInterface;
+use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\HttpServerInterface;
+use Busarm\PhpMini\Interfaces\ReportingInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\ProviderInterface;
@@ -417,14 +418,29 @@ class App implements HttpServerInterface, ContainerInterface
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
             $this->logger->debug(sprintf("Worker %s process %s started", $worker->name, $worker->id));
+
+            // Register distributed service discovery if available
+            if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
+                $this->serviceDiscovery->register();
+            }
         };
         $this->worker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;
             $this->logger->debug(sprintf("Worker %s process %s stopped", $worker->name, $worker->id));
+
+            // Unregister distributed service discovery if available
+            if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
+                $this->serviceDiscovery->unregister();
+            }
         };
         $this->worker->onWorkerExit = function (Worker $worker, $master, $pid) {
             $this->status = AppStatus::STOPPED;
             $this->logger->debug(sprintf("Worker %s master %s pid %s exited", $worker->name, $master, $pid));
+
+            // Unregister distributed service discovery if available
+            if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
+                $this->serviceDiscovery->unregister();
+            }
         };
         $this->worker->onConnect = function (ConnectionInterface $connection) {
             $this->config->logRequest

@@ -7,6 +7,7 @@ use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relation;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\DataType;
+use Busarm\PhpMini\Interfaces\Data\ModelInterface;
 
 use function Busarm\PhpMini\Helpers\is_list;
 
@@ -68,7 +69,7 @@ class ManyToMany extends Relation
     /**
      * Get relation data
      * 
-     * @return Model[]
+     * @return ModelInterface[]
      */
     public function get(array $conditions = []): array
     {

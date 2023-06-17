@@ -293,11 +293,7 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Count total number of model items.
-     *
-     * @param string|null $query Custom query to count
-     * @param array $params Custom query params
-     * @return integer
+     * @inheritDoc
      */
     public function count(string|null $query = null, $params = array()): int
     {
@@ -312,13 +308,8 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Find model for id. Without trashed (deleted) models
-     *
-     * @param mixed $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return self|null
+     * @inheritDoc
+     * @return ?self
      */
     public function find($id, $conditions = [], $params = [], $columns = []): ?self
     {
@@ -339,13 +330,8 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Find model for id. With trashed (deleted) models
-     *
-     * @param mixed $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return self|null
+     * @inheritDoc
+     * @return ?self
      */
     public function findTrashed($id, $conditions = [], $params = [], $columns = []): ?self
     {
@@ -357,12 +343,8 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Find model with condition.
-     *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return self|null
+     * @inheritDoc
+     * @return ?self
      */
     public function findWhere($conditions = [], $params = [], $columns = []): ?self
     {
@@ -390,45 +372,38 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Get list of model. Without trashed (deleted) models
-     *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params
-     * @param array $columns Select Colomn names. 
+     * @inheritDoc
      * @return self[]
      */
-    public function all($conditions = [], $params = [], $columns = []): array
+    public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->allTrashed(array_merge($conditions, [
                 sprintf("ISNULL(%s)", $this->getSoftDeleteDateName())
-            ]), $params, $columns);
+            ]), $params, $columns, $limit);
         } else {
-            return $this->allTrashed($conditions, $params, $columns);
+            return $this->allTrashed($conditions, $params, $columns, $limit);
         }
     }
 
     /**
-     * Get list of model. With trashed (deleted) models
-     *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params
-     * @param array $columns Select Colomn names. 
+     * @inheritDoc
      * @return self[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = []): array
+    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
         if (empty($columns)) $columns = ["*"];
 
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
+        $limit = $limit > 0 ? $limit : $this->getPerPage();
 
         $stmt = $this->db->prepare(sprintf(
             "SELECT %s FROM %s %s %s",
             $colsPlaceHolders,
             $this->getTableName(),
             !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : '',
-            $this->perPage >= 0 ? 'LIMIT ' . $this->perPage : ''
+            $limit >= 0 ? 'LIMIT ' . intval($limit) : ''
         ));
 
         if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class)) {
@@ -447,10 +422,7 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Delete model. 
-     *
-     * @param bool $force Force permanent delete or soft delete if supported
-     * @return bool
+     * @inheritDoc
      */
     public function delete($force = false): bool
     {
@@ -482,8 +454,7 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Restore model
-     * @return bool
+     * @inheritDoc
      */
     public function restore(): bool
     {
@@ -495,11 +466,7 @@ abstract class Model extends BaseDto implements ModelInterface
     }
 
     /**
-     * Save model
-     * 
-     * @param bool $trim Exclude NULL properties before saving
-     * @param bool $relations Save relations if available
-     * @return bool
+     * @inheritDoc
      */
     public function save($trim = false, $relations = true): bool
     {
@@ -943,8 +910,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
         $model = (new static);
-        if ($limit) $model->setPerPage($limit);
-        return $model->all($conditions, $params, $columns);
+        return $model->all($conditions, $params, $columns, $limit ?? 0);
     }
 
     /**
@@ -959,8 +925,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
         $model = (new static);
-        if ($limit) $model->setPerPage($limit);
-        return $model->allTrashed($conditions, $params, $columns);
+        return $model->allTrashed($conditions, $params, $columns, $limit ?? 0);
     }
 
     /**

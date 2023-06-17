@@ -25,6 +25,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Workerman\Protocols\Http\Request as HttpRequest;
 
+use const Busarm\PhpMini\Constants\VAR_HTTP_HOST;
+use const Busarm\PhpMini\Constants\VAR_ORIG_PATH_INFO;
+use const Busarm\PhpMini\Constants\VAR_PATH_INFO;
+use const Busarm\PhpMini\Constants\VAR_REQUEST_URI;
+
 /**
  * HTTP Request Provider
  * 
@@ -317,10 +322,10 @@ class Request implements RequestInterface
 
             $this->_scheme = $this->_scheme ?: ($this->isHttps() ? "https" : "http");
             $this->_ip = $this->_ip ?: $this->getIpAddress();
-            $this->_domain = $this->_domain ?: $this->_server->get('HTTP_HOST');
+            $this->_domain = $this->_domain ?: $this->_server->get(VAR_HTTP_HOST);
             $this->_host = $this->_host ?: $this->_scheme  . "://" . $this->_domain;
             if (!$this->_path) {
-                $this->_path = '/' . ltrim($this->_server->get('REQUEST_URI') ?: ($this->_server->get('PATH_INFO') ?: $this->_server->get('ORIG_PATH_INFO') ?: ''), '/');
+                $this->_path = '/' . ltrim($this->_server->get(VAR_REQUEST_URI) ?: ($this->_server->get(VAR_PATH_INFO) ?: $this->_server->get(VAR_ORIG_PATH_INFO) ?: ''), '/');
                 $this->_path = rawurldecode(explode('?', $this->_path ?? '', 2)[0]);
             }
             $this->_baseUrl = $this->_baseUrl ?: $this->_host;

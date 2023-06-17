@@ -45,11 +45,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Find single model with query.
-     *
-     * @param string $query Model Provider Query. e.g SQL query
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @return BaseDto|null
+     * @inheritDoc
      */
     public function querySingle(string $query, $params = array()): ?BaseDto
     {
@@ -63,82 +59,66 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Find list of models with query.
-     *
-     * @param string $query Model Provider Query. e.g SQL query
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @return CollectionBaseDto
+     * @inheritDoc
      */
-    public function queryList(string $query, $params = array()): CollectionBaseDto
+    public function queryList(string $query, $params = array(), int $limit = 0): CollectionBaseDto
     {
+        $limit = $limit > 0 ? $limit : $this->model->getPerPage();
+        $query = $this->model->getDatabase()->applyLimit($query, 1, $limit);
+
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
             $stmt = $this->model->getDatabase()->prepare($query);
             if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
                 return CollectionBaseDto::of($result);
             }
         }
+
         return CollectionBaseDto::of([]);
     }
 
     /**
-     * Find list of models with paginated query.
-     *
-     * @param string $query Model Provider Query. e.g SQL query
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param int $page Page Number Default: 1
-     * @param int $limit Page Limit. Default: 0 to disable
-     * @return PaginatedCollectionDto
+     * @inheritDoc
      */
     public function queryPaginate(string $query, $params = array(), int $page = 1, int $limit = 0): PaginatedCollectionDto
     {
-        if (empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) return new PaginatedCollectionDto;
 
         $limit = $limit > 0 ? $limit : $this->model->getPerPage();
         $total = $this->count($query, $params);
-        $data = $this->queryList($this->model->getDatabase()->applyLimit($query, $page, $limit), $params);
-        return (new PaginatedCollectionDto($data, $page, $limit, $total, $data->count()));
+        $query = $this->model->getDatabase()->applyLimit($query, $page, $limit);
+
+        if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+            $stmt = $this->model->getDatabase()->prepare($query);
+            if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
+                return (new PaginatedCollectionDto(CollectionBaseDto::of($result), $page, $limit, $total));
+            }
+        }
+
+        return new PaginatedCollectionDto;
     }
 
     /**
-     * Get all models. Without trashed (deleted) models
-     *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return CollectionBaseDto
+     * @inheritDoc
      */
-    public function all(array $conditions = array(), array $params = array(), array $columns = array()): CollectionBaseDto
+    public function all(array $conditions = array(), array $params = array(), array $columns = array(), int $limit = 0): CollectionBaseDto
     {
-        return CollectionBaseDto::of($this->model->all($conditions, $params, $columns));
+        return CollectionBaseDto::of($this->model->all($conditions, $params, $columns, $limit));
     }
 
     /**
-     * Get all models. With trashed (deleted) models.
-     *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return CollectionBaseDto
+     * @inheritDoc
      */
-    public function allTrashed(array $conditions = array(), array $params = array(), array $columns = array()): CollectionBaseDto
+    public function allTrashed(array $conditions = array(), array $params = array(), array $columns = array(), int $limit = 0): CollectionBaseDto
     {
         if (!empty($this->model->getSoftDeleteDateName())) {
-            return CollectionBaseDto::of($this->model->allTrashed($conditions, $params, $columns));
+            return CollectionBaseDto::of($this->model->allTrashed($conditions, $params, $columns, $limit));
         }
-        return $this->all($conditions, $params, $columns);
+        return $this->all($conditions, $params, $columns, $limit);
     }
 
     /**
-     * Get paginated list of models.
-     *
-     * @param int $page Page Number Default: 1
-     * @param int $limit Page Limit. Default: 0 to disable
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @return PaginatedCollectionDto
+     * @inheritDoc
      */
-    public function paginate(int $page = 1, int $limit = 0, array $conditions = array(), array $params = array(), array $columns = array()): PaginatedCollectionDto
+    public function paginate(array $conditions = array(), array $params = array(), array $columns = array(), int $page = 1, int $limit = 0): PaginatedCollectionDto
     {
         if (empty($columns)) $columns = ["*"];
 
@@ -152,20 +132,11 @@ class Repository implements QueryRepositoryInterface
             !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         );
 
-        $limit = $limit > 0 ? $limit : $this->model->getPerPage();
-        $total = $this->count($query, $params);
-        $data = $this->queryList($this->model->getDatabase()->applyLimit($query, $page, $limit), $params);
-        return (new PaginatedCollectionDto($data, $page, $limit, $total, $data->count()));
+        return $this->queryPaginate($query, $params, $page, $limit);
     }
 
     /**
-     * Find model by id. Without trashed (deleted) models
-     *
-     * @param int|string $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params
-     * @param array $columns Select Colomn names
-     * @return BaseDto|null
+     * @inheritDoc
      */
     public function findById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto
     {
@@ -173,13 +144,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Find model by id. With trashed (deleted) models
-     *
-     * @param int|string $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params
-     * @param array $columns Select Colomn names
-     * @return BaseDto|null
+     * @inheritDoc
      */
     public function findTrashedById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto
     {
@@ -190,10 +155,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Create a model.
-     *
-     * @param array $data
-     * @return BaseDto|null
+     * @inheritDoc
      */
     public function create(array $data): ?BaseDto
     {
@@ -206,10 +168,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Create list of models.
-     *
-     * @param array $data
-     * @return bool
+     * @inheritDoc
      */
     public function createBulk(array $data): bool
     {
@@ -225,11 +184,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Update model by id.
-     *
-     * @param int|string $id
-     * @param array $data
-     * @return bool
+     * @inheritDoc
      */
     public function updateById(int|string $id, array $data): bool
     {
@@ -242,10 +197,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Update list of models.
-     *
-     * @param array $data
-     * @return bool
+     * @inheritDoc
      */
     public function updateBulk(array $data): bool
     {
@@ -260,11 +212,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Delete model by id.
-     *
-     * @param int|string $id
-     * @param bool $force Permanently delete
-     * @return bool
+     * @inheritDoc
      */
     public function deleteById(int|string $id, $force = false): bool
     {
@@ -276,11 +224,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Delete list of models.
-     *
-     * @param array $ids
-     * @param bool $force Permanently delete
-     * @return bool
+     * @inheritDoc
      */
     public function deleteBulk(array $ids, $force = false): bool
     {
@@ -296,10 +240,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Restore model by id.
-     *
-     * @param int|string $id
-     * @return bool
+     * @inheritDoc
      */
     public function restoreById(int|string $id): bool
     {
@@ -311,10 +252,7 @@ class Repository implements QueryRepositoryInterface
     }
 
     /**
-     * Restore list of models.
-     *
-     * @param array $ids
-     * @return bool
+     * @inheritDoc
      */
     public function restoreBulk(array $ids): bool
     {

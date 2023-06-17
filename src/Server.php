@@ -369,7 +369,6 @@ class Server
     protected function runServiceClient(RequestInterface $request, ServiceClientInterface $client, string $uri): ResponseInterface|false|null
     {
         $uri = strval((new Uri($uri))->withQuery(strval($request->query())));
-        log_debug("Service Uri", $uri);
         $type = match ($request->method()) {
             HttpMethod::POST => ServiceType::CREATE,
             HttpMethod::PUT, HttpMethod::PATCH => ServiceType::UPDATE,
@@ -379,33 +378,26 @@ class Server
 
         // Local Client Service
         if ($client instanceof LocalClient) {
-            return (new LocalService($this->serviceDiscovery))->call(
+            $response = (new LocalService($client->getName(), $client->getLocation(), $this->serviceDiscovery))->call(
                 (new ServiceRequestDto)
-                    ->setName($client->getName())
-                    ->setLocation($client->getLocation())
                     ->setRoute($uri)
                     ->setType($type)
                     ->setParams($request->request()->all())
                     ->setHeaders($request->header()->all()),
                 $request
             );
+            return new Response($response->data, $response->code);
         }
         // Remote Client Service
         if ($client instanceof RemoteClient) {
-            $response = (new RemoteService($this->serviceDiscovery))->call(
+            $response = (new RemoteService($client->getName(), $client->getLocation(), $this->serviceDiscovery))->call(
                 (new ServiceRequestDto)
-                    ->setName($client->getName())
-                    ->setLocation($client->getLocation())
                     ->setRoute($uri)
                     ->setType($type)
-                    ->setParams($request->request()->all())
-                    ->setHeaders([
-                        VAR_SERVER_NAME => $this->name,
-                    ]),
+                    ->setParams($request->request()->all()),
                 $request
             );
-
-            return Response::fromPsr($response);
+            return new Response($response->data, $response->code);
         }
 
         return false;

@@ -5,14 +5,19 @@ namespace Busarm\PhpMini\Service;
 use Busarm\PhpMini\Bags\Bag;
 use Busarm\PhpMini\Bags\Query;
 use Busarm\PhpMini\Dto\ServiceRequestDto;
+use Busarm\PhpMini\Dto\ServiceResponseDto;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use Busarm\PhpMini\Loader;
 use Busarm\PhpMini\Request;
 use Nyholm\Psr7\Uri;
+
+use const Busarm\PhpMini\Constants\VAR_PATH_INFO;
+use const Busarm\PhpMini\Constants\VAR_REQUEST_URI;
 
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
@@ -25,23 +30,26 @@ use function Busarm\PhpMini\Helpers\http_parse_query;
  */
 class LocalService extends BaseService
 {
-    public function __construct(private ?ServiceDiscoveryInterface $discovery = null)
-    {
+    public function __construct(
+        private string $name,
+        private ?string $location = null,
+        private ?ServiceDiscoveryInterface $discovery = null,
+    ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function call(ServiceRequestDto $dto, RequestInterface $request)
+    public function call(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto
     {
-        $path = $dto->location ?? $this->getLocation($dto->name);
+        $path = $this->location ?? $this->getLocation($this->name);
         if (empty($path)) {
-            throw new SystemError(self::class . ": Location for client $dto->name not found");
+            throw new SystemError(self::class . ": Location for client $this->name not found");
         }
 
         $path = is_dir($path) ? $path . '/index.php' : $path;
         if (!file_exists($path)) {
-            throw new SystemError(self::class . ": Client $dto->name App file not found: $path");
+            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
         }
 
         $uri = (new Uri(rtrim($request->baseUrl(), '/') . '/' . ltrim($dto->route, '/')));
@@ -51,10 +59,10 @@ class LocalService extends BaseService
         $dto->headers['x-trace-id'] = $request->correlationId();
 
         $server = $request->server();
-        $server->set('REQUEST_URI', '/' . $dto->route);
-        $server->set('PATH_INFO', '/' . $dto->route);
+        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
+        $server->set(VAR_PATH_INFO, '/' . $dto->route);
 
-        return Loader::require($path, [
+        $response = Loader::require($path, [
             'request' =>
             Request::fromUrl(
                 strval($uri),
@@ -64,25 +72,35 @@ class LocalService extends BaseService
                     ServiceType::DELETE => HttpMethod::DELETE,
                     default   => HttpMethod::GET,
                 }
-            )
-                ->initialize(
-                    new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
-                    new Bag($dto->type != ServiceType::READ ? $dto->params : []),
-                    $request->cookie(),
-                    $request->session(),
-                    new Bag($dto->files),
-                    $server,
-                    new Bag($dto->headers),
-                    null,
-                )->toPsr(),
+            )->initialize(
+                new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
+                new Bag($dto->type != ServiceType::READ ? $dto->params : []),
+                $request->cookie(),
+                null,
+                new Bag($dto->files),
+                $server,
+                new Bag($dto->headers),
+                null,
+            )->toPsr(),
             'discovery' => $this->discovery,
         ]);
+
+        if ($response instanceof ResponseInterface && $response->isSuccessful()) {
+            return (new ServiceResponseDto)->setStatus(true)->setAsync(false)
+                ->setCode($response->getStatusCode())
+                ->setData($response->getParameters());
+        } else if (is_array($response) || is_object($response)) {
+            return (new ServiceResponseDto)->setStatus(true)->setAsync(false)
+                ->setCode(200)
+                ->setData((array)$response);
+        }
+        return (new ServiceResponseDto)->setStatus(false)->setAsync(false);
     }
 
     /**
      * @inheritDoc
      */
-    public function callAsync(ServiceRequestDto $dto, RequestInterface $request)
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto
     {
         throw new SystemError("Async local service request not currently supported.");
     }

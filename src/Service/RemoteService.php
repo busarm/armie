@@ -3,6 +3,7 @@
 namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Dto\ServiceRequestDto;
+use Busarm\PhpMini\Dto\ServiceResponseDto;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Errors\SystemError;
@@ -25,24 +26,27 @@ use function Busarm\PhpMini\Helpers\http_parse_query;
  */
 class RemoteService extends BaseService
 {
-    public function __construct(private ?ServiceDiscoveryInterface $discovery = null, private $timeout = 10)
-    {
+    public function __construct(
+        private string $name,
+        private ?string $location = null,
+        private ?ServiceDiscoveryInterface $discovery = null,
+        private $timeout = 10
+    ) {
     }
 
     /**
      * @inheritDoc
-     * @return ResponseInterface
      */
-    public function call(ServiceRequestDto $dto, RequestInterface $request): ResponseInterface
+    public function call(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto
     {
-        $url = $dto->location ?? $this->getLocation($dto->name);
+        $url = $this->location ?? $this->getLocation($this->name);
 
         if (empty($url)) {
-            throw new SystemError(self::class . ": Location for client `$dto->name` not found");
+            throw new SystemError(self::class . ": Location for client `$this->name` not found");
         }
 
         if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
-            throw new SystemError(self::class . ": Location for client `$dto->name` is not a valid remote url");
+            throw new SystemError(self::class . ": Location for client `$this->name` is not a valid remote url");
         }
 
         $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
@@ -54,7 +58,7 @@ class RemoteService extends BaseService
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
-        return $client->request(
+        $response = $client->request(
             match ($dto->type) {
                 ServiceType::CREATE => HttpMethod::POST,
                 ServiceType::UPDATE => HttpMethod::PUT,
@@ -77,23 +81,27 @@ class RemoteService extends BaseService
                     RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ]
         );
+
+        return (new ServiceResponseDto)
+            ->setStatus($response->getStatusCode() == 200 || $response->getStatusCode() == 201)
+            ->setAsync(false)
+            ->setCode($response->getStatusCode())
+            ->setData(json_decode($response->getBody(), true) ?? []);
     }
 
     /**
      * @inheritDoc
-     * @return PromiseInterface
      */
-    public function callAsync(ServiceRequestDto $dto, RequestInterface $request): PromiseInterface
+    public function callAsync(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto
     {
-
-        $url = $dto->location ?? $this->getLocation($dto->name);
+        $url = $this->location ?? $this->getLocation($this->name);
 
         if (empty($url)) {
-            throw new SystemError(self::class . ": Location for client `$dto->name` not found");
+            throw new SystemError(self::class . ": Location for client `$this->name` not found");
         }
 
         if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
-            throw new SystemError(self::class . ": Location for client `$dto->name` is not a valid remote url");
+            throw new SystemError(self::class . ": Location for client `$this->name` is not a valid remote url");
         }
 
         $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
@@ -105,7 +113,7 @@ class RemoteService extends BaseService
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
-        return $client->requestAsync(
+        $client->requestAsync(
             match ($dto->type) {
                 ServiceType::CREATE => HttpMethod::POST,
                 ServiceType::UPDATE => HttpMethod::PUT,
@@ -128,6 +136,11 @@ class RemoteService extends BaseService
                     RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ]
         );
+
+        return (new ServiceResponseDto)
+            ->setStatus(true)
+            ->setAsync(true)
+            ->setData([]);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Service;
 
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
+use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
@@ -18,37 +19,30 @@ use function Busarm\PhpMini\Helpers\log_error;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class RemoteServiceDiscovery extends BaseServiceDiscovery
+class RemoteServiceDiscovery implements ServiceDiscoveryInterface
 {
+    /**
+     * @var ServiceClientInterface[]
+     */
+    protected array $services = [];
+
+    /**
+     * Last registry request date
+     * 
+     * @var integer
+     */
     private int $requestedAt = 0;
 
     /**
      *
-     * @param string $endpoint Service discovery endpoint
-     * - Endpoint must be an HTTP GET request and should provide a response of list of services. Format = `{"name" : "url"}`
-     * @param integer $ttl Service discovery cache ttl (seconds). Re-load list after ttl
-     * @param integer $timeout Service discovery request timeout (seconds)
+     * @param string $endpoint Service registry endpoint
+     * - Endpoint must be an HTTP GET request and should provide a response of list of services. Format = `{"name" : "url", ...}`
+     * @param integer $ttl Service registry cache ttl (seconds). Re-load list after ttl
+     * @param integer $timeout Service registry request timeout (seconds)
      */
     public function __construct(private string $endpoint, private $ttl = 300, private $timeout = 10)
     {
-        parent::__construct();
         $this->load();
-    }
-
-    /**
-     * Get service client
-     *
-     * @param string $name Service Name
-     * @return ServiceClientInterface
-     */
-    private function get(string $name): ServiceClientInterface|null
-    {
-        foreach ($this->services as $service) {
-            if (strtolower($name) === strtolower($service->getName())) {
-                return $service;
-            }
-        }
-        return null;
     }
 
     /**
@@ -94,9 +88,25 @@ class RemoteServiceDiscovery extends BaseServiceDiscovery
     }
 
     /**
+     * Get service client
+     *
+     * @param string $name Service Name
+     * @return ServiceClientInterface
+     */
+    private function get(string $name): ServiceClientInterface|null
+    {
+        foreach ($this->services as $service) {
+            if (strtolower($name) === strtolower($service->getName())) {
+                return $service;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Load service clients
      */
-    public function load()
+    private function load()
     {
         $client = new Client([
             'timeout'  => $this->timeout,

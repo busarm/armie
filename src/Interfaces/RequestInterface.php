@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
@@ -64,7 +65,7 @@ interface RequestInterface extends ContainerInterface
     public function segments();
 
     /**
-     * @return string
+     * @return HttpMethod::*|string
      */
     public function method();
 

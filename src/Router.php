@@ -6,7 +6,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
-use Busarm\PhpMini\Interfaces\HTTP\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;

@@ -21,9 +21,10 @@ interface RepositoryInterface
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
+     * @param int $limit Query Limit. Default: 0 to disable
      * @return CollectionBaseDto
      */
-    public function all(array $conditions = [], array $params = [], array $columns = []): CollectionBaseDto;
+    public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
     /**
      * Get all records with trashed.
@@ -31,21 +32,22 @@ interface RepositoryInterface
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
+     * @param int $limit Query Limit. Default: 0 to disable
      * @return CollectionBaseDto
      */
-    public function allTrashed(array $conditions = [], array $params = [], array $columns = []): CollectionBaseDto;
+    public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
     /**
      * Get paginated list of records.
-     *
-     * @param int $page Page Number Default: 1
-     * @param int $limit Page Limit. Default: 0 to disable
+     * 
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
+     * @param int $page Page Number Default: 1
+     * @param int $limit Page Limit. Default: 0 to disable
      * @return PaginatedCollectionDto
      */
-    public function paginate(int $page = 1, int $limit = 0, array $conditions = [], array $params = [], array $columns = []): PaginatedCollectionDto;
+    public function paginate(array $conditions = [], array $params = [], array $columns = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 
     /**
      * Find record by id.

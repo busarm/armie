@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini\Dto;
 
-use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Enums\Env;
 use Throwable;
 

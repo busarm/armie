@@ -12,7 +12,7 @@ use Busarm\PhpMini\Dto\ServiceRequestDto;
 use Busarm\PhpMini\Enums\ServiceType;
 use Busarm\PhpMini\Interfaces\Data\CrudServiceRepositoryInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ServiceProviderInterface;
+use Busarm\PhpMini\Interfaces\ServiceHandlerInterface;
 
 /**
  * 
@@ -25,7 +25,7 @@ class CrudServiceRepository implements CrudServiceRepositoryInterface
 {
     public function __construct(
         private RequestInterface $request,
-        private ServiceProviderInterface $serviceProvider
+        private ServiceHandlerInterface $serviceProvider
     ) {
     }
 

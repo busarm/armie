@@ -10,6 +10,7 @@ use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Enums\AppStatus;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\HttpException;
@@ -45,6 +46,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Workerman\Connection\ConnectionInterface;
 use Workerman\Connection\TcpConnection;
+use Workerman\Events\Ev;
+use Workerman\Events\Event;
+use Workerman\Events\Select;
+use Workerman\Events\Swoole;
 use Workerman\Protocols\Http\Request as HttpRequest;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
 use Workerman\Worker;
@@ -330,7 +335,7 @@ class App implements HttpServerInterface, ContainerInterface
                     // Leave logs for tracing
                     if ($this->config->logRequest && $request instanceof RequestInterface) {
                         $endTime = microtime(true) * 1000;
-                        $this->logger->debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                        $this->logger->debug(sprintf("Request completed: id = %s, time = %s, durationMs = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
                     }
 
                     // Save session
@@ -349,7 +354,7 @@ class App implements HttpServerInterface, ContainerInterface
         // Leave logs for tracing
         if ($this->config->logRequest && $request instanceof RequestInterface) {
             $endTime = microtime(true) * 1000;
-            $this->logger->debug(sprintf("Request completed: id = %s, time = %s, duration-ms = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+            $this->logger->debug(sprintf("Request completed: id = %s, correlationId = %s, time = %s, durationMs = %s", $request->requestId(), $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
         }
 
         // Clean up request
@@ -365,14 +370,17 @@ class App implements HttpServerInterface, ContainerInterface
      * @param string $host
      * @param integer $port
      * @param integer $workers
+     * @param Looper::* $looper Event looper to use. Default: Looper::SELECT
      * @return void
      */
-    public function start(string $host, int $port = 80, $workers = 1)
+    public function start(string $host, int $port = 80, $workers = 1, $looper = Looper::SELECT)
     {
-        // Set workerman log file
+        // Set up workerman
+        Worker::$stopTimeout = 5;
         Worker::$logFile = $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
         Worker::$statusFile = $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
         Worker::$pidFile = $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
+        Worker::$eventLoopClass = $this->getEventLooper($looper);
 
         // TODO  Add workers for background jobs
 
@@ -435,7 +443,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onWorkerExit = function (Worker $worker, $master, $pid) {
             $this->status = AppStatus::STOPPED;
-            $this->logger->debug(sprintf("Worker %s master %s pid %s exited", $worker->name, $master, $pid));
+            $this->logger->debug(sprintf("Worker %s process pid %s exited", $worker->name, $pid));
 
             // Unregister distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
@@ -451,7 +459,7 @@ class App implements HttpServerInterface, ContainerInterface
                 &&  $this->logger->debug(sprintf("Connection from %s closed; sent to %s", $connection->getRemoteIp(), $connection->getRemotePort()));
         };
         $this->worker->onError = function ($error) {
-            $this->logger->error(strval($error));
+            $this->logger->error(sprintf("Worker error: %s", strval($error)));
         };
 
         // TODO Add socket handler, socket request dto and socket data dto
@@ -459,7 +467,23 @@ class App implements HttpServerInterface, ContainerInterface
         //----- Start event loop ------//
 
         $this->setStateless(true);
-        Worker::runAll();
+        Worker::$onMasterStop = function () {
+            $this->logger->debug("Worker master process stopped");
+        };
+        @Worker::runAll();
+    }
+
+    /**
+     * Get event looper class to be used
+     * @param Looper::* $looper
+     * @return string
+     */
+    protected function getEventLooper($looper)
+    {
+        if ($looper == Looper::EVENT && extension_loaded('event') && class_exists(\EventBase::class)) return Event::class;
+        else if ($looper == Looper::EV && extension_loaded('ev') && class_exists(\Ev::class)) return Ev::class;
+        else if ($looper == Looper::SWOOLE && extension_loaded('swoole') && class_exists(\Swoole\Event::class)) return Swoole::class;
+        return Select::class;
     }
 
     /**

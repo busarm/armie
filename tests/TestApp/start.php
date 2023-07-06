@@ -1,9 +1,11 @@
 <?php
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Bags\FileStore;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Enums\Env;
+use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
@@ -34,9 +36,8 @@ $app->get('pingHtml')->call(function (App $app) {
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
-    $req->cookie()->set("TestCookie", "test", 30);
-    $req->session()?->set("TestSession", "test");
-    // $req->connection()?->getConnection()?->send("HAHAHAHA TEST");
+    // $req->cookie()->set("TestCookie", "test", 30);
+    // $req->session()?->set("TestSession", "test");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -47,6 +48,7 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'currentUrl' => $req->currentUrl(),
         'baseUrl' => $req->baseUrl(),
         'ip' => $req->ip(),
+        'requestId' => $req->requestId(),
         'correlationId' => $req->correlationId(),
     ];
 });
@@ -55,4 +57,4 @@ $app->get('download')->call(function (Response $response) {
     return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
-$app->start('localhost', 8181, 5);
+$app->start('localhost', 8181, 5, Looper::EVENT);

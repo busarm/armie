@@ -10,10 +10,8 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\RequestOptions;
 use Nyholm\Psr7\Uri;
-use Psr\Http\Message\ResponseInterface;
 
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
@@ -144,12 +142,9 @@ class RemoteService extends BaseService
     }
 
     /**
-     * Get service location for name
-     * 
-     * @param string $name
-     * @return string|null
+     * @inheritDoc
      */
-    public function getLocation($name)
+    protected function getLocation($name)
     {
         $client = $this->discovery?->getServiceClient($name);
         if ($client) {

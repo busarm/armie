@@ -6,11 +6,11 @@ use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Data\PDO\ConnectionConfig;
 use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Reporter;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
+use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\ReportingInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -26,7 +26,6 @@ use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Route;
 use Busarm\PhpMini\Router;
-use Busarm\PhpMini\Service\BaseServiceDiscovery;
 use Busarm\PhpMini\Resolvers\Auth;
 use Busarm\PhpMini\Resolvers\ServerConnection;
 use Nyholm\Psr7\Request as Psr7Request;
@@ -83,7 +82,7 @@ class Resolver implements DependencyResolverInterface
                 ->setPersist($this->app->config->db->connectionPersist)
                 ->setErrorMode($this->app->config->db->connectionErrorMode)
                 ->setOptions($this->app->config->db->connectionOptions),
-            BaseServiceDiscovery::class, ServiceDiscoveryInterface::class => $this->app->serviceDiscovery,
+            ServiceDiscoveryInterface::class, DistributedServiceDiscoveryInterface::class  => $this->app->serviceDiscovery,
             default => ($request ? $request->getSingleton($className) : null) ?: $this->app->getSingleton($className)
         };
     }

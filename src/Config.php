@@ -5,7 +5,6 @@ namespace Busarm\PhpMini;
 use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Enums\CacheLimiter;
-use Busarm\PhpMini\Enums\ResponseFormat;
 use Busarm\PhpMini\Enums\SameSite;
 use Busarm\PhpMini\Enums\Verbose;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;

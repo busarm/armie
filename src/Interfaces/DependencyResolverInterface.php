@@ -28,7 +28,7 @@ interface DependencyResolverInterface
      *
      * @param T $instance
      * @param RequestInterface|RouteInterface $request
-     * @return T
+     * @return T|mixed
      * @template T Item type template
      */
     public function customize(mixed $instance, RequestInterface|RouteInterface|null $request = null): mixed;

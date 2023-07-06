@@ -13,7 +13,7 @@ use Busarm\PhpMini\Dto\ServiceResponseDto;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-interface ServiceProviderInterface
+interface ServiceHandlerInterface
 {
     /**
      * Call service
@@ -32,12 +32,4 @@ interface ServiceProviderInterface
      * @return ServiceResponseDto
      */
     public function callAsync(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto;
-
-    /**
-     * Get service location for name
-     * 
-     * @param string $name
-     * @return string|null
-     */
-    public function getLocation($name);
 }

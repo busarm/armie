@@ -106,12 +106,9 @@ class LocalService extends BaseService
     }
 
     /**
-     * Get service location for name
-     * 
-     * @param string $name
-     * @return string|null
+     * @inheritDoc
      */
-    public function getLocation($name)
+    protected function getLocation($name)
     {
         $client = $this->discovery?->getServiceClient($name);
         if ($client) {

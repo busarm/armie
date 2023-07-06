@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1]
+
+### Added
+
+-   Added CRUD service repository for microservice clients
+-   Added distributed service discovery support
+
 ## [1.5.0]
 
 ### Added

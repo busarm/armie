@@ -10,7 +10,7 @@
         </api>
     </version>
     <paths>
-        <output>docs/</output>
+        <output>.docs/</output>
         <cache>.tmp/</cache>
     </paths>
 </phpdocumentor>

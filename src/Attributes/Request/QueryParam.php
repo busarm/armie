@@ -4,6 +4,7 @@ namespace Busarm\PhpMini\Request\Attributes;
 
 use Attribute;
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Interfaces\Attribute\ParameterAttributeInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
@@ -24,7 +25,7 @@ class QueryParam implements ParameterAttributeInterface
 
     use TypeResolver;
 
-    public function __construct(private string $name, private bool $sanitize = false)
+    public function __construct(private string $name, private bool $required = false, private bool $sanitize = false)
     {
     }
 
@@ -35,6 +36,9 @@ class QueryParam implements ParameterAttributeInterface
     {
         if ($request instanceof RequestInterface) {
             $value = $request->query()->get($this->name, $value, $this->sanitize);
+            if ($this->required && !isset($value)) {
+                throw new BadRequestException(sprintf("%s query param is required", $this->name));
+            }
             return $this->resolveType($parameter->getType() ?: $this->findType($value), $value);
         }
         return null;

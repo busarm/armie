@@ -48,6 +48,7 @@ class Request implements RequestInterface
     use Container;
 
     protected string|null $_correlationId   =   NULL;
+    protected string|null $_requestId       =   NULL;
     protected string|null $_ip              =   NULL;
     protected string|null $_scheme          =   NULL;
     protected string|null $_domain          =   NULL;
@@ -331,10 +332,12 @@ class Request implements RequestInterface
             $this->_baseUrl = $this->_baseUrl ?: $this->_host;
             $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
 
-            $this->_correlationId = ($this->_headers->get('request-id') ??
-                $this->_headers->get('x-request-id') ??
-                $this->_headers->get('x-trace-id') ??
+            $this->_correlationId = ($this->_headers->get('x-trace-id') ??
                 $this->_headers->get('x-correlation-id'))
+                ?:  sha1(uniqid($this->ip() ?? ""));
+
+            $this->_requestId = ($this->_headers->get('x-request-id') ??
+                $this->_headers->get('request-id'))
                 ?:  floor(microtime(true) * 1000) . '.' . md5(uniqid());
         }
 
@@ -548,6 +551,15 @@ class Request implements RequestInterface
     public function correlationId()
     {
         return $this->_correlationId;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function requestId()
+    {
+        return $this->_requestId;
     }
 
     /**

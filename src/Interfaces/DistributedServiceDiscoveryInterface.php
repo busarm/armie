@@ -25,15 +25,11 @@ interface DistributedServiceDiscoveryInterface
 
     /**
      * Register service client
-     *
-     * @param ?RemoteClient $client
      */
     public function register(): void;
 
     /**
      * Unregister service client
-     *
-     * @param ?RemoteClient $client
      */
     public function unregister(): void;
 }

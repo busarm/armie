@@ -30,16 +30,14 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
      * @param RemoteClient $client Current client to be registered on the service registry
      * @param string $endpoint Service registry endpoint
      * - Endpoint must support
-     * -- GET /             - Get list of service client. Format = `[{"name":"<name>", "url":"<url>"}, ...]`
      * -- GET /{name}       - Get service client by name. Format = `{"name":"<name>", "url":"<url>"}`
      * -- POST /            - Register service client
-     * -- DELETE /{name}    - Unregister service client
+     * -- DELETE /{name}    - Unregister service client. Accepts `url` as query param.
      * @param integer $ttl Service registry cache ttl (seconds). Re-load after ttl. Default: 300secs
      * @param integer $timeout Service registry request timeout (seconds). Default: 10secs
      */
     public function __construct(private RemoteClient $client, private string $endpoint, private $ttl = 300, private $timeout = 10)
     {
-        $this->load();
     }
 
     /**
@@ -49,10 +47,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     {
         if ($name == $this->client->getName()) return null;
 
-        /** @var ServiceRegistryDto */
+        /** @var ServiceRegistryDto|null */
         $service = $this->registry[$name] ?? null;
 
-        if (isset($service)) {
+        if (!empty($service)) {
             if (($service->expiresAt > time())) {
                 return $service;
             } else {
@@ -73,6 +71,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                 }
             }
         }
+
         return null;
     }
 
@@ -109,7 +108,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
             HttpMethod::DELETE,
             $this->endpoint . "/" . $this->client->getName(),
             [
-                RequestOptions::VERIFY => false
+                RequestOptions::VERIFY => false,
+                RequestOptions::QUERY => [
+                    'url' => $this->client->getLocation()
+                ]
             ]
         );
     }
@@ -135,12 +137,11 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     public function getServiceClients(): array
     {
         return array_map(
-            fn (ServiceRegistryDto $service) => new RemoteClient($service->name, $service->url),
-            array_filter(
-                $this->registry,
-                fn (ServiceRegistryDto $service) => $service->name != $this->client->getName()
-                    && $service->expiresAt > time()
-            )
+            function (ServiceRegistryDto $service) {
+                $service = $this->get($service->name);
+                return new RemoteClient($service->name, $service->url);
+            },
+            $this->registry
         );
     }
 
@@ -155,32 +156,5 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
             $carry[$current->getName()] = $current->getLocation();
             return $carry;
         }, []);
-    }
-
-    /**
-     * Load service registry
-     */
-    private function load(): void
-    {
-        $http = new Client([
-            'timeout'  => $this->timeout,
-        ]);
-        $response = $http->request(
-            HttpMethod::GET,
-            $this->endpoint,
-            [
-                RequestOptions::VERIFY => false
-            ]
-        );
-        if ($response && $response->getStatusCode() == 200 && !empty($results = json_decode($response->getBody(), true))) {
-            foreach ($results as $result) {
-                if (
-                    isset($result['name']) && isset($result['url'])
-                    && $result['name'] != $this->client->getName()
-                ) {
-                    $this->registry[$result['name']] = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
-                }
-            }
-        }
     }
 }

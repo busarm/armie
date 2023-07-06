@@ -13,7 +13,8 @@ class ServiceRegistryDto extends BaseDto
     public function __construct(
         public string $name,
         public string $url,
-        public int $expiresAt = 0
+        public int $expiresAt = 0,
+        public int $requestCount = 1,
     ) {
     }
 }

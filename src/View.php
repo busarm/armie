@@ -42,7 +42,7 @@ class View implements ResponseHandlerInterface, Stringable
         $view = new self($data, $headers);
         try {
             $view->start();
-            $view->render();
+            if ($content = $view->render()) echo $content;
             return $view->end();
         } catch (Throwable $e) {
             ob_end_clean();
@@ -89,11 +89,11 @@ class View implements ResponseHandlerInterface, Stringable
 
     /**
      * 
-     * Renders the view
+     * Renders the view - print out or return the view as string
      *
-     * @return void
+     * @return ?string
      */
-    public function render()
+    public function render(): ?string
     {
         throw new SystemError('`render` method not implemented');
     }
@@ -156,7 +156,7 @@ class View implements ResponseHandlerInterface, Stringable
     public function handle(): ResponseInterface
     {
         $this->start();
-        $this->render();
+        if ($content = $this->render()) echo $content;
         $content = $this->end();
         return (new Response)->addHttpHeaders($this->headers)->html($content, 200);
     }

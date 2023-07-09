@@ -19,6 +19,10 @@
             "Busarm\\PhpMini\\Test\\": "tests/"
         }
     },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    },
     "archive": {
         "exclude": [
             "*",

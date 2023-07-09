@@ -8,7 +8,6 @@ use Busarm\PhpMini\Dto\CrudItemRequestDto;
 use Busarm\PhpMini\Dto\CrudListRequestDto;
 use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
 use Busarm\PhpMini\Dto\PaginatedCollectionDto;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
 
 /**
  * PHP Mini Framework

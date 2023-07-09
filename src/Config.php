@@ -677,6 +677,19 @@ class Config implements ConfigurationInterface
 
         return $this;
     }
+    /**
+     * Set logger verbosity
+     *
+     * @param  \Busarm\PhpMini\Enums\Verbose::*  $loggerVerborsity  Logger verbosity
+     *
+     * @return  self
+     */
+    public function setLoggerVerborsity($loggerVerborsity)
+    {
+        $this->loggerVerborsity = $loggerVerborsity;
+
+        return $this;
+    }
 
     /**
      * Set session lifetime (seconds). e.g 10 for 10 seconds

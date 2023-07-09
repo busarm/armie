@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini;
 
-use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\ReportingInterface;
 
 use function Busarm\PhpMini\Helpers\log_debug;
@@ -34,16 +33,6 @@ class Reporter implements ReportingInterface
         'private_key',
     ];
     protected array $breadCrumbs = [];
-
-    /**
-     * Set up reporting
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        throw new SystemError('`setUp` not implemented');
-    }
 
     /**
      * Leave breadcrumbs for issue tracking

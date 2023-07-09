@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Busarm\PhpMini\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;

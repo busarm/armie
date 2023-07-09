@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Request\Attributes;
+namespace Busarm\PhpMini\Attributes\Request;
 
 use Attribute;
 use Busarm\PhpMini\App;

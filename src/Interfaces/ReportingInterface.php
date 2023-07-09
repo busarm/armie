@@ -12,13 +12,6 @@ namespace Busarm\PhpMini\Interfaces;
 interface ReportingInterface
 {
     /**
-     * Set up reporting
-     *
-     * @return void
-     */
-    public function setUp();
-
-    /**
      * Leave breadcrumbs for issue tracking
      *
      * @param string $title

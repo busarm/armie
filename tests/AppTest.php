@@ -271,7 +271,7 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app singletons for stateless class on stateless mode - should not be supported
+     * Test app singletons for async class on async mode - should not be supported
      *
      * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
      * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
@@ -281,7 +281,7 @@ final class AppTest extends TestCase
     public function testAppSingletonNotSupportedOnStatelessRequest()
     {
         App::$statelessClasses[] = MockService::class;
-        $this->app->stateless = true;
+        $this->app->async = true;
         $this->app->router->addRoutes([
             Route::get('ping')->call(function () {
                 $mockService = MockService::make(['id' => uniqid()]);
@@ -305,7 +305,7 @@ final class AppTest extends TestCase
      */
     public function testStatelessSingleton()
     {
-        $this->app->stateless = true;
+        $this->app->async = true;
         $this->app->router->addRoutes([
             Route::get('ping')->call(function (App $app, RequestInterface $request) {
                 $mockService = MockStatelessService::make($request, ['id' => uniqid()]);

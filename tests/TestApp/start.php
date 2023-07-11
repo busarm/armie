@@ -1,7 +1,6 @@
 <?php
 
 use Busarm\PhpMini\App;
-use Busarm\PhpMini\Bags\FileStore;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Enums\Env;
@@ -24,7 +23,7 @@ $config = (new Config)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
     ->setLogRequest(false)
-    ->setSessionEnabled(false)
+    ->setSessionEnabled(true)
     ->setSessionLifetime(60);
 
 $app = new App($config, Env::LOCAL);
@@ -36,8 +35,8 @@ $app->get('pingHtml')->call(function (App $app) {
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
-    // $req->cookie()->set("TestCookie", "test", 30);
-    // $req->session()?->set("TestSession", "test");
+    $req->cookie()->set("TestCookie", "test", 30);
+    $req->session()?->set("TestSession", "test");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),

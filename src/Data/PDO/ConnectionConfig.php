@@ -20,6 +20,7 @@ class ConnectionConfig
     public bool $persist = false;
     public bool $errorMode = false;
     public array $options = [];
+    public int $poolSize = 0;
 
 
     /**
@@ -138,6 +139,18 @@ class ConnectionConfig
     public function setOptions(array $options)
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of poolSize
+     *
+     * @return  self
+     */ 
+    public function setPoolSize($poolSize)
+    {
+        $this->poolSize = $poolSize;
 
         return $this;
     }

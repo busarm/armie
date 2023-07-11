@@ -79,7 +79,7 @@ class Resolver implements DependencyResolverInterface
                 ->setDatabase($this->app->config->db->connectionDatabase)
                 ->setUser($this->app->config->db->connectionUsername)
                 ->setPassword($this->app->config->db->connectionPassword)
-                ->setPersist($this->app->config->db->connectionPersist)
+                ->setPersist($this->app->async ?: $this->app->config->db->connectionPersist)
                 ->setErrorMode($this->app->config->db->connectionErrorMode)
                 ->setOptions($this->app->config->db->connectionOptions),
             ServiceDiscoveryInterface::class, DistributedServiceDiscoveryInterface::class  => $this->app->serviceDiscovery,

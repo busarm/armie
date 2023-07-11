@@ -19,10 +19,7 @@ class TestViewPage extends View
     }
 
     /**
-     * 
-     * Renders the view
-     *
-     * @return void
+     * @inheritDoc
      */
     public function render()
     {

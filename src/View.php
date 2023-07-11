@@ -91,9 +91,9 @@ class View implements ResponseHandlerInterface, Stringable
      * 
      * Renders the view - print out or return the view as string
      *
-     * @return ?string
+     * @return string|void
      */
-    public function render(): ?string
+    public function render()
     {
         throw new SystemError('`render` method not implemented');
     }

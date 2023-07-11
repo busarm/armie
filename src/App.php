@@ -61,6 +61,7 @@ use function Busarm\PhpMini\Helpers\is_cli;
 // TODO PSR Cache Interface
 // TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
 // TODO Restructure folders to be self contained - class + it's interface
+// TODO Fix memory leak on event looper mode
 
 /**
  * Application Factory
@@ -75,7 +76,7 @@ class App implements HttpServerInterface, ContainerInterface
     use Container;
 
     /**
-     * List of classes that must be handled stateless when running in stateless mode
+     * List of classes that must be handled async when running in async mode
      */
     public static $statelessClasses = [
         Request::class,
@@ -121,13 +122,13 @@ class App implements HttpServerInterface, ContainerInterface
     public $startTimeMs;
 
     /** @var boolean 
-     * If app is running in stateless mode. E.g Using Swoole or other Event loops. 
-     * Do not use static variables for user specific data when runing on stateless mode.
+     * If app is running in async mode. E.g Using event loops such as Ev, Swoole. 
+     * ### NOTE: Take caution when using static varialbles. Do not use static variables for user specific data when runing on async mode.
      */
-    public bool $stateless = false;
+    public bool $async = false;
 
     /**
-     * Application main worker - when using event loop (stateless) mode
+     * Application main worker - when using event loop (async) mode
      *
      * @var Worker|null
      */
@@ -140,7 +141,7 @@ class App implements HttpServerInterface, ContainerInterface
     /** @var MiddlewareInterface[] */
     protected $middlewares = [];
 
-    /** @var array */
+    /** @var array<string, string> */
     protected $bindings = [];
 
     /**
@@ -307,7 +308,7 @@ class App implements HttpServerInterface, ContainerInterface
     public function run(RequestInterface|RouteInterface|null $request = null): ResponseInterface
     {
         $this->status = AppStatus::RUNNNIG;
-        $startTime = $this->stateless ? microtime(true) * 1000 : $this->startTimeMs;
+        $startTime = $this->async ? microtime(true) * 1000 : $this->startTimeMs;
 
         // Set request
         $request = $request ?? Request::fromGlobal($this->config);
@@ -327,26 +328,28 @@ class App implements HttpServerInterface, ContainerInterface
             ]);
         }
 
-        // Set shutdown hook
-        register_shutdown_function(function () use ($request, $startTime) {
-            if ($request) {
-                if ($request instanceof RequestInterface) {
+        // Set shutdown hook - Call only in sync mode to prevent memory leak
+        if (!$this->async) {
+            register_shutdown_function(function () use ($request, $startTime) {
+                if ($request) {
+                    if ($request instanceof RequestInterface) {
 
-                    // Leave logs for tracing
-                    if ($this->config->logRequest && $request instanceof RequestInterface) {
-                        $endTime = microtime(true) * 1000;
-                        $this->logger->debug(sprintf("Request completed: id = %s, time = %s, durationMs = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                        // Leave logs for tracing
+                        if ($this->config->logRequest && $request instanceof RequestInterface) {
+                            $endTime = microtime(true) * 1000;
+                            $this->logger->debug(sprintf("Request completed: id = %s, time = %s, durationMs = %s", $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
+                        }
+
+                        // Save session
+                        $request->session()?->save();
                     }
 
-                    // Save session
-                    $request->session()?->save();
+                    // Clean up request
+                    unset($request);
                 }
-
-                // Clean up request
-                $request = NULL;
-            }
-            $this->status = AppStatus::STOPPED;
-        });
+                $this->status = AppStatus::STOPPED;
+            });
+        }
 
         // Process route request
         $response = $this->processMiddleware($request);
@@ -358,11 +361,10 @@ class App implements HttpServerInterface, ContainerInterface
         }
 
         // Clean up request
-        $request = NULL;
+        unset($request);
 
         return $response;
     }
-
 
     /**
      * Start async http server
@@ -413,14 +415,14 @@ class App implements HttpServerInterface, ContainerInterface
         // Add handlers
         $this->worker->onMessage = function (TcpConnection $connection, HttpRequest $request) {
             try {
-                $request = Request::fromWorkerman($request, $this->config);
-                $response = $this->run($request)->prepare();
+                $response = $this->run(Request::fromWorkerman($request, $this->config))->prepare();
                 $connection->send($response->toWorkerman());
             } catch (Throwable $e) {
                 $this->reporter->reportException($e);
                 $response = (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500)->prepare();
                 $connection->send($response->toWorkerman());
             }
+            unset($response);
         };
         $this->worker->onWorkerStart = function (Worker $worker) {
             $this->status = AppStatus::RUNNNIG;
@@ -466,7 +468,7 @@ class App implements HttpServerInterface, ContainerInterface
 
         //----- Start event loop ------//
 
-        $this->setStateless(true);
+        $this->setAsync(true);
         Worker::$onMasterStop = function () {
             $this->logger->debug("Worker master process stopped");
         };
@@ -547,11 +549,11 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function addSingleton(string $className, &$object): static
     {
-        // Prevent setting global singletons for stateless classes
-        // with stateless mode if app is running
+        // Prevent setting global singletons for async classes
+        // with async mode if app is running
         if (
             $this->status === AppStatus::RUNNNIG
-            && $this->stateless
+            && $this->async
             && in_array($className, self::$statelessClasses)
         ) return $this;
 
@@ -616,13 +618,13 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Set if app is running in stateless mode. E.g Using Swoole or other Event loops.
+     * Set if app is running in async mode. E.g Using Swoole or other Event loops.
      *
      * @return  self
      */
-    public function setStateless($stateless)
+    public function setAsync($async)
     {
-        $this->stateless = $stateless;
+        $this->async = $async;
 
         return $this;
     }

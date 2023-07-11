@@ -6,6 +6,8 @@ use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Traits\Singleton;
 use PDO;
 
+use function Busarm\PhpMini\Helpers\app;
+
 /**
  * PHP Mini Framework
  *
@@ -17,11 +19,16 @@ class Connection extends PDO implements SingletonInterface
     use Singleton;
 
     /**
+     * @var self[]
+     */
+    static private $pool = [];
+
+    /**
      * @param ConnectionConfig $config
      * @throws \PDOException — if the attempt to connect to the requested database fails.
      * @inheritDoc
      */
-    public function __construct(ConnectionConfig $config)
+    public function __construct(private ConnectionConfig $config)
     {
         $dns = $config->dsn ?? sprintf("%s:dbname=%s;host=%s;port=%s", $config->driver, $config->database, $config->host, $config->port);
         parent::__construct($dns, $config->user, $config->password, array_merge([
@@ -29,6 +36,31 @@ class Connection extends PDO implements SingletonInterface
             self::ATTR_PERSISTENT => $config->persist,
             self::ATTR_ERRMODE => $config->errorMode ? self::ERRMODE_EXCEPTION : self::ERRMODE_SILENT,
         ], $config->options));
+    }
+
+    /**
+     * Create / Retrieve singleton instance 
+     *
+     * @param array $params
+     * @return static
+     */
+    public static function make(array $params = []): static
+    {
+        $config = app()->make(ConnectionConfig::class);
+
+        // Async mode - use pooling (round robin)
+        if (app()->async && $config->poolSize > 0) {
+            if (!empty(self::$pool)) {
+                self::$pool[] = array_shift(self::$pool);
+            } else {
+                for ($i = 0; $i < $config->poolSize; $i++) {
+                    self::$pool[] = new self($config);
+                }
+            }
+            return self::$pool[0];
+        }
+
+        return app()->make(static::class, $params);
     }
 
     /**

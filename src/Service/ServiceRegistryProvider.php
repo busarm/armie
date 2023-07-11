@@ -8,7 +8,7 @@ use Busarm\PhpMini\Exceptions\BadRequestException;
 use Busarm\PhpMini\Exceptions\NotFoundException;
 use Busarm\PhpMini\Interfaces\ProviderInterface;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
-use Busarm\PhpMini\Request\Attributes\QueryParam;
+use Busarm\PhpMini\Attributes\Request\QueryParam;
 
 /**
  * Use to generate a service registry server

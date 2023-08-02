@@ -140,6 +140,13 @@ interface ResponseInterface extends Stringable
     public function send($continue = false): self;
 
     /**
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
+     * @param int $code response code
+     * @return self
+     */
+    public function raw($data, $code = 200): self;
+
+    /**
      * @param array $data
      * @param int $code response code
      * @return self

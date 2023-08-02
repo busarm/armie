@@ -4,12 +4,12 @@ namespace Busarm\PhpMini\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\CrudItemRequestDto;
-use Busarm\PhpMini\Dto\CrudListRequestDto;
-use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
+use Busarm\PhpMini\Dto\ResourceItemRequestDto;
+use Busarm\PhpMini\Dto\ResourceListRequestDto;
+use Busarm\PhpMini\Dto\ResourcePaginatedListRequestDto;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\Data\RepositoryInterface;
-use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
@@ -19,7 +19,7 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class CrudController implements CrudControllerInterface
+abstract class ResourceController implements ResourceControllerInterface
 {
     public function __construct(
         private RepositoryInterface $repository,
@@ -31,7 +31,7 @@ abstract class CrudController implements CrudControllerInterface
     /**
      * @inheritDoc
      */
-    public function get(CrudItemRequestDto $dto): ResponseInterface
+    public function get(ResourceItemRequestDto $dto): ResponseInterface
     {
         $data = $this->repository->findById(
             $dto->id,
@@ -45,7 +45,7 @@ abstract class CrudController implements CrudControllerInterface
     /**
      * @inheritDoc
      */
-    public function list(CrudListRequestDto $dto): ResponseInterface
+    public function list(ResourceListRequestDto $dto): ResponseInterface
     {
         return $this->response->json($this->repository->all(
             Security::cleanQueryParamKeys($dto->query),
@@ -57,7 +57,7 @@ abstract class CrudController implements CrudControllerInterface
     /**
      * @inheritDoc
      */
-    public function paginatedList(CrudPaginatedListRequestDto $dto): ResponseInterface
+    public function paginatedList(ResourcePaginatedListRequestDto $dto): ResponseInterface
     {
         return $this->response->json($this->repository->paginate(
             Security::cleanQueryParamKeys($dto->query),

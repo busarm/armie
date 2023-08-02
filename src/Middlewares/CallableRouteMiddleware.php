@@ -39,13 +39,11 @@ final class CallableRouteMiddleware implements MiddlewareInterface
     {
         if (is_callable($this->callable)) {
 
-            $injector = (new DI(app()));
-
             $function = new ReflectionFunction($this->callable);
-            $result = $injector->processFunctionAttributes($function, $request);
+            $result = app()->di->processFunctionAttributes($function, $request);
             if (!isset($result)) {
                 $result = $function->invoke(
-                    ...array_merge($injector->resolveCallableDependencies(
+                    ...array_merge(app()->di->resolveCallableDependencies(
                         $function,
                         $request,
                     ), $this->params)

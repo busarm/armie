@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Data\PDO\Relations;
 use Busarm\PhpMini\Data\PDO\Model;
 use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relation;
+use Busarm\PhpMini\Enums\DataType;
 
 use function Busarm\PhpMini\Helpers\is_list;
 
@@ -27,7 +28,7 @@ class OneToOne extends Relation
         private Model $model,
         private Reference $reference,
     ) {
-        parent::__construct($name, get_class($reference->getModel()));
+        parent::__construct($name, DataType::OBJECT);
     }
 
     /**
@@ -128,7 +129,7 @@ class OneToOne extends Relation
         }
 
         // Save reference model
-        $referenceModel->load($data);
+        $referenceModel->fastLoad($data);
         if ($referenceModel->save()) {
 
             $modelData = [];
@@ -143,7 +144,7 @@ class OneToOne extends Relation
 
             // Save current model keys
             if (!empty($modelData) || isset($this->getCurrentModel()->{$this->getCurrentModel()->getKeyName()})) {
-                $this->getCurrentModel()->load($modelData);
+                $this->getCurrentModel()->fastLoad($modelData);
                 $this->getCurrentModel()->save(false, false);
             }
 
@@ -168,7 +169,7 @@ class OneToOne extends Relation
      */
     public function getReferenceModel(): Model
     {
-        return $this->reference->getModel();
+        return $this->reference->getModel($this->model->getDatabase());
     }
 
     /**

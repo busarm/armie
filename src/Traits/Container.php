@@ -33,7 +33,7 @@ trait Container
      *
      * @param class-string<T> $className
      * @param T|null $default
-     * @return T
+     * @return T|null
      * @template T Item type template
      */
     public function getSingleton(string $className, $default = null)

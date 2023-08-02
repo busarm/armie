@@ -9,6 +9,9 @@ use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use SessionHandler;
 use SessionHandlerInterface;
 
+use function Opis\Closure\serialize;
+use function Opis\Closure\unserialize;
+
 /**
  * PHP Mini Framework
  *
@@ -46,10 +49,10 @@ final class StatelessSession extends Bag implements SessionStoreInterface
 
         $data = $this->handler->read($this->id);
         if (!empty($data)) {
-            $this->load(\unserialize($data) ?? []);
+            $this->load(unserialize($data) ?? []);
             return true;
         } else {
-            if ($this->handler->write($this->id, \serialize([]))) {
+            if ($this->handler->write($this->id, serialize([]))) {
                 $this->load([]);
                 return true;
             }
@@ -65,7 +68,7 @@ final class StatelessSession extends Bag implements SessionStoreInterface
     public function save(): bool
     {
         if (!empty($this->updates())) {
-            $this->handler->write($this->id, \serialize($this->all()));
+            $this->handler->write($this->id, serialize($this->all()));
             return $this->handler->close();
         }
         return true;

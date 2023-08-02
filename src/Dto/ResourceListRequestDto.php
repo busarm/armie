@@ -8,7 +8,7 @@ namespace Busarm\PhpMini\Dto;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class CrudListRequestDto extends BaseDto
+class ResourceListRequestDto extends BaseDto
 {
     /** @var int Requested list limit. Default 0 */
     public int $limit = 0;

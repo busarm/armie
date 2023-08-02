@@ -138,7 +138,7 @@ class OneToMany extends Relation
         }
 
         // Save reference model
-        $referenceModel->load($data);
+        $referenceModel->fastLoad($data);
         if ($referenceModel->save()) {
 
             $modelData = [];
@@ -152,7 +152,7 @@ class OneToMany extends Relation
             }
             // Save current model keys
             if (!empty($modelData) || isset($this->getCurrentModel()->{$this->getCurrentModel()->getKeyName()})) {
-                $this->getCurrentModel()->load($modelData);
+                $this->getCurrentModel()->fastLoad($modelData);
                 $this->getCurrentModel()->save(false, false);
             }
 
@@ -177,7 +177,7 @@ class OneToMany extends Relation
      */
     public function getReferenceModel(): Model
     {
-        return $this->reference->getModel();
+        return $this->reference->getModel($this->model->getDatabase());
     }
 
     /**

@@ -89,6 +89,12 @@ class PDOConfig implements ConfigurationInterface
      */
     public array $connectionOptions = [];
 
+    /**
+     * CUSTOM connection pool size
+     *
+     * @var int
+     */
+    public int $connectionPoolSize = 0;
 
     public function __construct()
     {
@@ -230,6 +236,20 @@ class PDOConfig implements ConfigurationInterface
     public function setConnectionOptions(array $connectionOptions)
     {
         $this->connectionOptions = $connectionOptions;
+
+        return $this;
+    }
+
+    /**
+     * Set Custom connection pool size
+     *
+     * @param  int  $connectionPoolSize  CUSTOM connection pool size
+     *
+     * @return  self
+     */ 
+    public function setConnectionPoolSize(int $connectionPoolSize)
+    {
+        $this->connectionPoolSize = $connectionPoolSize;
 
         return $this;
     }

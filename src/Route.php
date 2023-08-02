@@ -8,6 +8,7 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Traits\Container;
+use Opis\Closure\SerializableClosure;
 
 /**
  * Application Routes Provider
@@ -22,7 +23,7 @@ class Route implements RouteInterface
     use Container;
 
     /** @var Closure Request executable function */
-    protected Closure|null $callable = null;
+    protected SerializableClosure|Closure|null $callable = null;
 
     /** @var string|null Request controller */
     protected ?string $controller = null;

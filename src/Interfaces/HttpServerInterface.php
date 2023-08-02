@@ -2,7 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
 
 /**
  * PHP Mini Framework
@@ -62,21 +62,21 @@ interface HttpServerInterface
     public function head(string $path): RouteInterface;
 
     /**
-     * Set HTTP CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * Set HTTP Resource (CREATE/READ/UPDATE/DELETE) routes for controller
      * Creates the following routes:
-     * - GET    $path/list      ->  CrudControllerInterface::list
-     * - GET    $path/paginate  ->  CrudControllerInterface::paginatedList
-     * - GET    $path/{id}      ->  CrudControllerInterface::get
-     * - POST   $path/bulk      ->  CrudControllerInterface::createBulk
-     * - POST   $path           ->  CrudControllerInterface::create
-     * - PUT    $path/bulk      ->  CrudControllerInterface::updateBulk
-     * - PUT    $path/{id}      ->  CrudControllerInterface::update
-     * - DELETE $path/bulk      ->  CrudControllerInterface::deleteBulk
-     * - DELETE $path/{id}      ->  CrudControllerInterface::delete
+     * - GET    $path/list      ->  ResourceControllerInterface::list
+     * - GET    $path/paginate  ->  ResourceControllerInterface::paginatedList
+     * - GET    $path/{id}      ->  ResourceControllerInterface::get
+     * - POST   $path/bulk      ->  ResourceControllerInterface::createBulk
+     * - POST   $path           ->  ResourceControllerInterface::create
+     * - PUT    $path/bulk      ->  ResourceControllerInterface::updateBulk
+     * - PUT    $path/{id}      ->  ResourceControllerInterface::update
+     * - DELETE $path/bulk      ->  ResourceControllerInterface::deleteBulk
+     * - DELETE $path/{id}      ->  ResourceControllerInterface::delete
      *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
-     * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home
+     * @param class-string<ResourceControllerInterface> $controller Application Controller class name e.g Home
      * @return mixed
      */
-    public function crud(string $path, string $controller);
+    public function resource(string $path, string $controller);
 }

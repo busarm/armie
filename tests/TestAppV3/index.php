@@ -16,7 +16,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 $config = (new Config())
     ->setAppPath(__DIR__)
-    ->setEncryptionKey("asdgkasdfer@jsfrtv453ds!mfo")
+    ->setSecret("asdgkasdfer@jsfrtv453ds!mfo")
     ->setCookieEncrypt(false)
     ->setHttp((new HttpConfig)
         ->setCheckCors(true)

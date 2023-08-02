@@ -5,7 +5,7 @@
 
 # PHP Mini
 
-A micro php framework with asynchronous event driven support; designed to provide highly performance with elegance and optimal developer experience.
+A micro php framework with asynchronous event driven support; designed to provide high performance with elegance and optimal developer experience.
 
 ## Installation
 
@@ -93,9 +93,6 @@ $ php -S localhost:8181 -t tests/TestServer
 
     // With Single processes
     $app->start("localhost", 8080);
-
-    // With 5 processes
-    $app->start("localhost", 8080, 5);
 
 ```
 

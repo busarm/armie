@@ -138,7 +138,18 @@ class Response implements ResponseInterface
      */
     public static function fromPsr(MessageResponseInterface $psr): self
     {
-        return new self($psr->getBody(), $psr->getStatusCode(), $psr->getHeaders(), $psr->getProtocolVersion());
+        return new self(
+            $psr->getBody(),
+            $psr->getStatusCode(),
+            $psr->getHeaders(),
+            $psr->getProtocolVersion(),
+            match ($psr->getHeader('Content-Type')) {
+                'application/json' => ResponseFormat::JSON,
+                'text/html', 'text/plain' => ResponseFormat::HTML,
+                'text/xml' => ResponseFormat::XML,
+                default => ResponseFormat::BIN
+            }
+        );
     }
 
     /**
@@ -468,6 +479,20 @@ class Response implements ResponseInterface
     }
 
     /**
+     * @param \Psr\Http\Message\StreamInterface|string|null $data
+     * @param int $code response code
+     * @return self
+     */
+    public function raw($data, $code = 200): self
+    {
+        $this->setParameters([]);
+        $this->setBody($data);
+        $this->setStatusCode($code);
+        $this->setFormat(ResponseFormat::BIN);
+        return $this;
+    }
+
+    /**
      * @param array $data
      * @param int $code response code
      * @return self
@@ -660,10 +685,11 @@ class Response implements ResponseInterface
      */
     public function toPsr(): MessageResponseInterface
     {
+        $this->prepare();
         $response = new \Nyholm\Psr7\Response(
-            $this->statusCode,
-            $this->httpHeaders,
-            $this->getResponseBody(),
+            $this->getStatusCode(),
+            $this->getHttpHeaders(),
+            $this->getBody(),
             $this->version,
             $this->statusText
         );
@@ -677,6 +703,7 @@ class Response implements ResponseInterface
      */
     public function toWorkerman(): HttpResponse
     {
+        $this->prepare();
         return new HttpResponse($this->getStatusCode(), $this->getHttpHeaders(), $this->getBody());
     }
 }

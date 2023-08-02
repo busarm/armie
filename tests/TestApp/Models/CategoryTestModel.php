@@ -16,7 +16,10 @@ class CategoryTestModel extends Model
 {
     public int|null $id;
     public string|null $name;
-    public string|null $desc;
+    public string|null $description;
+    public string|null $createdAt;
+    public string|null $updatedAt;
+
     /** @var ProductTestModel[] */
     public array|null $products;
 
@@ -34,7 +37,7 @@ class CategoryTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToMany('products', $this, new Reference(new ProductTestModel(), ['id' => 'categoryId']))
+            new OneToMany('products', $this, new Reference(ProductTestModel::class, ['id' => 'categoryId']))
         ];
     }
 
@@ -56,5 +59,25 @@ class CategoryTestModel extends Model
     public function getKeyName(): ?string
     {
         return 'id';
+    }
+
+    /**
+     * Model created date param name. e.g created_at, createdAt
+     *
+     * @return string
+     */
+    public function getCreatedDateName(): ?string
+    {
+        return 'createdAt';
+    }
+
+    /**
+     * Model updated date date param name. e.g updated_at, updatedAt
+     *
+     * @return string
+     */
+    public function getUpdatedDateName(): ?string
+    {
+        return 'updatedAt';
     }
 }

@@ -23,16 +23,17 @@ class TestViewPage extends View
      */
     public function render()
     {
-    ?>
+        $header = new TestComponent;
+        return <<<HTML
         <html>
-
-        <body>
-            <?= $this->include('test_component') ?>
-            <?= $this->request->version() ?>
-            <h2>Test View Page</h2>
-        </body>
+            <body>
+                <div>{$header}</div>
+                <div>{$this->request->version()}</div>
+                <div>{$this->request->header()->get('host')}</div>
+                <h2>Test View Page</h2>
+            </body>
 
         </html>
-    <?php
+        HTML;
     }
 }

@@ -10,7 +10,7 @@ use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 
-use function Busarm\PhpMini\Helpers\createSetCookieHeader;
+use function Busarm\PhpMini\Helpers\create_cookie_header;
 
 /**
  * PHP Mini Framework
@@ -39,7 +39,7 @@ final class StatelessCookieMiddleware implements MiddlewareInterface
                 $headers = [];
                 foreach ($cookies as $name => $cookie) {
                     if ($cookie instanceof CookieDto) {
-                        $headers[$name] = createSetCookieHeader(
+                        $headers[$name] = create_cookie_header(
                             $name,
                             $cookie->value,
                             $cookie->expires,
@@ -51,7 +51,7 @@ final class StatelessCookieMiddleware implements MiddlewareInterface
                         );
                     } else {
                         $options = $this->config?->getCookieConfigs() ?? [];
-                        $headers[$name] = createSetCookieHeader(
+                        $headers[$name] = create_cookie_header(
                             $name,
                             $cookie,
                             $options['expires'] ?? 0,

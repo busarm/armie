@@ -40,12 +40,13 @@ class ProductTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToOne('category', $this, new Reference(new CategoryTestModel, ['categoryId' => 'id'])),
+            new OneToOne('category', $this, new Reference(CategoryTestModel::class, ['categoryId' => 'id'])),
             new ManyToMany(
                 'tags',
                 $this,
-                new Reference(new ProductTagTestModel, ['id' => 'productId']),
-                new Reference(new TagTestModel, ['tagId' => 'id']), false
+                new Reference(ProductTagTestModel::class, ['id' => 'productId']),
+                new Reference(TagTestModel::class, ['tagId' => 'id']),
+                false
             )
         ];
     }

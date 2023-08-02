@@ -27,7 +27,7 @@ final class ServerTest extends TestCase
     private Server|null $server = NULL;
     private App|null $app = NULL;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
@@ -48,7 +48,7 @@ final class ServerTest extends TestCase
     }
 
     /**
-     * Test app setup 
+     * Test app setUp 
      *
      * @return void
      */

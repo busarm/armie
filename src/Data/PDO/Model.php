@@ -3,10 +3,13 @@
 namespace Busarm\PhpMini\Data\PDO;
 
 use Busarm\PhpMini\Data\PDO\Connection;
-use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Helpers\StringableDateTime;
 
 use Busarm\PhpMini\Interfaces\Data\ModelInterface;
+use Busarm\PhpMini\Traits\PropertyLoader;
+use Busarm\PhpMini\Traits\TypeResolver;
+
+use function Busarm\PhpMini\Helpers\dispatch;
 use function Busarm\PhpMini\Helpers\is_list;
 
 /**
@@ -15,19 +18,23 @@ use function Busarm\PhpMini\Helpers\is_list;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class Model extends BaseDto implements ModelInterface
+abstract class Model implements ModelInterface
 {
-    const EVENT_BEFORE_CREATE   =   'before_create';
-    const EVENT_AFTER_CREATE    =   'after_create';
-    const EVENT_BEFORE_UPDATE   =   'before_update';
-    const EVENT_AFTER_UPDATE    =   'after_update';
-    const EVENT_BEFORE_DELETE   =   'before_delete';
-    const EVENT_AFTER_DELETE    =   'after_delete';
+    use TypeResolver;
 
-    /**
-     * @var array<string,callable>
-     */
-    protected static array $events = [];
+    use PropertyLoader {
+        fields as defaultFields;
+        __excluded as __defaultExcluded;
+    }
+
+    const EVENT_BEFORE_QUERY    =   self::class . '::BeforeQuery';
+    const EVENT_AFTER_QUERY     =   self::class . '::AfterQuery';
+    const EVENT_BEFORE_CREATE   =   self::class . '::BeforeCreate';
+    const EVENT_AFTER_CREATE    =   self::class . '::AfterCreate';
+    const EVENT_BEFORE_UPDATE   =   self::class . '::BeforeUpdate';
+    const EVENT_AFTER_UPDATE    =   self::class . '::AfterUpdate';
+    const EVENT_BEFORE_DELETE   =   self::class . '::BeforeDelete';
+    const EVENT_AFTER_DELETE    =   self::class . '::AfterDelete';
 
     /**
      * Database connection instance.
@@ -71,10 +78,42 @@ abstract class Model extends BaseDto implements ModelInterface
      */
     protected array $requestedRelations = [];
 
+
     final public function __construct(Connection|null $db = null)
     {
-        $this->db = $db ?: Connection::make();
+        $this->db = $db ?? Connection::make();
         $this->setUp();
+    }
+
+    public function __sleep()
+    {
+        return array_merge(
+            array_keys($this->fields()),
+            $this->__defaultExcluded(),
+            [
+                'requestedRelations', 'loadedRelations', 'autoLoadRelations',
+                'new', 'perPage'
+            ]
+        );
+    }
+
+    public function __wakeup(): void
+    {
+        $this->db = Connection::make();
+    }
+
+    /**
+     * Get properties to be excluded from model's entity fields  
+     */
+    public function __excluded(): array
+    {
+        return  array_merge(
+            $this->__defaultExcluded(),
+            [
+                'requestedRelations', 'loadedRelations', 'autoLoadRelations',
+                'db', 'new', 'perPage'
+            ]
+        );
     }
 
     /**
@@ -122,7 +161,7 @@ abstract class Model extends BaseDto implements ModelInterface
      *
      * @return  self
      */
-    public function setNew(bool $new)
+    protected function setNew(bool $new)
     {
         $this->new = $new;
 
@@ -360,7 +399,11 @@ abstract class Model extends BaseDto implements ModelInterface
             !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         ));
 
-        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchObject(static::class))) {
+        // Dispatch event
+        dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchObject(static::class, [$this->db]))) {
+            // Dispatch event
+            dispatch(self::EVENT_AFTER_QUERY);
             return $result
                 ->setNew(false)
                 ->setPerPage($this->getPerPage())
@@ -406,7 +449,11 @@ abstract class Model extends BaseDto implements ModelInterface
             $limit >= 0 ? 'LIMIT ' . intval($limit) : ''
         ));
 
-        if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class)) {
+        // Dispatch event
+        dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+        if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class, [$this->db])) {
+            // Dispatch event
+            dispatch(self::EVENT_AFTER_QUERY);
             return $this->processEagerLoadRelations(array_map(
                 fn (self $result) => $result
                     ->setNew(false)
@@ -428,14 +475,15 @@ abstract class Model extends BaseDto implements ModelInterface
     {
         // Soft delele
         if (!$force && !empty($this->getSoftDeleteDateName())) {
-            $this->{$this->getSoftDeleteDateName()} = new StringableDateTime;
+            $this->{$this->getSoftDeleteDateName()} = strval(new StringableDateTime);
             return $this->save() !== false;
         }
 
         // Permanent delete
         else {
 
-            self::emit(self::EVENT_BEFORE_DELETE, $this);
+            // Dispatch event
+            dispatch(self::EVENT_BEFORE_DELETE, $this->toArray());
 
             $stmt = $this->db->prepare(sprintf(
                 "DELETE FROM %s WHERE %s = ?",
@@ -445,7 +493,8 @@ abstract class Model extends BaseDto implements ModelInterface
             if ($stmt) {
                 $stmt->execute([$this->{$this->getKeyName()}]);
                 if ($stmt->rowCount() > 0) {
-                    self::emit(self::EVENT_AFTER_DELETE, $this);
+                    // Dispatch event
+                    dispatch(self::EVENT_AFTER_DELETE);
                     return true;
                 }
             }
@@ -473,18 +522,19 @@ abstract class Model extends BaseDto implements ModelInterface
         // Create
         if ($this->new || !isset($this->{$this->getKeyName()})) {
 
-            self::emit(self::EVENT_BEFORE_CREATE, $this);
-
             // Add created & updated dates if not available
-            if (!empty($this->getCreatedDateName()) && !isset($this->{$this->getCreatedDateName()})) {
-                $this->{$this->getCreatedDateName()} = new StringableDateTime;
+            if (!empty($this->getCreatedDateName())) {
+                $this->{$this->getCreatedDateName()} = strval(new StringableDateTime);
             }
-            if (!empty($this->getUpdatedDateName()) && !isset($this->{$this->getUpdatedDateName()})) {
-                $this->{$this->getUpdatedDateName()} = new StringableDateTime;
+            if (!empty($this->getUpdatedDateName())) {
+                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime);
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
             if (empty($params)) return false;
+
+            // Dispatch event
+            dispatch(self::EVENT_BEFORE_CREATE, $params);
 
             $placeHolderKeys = implode(',', array_map(fn ($key) => "`$key`", array_keys($params)));
             $placeHolderValues = implode(',', array_fill(0, count($params), '?'));
@@ -502,21 +552,31 @@ abstract class Model extends BaseDto implements ModelInterface
                 $this->{$this->getKeyName()} = $id;
             }
 
-            self::emit(self::EVENT_AFTER_CREATE, $this);
+            // Dispatch event
+            dispatch(self::EVENT_AFTER_CREATE, $this->toArray());
+
+            // Notify record exists
+            $this->setNew(false);
+
+            // Save relations if available
+            if ($relations) {
+                $this->saveRelations();
+            }
         }
 
         // Update
-        else {
-
-            self::emit(self::EVENT_BEFORE_UPDATE, $this);
+        else if ($this->isDirty()) {
 
             // Add updated date if not available
-            if (!empty($this->getUpdatedDateName()) && !isset($this->{$this->getUpdatedDateName()})) {
-                $this->{$this->getUpdatedDateName()} = new StringableDateTime;
+            if (!empty($this->getUpdatedDateName())) {
+                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime);
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
             if (empty($params)) return false;
+
+            // Dispatch event
+            dispatch(self::EVENT_BEFORE_UPDATE, $params);
 
             $placeHolder = implode(',', array_map(fn ($key) => "`$key` = ?", array_keys($params)));
             $stmt = $this->db->prepare(sprintf(
@@ -528,14 +588,16 @@ abstract class Model extends BaseDto implements ModelInterface
 
             if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) return false;
 
-            self::emit(self::EVENT_AFTER_UPDATE, $this);
-        }
+            // Dispatch event
+            dispatch(self::EVENT_AFTER_UPDATE, $this->toArray());
 
-        $this->new = false;
+            // Notify record exists
+            $this->setNew(false);
 
-        // Save relations if available
-        if ($relations) {
-            $this->saveRelations();
+            // Save relations if available
+            if ($relations) {
+                $this->saveRelations();
+            }
         }
 
         return true;
@@ -546,13 +608,17 @@ abstract class Model extends BaseDto implements ModelInterface
      * 
      * @return bool
      */
-    protected  function saveRelations(): bool
+    protected function saveRelations(): bool
     {
         $success = true;
         foreach ($this->getRelations() as $relation) {
             $data = $this->{$relation->getName()} ?? null;
             if (isset($data)) {
-                $success = !$relation->save($data) ? false : $success;
+                if ($data instanceof self) {
+                    $success = !$data->save() ? false : $success;
+                } else {
+                    $success = !$relation->save((array)$data) ? false : $success;
+                }
             }
         }
         return $success;
@@ -847,7 +913,8 @@ abstract class Model extends BaseDto implements ModelInterface
      */
     public static function create(array $data): ?self
     {
-        $model = self::with($data);
+        $model = new static;
+        $model->load($data);
         if ($model->save()) {
             return $model;
         }
@@ -864,7 +931,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public static function update(string|int $id, array $data): ?self
     {
         $model = self::findById($id);
-        if ($model && $model->load($data)->save()) {
+        if ($model && $model->fastLoad($data)->save()) {
             return $model;
         }
         return null;
@@ -910,7 +977,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
         $model = (new static);
-        return $model->all($conditions, $params, $columns, $limit ?? 0);
+        return $model->setAutoLoadRelations(false)->all($conditions, $params, $columns, $limit ?? 0);
     }
 
     /**
@@ -925,34 +992,7 @@ abstract class Model extends BaseDto implements ModelInterface
     public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
         $model = (new static);
-        return $model->allTrashed($conditions, $params, $columns, $limit ?? 0);
-    }
-
-    /**
-     * Listen to model event
-     *
-     * @param string $event
-     * @param callable $fn Lisner - `fn(self model) => void`
-     * @return void
-     */
-    public static function listen(string $event, callable $fn)
-    {
-        self::$events[$event] = $fn;
-    }
-
-    /**
-     * Trigger model events
-     *
-     * @param string $event
-     * @param self $model
-     * @return void
-     */
-    public static function emit(string $event, self $model)
-    {
-        if (array_key_exists($event, self::$events)) {
-            $fn = self::$events[$event];
-            $fn($model);
-        }
+        return $model->setAutoLoadRelations(false)->allTrashed($conditions, $params, $columns, $limit ?? 0);
     }
 
     ##### Clones #####
@@ -995,22 +1035,6 @@ abstract class Model extends BaseDto implements ModelInterface
     /**
      * @inheritDoc
      */
-    public static function with(array|object|null $data, $sanitize = false): self
-    {
-        $dto = new static;
-        if ($data) {
-            if ($data instanceof self) {
-                $dto->load($data->toArray());
-            } else {
-                $dto->load((array)$data);
-            }
-        }
-        return $dto;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function fields($all = false, $trim = false): array
     {
         if (!empty($fields = $this->getFields())) {
@@ -1018,13 +1042,13 @@ abstract class Model extends BaseDto implements ModelInterface
             if ($this->autoLoadRelations) {
                 $fields = array_merge($fields, $this->getRelations());
             } else if (!empty($this->loadedRelations)) {
-                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->loadedRelations),));
+                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->loadedRelations)));
             }
             foreach ($fields as $field) {
                 $attrs[$field->getName()] = $field->getType();
             }
             return $attrs;
         }
-        return parent::fields($all, $trim);
+        return $this->defaultFields($all, $trim);
     }
 }

@@ -4,9 +4,9 @@ namespace Busarm\PhpMini\Interfaces\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\CrudItemRequestDto;
-use Busarm\PhpMini\Dto\CrudListRequestDto;
-use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
+use Busarm\PhpMini\Dto\ResourceItemRequestDto;
+use Busarm\PhpMini\Dto\ResourceListRequestDto;
+use Busarm\PhpMini\Dto\ResourcePaginatedListRequestDto;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 
 /**
@@ -16,31 +16,31 @@ use Busarm\PhpMini\Interfaces\ResponseInterface;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-interface CrudControllerInterface
+interface ResourceControllerInterface
 {
     /**
      * Get item by id
      *
-     * @param CrudItemRequestDto $dto
+     * @param ResourceItemRequestDto $dto
      * @return ResponseInterface
      */
-    public function get(CrudItemRequestDto $dto): ResponseInterface;
+    public function get(ResourceItemRequestDto $dto): ResponseInterface;
 
     /**
      * Get list of items
      *
-     * @param CrudListRequestDto $dto
+     * @param ResourceListRequestDto $dto
      * @return ResponseInterface
      */
-    public function list(CrudListRequestDto $dto): ResponseInterface;
+    public function list(ResourceListRequestDto $dto): ResponseInterface;
 
     /**
      * Get paginated list of items
      * 
-     * @param CrudPaginatedListRequestDto $dto
+     * @param ResourcePaginatedListRequestDto $dto
      * @return ResponseInterface
      */
-    public function paginatedList(CrudPaginatedListRequestDto $dto): ResponseInterface;
+    public function paginatedList(ResourcePaginatedListRequestDto $dto): ResponseInterface;
     
     /**
      * Create item record

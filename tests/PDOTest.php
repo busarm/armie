@@ -14,15 +14,12 @@ use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-
 /**
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @covers \Busarm\PhpMini\Data\PDO\Connection
- * @covers \Busarm\PhpMini\Data\PDO\ConnectionConfig
  * @covers \Busarm\PhpMini\Data\PDO\Model
  * @covers \Busarm\PhpMini\Data\PDO\Repository
  * @covers \Busarm\PhpMini\Test\TestApp\Models
@@ -35,7 +32,7 @@ final class PDOTest extends TestCase
     private static App|null $app = NULL;
     private Generator|null $faker = NULL;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
@@ -250,7 +247,7 @@ final class PDOTest extends TestCase
     public function testGetProductListRepo()
     {
         $productRepo = new ProductTestRepository();
-        $result = $productRepo->paginate(1, 3);
+        $result = $productRepo->paginate();
         $this->assertNotEmpty($result->data);
     }
 }

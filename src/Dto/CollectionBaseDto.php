@@ -42,7 +42,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     protected function __construct($input = [],  private $itemClass = null)
     {
         // Create an empty array.
-        parent::__construct([], 0, ArrayIterator::class);
+        parent::__construct();
 
         // Load data
         $this->load($input);
@@ -51,19 +51,19 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Load data
      *
-     * @param array<T>|Traversable $data
+     * @param array<T>|Traversable $input
      * @param bool $sanitize
      * @return self
      */
-    public function load(array|Traversable $data, $sanitize = false): self
+    public function load(array|Traversable $input, $sanitize = false): self
     {
         // Validate that the input is an array or an object with an Traversable interface.
-        if (!(is_array($data) || (is_object($data) && in_array(Traversable::class, class_implements($data))))) {
+        if (!(is_array($input) || (is_object($input) && in_array(Traversable::class, class_implements($input))))) {
             throw new InvalidArgumentException('$input must be an array or an object that implements \Traversable.');
         }
 
         // Append each item so to validate it's type.
-        foreach ($data as $key => $value) {
+        foreach ($input as $key => $value) {
             // Validate Item type if available
             if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
                 throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
@@ -476,7 +476,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param array<T>|object $data
      * @param class-string<T>|null $itemClass
-     * @return self
+     * @return self<T>
      */
     public static function of(array|object $data, string $itemClass = null): self
     {

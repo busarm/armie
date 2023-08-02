@@ -20,6 +20,7 @@ use Busarm\PhpMini\Attributes\Request\QueryParam;
  */
 class ServiceRegistryProvider implements ProviderInterface
 {
+    const ROUTE = 'discovery';
 
     public function __construct(private StorageBagInterface $storage)
     {
@@ -30,17 +31,8 @@ class ServiceRegistryProvider implements ProviderInterface
      */
     public function process(App $app): void
     {
-        // Get service endpoint
-        $app->get("discovery/{name}")->call(function (string $name) {
-            $list = $this->storage->get($name);
-            if (!empty($list) && is_array($list)) {
-                return $this->leastUsed($list);
-            }
-            throw new NotFoundException("Service not found for name: $name");
-        });
-
         // Register service endpoint
-        $app->post("discovery")->call(function (ServiceRegistryDto $dto) {
+        $app->post(self::ROUTE)->call(function (ServiceRegistryDto $dto) {
             if ($dto && $dto->name && filter_var($dto->url, FILTER_VALIDATE_URL)) {
                 $list = $this->storage->get($dto->name, []);
                 $list[] = $dto->toArray();
@@ -51,7 +43,7 @@ class ServiceRegistryProvider implements ProviderInterface
         });
 
         // Unegister service endpoint
-        $app->delete("discovery/{name}")->call(function (
+        $app->delete(self::ROUTE . "/{name}")->call(function (
             string $name,
             #[QueryParam('url', true)] string $url
         ) {
@@ -63,6 +55,15 @@ class ServiceRegistryProvider implements ProviderInterface
                     }
                 }
                 $this->storage->set($name, $list);
+            }
+            throw new NotFoundException("Service not found for name: $name");
+        });
+
+        // Get service endpoint
+        $app->get(self::ROUTE . "/{name}")->call(function (string $name) {
+            $list = $this->storage->get($name);
+            if (!empty($list) && is_array($list)) {
+                return $this->leastUsed($list);
             }
             throw new NotFoundException("Service not found for name: $name");
         });

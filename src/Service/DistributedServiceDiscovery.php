@@ -8,6 +8,7 @@ use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
 /**
@@ -24,6 +25,8 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
      * @param array<string,ServiceRegistryDto> $services
      */
     protected array $registry = [];
+
+    protected bool $registered = false;
 
     /**
      *
@@ -57,18 +60,21 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                 $http = new Client([
                     'timeout'  => $this->timeout,
                 ]);
-                $response = $http->request(
+                $http->requestAsync(
                     HttpMethod::GET,
                     $this->endpoint . "/$name",
                     [
                         RequestOptions::VERIFY => false
                     ]
-                );
-                if ($response && $response->getStatusCode() == 200 && !empty($result = json_decode($response->getBody(), true))) {
-                    if (isset($result['name']) && isset($result['url'])) {
-                        return $this->registry[$result['name']] = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
+                )->then(
+                    function (Response $response) {
+                        if ($response && $response->getStatusCode() == 200 && !empty($result = json_decode($response->getBody(), true))) {
+                            if (isset($result['name']) && isset($result['url'])) {
+                                return $this->registry[$result['name']] = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
+                            }
+                        }
                     }
-                }
+                )->wait();
             }
         }
 
@@ -93,7 +99,9 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                     'url' => $this->client->getLocation()
                 ]
             ]
-        );
+        )->then(function () {
+            $this->registered = true;
+        });
     }
 
     /**
@@ -113,7 +121,9 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                     'url' => $this->client->getLocation()
                 ]
             ]
-        );
+        )->then(function () {
+            $this->registered = false;
+        });
     }
 
     /**

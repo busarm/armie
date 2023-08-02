@@ -22,8 +22,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Uri;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-
 use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
 
 /**

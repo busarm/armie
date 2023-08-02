@@ -54,11 +54,9 @@ class DI
             && $class->isInstantiable()
         ) {
             // Resolve constructor method if available
-            if (method_exists($class->getName(), '__construct')) {
-                $method = new ReflectionMethod($class->getName(), '__construct');
-                $this->processMethodAttributes($method, $request);
-
-                $instance = $class->newInstance(...$this->resolveMethodDependencies($method, $request, $params));
+            if ($class->getConstructor()) {
+                $this->processMethodAttributes($class->getConstructor(), $request);
+                $instance = $class->newInstance(...$this->resolveMethodDependencies($class->getConstructor(), $request, $params));
             } else {
                 $instance = $class->newInstance();
             }

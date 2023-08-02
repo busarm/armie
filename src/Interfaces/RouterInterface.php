@@ -35,13 +35,13 @@ interface RouterInterface
     public function addRoutes(array $routes): self;
 
     /**
-     * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller
+     * Add Resource (CREATE/READ/UPDATE/DELETE) routes for controller
      * 
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
      * @param string $controller Application Controller class name e.g Home
      * @return RouterInterface
      */
-    public function addCrudRoutes(string $path, string $controller): RouterInterface;
+    public function addResourceRoutes(string $path, string $controller): RouterInterface;
 
     /**
      * @return RouteInterface[]

@@ -3,10 +3,15 @@
 namespace Busarm\PhpMini\Traits;
 
 use ArrayObject;
+use Busarm\PhpMini\Dto\BaseDto;
+use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\DataType;
 use Busarm\PhpMini\Helpers\StringableDateTime;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
+use InvalidArgumentException;
 use ReflectionNamedType;
 use ReflectionUnionType;
 
@@ -19,13 +24,47 @@ use ReflectionUnionType;
 trait TypeResolver
 {
     /**
-     * Resolve variable type
+     * Resolve data type
+     *
+     * @param \ReflectionProperty $property
+     * @param mixed $data
+     * @return mixed - Variable with appropraite type
+     */
+    protected function resolvePropertyType($property, $data)
+    {
+        if ($data !== null) {
+
+            $name = $property->getName();
+            $type = strval($property->getType());
+
+            if ($type == BaseDto::class || is_subclass_of($type, BaseDto::class)) {
+                if (!is_array($data)) {
+                    throw new InvalidArgumentException(sprintf("Value of '$name' in '%s' must be an array or object %s given", static::class, gettype($data)));
+                }
+                $data = $type::with($data);
+            } else if ($type == CollectionBaseDto::class || is_subclass_of($type, CollectionBaseDto::class)) {
+                if (!is_array($data)) {
+                    throw new InvalidArgumentException(sprintf("Value of '$name' must be an array or object %s given", gettype($data)));
+                }
+                $data = $type::of($data);
+            } else {
+                $data = $this->resolveType($property->getType(), $data);
+            }
+
+            return $data;
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve data type
      *
      * @param ReflectionUnionType|ReflectionNamedType|\ReflectionType|string $type
      * @param mixed $data
      * @return mixed - Variable with appropraite type
      */
-    public function resolveType($type, $data)
+    protected function resolveType($type, $data)
     {
         $type = $this->getTypeName($type, $data);
 
@@ -35,11 +74,13 @@ trait TypeResolver
                 DataType::BOOL, DataType::BOOLEAN => boolval($data),
                 DataType::FLOAT => floatval($data),
                 DataType::DOUBLE => doubleval($data),
-                DataType::ARRAY => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : (array) $data,
+                DataType::ARRAY => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : ((array) $data),
                 DataType::OBJECT, DataType::JSON => is_string($data) ? json_decode($data) : (object) $data,
                 DataType::STRING => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
+                DataType::DATETIME, StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
+                    strval(StringableDateTime::createFromInterface($data)) :
+                    strval(new StringableDateTime($data, new DateTimeZone(date_default_timezone_get()))),
                 ArrayObject::class => new ArrayObject(is_string($data) ? json_decode($data, true) : (array) $data),
-                StringableDateTime::class, DateTime::class, DateTimeInterface::class, DataType::DATETIME =>  is_string($data) ? (new StringableDateTime($data)) : StringableDateTime::createFromInterface($data),
                 default => $data
             };
         }
@@ -54,7 +95,7 @@ trait TypeResolver
      * @param ReflectionNamedType[] $types
      * @return \Busarm\PhpMini\Enums\DataType::*|string
      */
-    public function findType($data, $types = [])
+    protected function findType($data, $types = [])
     {
         $types = array_map(fn ($type) => strval($type), $types);
         if ($data !== null) {
@@ -81,7 +122,7 @@ trait TypeResolver
      * @param mixed $data
      * @return string 
      */
-    public function getTypeName($type, $data = null)
+    protected function getTypeName($type, $data = null)
     {
         if ($type instanceof ReflectionUnionType) {
             $type = $this->findType($data, $type->getTypes());

@@ -32,8 +32,8 @@ class ProductTagTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToOne('product', $this, new Reference(new ProductTestModel, ['productId' => 'id'])),
-            new OneToOne('tag', $this, new Reference(new TagTestModel, ['tagId' => 'id'])),
+            new OneToOne('product', $this, new Reference(ProductTestModel::class, ['productId' => 'id'])),
+            new OneToOne('tag', $this, new Reference(TagTestModel::class, ['tagId' => 'id'])),
         ];
     }
 

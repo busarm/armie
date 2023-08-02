@@ -102,7 +102,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setCheckCors($checkCors)
+    public function setCheckCors(bool $checkCors)
     {
         $this->checkCors = $checkCors;
 
@@ -116,7 +116,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setAllowAnyCorsDomain($allowAnyCorsDomain)
+    public function setAllowAnyCorsDomain(bool $allowAnyCorsDomain)
     {
         $this->allowAnyCorsDomain = $allowAnyCorsDomain;
 
@@ -130,7 +130,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setAllowedCorsOrigins($allowedCorsOrigins)
+    public function setAllowedCorsOrigins(array $allowedCorsOrigins)
     {
         $this->allowedCorsOrigins = $allowedCorsOrigins;
 
@@ -144,7 +144,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setAllowedCorsMethods($allowedCorsMethods)
+    public function setAllowedCorsMethods(array $allowedCorsMethods)
     {
         $this->allowedCorsMethods = $allowedCorsMethods;
 
@@ -158,7 +158,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setAllowedCorsHeaders($allowedCorsHeaders)
+    public function setAllowedCorsHeaders(array $allowedCorsHeaders)
     {
         $this->allowedCorsHeaders = $allowedCorsHeaders;
 
@@ -172,7 +172,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setExposedCorsHeaders($exposedCorsHeaders)
+    public function setExposedCorsHeaders(array $exposedCorsHeaders)
     {
         $this->exposedCorsHeaders = $exposedCorsHeaders;
 
@@ -186,7 +186,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setCorsMaxAge($corsMaxAge)
+    public function setCorsMaxAge(int $corsMaxAge)
     {
         $this->corsMaxAge = $corsMaxAge;
 
@@ -200,7 +200,7 @@ class HttpConfig implements ConfigurationInterface
      *
      * @return  self
      */
-    public function setSendAndContinue($sendAndContinue)
+    public function setSendAndContinue(bool $sendAndContinue)
     {
         $this->sendAndContinue = $sendAndContinue;
 
@@ -210,11 +210,11 @@ class HttpConfig implements ConfigurationInterface
     /**
      * Set HTPP default response format
      *
-     * @param  string  $responseFormat  HTPP default response format. `json`|`xml`
+     * @param \Busarm\PhpMini\Enums\ResponseFormat::*  $responseFormat  HTPP default response format. `json`|`xml`
      *
      * @return  self
      */
-    public function setResponseFormat($responseFormat)
+    public function setResponseFormat(string $responseFormat)
     {
         $this->responseFormat = $responseFormat;
 

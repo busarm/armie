@@ -87,4 +87,10 @@ interface StorageBagInterface extends Stringable
      * @return void
      */
     public function clear();
+    /**
+     * Number of items in store
+     *
+     * @return int
+     */
+    public function count(): int;
 }

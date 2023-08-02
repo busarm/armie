@@ -39,10 +39,7 @@ final class ViewRouteMiddleware implements MiddlewareInterface
     {
         // View Class
         if (class_exists($this->viewPathOrClass)) {
-
-            $injector = (new DI(app()));
-
-            $result = $injector->instantiate($this->viewPathOrClass, $request);
+            $result = app()->di->instantiate($this->viewPathOrClass, $request);
         }
         // View Component
         else {

@@ -4,7 +4,8 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Data\PDO\ConnectionConfig;
+use Busarm\PhpMini\Configs\HttpConfig;
+use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Reporter;
@@ -58,6 +59,8 @@ class Resolver implements DependencyResolverInterface
         return match ($className) {
             App::class => $this->app,
             Config::class, ConfigurationInterface::class => $this->app->config,
+            PDOConfig::class => $this->app->config->db,
+            HttpConfig::class => $this->app->config->http,
             Router::class, RouterInterface::class => $this->app->router,
             Reporter::class, ReportingInterface::class => $this->app->reporter,
             ConsoleLogger::class, LoggerInterface::class => $this->app->logger,
@@ -71,17 +74,6 @@ class Resolver implements DependencyResolverInterface
             AuthUserResolver::class => $request && $request instanceof RequestInterface ? $request->auth()?->getUser() : null,
             ServerConnection::class, ServerConnectionResolver::class  => $request && $request instanceof RequestInterface ? $request->connection() : null,
             ConnectionInterface::class  => $request && $request instanceof RequestInterface ? $request->connection()?->getConnection() : null,
-            ConnectionConfig::class => (new ConnectionConfig())
-                ->setDriver($this->app->config->db->connectionDriver)
-                ->setDsn($this->app->config->db->connectionDNS)
-                ->setHost($this->app->config->db->connectionHost)
-                ->setPort($this->app->config->db->connectionPort)
-                ->setDatabase($this->app->config->db->connectionDatabase)
-                ->setUser($this->app->config->db->connectionUsername)
-                ->setPassword($this->app->config->db->connectionPassword)
-                ->setPersist($this->app->async ?: $this->app->config->db->connectionPersist)
-                ->setErrorMode($this->app->config->db->connectionErrorMode)
-                ->setOptions($this->app->config->db->connectionOptions),
             ServiceDiscoveryInterface::class, DistributedServiceDiscoveryInterface::class  => $this->app->serviceDiscovery,
             default => ($request ? $request->getSingleton($className) : null) ?: $this->app->getSingleton($className)
         };

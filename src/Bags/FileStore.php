@@ -5,6 +5,9 @@ namespace Busarm\PhpMini\Bags;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 
+use function Opis\Closure\serialize;
+use function Opis\Closure\unserialize;
+
 /**
  * Store simple plain data (string, array, object) as file
  * 
@@ -52,7 +55,7 @@ class FileStore implements StorageBagInterface
 	public function set(string $path, mixed $data, $sanitize = true): bool
 	{
 		if (is_string($data) || is_array($data) || is_object($data)) {
-			if ($data && !is_null($serialized = \serialize(
+			if ($data && !is_null($serialized = serialize(
 				$sanitize ? Security::clean($data) : $data
 			))) {
 				$data = $serialized;
@@ -65,6 +68,8 @@ class FileStore implements StorageBagInterface
 			if (!\is_dir($dir)) {
 				mkdir($dir, 0755, true);
 			}
+
+			// TODO Use async stream
 			return \file_put_contents($path, $data);
 		}
 		return false;
@@ -94,7 +99,7 @@ class FileStore implements StorageBagInterface
 	{
 		if ($this->has($path)) {
 			$data = \file_get_contents($this->fullPath($path));
-			if ($data && !is_null($parsed = \unserialize($data))) {
+			if ($data && !is_null($parsed = unserialize($data))) {
 				$data = $parsed;
 			}
 			return $sanitize ? Security::clean($data) : $data;
@@ -186,6 +191,16 @@ class FileStore implements StorageBagInterface
 			\unlink($path);
 		}
 	}
+
+    /**
+     * Number of items in store
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->all());
+    }
 
 	/**
 	 * 

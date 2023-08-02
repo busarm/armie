@@ -34,8 +34,8 @@ class TagTestModel extends Model
             new ManyToMany(
                 'products',
                 $this,
-                new Reference(new ProductTagTestModel, ['id' => 'tagId']),
-                new Reference(new ProductTestModel, ['productId' => 'id'])
+                new Reference(ProductTagTestModel::class, ['id' => 'tagId']),
+                new Reference(ProductTestModel::class, ['productId' => 'id'])
             )
         ];
     }

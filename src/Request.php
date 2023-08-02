@@ -108,11 +108,11 @@ class Request implements RequestInterface
                 (new Cookie(
                     $config ? $config->getCookieConfigs() : [],
                     $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                    $config?->cookieEncrypt ? $config?->encryptionKey : null
+                    $config?->cookieEncrypt ? $config?->secret : null
                 )),
                 $config?->sessionEnabled ? (new Session(
                     $config ? $config->getSessionConfigs() : [],
-                    $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                    $config?->cookieEncrypt ? $config?->secret : null,
                     $config?->sessionHandler
                 )) : null,
                 (new Bag),
@@ -148,11 +148,11 @@ class Request implements RequestInterface
             (new Cookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                $config?->cookieEncrypt ? $config?->encryptionKey : null
+                $config?->cookieEncrypt ? $config?->secret : null
             )),
             $config?->sessionEnabled ? (new Session(
                 $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->cookieEncrypt ? $config?->secret : null,
                 $config?->sessionHandler
             )) : null,
             (new Bag)->mirror($_FILES),
@@ -178,11 +178,11 @@ class Request implements RequestInterface
             (new Cookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name || '')),
-                $config?->cookieEncrypt ? $config?->encryptionKey : null
+                $config?->cookieEncrypt ? $config?->secret : null
             ))->load($psr->getCookieParams() ?? []),
             $config?->sessionEnabled ? (new Session(
                 $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->cookieEncrypt ? $config?->secret : null,
                 $config?->sessionHandler
             )) : null,
             new Upload($psr->getUploadedFiles()),
@@ -218,11 +218,11 @@ class Request implements RequestInterface
             (new StatelessCookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                $config?->cookieEncrypt ? $config?->encryptionKey : null
+                $config?->cookieEncrypt ? $config?->secret : null
             ))->load($http->cookie() ?? []),
             $config?->sessionEnabled ? (new StatelessSession(
                 $config?->getSessionConfigs()['name'] ?? 'PHPSESS',
-                $config?->cookieEncrypt ? $config?->encryptionKey : null,
+                $config?->cookieEncrypt ? $config?->secret : null,
                 $config?->sessionHandler
             )) : null,
             new Upload($http->file()),

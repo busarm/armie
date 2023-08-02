@@ -188,6 +188,16 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
+     * Number of items in store
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->all());
+    }
+
+    /**
      * Gets a string representation of the object
      *
      * @return string Returns the `string` representation of the object.

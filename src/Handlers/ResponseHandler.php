@@ -7,9 +7,11 @@ use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Response;
+use Generator;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Traversable;
 
 /**
  * PHP Mini Framework
@@ -37,6 +39,8 @@ final class ResponseHandler implements ResponseHandlerInterface
                         $response = $this->data->handle();
                     } elseif ($this->data instanceof StreamInterface) {
                         $response->setBody($this->data);
+                    } elseif ($this->data instanceof Traversable) {
+                        $response->setBody(json_encode(iterator_to_array($this->data)));
                     } elseif ($this->data instanceof Arrayable) {
                         $response->setParameters($this->data->toArray());
                     } elseif (is_array($this->data) || is_object($this->data)) {

@@ -37,7 +37,7 @@ final class AppTest extends TestCase
 
     private App|null $app = NULL;
 
-    public static function setupBeforeClass(): void
+    public static function setUpBeforeClass(): void
     {
         ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
@@ -61,7 +61,7 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app setup 
+     * Test app setUp 
      *
      * @return void
      */
@@ -344,12 +344,12 @@ final class AppTest extends TestCase
     }
 
     /**
-     * Test app run mock HTTP CRUD Controller
+     * Test app run mock HTTP Resource Controller
      *
      * @group skip
      * @return void
      */
-    public function testAppRunMockHttpCrudController()
+    public function testAppRunMockHttpResourceController()
     {
         $this->app->config
             ->setAppPath(__DIR__ . '/TestApp')
@@ -365,7 +365,7 @@ final class AppTest extends TestCase
                 ->setConnectionPersist(false)
                 ->setConnectionErrorMode(true));
 
-        $this->app->router->addCrudRoutes('product', ProductTestController::class);
+        $this->app->router->addResourceRoutes('product', ProductTestController::class);
         $response = $this->app->run(
             Request::fromUrl(
                 self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/product/paginate?limit=2&page=10',

@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
+use Exception;
 use Stringable;
 
 /**
@@ -13,23 +14,27 @@ use Stringable;
 class Reference implements Stringable
 {
     /**
-     * @param Model $model Reference Model
+     * @param Model|class-string<Model> $model Reference Model or Model Class Name
      * @param array $keys Reference keys e.g. `['fromModelKey1' => 'toModelKey1', 'fromModelKey2' => 'toModelKey2']`
-     * @param string|null $name Reference keys. Default = `$model` class name
      */
-    public function __construct(private Model $model, private array $keys, private string|null $name = null)
+    public function __construct(private Model|string $model, private array $keys)
     {
-        $this->name = $name ?? get_class($model);
+        if (!($model instanceof Model) && !is_subclass_of($model, Model::class)) {
+            throw new Exception('Reference `model` must be a subclass of ' . Model::class);
+        }
     }
 
     /**
      * Get reference 
      * 
+     * @param Connection|null $db
      * @return Model
      */
-    public function getModel(): Model
+    public function getModel(Connection|null $db = null): Model
     {
-        return $this->model;
+        return $this->model instanceof Model ?
+            $this->model :
+            $this->model = (new \ReflectionClass($this->model))->newInstance($db);
     }
 
     /**
@@ -49,7 +54,7 @@ class Reference implements Stringable
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->model instanceof Model ? get_class($this->model) : $this->model;
     }
 
     /**

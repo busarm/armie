@@ -3,11 +3,12 @@ version: '3.7'
 services:
   # PHP Server
   php:
-    image: webdevops/php:8.0-alpine
+    image: webdevops/php:8.1-alpine
     expose:
       - 9000
     volumes:
       - .:/var/www:rw
+      - ./tests/php/php.ini:/opt/docker/etc/php/php.ini:ro
     environment:
       # PHP
       PHP_MEMORY_LIMIT: 512M
@@ -23,6 +24,8 @@ services:
       - 80:80
     volumes:
       - .:/var/www:ro
+      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
       WEB_DOCUMENT_ROOT: '/var/www/tests/TestServer'
@@ -39,6 +42,9 @@ services:
       - 81:80
     volumes:
       - .:/var/www:ro
+      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
+
     environment:
       # NGINX
       WEB_DOCUMENT_ROOT: '/var/www/tests/TestApp'
@@ -55,6 +61,8 @@ services:
       - 82:80
     volumes:
       - .:/var/www:ro
+      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
       WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV2'
@@ -71,6 +79,8 @@ services:
       - 83:80
     volumes:
       - .:/var/www:ro
+      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
       WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV3'
@@ -78,8 +88,29 @@ services:
       # `php` service name + exposed port
       WEB_PHP_SOCKET: 'php:9000'
 
+  # MYSQL
+  mysql:
+    image: mysql:latest
+    ports: 
+      - 3310:3306
+    volumes:
+      - mysql-volume:/var/lib/mysql:rw
+      - ./tests/mysql/mysql.conf:/etc/mysql/conf.d/mysql.conf:ro
+      # Deploy database ddl scripts on fresh init 
+      # NOTE: If ddl has any error, docker will fail to start
+      - ./tests/database:/docker-entrypoint-initdb.d/:ro
+    environment:
+      - MYSQL_DATABASE=default
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=UTC
+
   # PHP Docs
   docs:
     image: phpdoc/phpdoc
     volumes:
       - ./:/data:rw
+
+volumes:
+  mysql-volume:
+    name: mysql-test-volume

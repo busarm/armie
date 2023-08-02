@@ -2,7 +2,11 @@
 
 namespace Busarm\PhpMini\Helpers;
 
+use Busarm\PhpMini\Async;
 use Busarm\PhpMini\Errors\SystemError;
+use Busarm\PhpMini\Tasks\EventTask;
+use Busarm\PhpMini\Tasks\Task;
+use Generator;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
@@ -216,10 +220,12 @@ function &router()
  */
 function log_message($level, $message, array $context = [])
 {
+    $message = is_array($message) || is_object($message) ? var_export($message, true) : (string) $message;
+    $message = date("Y-m-d H:i:s.", microtime(true)) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
     try {
-        app()->logger->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
+        app()->logger->log($level, $message, $context);
     } catch (\Throwable $th) {
-        (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, is_array($message) || is_object($message) ? var_export($message, true) : (string) $message, $context);
+        (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
     }
 }
 
@@ -399,7 +405,7 @@ function is_list(array $list): bool
  * @param boolean $httponly
  * @return string
  */
-function createSetCookieHeader(
+function create_cookie_header(
     string $name,
     string $value,
     int $expires = 0,
@@ -410,7 +416,6 @@ function createSetCookieHeader(
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    date_default_timezone_set('UTC');
     $date = date("D, d-M-Y H:i:s", $expires) . ' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
@@ -432,4 +437,115 @@ function createSetCookieHeader(
         $header .= "; HttpOnly";
     }
     return $header;
+}
+
+/**
+ * Find a free port on the system
+ *
+ * @return int
+ */
+function find_free_port()
+{
+    $sock = socket_create_listen(0);
+    socket_getsockname($sock, $addr, $port);
+    socket_close($sock);
+
+    return $port;
+}
+
+/**
+ * This function returns the maximum files size that can be uploaded 
+ * in PHP
+ * @return int size in kilobytes
+ **/
+function get_max_upload_size($default = 1024)
+{
+    return min(parse_php_size(ini_get('post_max_size')), parse_php_size(ini_get('upload_max_filesize'))) ?: $default * 1024;
+}
+
+/**
+ * This function transforms the php.ini notation for numbers (like '2M') to an integer (2*1024*1024 in this case)
+ * 
+ * @param string $sSize
+ * @return integer The value in bytes
+ */
+function parse_php_size($sSize)
+{
+    $sSuffix = strtoupper(substr($sSize, -1));
+    if (!in_array($sSuffix, array('P', 'T', 'G', 'M', 'K'))) {
+        return (int)$sSize;
+    }
+    $iValue = substr($sSize, 0, -1);
+    switch ($sSuffix) {
+        case 'P':
+            $iValue *= 1024;
+            // Fallthrough intended
+        case 'T':
+            $iValue *= 1024;
+            // Fallthrough intended
+        case 'G':
+            $iValue *= 1024;
+            // Fallthrough intended
+        case 'M':
+            $iValue *= 1024;
+            // Fallthrough intended
+        case 'K':
+            $iValue *= 1024;
+            break;
+    }
+    return (int)$iValue;
+}
+
+
+/**
+ * Run task as async  (NON - Blocking)
+ * 
+ * @param Task|callable $task
+ */
+function async(Task|callable $task): mixed
+{
+    return  Async::runTask($task, false);
+}
+
+/**
+ * Run task as async and wait for result (Blocking)
+ * 
+ * @param Task|callable $task
+ */
+function await(Task|callable $task): mixed
+{
+    return Async::runTask($task, true);
+}
+
+/**
+ * Run task list concurrently
+ * 
+ * @param Task[]|callable[] $task
+ * @param bool $wait
+ */
+function concurrent(array $tasks, $wait = false): Generator
+{
+    return Async::runTasks($tasks, $wait);
+}
+
+/**
+ * Listen to event
+ * 
+ * @param string $event
+ * @param callable|class-string<Task> $listner
+ */
+function listen(string $event, callable|string $listner)
+{
+    app()->eventManager->addEventListner($event, $listner);
+}
+
+/**
+ * Dispatch event
+ * 
+ * @param string $event
+ * @param array $data
+ */
+function dispatch(string $event, array $data = [])
+{
+    app()->eventManager->dispatchEvent($event, $data);
 }

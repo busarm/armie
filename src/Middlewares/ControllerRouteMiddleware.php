@@ -38,10 +38,8 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
     {
         if (class_exists($this->controller)) {
 
-            $injector = (new DI(app()));
-
             // Load controller
-            $object = $injector->instantiate($this->controller, $request);
+            $object = app()->di->instantiate($this->controller, $request);
             if ($object) {
 
                 // Load method
@@ -51,12 +49,12 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     && is_callable(array($object, $this->function))
                 ) {
 
-                    $method = new ReflectionMethod($this->controller, $this->function);
-                    $result = $injector->processMethodAttributes($method, $request);
+                    $method = new ReflectionMethod($object, $this->function);
+                    $result = app()->di->processMethodAttributes($method, $request);
                     if (!isset($result)) {
                         $result = $method->invoke(
                             $object,
-                            ...array_merge($injector->resolveMethodDependencies(
+                            ...array_merge(app()->di->resolveMethodDependencies(
                                 $method,
                                 $request,
                             ), $this->params)

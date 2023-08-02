@@ -93,11 +93,11 @@ class Config implements ConfigurationInterface
     public string $configPath = '';
 
     /**
-     * App encryption Key
+     * App secret key
      *
      * @var string|null
      */
-    public string|null $encryptionKey = NULL;
+    public string|null $secret = NULL;
 
 
     // ------------- COOKIE -----------------//
@@ -467,7 +467,7 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set path to view folder - relative to system base path or app folder. e.g `/var/www/html/view` or `view` ('/var/www/html/app/view')
+     * Set path to view folder - relative to system base path or app folder. e.g `/var/www/html/view` or `view` - ('/var/www/html/app/view')
      *
      * @param  string  $viewPath  (Without leading or trailing slash)
      *
@@ -495,15 +495,15 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set encryption Key
+     * Set secret key
      *
-     * @param  string  $encryptionKey
+     * @param  string  $secret
      *
      * @return  self
      */
-    public function setEncryptionKey($encryptionKey)
+    public function setSecret($secret)
     {
-        $this->encryptionKey = $encryptionKey;
+        $this->secret = $secret;
 
         return $this;
     }

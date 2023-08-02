@@ -207,7 +207,7 @@ class ManyToMany extends Relation
         $referenceModel = $this->getReferenceModel()->clone();
 
         // Save related model
-        $itemModel->load($data);
+        $itemModel->fastLoad($data);
         if ($itemModel->save()) {
 
             $pivotData = [];
@@ -229,7 +229,7 @@ class ManyToMany extends Relation
             }
 
             // Save reference model
-            $referenceModel->load($pivotData);
+            $referenceModel->fastLoad($pivotData);
             if ($referenceModel->save()) {
                 return true;
             }
@@ -253,7 +253,7 @@ class ManyToMany extends Relation
      */
     public function getReferenceModel(): Model
     {
-        return $this->pivotReference->getModel();
+        return $this->pivotReference->getModel($this->model->getDatabase());
     }
 
     /**
@@ -271,7 +271,7 @@ class ManyToMany extends Relation
      */
     public function getItemModel(): Model
     {
-        return $this->itemReference->getModel();
+        return $this->itemReference->getModel($this->model->getDatabase());
     }
 
     /**

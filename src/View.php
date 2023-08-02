@@ -155,18 +155,17 @@ class View implements ResponseHandlerInterface, Stringable
      */
     public function handle(): ResponseInterface
     {
-        $this->start();
-        if ($content = $this->render()) echo $content;
-        $content = $this->end();
-        return (new Response)->addHttpHeaders($this->headers)->html($content, 200);
+        return (new Response)->addHttpHeaders($this->headers)->html(strval($this), 200);
     }
 
     /**
      * Gets a string representation of the object
-     * @return string Returns the `string` representation of the object.
+     * @return string Returns the `string` representation of the view.
      */
     public function __toString()
     {
-        return strval($this->handle()->getBody());
+        $this->start();
+        if ($content = $this->render()) echo $content;
+        return $content = $this->end();
     }
 }

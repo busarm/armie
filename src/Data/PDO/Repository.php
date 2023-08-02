@@ -140,7 +140,8 @@ class Repository implements QueryRepositoryInterface
      */
     public function findById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto
     {
-        return $this->model->find($id, $conditions, $params, $columns);
+        $data = $this->model->find($id, $conditions, $params, $columns);
+        return $data ? BaseDto::with($data->toArray()) : $data;
     }
 
     /**
@@ -149,7 +150,8 @@ class Repository implements QueryRepositoryInterface
     public function findTrashedById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto
     {
         if (!empty($this->model->getSoftDeleteDateName())) {
-            return $this->model->findTrashed($id, $conditions, $params, $columns);
+            $data = $this->model->findTrashed($id, $conditions, $params, $columns);
+            return $data ? BaseDto::with($data->toArray()) : $data;
         }
         return $this->findById($id, $conditions, $params, $columns);
     }
@@ -162,7 +164,7 @@ class Repository implements QueryRepositoryInterface
         $model = $this->model->clone();
         $model->load($data);
         if ($model->save()) {
-            return $model;
+            return BaseDto::with($model);
         }
         return null;
     }

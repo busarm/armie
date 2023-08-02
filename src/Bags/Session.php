@@ -10,6 +10,8 @@ use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use SessionHandler;
 use SessionHandlerInterface;
 
+use function Busarm\PhpMini\Helpers\is_cli;
+
 /**
  * PHP Mini Framework
  *
@@ -315,6 +317,16 @@ final class Session implements SessionStoreInterface
         session_unset();
     }
 
+    /**
+     * Number of items in store
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->all());
+    }
+
 
     //--------- Utils --------//
 
@@ -359,7 +371,7 @@ final class Session implements SessionStoreInterface
     private function throwIfHeadersSent(): void
     {
         [$file, $line] = [null, null];
-        $headersWereSent = (bool) ini_get('session.use_cookies') && headers_sent($file, $line);
+        $headersWereSent = !is_cli() && (bool) ini_get('session.use_cookies') && headers_sent($file, $line);
 
         $headersWereSent && throw new SessionError("Header already sent in $file:$line");
     }
@@ -381,7 +393,7 @@ final class Session implements SessionStoreInterface
      */
     private function throwIfNotStarted(): void
     {
-        !$this->isStarted() && throw new SessionError('Session has not been started');
+        !$this->isStarted() && throw new SessionError('Session has not been started. Tip: Add SessionMiddleware');
     }
 
     /**

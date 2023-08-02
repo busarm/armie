@@ -8,25 +8,42 @@
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
+use Busarm\PhpMini\Configs\PDOConfig;
+use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Middlewares\SessionMiddleware;
+use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
 use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
+use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
+use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
+use Faker\Factory;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 $config = (new Config())
     ->setAppPath(__DIR__)
-    ->setEncryptionKey("ds3d5Posdf@nZods!mfo")
+    ->setSecret("ds3d5Posdf@nZods!mfo")
     ->setCookieEncrypt(false)
+    ->setSessionEnabled(false)
     ->setHttp((new HttpConfig)
         ->setCheckCors(true)
         ->setAllowAnyCorsDomain(true)
         ->setAllowedCorsHeaders(['*'])
-        ->setAllowedCorsMethods(['GET']));
+        ->setAllowedCorsMethods(['GET']))
+    ->setDb((new PDOConfig)
+        ->setConnectionDriver("mysql")
+        ->setConnectionHost("mysql")
+        ->setConnectionDatabase('default')
+        ->setConnectionPort(3306)
+        ->setConnectionUsername("root")
+        ->setConnectionPassword("root")
+        ->setConnectionPersist(false)
+        ->setConnectionErrorMode(true));
 
 $app = new App($config, Env::LOCAL);
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
@@ -37,6 +54,7 @@ $app->get('pingHtml')->call(function (App $app) {
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
+    $req->session()->set("Name", "Samuel");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -49,6 +67,25 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'ip' => $req->ip(),
         'correlationId' => $req->correlationId(),
     ];
+});
+
+$app->get('test-db')->call(function () {
+    return CollectionBaseDto::of(ProductTestModel::getAll());
+});
+
+$app->get('test-db-write')->call(function () {
+    $faker = Factory::create();
+    $cat = CategoryTestModel::create(['name' => $faker->word(), 'description' => $faker->sentence()]);
+    $products = [];
+    foreach (range(1, 10) as $_) {
+        $products[] = ProductTestModel::create([
+            'name' =>  $faker->name(),
+            'type' => $faker->word(),
+            'qty' => $faker->numberBetween(1, 1000),
+            'categoryId' => $cat->get('id')
+        ]);
+    }
+    return CollectionBaseDto::of($products);
 });
 
 $app->get('download')->call(function (Response $response) {

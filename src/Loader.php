@@ -54,9 +54,12 @@ class Loader implements LoaderInterface
      */
     public function view($path, $vars = array(), $return = false): ?string
     {
+        if (empty($this->config->viewPath)) throw new LoaderError("`viewPath` config should not be empty");
+
         $path = (str_starts_with($this->config->viewPath, $this->config->appPath) ?
             $this->config->viewPath :
             $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
+
         if (file_exists($path)) {
             $content = self::load($path, $vars);
             if ($return) return $content;
@@ -76,6 +79,8 @@ class Loader implements LoaderInterface
      */
     public function config($path): mixed
     {
+        if (empty($this->config->configPath)) throw new LoaderError("`configPath` config should not be empty");
+
         $path = (str_starts_with($this->config->configPath, $this->config->appPath) ?
             $this->config->configPath :
             $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');

@@ -5,6 +5,7 @@ namespace Busarm\PhpMini\Bags;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
+use Opis\Closure\SerializableClosure;
 
 /**
  * PHP Mini Framework
@@ -14,9 +15,8 @@ use Closure;
  */
 class Bag implements StorageBagInterface
 {
-
-	protected Closure|null $onChange = null;
-	protected Closure|null $onDelete = null;
+	protected SerializableClosure|Closure|null $onChange = null;
+	protected SerializableClosure|Closure|null $onDelete = null;
 	protected array $keys = [];
 	protected array $original = [];
 
@@ -222,6 +222,16 @@ class Bag implements StorageBagInterface
 
 		if ($this->onDelete) foreach (array_keys($data) as $name) ($this->onDelete)($name);
 		$data = NULL;
+	}
+
+	/**
+	 * Number of items in store
+	 *
+	 * @return int
+	 */
+	public function count(): int
+	{
+		return count($this->all());
 	}
 
 	/**

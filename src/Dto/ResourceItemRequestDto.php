@@ -8,7 +8,7 @@ namespace Busarm\PhpMini\Dto;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class CrudItemRequestDto extends BaseDto
+class ResourceItemRequestDto extends BaseDto
 {
     /** @var string|int Record Id */
     public string|int $id;

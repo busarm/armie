@@ -6,7 +6,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
-use Busarm\PhpMini\Interfaces\Data\CrudControllerInterface;
+use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
@@ -92,20 +92,20 @@ class Router implements RouterInterface
     }
 
     /**
-     * Add CRUD (CREATE/READ/UPDATE/DELETE) routes for controller. 
-     * Controller must implement CrudControllerInterface
+     * Add Resource (CREATE/READ/UPDATE/DELETE) routes for controller. 
+     * Controller must implement ResourceControllerInterface
      * 
-     * @see CrudControllerInterface
+     * @see ResourceControllerInterface
      * 
      * @param string $path HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
-     * @param class-string<CrudControllerInterface> $controller Application Controller class name e.g Home
+     * @param class-string<ResourceControllerInterface> $controller Application Controller class name e.g Home
      * @return RouterInterface
      */
-    public function addCrudRoutes(string $path, string $controller): RouterInterface
+    public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
 
-        if (!in_array(CrudControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement " . CrudControllerInterface::class);
+        if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
+            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET, "$path/list")->to($controller, 'list');

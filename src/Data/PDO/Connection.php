@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
+use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Interfaces\SingletonInterface;
 use Busarm\PhpMini\Traits\Singleton;
 use PDO;
@@ -19,23 +20,25 @@ class Connection extends PDO implements SingletonInterface
     use Singleton;
 
     /**
-     * @var self[]
-     */
-    static private $pool = [];
-
-    /**
-     * @param ConnectionConfig $config
+     * @param PDOConfig $config
+     * @param int $id
      * @throws \PDOException — if the attempt to connect to the requested database fails.
      * @inheritDoc
      */
-    public function __construct(private ConnectionConfig $config)
+    public function __construct(private PDOConfig $config, public $id = 0)
     {
-        $dns = $config->dsn ?? sprintf("%s:dbname=%s;host=%s;port=%s", $config->driver, $config->database, $config->host, $config->port);
-        parent::__construct($dns, $config->user, $config->password, array_merge([
+        $dns = $config->connectionDNS ?? sprintf(
+            "%s:dbname=%s;host=%s;port=%s",
+            $config->connectionDriver,
+            $config->connectionDatabase,
+            $config->connectionHost,
+            $config->connectionPort
+        );
+        parent::__construct($dns, $config->connectionUsername, $config->connectionPassword, array_merge([
             self::ATTR_AUTOCOMMIT => true,
-            self::ATTR_PERSISTENT => $config->persist,
-            self::ATTR_ERRMODE => $config->errorMode ? self::ERRMODE_EXCEPTION : self::ERRMODE_SILENT,
-        ], $config->options));
+            self::ATTR_PERSISTENT => $config->connectionPersist,
+            self::ATTR_ERRMODE => $config->connectionErrorMode ? self::ERRMODE_EXCEPTION : self::ERRMODE_SILENT,
+        ], $config->connectionOptions));
     }
 
     /**
@@ -46,18 +49,13 @@ class Connection extends PDO implements SingletonInterface
      */
     public static function make(array $params = []): static
     {
-        $config = app()->make(ConnectionConfig::class);
-
-        // Async mode - use pooling (round robin)
-        if (app()->async && $config->poolSize > 0) {
-            if (!empty(self::$pool)) {
-                self::$pool[] = array_shift(self::$pool);
-            } else {
-                for ($i = 0; $i < $config->poolSize; $i++) {
-                    self::$pool[] = new self($config);
-                }
-            }
-            return self::$pool[0];
+        // Async mode - use pooling
+        if (app()->async && app()->config->db->connectionPoolSize > 0) {
+            /** @var static */
+            return ConnectionPool::make([
+                'config' => app()->config->db,
+                'size' =>  app()->config->db->connectionPoolSize ?: app()->config->db->connectionPoolSize
+            ])->get();
         }
 
         return app()->make(static::class, $params);

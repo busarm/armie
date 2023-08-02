@@ -14,22 +14,32 @@ namespace Busarm\PhpMini\Enums;
 class Looper
 {
     /**
+     * Default eventloop using `stream_select` and `pcntl_fork`
+     */
+    const DEFAULT   =   1;
+    /**
      * Ev eventloop
      * Ensure `ev` extension is installed. E.g pecl install ev
      */
-    const EV        =   1;
+    const EV        =   2;
     /**
      * Libevent eventloop
      * Ensure `event` extension is installed. E.g pecl install event
      */
-    const EVENT     =   2;
+    const EVENT     =   3;
     /**
      * Swoole eventloop
      * Ensure `swoole` extension is installed. E.g pecl install swoole
      */
-    const SWOOLE    =   3;
+    const SWOOLE    =   4;
     /**
-     * Default eventloop using `stream_select`
+     * Lbbuv eventloop
+     * Ensure `uv` extension is installed. E.g sudo apt-get install libuv1.dev for Ubuntu
      */
-    const SELECT    =   4;
+    const UV        =   5;
+    /**
+     * React eventloop
+     * Ensure `react/event-loop` package is installed. E.g react/event-loop
+     */
+    const REACT     =   6;
 }

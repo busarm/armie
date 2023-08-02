@@ -19,6 +19,7 @@ use Nyholm\Psr7\Uri;
 use const Busarm\PhpMini\Constants\VAR_PATH_INFO;
 use const Busarm\PhpMini\Constants\VAR_REQUEST_URI;
 
+use function Busarm\PhpMini\Helpers\async;
 use function Busarm\PhpMini\Helpers\http_parse_query;
 
 /**
@@ -102,7 +103,65 @@ class LocalService extends BaseService
      */
     public function callAsync(ServiceRequestDto $dto, RequestInterface $request): ServiceResponseDto
     {
-        throw new SystemError("Async local service request not currently supported.");
+        $path = $this->location ?? $this->getLocation($this->name);
+        if (empty($path)) {
+            throw new SystemError(self::class . ": Location for client $this->name not found");
+        }
+
+        $path = is_dir($path) ? $path . '/index.php' : $path;
+        if (!file_exists($path)) {
+            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
+        }
+
+        $baseUrl = $request->baseUrl();
+
+        $dto->headers = $dto->headers ?? [];
+        $dto->headers['x-trace-id'] = $request->correlationId();
+
+        $server = $request->server();
+        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
+        $server->set(VAR_PATH_INFO, '/' . $dto->route);
+        $serverList = $server->all();
+
+        $cookieList = $request->server()->all();
+
+        $discovery = $this->discovery;
+
+        // Call async
+        async(function () use ($path, $baseUrl, $dto, $discovery, $cookieList, $serverList) {
+
+            $uri = (new Uri(rtrim($baseUrl, '/') . '/' . ltrim($dto->route, '/')));
+            $query = http_parse_query($uri->getQuery());
+
+            // Load local service with path
+            Loader::require($path, [
+                'request' =>
+                Request::fromUrl(
+                    strval($uri),
+                    match ($dto->type) {
+                        ServiceType::CREATE => HttpMethod::POST,
+                        ServiceType::UPDATE => HttpMethod::PUT,
+                        ServiceType::DELETE => HttpMethod::DELETE,
+                        default   => HttpMethod::GET,
+                    }
+                )->initialize(
+                    new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
+                    new Bag($dto->type != ServiceType::READ ? $dto->params : []),
+                    new Bag($cookieList),
+                    null,
+                    new Bag($dto->files),
+                    new Bag($serverList),
+                    new Bag($dto->headers),
+                    null,
+                )->toPsr(),
+                'discovery' => $discovery,
+            ]);
+        });
+
+        return (new ServiceResponseDto)
+            ->setStatus(true)
+            ->setAsync(true)
+            ->setData([]);
     }
 
     /**

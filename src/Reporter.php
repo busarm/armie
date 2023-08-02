@@ -86,7 +86,7 @@ class Reporter implements ReportingInterface
     public function reportException(\Throwable $exception)
     {
         $contexts = array_map(function ($instance) {
-            return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '0');
+            return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
         }, $exception->getTrace());
         log_exception($exception);
         log_debug($this->toString([

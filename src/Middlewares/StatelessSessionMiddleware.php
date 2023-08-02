@@ -11,8 +11,6 @@ use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use SessionHandlerInterface;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-
 /**
  * PHP Mini Framework
  *

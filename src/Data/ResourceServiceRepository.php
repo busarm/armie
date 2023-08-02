@@ -4,13 +4,13 @@ namespace Busarm\PhpMini\Data;
 
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\CrudItemRequestDto;
-use Busarm\PhpMini\Dto\CrudListRequestDto;
-use Busarm\PhpMini\Dto\CrudPaginatedListRequestDto;
+use Busarm\PhpMini\Dto\ResourceItemRequestDto;
+use Busarm\PhpMini\Dto\ResourceListRequestDto;
+use Busarm\PhpMini\Dto\ResourcePaginatedListRequestDto;
 use Busarm\PhpMini\Dto\PaginatedCollectionDto;
 use Busarm\PhpMini\Dto\ServiceRequestDto;
 use Busarm\PhpMini\Enums\ServiceType;
-use Busarm\PhpMini\Interfaces\Data\CrudServiceRepositoryInterface;
+use Busarm\PhpMini\Interfaces\Data\ResourceServiceRepositoryInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\ServiceHandlerInterface;
 
@@ -21,18 +21,18 @@ use Busarm\PhpMini\Interfaces\ServiceHandlerInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class CrudServiceRepository implements CrudServiceRepositoryInterface
+class ResourceServiceRepository implements ResourceServiceRepositoryInterface
 {
     public function __construct(
-        private RequestInterface $request,
-        private ServiceHandlerInterface $serviceProvider
+        protected RequestInterface $request,
+        protected ServiceHandlerInterface $serviceProvider
     ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function get(CrudItemRequestDto $dto): ?BaseDto
+    public function get(ResourceItemRequestDto $dto): ?BaseDto
     {
         $response = $this->serviceProvider->call((new ServiceRequestDto)
                 ->setRoute('/')
@@ -49,7 +49,7 @@ class CrudServiceRepository implements CrudServiceRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function list(CrudListRequestDto $dto): CollectionBaseDto
+    public function list(ResourceListRequestDto $dto): CollectionBaseDto
     {
         $response = $this->serviceProvider->call((new ServiceRequestDto)
                 ->setRoute('list')
@@ -66,7 +66,7 @@ class CrudServiceRepository implements CrudServiceRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function paginatedList(CrudPaginatedListRequestDto $dto): PaginatedCollectionDto
+    public function paginatedList(ResourcePaginatedListRequestDto $dto): PaginatedCollectionDto
     {
         $response = $this->serviceProvider->call((new ServiceRequestDto)
                 ->setRoute('paginate')

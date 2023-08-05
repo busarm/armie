@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Enums\HttpMethod;
 use Closure;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 
@@ -24,8 +25,8 @@ interface RouteInterface extends ContainerInterface
     public function getParams(): array;
     /**  @return string|null */
     public function getView(): ?string;
-    /**  @return string|null */
-    public function getMethod(): ?string;
+    /**  @return HttpMethod|null */
+    public function getMethod(): ?HttpMethod;
     /**  @return string|null */
     public function getPath(): ?string;
     /**  @return MiddlewareInterface[] */

@@ -49,7 +49,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * @param string $query Model Provider Query. e.g SQL query
      * @param array $params Query Params. e.g SQL query params
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto
+     * @return CollectionBaseDto<BaseDto>
      */
     public function queryList(string $query, $params = [], int $limit = 0): CollectionBaseDto;
 
@@ -59,7 +59,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param int $page Page Number Default: 1
      * @param int $limit Page Limit. Default: 0 to disable
-     * @return PaginatedCollectionDto
+     * @return PaginatedCollectionDto<BaseDto>
      */
     public function queryPaginate(string $query, $params = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 }

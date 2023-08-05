@@ -40,7 +40,7 @@ use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
 use Busarm\PhpMini\Tasks\Task;
 use Busarm\PhpMini\Traits\Container;
 use Exception;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 use Psr\Http\Message\RequestInterface as MessageRequestInterface;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -61,8 +61,8 @@ use Workerman\Protocols\Http\Session\FileSessionHandler;
 use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\is_cli;
-use function Opis\Closure\serialize;
-use function Opis\Closure\unserialize;
+use function Busarm\PhpMini\Helpers\serialize;
+use function Busarm\PhpMini\Helpers\unserialize;
 
 // TODO Queue Manager Interface - Handle sync and async jobs
 // TODO PSR Cache Interface
@@ -98,28 +98,28 @@ class App implements HttpServerInterface, ContainerInterface
     ];
 
     /** @var static App instance */
-    private static $__instance = null;
+    private static ?self $__instance = null;
 
 
     /** @var RouterInterface */
-    public $router = null;
+    public ?RouterInterface $router = null;
 
     /** @var LoggerInterface */
-    public $logger = null;
+    public ?LoggerInterface $logger = null;
 
     /** @var LoaderInterface */
-    public $loader = null;
+    public ?LoaderInterface $loader = null;
 
     /** @var ReportingInterface */
-    public $reporter = null;
+    public ?ReportingInterface $reporter = null;
 
     /** @var DependencyResolverInterface */
-    public $resolver = null;
+    public ?DependencyResolverInterface $resolver = null;
 
     /**
      * @var ServiceDiscoveryInterface
      */
-    public $serviceDiscovery = null;
+    public ?ServiceDiscoveryInterface $serviceDiscovery = null;
 
     /** @var DI */
     public $di = null;
@@ -127,14 +127,14 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * @var EventManagerInterface
      */
-    public $eventManager = null;
+    public ?EventManagerInterface $eventManager = null;
 
 
     /** @var boolean App is running in CLI mode*/
-    public $isCli;
+    public bool $isCli;
 
     /** @var int|float App start time in milliseconds */
-    public $startTimeMs;
+    public int|float $startTimeMs;
 
     /** 
      * @var boolean 
@@ -171,17 +171,18 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * App current status
      *
-     * @var \Busarm\PhpMini\Enums\AppStatus::*
+     * @var AppStatus
      */
-    protected int $status = AppStatus::STOPPED;
+    protected AppStatus $status = AppStatus::STOPPED;
 
     /**
      * @param Config $config App configuration object
-     * @param \Busarm\PhpMini\Enums\Env::* $env App environment
+     * @param Env $env App environment
      */
-    public function __construct(public Config $config, public string $env = Env::LOCAL)
+    public function __construct(public Config $config, public Env $env = Env::LOCAL)
     {
         if (empty($this->config->appPath)) throw new SystemError("`appPath` config should not be empty");
+        if (\PHP_VERSION_ID < 80100) throw new SystemError("Only PHP 8.1 and above is supported");
 
         $this->status = AppStatus::INITIALIZING;
 
@@ -327,9 +328,9 @@ class App implements HttpServerInterface, ContainerInterface
      */
     protected function setUpErrorHandlers()
     {
-        set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
-            $this->reporter->reportError("Internal Server Error [$errno]", $errstr, $errfile, $errline);
-        }, E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_CORE_WARNING | E_NOTICE | E_STRICT);
+        set_error_handler(function (int $severity, string $message, string $file, int $line) {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        }, E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_CORE_WARNING | E_COMPILE_WARNING | E_USER_WARNING | E_NOTICE | E_STRICT);
 
         set_exception_handler(function (Throwable $e) {
             if ($e instanceof HttpException) {
@@ -343,25 +344,25 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * Set up shutdown handler
+     * 
+     * @param RequestInterface|RouteInterface $request, 
+     * @param float $startTime
      */
-    protected function addShutdownHandler(RequestInterface|RouteInterface &$request, int $startTime)
+    protected function addShutdownHandler(RequestInterface|RouteInterface &$request, float $startTime)
     {
         // Call only in sync mode to prevent memory leak
         if (!$this->async) {
             register_shutdown_function(function () use (&$request, $startTime) {
                 if ($request) {
                     if ($request instanceof RequestInterface) {
-
                         // Leave logs for tracing
                         if ($this->config->logRequest && $request instanceof RequestInterface) {
                             $endTime = microtime(true) * 1000;
                             $this->logger->debug(sprintf("Request completed: id = %s, correlationId = %s, time = %s, durationMs = %s", $request->requestId(), $request->correlationId(), $endTime, round($endTime - $startTime, 2)));
                         }
-
                         // Save session
                         $request->session()?->save();
                     }
-
                     // Clean up request
                     $request = NULL;
                 }
@@ -559,7 +560,7 @@ class App implements HttpServerInterface, ContainerInterface
         try {
             // Add default response handler
             $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $request instanceof RequestInterface ?
-                (new Response(version: $request->version(), format: $this->config->http->responseFormat))->html(sprintf("Not found - %s %s", $request->method(), $request->path()), 404) : (new Response(format: $this->config->http->responseFormat))->html("Resource not found", 404);
+                (new Response(version: $request->version(), format: $this->config->http->responseFormat))->html(sprintf("Not found - %s %s", $request->method()->value, $request->path()), 404) : (new Response(format: $this->config->http->responseFormat))->html("Resource not found", 404);
 
             foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
                 $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
@@ -583,7 +584,7 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function run(RequestInterface|RouteInterface|null $request = null): ResponseInterface
     {
-        self::$__instance = $this;
+        self::$__instance = &$this;
 
         $this->status = AppStatus::RUNNNIG;
 
@@ -779,7 +780,6 @@ class App implements HttpServerInterface, ContainerInterface
             // Add message handler
             $worker->onMessage = function (TcpConnection $connection, $data) {
                 try {
-                    // $this->logger->debug($data);
                     $dto = unserialize($data);
                     if ($dto instanceof TaskDto && $dto->key && $dto->key === $this->config->secret) {
                         if (
@@ -960,7 +960,7 @@ class App implements HttpServerInterface, ContainerInterface
             $response = new ResponseDto();
             $response->success = $status == 200 || $status == 201;
             $response->message = $message;
-            $response->env = $this->env;
+            $response->env = $this->env->value;
             $response->version = $this->config->version;
 
             // Show more info if not production
@@ -1006,10 +1006,10 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * Get event looper class to be used
-     * @param Looper::* $looper
+     * @param Looper $looper
      * @return string
      */
-    protected function getEventLooper($looper)
+    protected function getEventLooper(Looper $looper)
     {
         if ($looper == Looper::EVENT && extension_loaded('event') && class_exists(\EventBase::class)) return Event::class;
         else if ($looper == Looper::EV && extension_loaded('ev') && class_exists(\Ev::class)) return Ev::class;

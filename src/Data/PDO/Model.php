@@ -401,10 +401,11 @@ abstract class Model implements ModelInterface
 
         // Dispatch event
         dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
-        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchObject(static::class, [$this->db]))) {
+        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
             // Dispatch event
             dispatch(self::EVENT_AFTER_QUERY);
-            return $result
+            return (new static($this->db))
+                ->fastLoad($result)
                 ->setNew(false)
                 ->setPerPage($this->getPerPage())
                 ->setAutoLoadRelations($this->getAutoLoadRelations())
@@ -451,11 +452,12 @@ abstract class Model implements ModelInterface
 
         // Dispatch event
         dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
-        if ($stmt && $stmt->execute($params) && $results = $stmt->fetchAll(Connection::FETCH_CLASS, static::class, [$this->db])) {
+        if ($stmt && $stmt->execute($params) && ($results = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
             // Dispatch event
             dispatch(self::EVENT_AFTER_QUERY);
             return $this->processEagerLoadRelations(array_map(
-                fn (self $result) => $result
+                fn ($result) => (new static($this->db))
+                    ->fastLoad($result)
                     ->setNew(false)
                     ->setPerPage($this->getPerPage())
                     ->setAutoLoadRelations($this->getAutoLoadRelations())

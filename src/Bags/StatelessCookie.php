@@ -54,10 +54,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Load cookies
-     * 
-     * @param array $cookies
-     * @return self
+	 * @inheritDoc
      */
     public function load(array $cookies): self
     {
@@ -109,12 +106,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Pull attribute: Get and delete
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     * @return mixed
+	 * @inheritDoc
      */
     public function pull(string $name, $default = null, $sanitize = false): mixed
     {
@@ -124,11 +116,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Checks if an attribute exists
-     *
-     * @param string $name
-     *
-     * @return bool
+	 * @inheritDoc
      */
     function has(string $name): bool
     {
@@ -136,19 +124,23 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Get all attributes
-     *
-     * @return array<string, CookieDto>
+	 * @inheritDoc
      */
     function all(): array
     {
         return $this->data ?? [];
     }
 
+	/**
+	 * @inheritDoc
+	 */
+	public function slice(int $offset, int $length): array
+	{
+		return array_slice($this->data, $offset, $length);
+	}
+
     /**
-     * Get updated attributes
-     *
-     * @return array<string, CookieDto>
+	 * @inheritDoc
      */
     public function updates(): array
     {
@@ -156,11 +148,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Set bulk attributes
-     *
-     * @param array $data
-     *
-     * @return void
+	 * @inheritDoc
      */
     public function replace(array $data)
     {
@@ -168,7 +156,6 @@ final class StatelessCookie implements StorageBagInterface
             $this->set($name, $cookie);
         }
     }
-
 
     /**
      * @inheritDoc
@@ -188,9 +175,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-     * Number of items in store
-     *
-     * @return int
+	 * @inheritDoc
      */
     public function count(): int
     {

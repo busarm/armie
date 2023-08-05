@@ -23,7 +23,7 @@ class WorkerConfig
      * Number of taks workers to spawn
      */
     public int $taskWorkers = 2;
-    
+
     /**
      * Enable task worker
      */
@@ -31,9 +31,9 @@ class WorkerConfig
 
     /**
      * Event lool type
-     * @var Looper::*
+     * @var Looper
      */
-    public int $looper = Looper::DEFAULT;
+    public Looper $looper = Looper::DEFAULT;
 
     /**
      * Full path to worker's pid file
@@ -78,7 +78,7 @@ class WorkerConfig
      * Set enable task worker
      *
      * @return  self
-     */ 
+     */
     public function setUseTaskWorker($useTaskWorker)
     {
         $this->useTaskWorker = $useTaskWorker;
@@ -89,11 +89,11 @@ class WorkerConfig
     /**
      * Set event lool type
      *
-     * @param  Looper::*  $looper  Event lool type
+     * @param  Looper  $looper  Event lool type
      *
      * @return  self
      */
-    public function setLooper(int $looper)
+    public function setLooper(Looper $looper)
     {
         $this->looper = $looper;
 

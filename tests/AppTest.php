@@ -86,7 +86,7 @@ final class AppTest extends TestCase
     {
         $response = $this->app->run(Route::init()->to(HomeTestController::class, 'ping'));
         $this->assertNotNull($response);
-        $this->assertEquals('success-' . $this->app->env, strval($response->getBody()));
+        $this->assertEquals('success-' . $this->app->env->value, strval($response->getBody()));
     }
 
     /**
@@ -100,7 +100,7 @@ final class AppTest extends TestCase
         $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('success-' . $this->app->env, $response->getBody());
+        $this->assertEquals('success-' . $this->app->env->value, $response->getBody());
     }
 
     /**
@@ -110,8 +110,8 @@ final class AppTest extends TestCase
      */
     public function testAppRunMockHttpView()
     {
-        $this->app->get('pingHtml')->view(TestViewPage::class);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
+        $this->app->get('pingHtml/{name}')->view(TestViewPage::class);
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml/sam', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString("Test View Component", strval($response->getBody()));

@@ -9,10 +9,10 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class ResponseFormat
+enum ResponseFormat: string
 {
-    const JSON  =   'json';
-    const HTML  =   'html';
-    const XML   =   'xml';
-    const BIN   =   'bin';
+    case JSON  =   'json';
+    case HTML  =   'html';
+    case XML   =   'xml';
+    case BIN   =   'bin';
 }

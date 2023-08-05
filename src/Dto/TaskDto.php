@@ -2,7 +2,9 @@
 
 namespace Busarm\PhpMini\Dto;
 
-use function Opis\Closure\serialize;
+use Busarm\PhpMini\Tasks\Task;
+
+use function Busarm\PhpMini\Helpers\serialize;
 
 /**
  * PHP Mini Framework
@@ -20,9 +22,9 @@ class TaskDto
 
     public function __construct()
     {
-        $this->name = 'Task|' . microtime(true);
+        $this->name = Task::class . "::" . uniqid();
     }
-
+    
     /**
      * Gets a string representation of the object
      * @return string Returns the `string` representation of the object.

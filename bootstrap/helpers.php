@@ -4,9 +4,11 @@ namespace Busarm\PhpMini\Helpers;
 
 use Busarm\PhpMini\Async;
 use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Tasks\EventTask;
 use Busarm\PhpMini\Tasks\Task;
+use Closure;
 use Generator;
+use Laravel\SerializableClosure\SerializableClosure;
+use ReflectionObject;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
@@ -548,4 +550,139 @@ function listen(string $event, callable|string $listner)
 function dispatch(string $event, array $data = [])
 {
     app()->eventManager->dispatchEvent($event, $data);
+}
+
+
+/**
+ * Wrap data to be serialized
+ *
+ * @param mixed $data
+ * @return string
+ */
+function wrapSerializable($data)
+{
+    if ($data instanceof Closure) {
+        $data = new SerializableClosure($data);
+    } else if (is_callable($data)) {
+        $data = new SerializableClosure(Closure::fromCallable($data));
+    } else if (is_array($data)) {
+        $data = array_map(function ($value) {
+            return wrapSerializable($value);
+        }, $data);
+    } else if (is_object($data)) {
+        $reflection = new ReflectionObject($data);
+        // do {
+        if ($reflection->isUserDefined()) {
+            foreach ($reflection->getProperties() as $prop) {
+                if (
+                    !$prop->isStatic()
+                    && !$prop->isReadOnly()
+                    && $prop->getDeclaringClass()->isUserDefined()
+                    && $prop->isInitialized($data)
+                ) {
+                    $value = $prop->getValue($data);
+                    if (isset($value)) {
+                        $prop->setValue($data, wrapSerializable($value));
+                    }
+                }
+            }
+        }
+        // } while ($reflection = $reflection->getParentClass());
+    }
+    return $data;
+}
+
+/**
+ * Unwrap data that was unserialized
+ *
+ * @param mixed $data
+ * @return string
+ */
+function unwrapSerializable($data)
+{
+    if ($data instanceof SerializableClosure) {
+        $data = $data->getClosure();
+    } else if (is_array($data)) {
+        $data = array_map(function ($value) {
+            return unwrapSerializable($value);
+        }, $data);
+    } else if (is_object($data)) {
+        $reflection = new ReflectionObject($data);
+        do {
+            if ($reflection->isUserDefined()) {
+                foreach ($reflection->getProperties() as $prop) {
+                    if (
+                        !$prop->isStatic()
+                        && !$prop->isReadOnly()
+                        && $prop->getDeclaringClass()->isUserDefined()
+                        && $prop->isInitialized($data)
+                    ) {
+                        $value = $prop->getValue($data);
+                        if (isset($value)) {
+                            $prop->setValue($data, unwrapSerializable($value));
+                        }
+                    }
+                }
+            } else break;
+        } while ($reflection = $reflection->getParentClass());
+    }
+    return $data;
+}
+
+/**
+ * Serialize
+ *
+ * @param mixed $data
+ * @return string
+ */
+function serialize($data)
+{
+    return \serialize(wrapSerializable($data));
+}
+
+/**
+ * Unserialize
+ *
+ * @param string $data
+ * @param array|null $options
+ * @return mixed
+ */
+function unserialize($data, array $options = [])
+{
+    return unwrapSerializable(\unserialize($data, $options));
+}
+
+/**
+ * Read from stream socket
+ * 
+ * @param resource $socket
+ * @param int $length
+ * @return string
+ */
+function stream_read(mixed $socket, int $length): string
+{
+    $response = "";
+    while (!feof($socket)) {
+        $response .= fread($socket, $length);
+        $stream_meta_data = stream_get_meta_data($socket);
+        if (($stream_meta_data['unread_bytes'] ?? 0) <= 0) break;
+    }
+    return $response;
+}
+
+/**
+ * Write to stream socket
+ * 
+ * @param resource $socket
+ * @param string $data
+ * @param int $length
+ */
+function stream_write(mixed $socket, string $data, int $length)
+{
+    for ($written = 0; $written < strlen($data); $written += $length) {
+        $fwrite = fwrite($socket, substr($data, $written));
+        if ($fwrite === false) {
+            continue;
+        }
+    }
 }

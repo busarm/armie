@@ -22,6 +22,8 @@ interface FieldInterface extends  Stringable
 
     /**
      * Get field type
+     * 
+     * @return string
      */
-    public function getType();
+    public function getType(): string;
 }

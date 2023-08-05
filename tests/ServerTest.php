@@ -72,7 +72,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForRoute()
     {
         $this->server->addRoutePath('v1', __DIR__ . '/TestApp');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/ping'));
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -86,7 +86,7 @@ final class ServerTest extends TestCase
     public function testServerRunHttpForDomain()
     {
         $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/TestApp');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping'));
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }

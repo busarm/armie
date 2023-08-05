@@ -154,9 +154,9 @@ class Config implements ConfigurationInterface
     /**
      * Cookie Same Site Policy
      * 
-     * @var \Busarm\PhpMini\Enums\SameSite::*
+     * @var SameSite
      */
-    public string $cookieSameSite = SameSite::LAX;
+    public SameSite $cookieSameSite = SameSite::LAX;
 
 
     // ------------- SESSION -----------------//
@@ -206,9 +206,9 @@ class Config implements ConfigurationInterface
     /**
      * Cache Limiter
      *
-     * @var \Busarm\PhpMini\Enums\CacheLimiter::*
+     * @var CacheLimiter
      */
-    public string $cacheLimiter = CacheLimiter::NO_CACHE;
+    public CacheLimiter $cacheLimiter = CacheLimiter::NO_CACHE;
 
 
     // ------------- LOG -----------------//
@@ -224,9 +224,9 @@ class Config implements ConfigurationInterface
     /**
      * Logger verbosity
      * 
-     * @var \Busarm\PhpMini\Enums\Verbose::*
+     * @var Verbose
      */
-    public int $loggerVerborsity = Verbose::DEBUG;
+    public Verbose $loggerVerborsity = Verbose::DEBUG;
 
 
     // ------------- SSL -----------------//
@@ -304,8 +304,8 @@ class Config implements ConfigurationInterface
             'cookie_domain' => $this->cookieDomain,
             'cookie_secure' => $this->cookieSecure,
             'cookie_httponly' => $this->cookieHttpOnly,
-            'cookie_samesite' => $this->cookieSameSite,
-            'cache_limiter' => $this->cacheLimiter,
+            'cookie_samesite' => $this->cookieSameSite->value,
+            'cache_limiter' => $this->cacheLimiter->value,
             'save_path' => $this->sessionPath,
             'name' => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)) . '_sess'
         ];
@@ -324,7 +324,7 @@ class Config implements ConfigurationInterface
             'domain' => $this->cookieDomain,
             'secure' => $this->cookieSecure,
             'httponly' => $this->cookieHttpOnly,
-            'samesite' => $this->cookieSameSite,
+            'samesite' => $this->cookieSameSite->value,
         ];
     }
 
@@ -609,11 +609,11 @@ class Config implements ConfigurationInterface
     /**
      * Set cookie Same Site Policy
      *
-     * @param  \Busarm\PhpMini\Enums\SameSite::*  $cookieSameSite  Cookie Same Site Policy
+     * @param  SameSite  $cookieSameSite  Cookie Same Site Policy
      *
      * @return  self
      */
-    public function setCookieSameSite(string $cookieSameSite)
+    public function setCookieSameSite(SameSite $cookieSameSite)
     {
         $this->cookieSameSite = $cookieSameSite;
 
@@ -652,11 +652,11 @@ class Config implements ConfigurationInterface
     /**
      * Set cache Limiter
      *
-     * @param  \Busarm\PhpMini\Enums\CacheLimiter::*  $cacheLimiter  Cache Limiter
+     * @param  CacheLimiter  $cacheLimiter  Cache Limiter
      *
      * @return  self
      */
-    public function setCacheLimiter(string $cacheLimiter)
+    public function setCacheLimiter(CacheLimiter $cacheLimiter)
     {
         $this->cacheLimiter = $cacheLimiter;
 
@@ -680,11 +680,11 @@ class Config implements ConfigurationInterface
     /**
      * Set logger verbosity
      *
-     * @param  \Busarm\PhpMini\Enums\Verbose::*  $loggerVerborsity  Logger verbosity
+     * @param  Verbose  $loggerVerborsity  Logger verbosity
      *
      * @return  self
      */
-    public function setLoggerVerborsity($loggerVerborsity)
+    public function setLoggerVerborsity(Verbose $loggerVerborsity)
     {
         $this->loggerVerborsity = $loggerVerborsity;
 

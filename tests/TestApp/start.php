@@ -43,7 +43,7 @@ $config = (new Config)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
     ->setLogRequest(false)
-    ->setSessionEnabled(false)
+    ->setSessionEnabled(true)
     ->setSessionLifetime(60)
     ->setDb((new PDOConfig)
             ->setConnectionDriver("mysql")
@@ -64,14 +64,18 @@ $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-' . $app->env;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
+$app->get('test/view/{name}')->call(function (RequestInterface $req, string $name) {
+    return new TestViewPage($req, $name);
+});
 $app->get('test/view')->call(function (RequestInterface $req) {
-    return new TestViewPage($req);
+    return new TestViewPage($req, "NO-NAME");
 });
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->cookie()->set("TestCookie", "test", 30);
+
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -274,7 +278,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
         'timeout'  => 10000,
     ]);
     return $http->requestAsync(
-        HttpMethod::GET,
+        HttpMethod::GET->value,
         "https://busarm.com/ping",
         [
             RequestOptions::VERIFY => false
@@ -284,11 +288,14 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
     $req->session()?->set("TestSession", "test");
+    $store = new FileStore($app->config->tempPath . '/files');
+    $store->set("TestSession-File", ["test", $app->env]);
     return [
         'name' => 'v1',
         'enabled' => $app->config->sessionEnabled,
         'session' => $req->session()?->all(),
-        'cookies' => $req->cookie()->all()
+        'cookies' => $req->cookie()->all(),
+        'store' => $store->all()
     ];
 });
 

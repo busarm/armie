@@ -53,7 +53,7 @@ class CorsMiddleware implements MiddlewareInterface
     private function preflight(RequestInterface $request): ResponseInterface|bool
     {
         // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
-        if (strtoupper($request->method()) === HttpMethod::OPTIONS) {
+        if ($request->method() === HttpMethod::OPTIONS) {
             return $this->handle($request);
         }
         return false;
@@ -101,11 +101,11 @@ class CorsMiddleware implements MiddlewareInterface
             $response->setHttpHeader('Access-Control-Expose-Headers', implode(', ', $exposedHeaders));
             $response->setHttpHeader('Access-Control-Allow-Max-Age', $maxAge);
 
-            if (strtoupper($request->method()) === HttpMethod::OPTIONS) {
+            if ($request->method() === HttpMethod::OPTIONS) {
                 $response->setHttpHeader('Cache-Control', "max-age=" . $maxAge);
                 $response->html("Preflight Ok");
             }
-        } elseif (strtoupper($request->method()) === HttpMethod::OPTIONS) {
+        } elseif ($request->method() === HttpMethod::OPTIONS) {
             $response->html("Preflight Ok");
         }
 

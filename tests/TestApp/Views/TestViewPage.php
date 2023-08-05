@@ -13,7 +13,7 @@ use Busarm\PhpMini\View;
  */
 class TestViewPage extends View
 {
-    public function __construct(private RequestInterface $request)
+    public function __construct(private RequestInterface $request, private string $name)
     {
         parent::__construct();
     }
@@ -28,6 +28,7 @@ class TestViewPage extends View
         <html>
             <body>
                 <div>{$header}</div>
+                <div>{$this->name}</div>
                 <div>{$this->request->version()}</div>
                 <div>{$this->request->header()->get('host')}</div>
                 <h2>Test View Page</h2>

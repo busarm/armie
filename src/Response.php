@@ -33,9 +33,9 @@ class Response implements ResponseInterface
     protected $version;
 
     /**
-     * @var string
+     * @var ResponseFormat
      */
-    protected $format = ResponseFormat::JSON;
+    protected ResponseFormat $format = ResponseFormat::JSON;
 
     /**
      * @var int
@@ -185,20 +185,20 @@ class Response implements ResponseInterface
 
     /**
      *
-     * @return string
+     * @return ResponseFormat
      */
-    public function getFormat(): string
+    public function getFormat(): ResponseFormat
     {
         return $this->format;
     }
 
     /**
      *
-     * @param string $format
+     * @param ResponseFormat $format
      *
      * @return self
      */
-    public function setFormat($format = ResponseFormat::JSON): self
+    public function setFormat(ResponseFormat $format = ResponseFormat::JSON): self
     {
         $this->format = $format;
         return $this;

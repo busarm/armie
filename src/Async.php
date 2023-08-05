@@ -3,17 +3,18 @@
 namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Bags\Bag;
+use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Tasks\CallableTask;
 use Busarm\PhpMini\Tasks\Task;
 use Closure;
+use Fiber;
 use Generator;
 use Workerman\Timer;
 
 use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\get_max_upload_size;
-use function Busarm\PhpMini\Helpers\log_error;
-use function Opis\Closure\unserialize;
+use function Busarm\PhpMini\Helpers\stream_read;
+use function Busarm\PhpMini\Helpers\stream_write;
 
 /**
  * Handle async operations
@@ -22,15 +23,17 @@ use function Opis\Closure\unserialize;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * 
- * // TODO Add Coroutine support
  */
 class Async
 {
+    const STREAM_TIMEOUT = 30;
+    const STREAM_READ_WRITE_TIMEOUT = 10;
+    const STREAM_BUFFER_LENGTH = 8192;
     const MAX_RATE_LIMIT = 1000;
 
     /**
      * Buffer store
+     * @var StorageBagInterface<string>
      */
     public static StorageBagInterface|null $buffer = null;
     /**
@@ -46,15 +49,17 @@ class Async
      * Run task
      * 
      * @param Task|callable $task Task instance or Callable function to run
-     * @param bool $wait Run asynchronously or wait for response
+     * @param bool $wait Wait for response or run asynchronously
      */
-    public static function runTask(Task|callable $task, $wait = false): mixed
+    public static function runTask(Task|callable $task, bool $wait = false): mixed
     {
         // Use worker
         if (app()->async && isset(app()->taskWorker)) {
-            $length = get_max_upload_size(8196);
             $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-            return $wait ? self::withWorker($task, $length) : self::withThrottledWorker($task, $length);
+            $body = strval($task->getRequest(true, app()->config->secret));
+            return $wait
+                ? self::withWorker($task->getName(), $body, self::STREAM_BUFFER_LENGTH)
+                : self::withBufferedWorker($task->getName(), $body, self::STREAM_BUFFER_LENGTH);
         }
 
         // Use default
@@ -68,18 +73,34 @@ class Async
      * Run tasks
      * 
      * @param Task[]|callable[] $tasks List of Task instance to run
-     * @param bool $wait Run asynchronously or wait for response
+     * @param bool $wait Wait for response or run asynchronously
      * @return Generator
      */
-    public static function runTasks(array $tasks, $wait = false): Generator
+    public static function runTasks(array $tasks, bool $wait = false): Generator
     {
-
         // Use worker
         if (app()->async && !empty(app()->taskWorker)) {
-            $length = get_max_upload_size(8196);
-            foreach ($tasks as $task) {
-                $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-                yield $wait ? self::withWorker($task, $length) : self::withThrottledWorker($task, $length);
+            // Run with fiber worker
+            if ($wait) {
+                /** @var \Fiber[] */
+                $fibers = [];
+                foreach ($tasks as $task) {
+                    $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+                    $body = strval($task->getRequest(true, app()->config->secret));
+                    $fibers[] = self::withFiberWorker($task->getName(), $body, self::STREAM_BUFFER_LENGTH);
+                }
+                foreach ($fibers as $fiber) {
+                    $fiber->resume();
+                    yield $fiber->getReturn();
+                }
+            }
+            // Run with buffered worker
+            else {
+                foreach ($tasks as $task) {
+                    $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+                    $body = strval($task->getRequest(true, app()->config->secret));
+                    yield self::withBufferedWorker($task->getName(), $body, self::STREAM_BUFFER_LENGTH);
+                }
             }
         }
 
@@ -95,31 +116,35 @@ class Async
     }
 
     /**
-     * Run task using task limitd worker
+     * Run task using task with throttled worker
      * 
-     * @param Task $task Task instance to run
-     * @param int $length Max stream length
+     * @param string $id Task request id
+     * @param string $body Task request body
+     * @param int $length Max stream length in bytes
      * @return null
      */
-    public static function withThrottledWorker(Task $task, int $length): mixed
+    private static function withBufferedWorker(string $id, string $body, int $length): mixed
     {
         // Add to buffer
         self::$buffer = self::$buffer ?? new Bag();
-        self::$buffer->set($task->getName(), $task);
+        self::$buffer->set($id, $body);
 
         // Get rate limit
         $limit = (int) ceil(min(self::$bufferRateLimit, self::MAX_RATE_LIMIT) / 10);
 
         // Start bufferring
         self::$bufferTimer = self::$bufferTimer ?: Timer::add(.1, function ($length, $limit) {
-            $splice = array_slice(self::$buffer->all(), 0, $limit);
-            foreach ($splice as $key => $task) {
-                if (self::withWorker($task, $length, false) !== false) {
+            $tasks = self::$buffer->slice(0, $limit);
+            foreach ($tasks as $key => $task) {
+                print_r("Buffer started - $key \n");
+                if (self::withWorker($key, $task, $length, false) !== false) {
+                    print_r("Buffer finished - $key \n");
                     self::$buffer->remove($key);
                 }
             }
             if (self::$buffer->count() == 0) {
                 Timer::del(self::$bufferTimer);
+                print_r("Buffer completed \n");
                 self::$bufferTimer = null;
             }
         }, [$length, $limit], true);
@@ -128,60 +153,112 @@ class Async
     }
 
     /**
+     * Run task using task worker with fibers
+     * 
+     * @param string $id Task request id
+     * @param string $body Task request body
+     * @param int $length Max stream length in bytes
+     * @return Fiber
+     */
+    private static function withFiberWorker(string $id, string $body, int $length): Fiber
+    {
+        $fiber = new Fiber(function (string $id, string $body, int $length) {
+            $socket = self::connect($id, false, false);
+
+            print_r("Writing request for task $id; socket " . get_resource_id($socket) . PHP_EOL);
+            // Send the data
+            stream_write($socket, $body, $length);
+
+            // Suspend fiber after sending requesst
+            Fiber::suspend();
+
+            print_r("Reading response for task $id; socket " . get_resource_id($socket) . PHP_EOL);
+            // Receive the response.
+            $response = stream_read($socket, $length);
+
+            print_r("Closing socket " . get_resource_id($socket) . " for task $id\n");
+            // Close socket - for non-persistent connection
+            $socket && fclose($socket) && $socket = null;
+
+            print_r("Sending result for task $id \n");
+            // Return response. 
+            return $response ? unserialize($response) : null;
+        });
+
+        // Start running fiber
+        $fiber->start($id, $body, $length);
+
+        return $fiber;
+    }
+
+    /**
      * Run task using task worker
      * 
-     * @param Task $task Task instance to run
-     * @param int $length Max stream length
-     * @param bool $wait Run asynchronously or wait for response
+     * @param string $id Task request id
+     * @param string $body Task request body
+     * @param int $length Max stream length in bytes
+     * @param bool $wait Wait for response or run asynchronously
      * @return mixed `false` if failed
      */
-    public static function withWorker(Task $task, int $length, $wait = true): mixed
+    private static function withWorker(string $id, string $body, int $length, $wait = true): mixed
     {
         static $socket = null;
+        $async = !$wait;
+        $persist = !$async;
 
         // Create connection
         if (!$socket) {
-
-            $address = app()->taskWorker->getSocketName();
-            $flag = $wait
-                ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT
-                : STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
-
-            if (!($socket = stream_socket_client($address, $errorCode, $errorMsg, 30, $flag))) {
-                // Try again in a sec if not async
-                if ($wait) {
-                    log_error(sprintf("Failed to create socket for %s: [%s] %s. Retrying in a sec...", $task->getName(), $errorCode, $errorMsg));
-                    sleep(1);
-                    return self::withWorker($task, $length, $wait);
-                }
+            $socket = self::connect($id, $async, $persist);
+            if ($socket == false) {
                 return false;
             }
-
-            // Set blocking mode
-            stream_set_blocking($socket, $wait);
-
-            // Set buffer sizes
-            stream_set_read_buffer($socket, $length);
-            stream_set_write_buffer($socket, $length);
-
-            // Set read/write timeout
-            stream_set_timeout($socket, 30);
         }
 
+        print_r("Writing request for task $id; socket " . get_resource_id($socket) . PHP_EOL);
         // Send the data
-        $body = strval($task->getRequest(!$wait, app()->config->secret));
-        for ($written = 0; $written < strlen($body); $written += $length) {
-            $fwrite = fwrite($socket, substr($body, $written));
-            if ($fwrite === false) {
-                continue;
-            }
+        stream_write($socket, $body, $length);
+
+        $wait && print_r("Reading response for task $id; socket " . get_resource_id($socket) . PHP_EOL);
+        // Receive the response.
+        $response = $wait ? stream_read($socket, $length) : null;
+
+        !$persist && print_r("Closing socket " . get_resource_id($socket) . " for task $id\n");
+        // Close socket - for non-persistent connection
+        !$persist && $socket && fclose($socket) && $socket = null;
+
+        print_r("Sending result for task $id \n");
+        // Return response. 
+        return $wait && $response ? unserialize($response) : null;
+    }
+
+    /**
+     * Connect to task worker and return connection
+     * 
+     * @param string $id Task request id
+     * @param bool $async Async connection
+     * @param bool $persist Peristent connection
+     * @return resource|false `false` if failed: If $async = true
+     * @throws SystemError If $async = false
+     */
+    private static function connect(string $id, bool $async = false, bool $persist = false): mixed
+    {
+        $address = app()->taskWorker?->getSocketName();
+
+        $flag = !$async
+            ? ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT : STREAM_CLIENT_CONNECT)
+            : ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT : STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT);
+
+        if (!($socket = stream_socket_client($address, $errorCode, $errorMsg, self::STREAM_TIMEOUT, $flag))) {
+            if (!$async) throw new SystemError(sprintf("Failed to connect to %s for %s: [%s] %s.", $address,  $id, $errorCode, $errorMsg));
+            return false;
         }
 
-        // Receive the response.
-        $response = $wait ? fread($socket, $length) : null;
-        // Close socket
-        !$wait && $socket && fclose($socket) && $socket = null;
-        // Yield empty response. 
-        return $wait && $response ? unserialize($response) : null;
+        // Set blocking mode
+        stream_set_blocking($socket, !$async);
+
+        // Set read/write timeout
+        stream_set_timeout($socket, self::STREAM_READ_WRITE_TIMEOUT);
+
+        return $socket;
     }
 }

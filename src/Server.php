@@ -65,7 +65,7 @@ class Server
 
     private Reporter $reporter;
 
-    public function __construct(public string $name, public string $env = Env::LOCAL)
+    public function __construct(public string $name, public Env $env = Env::LOCAL)
     {
         $this->reporter = (new Reporter);
 

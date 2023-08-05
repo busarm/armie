@@ -75,4 +75,9 @@ class ConnectionPool implements SingletonInterface
         }
         return $connection;
     }
+
+    public function __destruct()
+    {
+        self::$pool = [];
+    }
 }

@@ -5,13 +5,14 @@ namespace Busarm\PhpMini\Bags;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Closure;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 
 /**
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @inheritDoc
  */
 class Bag implements StorageBagInterface
 {
@@ -26,40 +27,6 @@ class Bag implements StorageBagInterface
 		foreach (array_keys($this->attributes) as $name) {
 			$this->key($name);
 		}
-	}
-
-	/**
-	 * Mirror attributes with external source
-	 *
-	 * @param array $attributes
-	 * @return self
-	 */
-	public function mirror(&$attributes): self
-	{
-		$this->attributes = &$attributes;
-		$this->original = $this->attributes;
-		$this->keys = [];
-		foreach (array_keys($this->attributes) as $name) {
-			$this->key($name);
-		}
-		return $this;
-	}
-
-	/**
-	 * Load attributes
-	 * 
-	 * @param array $attributes
-	 * @return self
-	 */
-	public function load(array $attributes): self
-	{
-		$this->attributes = $attributes;
-		$this->original = $this->attributes;
-		$this->keys = [];
-		foreach (array_keys($this->attributes) as $name) {
-			$this->key($name);
-		}
-		return $this;
 	}
 
 	/**
@@ -85,25 +52,48 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Set attribute
+	 * Mirror attributes with external source
 	 *
-	 * @param string $name
-	 * @param mixed $value
-	 * @param mixed $options
-	 * @return bool
+	 * @param array $attributes
+	 * @return self
+	 */
+	public function mirror(&$attributes): self
+	{
+		$this->attributes = &$attributes;
+		$this->original = $this->attributes;
+		$this->keys = [];
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
+		return $this;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function load(array $attributes): self
+	{
+		$this->attributes = $attributes;
+		$this->original = $this->attributes;
+		$this->keys = [];
+		foreach (array_keys($this->attributes) as $name) {
+			$this->key($name);
+		}
+		return $this;
+	}
+
+	/**
+	 * @inheritDoc
 	 */
 	public function set(string $name, mixed $value, $options = NULL): bool
 	{
 		$this->attributes[$this->key($name)] = $value;
-		if ($this->onChange) ($this->onChange)($name, $value);
+		if ($this->onChange) call_user_func($this->onChange, $name, $value);
 		return true;
 	}
 
 	/**
-	 * Checks if an attribute exists
-	 *
-	 * @param string $name
-	 * @return bool
+	 * @inheritDoc
 	 */
 	public function has(string $name): bool
 	{
@@ -111,11 +101,7 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Get key exact key for name or set of it doesn't exist
-	 *
-	 * @param string $name Name of key
-	 * @param bool $force Force retrieve key. Don't set if no available
-	 * @return string
+	 * @inheritDoc
 	 */
 	public function key(string $name, $force = false): string
 	{
@@ -128,12 +114,7 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Get attribute
-	 *
-	 * @param string $name
-	 * @param mixed $default
-	 * @param bool $sanitize
-	 * @return mixed
+	 * @inheritDoc
 	 */
 	public function get(string $name, $default = null, $sanitize = false): mixed
 	{
@@ -144,12 +125,7 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Pull attribute: Get and delete
-	 *
-	 * @param string $name
-	 * @param mixed $default
-	 * @param bool $sanitize
-	 * @return mixed
+	 * @inheritDoc
 	 */
 	public function pull(string $name, $default = null, $sanitize = false): mixed
 	{
@@ -159,9 +135,7 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Get all attributes
-	 *
-	 * @return array
+	 * @inheritDoc
 	 */
 	public function all(): array
 	{
@@ -169,9 +143,15 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Get updated attributes
-	 *
-	 * @return array
+	 * @inheritDoc
+	 */
+	public function slice(int $offset, int $length): array
+	{
+		return array_slice($this->attributes, $offset, $length);
+	}
+
+	/**
+	 * @inheritDoc
 	 */
 	public function updates(): array
 	{
@@ -179,10 +159,7 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * Set bulk attributes
-	 *
-	 * @param array $data
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function replace(array $data)
 	{
@@ -191,14 +168,13 @@ class Bag implements StorageBagInterface
 			$this->key($name);
 		}
 
-		if ($this->onChange) foreach ($data as $name => $value) ($this->onChange)($name, $value);
+		if ($this->onChange)
+			foreach ($data as $name => $value)
+				call_user_func($this->onChange, $name, $value);
 	}
 
 	/**
-	 * Remove attribute
-	 *
-	 * @param string $name
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function remove(string $name)
 	{
@@ -206,13 +182,11 @@ class Bag implements StorageBagInterface
 			unset($this->attributes[$this->key($name)]);
 			unset($this->keys[strtolower($name)]);
 		};
-		if ($this->onDelete) ($this->onDelete)($name);
+		if ($this->onDelete) call_user_func($this->onDelete, $name);
 	}
 
 	/**
-	 * Remove all attribute
-	 *
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function clear()
 	{
@@ -220,14 +194,15 @@ class Bag implements StorageBagInterface
 		$this->attributes = [];
 		$this->keys = [];
 
-		if ($this->onDelete) foreach (array_keys($data) as $name) ($this->onDelete)($name);
+		if ($this->onDelete)
+			foreach (array_keys($data) as $name)
+				call_user_func($this->onDelete, $name);
+
 		$data = NULL;
 	}
 
 	/**
-	 * Number of items in store
-	 *
-	 * @return int
+	 * @inheritDoc
 	 */
 	public function count(): int
 	{

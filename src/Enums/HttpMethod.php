@@ -9,13 +9,13 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class HttpMethod
+enum HttpMethod: string
 {
-    const GET       =  "GET";
-    const POST      =  "POST";
-    const PUT       =  "PUT";
-    const PATCH     =  "PATCH";
-    const DELETE    =  "DELETE";
-    const OPTIONS   =  "OPTIONS";
-    const HEAD      =  "HEAD";
+    case GET       =  "GET";
+    case POST      =  "POST";
+    case PUT       =  "PUT";
+    case PATCH     =  "PATCH";
+    case DELETE    =  "DELETE";
+    case OPTIONS   =  "OPTIONS";
+    case HEAD      =  "HEAD";
 }

@@ -90,9 +90,9 @@ class HttpConfig implements ConfigurationInterface
     /**
      * HTPP default response format
      * 
-     * @var \Busarm\PhpMini\Enums\ResponseFormat::*
+     * @var ResponseFormat
      */
-    public string $responseFormat = ResponseFormat::JSON;
+    public ResponseFormat $responseFormat = ResponseFormat::JSON;
 
 
     /**
@@ -210,11 +210,11 @@ class HttpConfig implements ConfigurationInterface
     /**
      * Set HTPP default response format
      *
-     * @param \Busarm\PhpMini\Enums\ResponseFormat::*  $responseFormat  HTPP default response format. `json`|`xml`
+     * @param ResponseFormat  $responseFormat  HTPP default response format. `json`|`xml`
      *
      * @return  self
      */
-    public function setResponseFormat(string $responseFormat)
+    public function setResponseFormat(ResponseFormat $responseFormat)
     {
         $this->responseFormat = $responseFormat;
 

@@ -53,7 +53,7 @@ final class CallableRouteMiddleware implements MiddlewareInterface
             if ($request instanceof RequestInterface) {
                 return $result !== false ?
                     (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->http->responseFormat))->handle() :
-                    throw new NotFoundException("Not found - " . ($request->method() . ' ' . $request->path()));
+                    throw new NotFoundException("Not found - " . ($request->method()->value . ' ' . $request->path()));
             }
             return $result !== false ?
                 (new ResponseHandler(data: $result, format: app()->config->http->responseFormat))->handle() :

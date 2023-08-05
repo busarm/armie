@@ -9,9 +9,9 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class SameSite
+enum SameSite: string
 {
-    const LAX       =   'Lax';
-    const STRICT    =   'Strict';
-    const NONE      =   'None';
+    case LAX       =   'Lax';
+    case STRICT    =   'Strict';
+    case NONE      =   'None';
 }

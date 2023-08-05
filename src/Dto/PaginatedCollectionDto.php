@@ -7,10 +7,11 @@ namespace Busarm\PhpMini\Dto;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @template T
  */
 class PaginatedCollectionDto extends BaseDto
 {
-    /** @var CollectionBaseDto|array */
+    /** @var CollectionBaseDto<T>|array<T> */
     public CollectionBaseDto|array $data = [];
     /** @var int */
     public int $count = 0;

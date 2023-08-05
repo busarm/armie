@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Dto;
 
+use Busarm\PhpMini\Enums\ServiceType;
+
 /**
  * PHP Mini Framework
  *
@@ -12,8 +14,8 @@ class ServiceRequestDto extends BaseDto
 {
     /** @var string Route pathe to resource in service */
     public string|null $route = null;
-    /** @var \Busarm\PhpMini\Enums\ServiceType::* Service resource request type */
-    public string|null $type = null;
+    /** @var ServiceType Service resource request type */
+    public ServiceType|null $type = null;
     /** @var array<string,string> Service params */
     public array $params = [];
     /** @var array<string,string> Service headers */
@@ -37,10 +39,10 @@ class ServiceRequestDto extends BaseDto
     /**
      * Set the value of type
      * 
-     * @param \Busarm\PhpMini\Enums\ServiceType::* $type
+     * @param ServiceType $type
      * @return  self
      */
-    public function setType($type)
+    public function setType(ServiceType $type)
     {
         $this->type = $type;
 

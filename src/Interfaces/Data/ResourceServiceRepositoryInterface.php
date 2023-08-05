@@ -30,7 +30,7 @@ interface ResourceServiceRepositoryInterface
      * Get list of items
      *
      * @param ResourceListRequestDto $dto
-     * @return CollectionBaseDto
+     * @return CollectionBaseDto<BaseDto>
      */
     public function list(ResourceListRequestDto $dto): CollectionBaseDto;
 
@@ -38,7 +38,7 @@ interface ResourceServiceRepositoryInterface
      * Get paginated list of items
      * 
      * @param ResourcePaginatedListRequestDto $dto
-     * @return PaginatedCollectionDto
+     * @return PaginatedCollectionDto<BaseDto>
      */
     public function paginatedList(ResourcePaginatedListRequestDto $dto): PaginatedCollectionDto;
 

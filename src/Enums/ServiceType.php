@@ -9,10 +9,10 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class ServiceType
+enum ServiceType: string
 {
-    const CREATE    =  "CREATE";
-    const READ      =  "READ";
-    const UPDATE    =  "UPDATE";
-    const DELETE    =  "DELETE";
+    case CREATE    =  "CREATE";
+    case READ      =  "READ";
+    case UPDATE    =  "UPDATE";
+    case DELETE    =  "DELETE";
 }

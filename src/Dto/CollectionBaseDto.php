@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini\Dto;
 
-use ArrayIterator;
 use ArrayObject;
 use InvalidArgumentException;
 use OutOfRangeException;
@@ -65,8 +64,13 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         // Append each item so to validate it's type.
         foreach ($input as $key => $value) {
             // Validate Item type if available
-            if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
-                throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
+            if (!empty($this->itemClass)) {
+                if (is_subclass_of($this->itemClass, BaseDto::class) && !($value instanceof BaseDto) && is_array($value)) {
+                    $value = $this->itemClass::with($value);
+                }
+                if (!($value instanceof ($this->itemClass))) {
+                    throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
+                }
             }
             $this[$key] = $sanitize ? Security::clean($value) : $value;
         }

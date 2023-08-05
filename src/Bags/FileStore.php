@@ -4,9 +4,9 @@ namespace Busarm\PhpMini\Bags;
 
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Generator;
 
-use function Opis\Closure\serialize;
-use function Opis\Closure\unserialize;
+use function Busarm\PhpMini\Helpers\async;
 
 /**
  * Store simple plain data (string, array, object) as file
@@ -15,6 +15,7 @@ use function Opis\Closure\unserialize;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @inheritDoc
  */
 class FileStore implements StorageBagInterface
 {
@@ -29,10 +30,7 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Load list of data into store
-	 * 
-	 * @param array<string,array|object|string> $data
-	 * @return self
+	 * @inheritDoc
 	 */
 	public function load(array $data): self
 	{
@@ -45,42 +43,7 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Set file
-	 *
-	 * @param string $path
-	 * @param mixed $data
-	 * @param bool $sanitize
-	 * @return bool
-	 */
-	public function set(string $path, mixed $data, $sanitize = true): bool
-	{
-		if (is_string($data) || is_array($data) || is_object($data)) {
-			if ($data && !is_null($serialized = serialize(
-				$sanitize ? Security::clean($data) : $data
-			))) {
-				$data = $serialized;
-			}
-
-			$path = $this->fullPath($path);
-			$dir = \dirname($path);
-
-			// Directory not available
-			if (!\is_dir($dir)) {
-				mkdir($dir, 0755, true);
-			}
-
-			// TODO Use async stream
-			return \file_put_contents($path, $data);
-		}
-		return false;
-	}
-
-	/**
-	 * 
-	 * Checks if an file exists
-	 *
-	 * @param string $path
-	 * @return boolean
+	 * @inheritDoc
 	 */
 	public function has(string $path): bool
 	{
@@ -88,32 +51,54 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Get file
-	 *
-	 * @param string $path
-	 * @param mixed $default
-	 * @param bool $sanitize
-	 * @return mixed
+	 * @inheritDoc
+	 */
+	public function set(string $path, mixed $data, $sanitize = true): bool
+	{
+		if (is_string($data) || is_array($data) || is_object($data)) {
+
+			$path = $this->fullPath($path);
+			$dir = \dirname($path);
+
+			async(function () use ($path, $dir, $data, $sanitize) {
+				if ($data && !is_null($serialized = serialize(
+					$sanitize ? Security::clean($data) : $data
+				))) {
+					$data = $serialized;
+				}
+				// Directory not available
+				if (!\is_dir($dir)) {
+					mkdir($dir, 0755, true);
+				}
+				return \file_put_contents($path, $data);
+			});
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @inheritDoc
 	 */
 	public function get(string $path, $default = null, $sanitize = false): mixed
 	{
 		if ($this->has($path)) {
-			$data = \file_get_contents($this->fullPath($path));
+
+			$path = $this->fullPath($path);
+
+			$data = \file_get_contents($path);
 			if ($data && !is_null($parsed = unserialize($data))) {
 				$data = $parsed;
 			}
+
 			return $sanitize ? Security::clean($data) : $data;
 		}
 		return $default;
 	}
 
 	/**
-	 * Pull file: Get and delete
-	 *
-	 * @param string $path
-	 * @param mixed $default
-	 * @param bool $sanitize
-	 * @return mixed
+	 * @inheritDoc
 	 */
 	public function pull(string $path, $default = null, $sanitize = false): mixed
 	{
@@ -123,23 +108,38 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Get all files
-	 *
-	 * @return array
+	 * @inheritDoc
 	 */
 	public function all(): array
 	{
 		$list = [];
-		foreach ($this->listFiles($this->basePath) as $path) {
+		foreach ($this->getFiles($this->basePath) as $path) {
 			$list[$path] = $this->get($path);
 		}
 		return $list;
 	}
 
 	/**
-	 * Get updated files
-	 *
-	 * @return array
+	 * @inheritDoc
+	 */
+	public function slice(int $offset, int $length): array
+	{
+		$index = 0;
+		$count = 0;
+		$list = [];
+		foreach ($this->getFiles($this->basePath) as $path) {
+			if ($index >= $offset) {
+				$list[$path] = $this->get($path);
+				$count++;
+				if ($count == $length) break;
+			}
+			$index++;
+		}
+		return $list;
+	}
+
+	/**
+	 * @inheritDoc
 	 */
 	public function updates(): array
 	{
@@ -156,10 +156,7 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Replace files in store with given list
-	 *
-	 * @param array<string,array|object|string> $data
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function replace(array $data)
 	{
@@ -168,10 +165,7 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Remove file
-	 *
-	 * @param string $path
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function remove(string $path)
 	{
@@ -181,26 +175,22 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Remove all file
-	 *
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function clear()
 	{
-		foreach ($this->listFiles($this->basePath) as $path) {
+		foreach ($this->getFiles($this->basePath) as $path) {
 			\unlink($path);
 		}
 	}
 
-    /**
-     * Number of items in store
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->all());
-    }
+	/**
+	 * @inheritDoc
+	 */
+	public function count(): int
+	{
+		return iterator_count($this->getFiles($this->basePath));
+	}
 
 	/**
 	 * 
@@ -230,28 +220,21 @@ class FileStore implements StorageBagInterface
 	}
 
 	/**
-	 * Lst all files in directory
+	 * Get list of files in directory
 	 *
 	 * @param string $dir
-	 * @return array
+	 * @return Generator<string>
 	 */
-	private function listFiles(string $dir): array
+	private function getFiles(string $dir): Generator
 	{
-		$list = [];
-		if (\is_dir($dir)) {
-			$items = array_diff(\scandir($dir), ['.', '..']);
-			foreach ($items as $item) {
-				if ($this->isStorePath($item)) {
-					$item = $dir . DIRECTORY_SEPARATOR . $item;
-					if (is_dir($item)) {
-						$list = array_merge($list, $this->listFiles($item));
-					} else {
-						$list[] = $item;
-					}
+		if (is_dir($dir)) {
+			foreach (new \DirectoryIterator($dir) as $path) {
+				if (!$path->isDot() && !$path->isDir()) {
+					yield $dir . DIRECTORY_SEPARATOR . $path->getFilename();
 				}
 			}
 		}
-		return $list;
+		return null;
 	}
 
 	/**

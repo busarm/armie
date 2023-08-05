@@ -11,35 +11,35 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class Looper
+enum Looper
 {
     /**
      * Default eventloop using `stream_select` and `pcntl_fork`
      */
-    const DEFAULT   =   1;
+    case DEFAULT;
     /**
      * Ev eventloop
      * Ensure `ev` extension is installed. E.g pecl install ev
      */
-    const EV        =   2;
+    case EV;
     /**
      * Libevent eventloop
      * Ensure `event` extension is installed. E.g pecl install event
      */
-    const EVENT     =   3;
+    case EVENT;
     /**
      * Swoole eventloop
      * Ensure `swoole` extension is installed. E.g pecl install swoole
      */
-    const SWOOLE    =   4;
+    case SWOOLE;
     /**
      * Lbbuv eventloop
      * Ensure `uv` extension is installed. E.g sudo apt-get install libuv1.dev for Ubuntu
      */
-    const UV        =   5;
+    case UV;
     /**
      * React eventloop
      * Ensure `react/event-loop` package is installed. E.g react/event-loop
      */
-    const REACT     =   6;
+    case REACT;
 }

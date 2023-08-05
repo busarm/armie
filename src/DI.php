@@ -172,7 +172,7 @@ class DI
         // Add conditon if something is leftout.
         // This is to ensure that the type is an existing class.
         $name = strval($type);
-        return $name != Closure::class && !is_callable($name) && class_exists($name);
+        return $name != Closure::class && $name != 'callable' && class_exists($name);
     }
 
     /**

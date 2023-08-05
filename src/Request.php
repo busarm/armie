@@ -56,7 +56,7 @@ class Request implements RequestInterface
     protected string|null $_baseUrl         =   NULL;
     protected string|null $_path            =   NULL;
     protected string|null $_currentUrl      =   NULL;
-    protected string|null $_method          =   NULL;
+    protected HttpMethod|null $_method      =   NULL;
     protected string|null $_contentType     =   NULL;
     protected string|null $_protocol        =   NULL;
     protected mixed $_content               =   NUll;
@@ -93,11 +93,11 @@ class Request implements RequestInterface
      * Create request object using custom URL
      *
      * @param string $url
-     * @param HttpMethod::* $method
+     * @param HttpMethod $method
      * @param Config|null $config
      * @return self
      */
-    public static function fromUrl(string $url, string $method = HttpMethod::GET, Config|null $config = null): self
+    public static function fromUrl(string $url, HttpMethod $method = HttpMethod::GET, Config|null $config = null): self
     {
         if ($validUrl = filter_var($url, FILTER_VALIDATE_URL)) {
             $uri = new Uri($validUrl);
@@ -301,21 +301,21 @@ class Request implements RequestInterface
                 $this->_headers ? $this->_headers->all() : []
             ));
             $this->_contentType  = $this->_contentType ?: $this->_server->get('CONTENT_TYPE', '');
-            $this->_method       = $this->_method ?: $this->_server->get('REQUEST_METHOD', HttpMethod::GET);
+            $this->_method       = $this->_method ?: ($this->_server->get('REQUEST_METHOD') ? HttpMethod::tryFrom($this->_server->get('REQUEST_METHOD')) : HttpMethod::GET);
             $this->_protocol     = $this->_protocol ?: $this->getServerPotocol();
 
             // Load request body
             if (
                 (!$this->_request || empty($this->_request->all())) &&
                 0 === strpos($this->_contentType, 'application/x-www-form-urlencoded') &&
-                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
+                in_array($this->_method, array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 parse_str($this->getContent(), $data);
                 $this->_request = new Bag($data);
             } else if (
                 (!$this->_request || empty($this->_request->all())) &&
                 0 === strpos($this->_contentType, 'application/json') &&
-                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
+                in_array($this->_method, array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 $data = json_decode($this->getContent(), true);
                 $this->_request = new Bag($data);
@@ -619,9 +619,9 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return HttpMethod
      */
-    public function method()
+    public function method(): HttpMethod
     {
         return $this->_method;
     }
@@ -859,7 +859,7 @@ class Request implements RequestInterface
     function toPsr(): ServerRequestInterface
     {
         $request = $this->_psr ?? (new \Nyholm\Psr7\ServerRequest(
-            $this->_method,
+            $this->_method->value,
             (new Uri($this->_currentUrl))->withQuery(strval($this->_query)),
             $this->_headers ? $this->_headers->all() : [],
             $this->_content ?: strval($this->_request),

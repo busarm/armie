@@ -10,13 +10,14 @@ use Stringable;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
+ * @template T
  */
 interface StorageBagInterface extends Stringable
 {
     /**
      * Load attributes from external source
      * 
-     * @param array $attributes
+     * @param array<string, T> $attributes
      * @return self
      */
     public function load(array $attributes): self;
@@ -24,7 +25,7 @@ interface StorageBagInterface extends Stringable
      * Set attribute
      *
      * @param string $name
-     * @param mixed $value
+     * @param T $value
      * @param mixed $options
      * @return bool
      */
@@ -41,36 +42,42 @@ interface StorageBagInterface extends Stringable
      * Get attribute
      *
      * @param string $name
-     * @param mixed $default
+     * @param T $default
      * @param bool $sanitize
-     * @return mixed
+     * @return T|null
      */
     public function get(string $name, $default = null, $sanitize = false): mixed;
     /**
      * Pull attribute: Get and delete
      *
      * @param string $name
-     * @param mixed $default
+     * @param T $default
      * @param bool $sanitize
-     * @return mixed
+     * @return T|null
      */
     public function pull(string $name, $default = null, $sanitize = false): mixed;
     /**
      * Get all attributes
      *
-     * @return array
+     * @return array<string, T>
      */
     public function all(): array;
     /**
+     * Get slice of attributes
+     *
+     * @return array<string, T>
+     */
+    public function slice(int $from, int $to): array;
+    /**
      * Get updated attributes
      *
-     * @return array
+     * @return array<string, T>
      */
     public function updates(): array;
     /**
      * Set bulk attributes
      *
-     * @param array $data
+     * @param array<string, T> $data
      * @return void
      */
     public function replace(array $data);

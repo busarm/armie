@@ -7,7 +7,6 @@ use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Response;
-use Generator;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -21,7 +20,7 @@ use Traversable;
  */
 final class ResponseHandler implements ResponseHandlerInterface
 {
-    public function __construct(private mixed $data, private $version = '1.1', private $format = ResponseFormat::JSON)
+    public function __construct(private mixed $data, private $version = '1.1', private ResponseFormat $format = ResponseFormat::JSON)
     {
     }
 

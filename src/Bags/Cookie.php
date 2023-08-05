@@ -11,6 +11,7 @@ use Busarm\PhpMini\Interfaces\StorageBagInterface;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
+ * @inheritDoc
  */
 final class Cookie implements StorageBagInterface
 {
@@ -47,10 +48,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Load cookies
-     * 
-     * @param array $cookies
-     * @return self
+     * @inheritDoc
      */
     public function load(array $cookies): self
     {
@@ -106,12 +104,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Pull attribute: Get and delete
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     * @return mixed
+     * @inheritDoc
      */
     public function pull(string $name, $default = null, $sanitize = false): mixed
     {
@@ -121,11 +114,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Checks if an attribute exists
-     *
-     * @param string $name
-     *
-     * @return bool
+     * @inheritDoc
      */
     function has(string $name): bool
     {
@@ -133,9 +122,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Get all attributes
-     *
-     * @return array
+     * @inheritDoc
      */
     function all(): array
     {
@@ -143,9 +130,15 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Get updated attributes
-     *
-     * @return array
+     * @inheritDoc
+     */
+    public function slice(int $offset, int $length): array
+    {
+        return array_slice($_COOKIE, $offset, $length);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function updates(): array
     {
@@ -153,11 +146,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Set bulk attributes
-     *
-     * @param array $data
-     *
-     * @return void
+     * @inheritDoc
      */
     public function replace(array $data)
     {
@@ -186,9 +175,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Number of items in store
-     *
-     * @return int
+     * @inheritDoc
      */
     public function count(): int
     {

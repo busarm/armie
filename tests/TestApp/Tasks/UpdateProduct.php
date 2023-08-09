@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Test\TestApp\Tasks;
 
+use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Tasks\Task;
 use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
 

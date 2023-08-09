@@ -48,6 +48,13 @@ class Router implements RouterInterface
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
 
+    /**
+     * [RESTRICTED]
+     */
+    public function __serialize()
+    {
+        throw new SystemError("Serializing router instance is forbidden");
+    }
 
     /**
      * @param HttpMethod $method

@@ -7,8 +7,6 @@ use Busarm\PhpMini\Data\PDO\Reference;
 use Busarm\PhpMini\Data\PDO\Relation;
 use Busarm\PhpMini\Enums\DataType;
 
-use function Busarm\PhpMini\Helpers\is_list;
-
 /**
  * PHP Mini Framework
  *
@@ -114,7 +112,7 @@ class OneToOne extends Relation
         if (empty($data)) return false;
 
         // Is multiple values - select last, as 1:1 relation only supports single item
-        if (is_list($data)) {
+        if (array_is_list($data)) {
             $data = $data[count($data) - 1];
         }
 

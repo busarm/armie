@@ -71,7 +71,7 @@ class Server
 
         // Set up error handler
         set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
-            $this->reporter->reportError("Internal Server Error", $errstr, $errfile, $errline);
+            $this->reporter->error("Internal Server Error", $errstr, $errfile, $errline);
             (new Response())
                 ->setParameters(
                     (new ResponseDto)
@@ -84,7 +84,7 @@ class Server
                 )->send();
         });
         set_exception_handler(function (Throwable $e) {
-            $this->reporter->reportException($e);
+            $this->reporter->exception($e);
             $trace = array_map(function ($instance) {
                 return (new ErrorTraceDto($instance));
             }, $e->getTrace());
@@ -100,6 +100,14 @@ class Server
                         ->toArray()
                 )->send();
         });
+    }
+
+    /**
+     * [RESTRICTED]
+     */
+    public function __serialize()
+    {
+        throw new SystemError("Serializing server instance is forbidden");
     }
 
     /**

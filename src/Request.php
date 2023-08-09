@@ -72,6 +72,13 @@ class Request implements RequestInterface
     protected AuthResolver|null $_auth                  =   null;
     protected ServerConnectionResolver|null $_connection     =   null;
 
+    /**
+     * [RESTRICTED]
+     */
+    public function __serialize()
+    {
+        throw new SystemError("Serializing request instance is forbidden");
+    }
 
     /**
      * Capture server request or create using Globals
@@ -391,9 +398,9 @@ class Request implements RequestInterface
     {
         if (!empty($this->_server->get('HTTPS')) && strtolower($this->_server->get('HTTPS')) !== 'off') {
             return TRUE;
-        } elseif (!empty($this->_server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->_server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
+        } else if (!empty($this->_server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->_server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
             return TRUE;
-        } elseif (!empty($this->_server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->_server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
+        } else if (!empty($this->_server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->_server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
             return TRUE;
         }
         return FALSE;
@@ -457,7 +464,7 @@ class Request implements RequestInterface
         if ($type == 'ipv4') {
             // Validates IPV4
             $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-        } elseif ($type == 'ipv6') {
+        } else if ($type == 'ipv6') {
             // Validates IPV6
             $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
         } else {
@@ -487,7 +494,7 @@ class Request implements RequestInterface
                 $headers[substr($key, 5)] = $value;
             }
             // CONTENT_* are not prefixed with HTTP_
-            elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
+            else if (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
                 $headers[$key] = $value;
             }
         }
@@ -511,9 +518,9 @@ class Request implements RequestInterface
             $authorizationHeader = null;
             if (isset($server['HTTP_AUTHORIZATION'])) {
                 $authorizationHeader = $server['HTTP_AUTHORIZATION'];
-            } elseif (isset($server['REDIRECT_HTTP_AUTHORIZATION'])) {
+            } else if (isset($server['REDIRECT_HTTP_AUTHORIZATION'])) {
                 $authorizationHeader = $server['REDIRECT_HTTP_AUTHORIZATION'];
-            } elseif (function_exists('apache_request_headers')) {
+            } else if (function_exists('apache_request_headers')) {
                 $requestHeaders = (array) apache_request_headers();
 
                 // Server-side fix for bug in old Android versions (a nice side-effect of this fix means we don't care about capitalization for Authorization)

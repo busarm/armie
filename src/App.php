@@ -60,6 +60,7 @@ use Workerman\Protocols\Http\Request as HttpRequest;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
 use Workerman\Worker;
 
+use function Busarm\PhpMini\Helpers\error_level;
 use function Busarm\PhpMini\Helpers\is_cli;
 use function Busarm\PhpMini\Helpers\serialize;
 use function Busarm\PhpMini\Helpers\unserialize;
@@ -241,6 +242,14 @@ class App implements HttpServerInterface, ContainerInterface
 
     /**
      * [RESTRICTED]
+     */
+    function __serialize()
+    {
+        throw new SystemError("Serializing app instance is forbidden");
+    }
+
+    /**
+     * [RESTRICTED]
      *
      * @param mixed $key
      * @param mixed $val
@@ -326,20 +335,24 @@ class App implements HttpServerInterface, ContainerInterface
     /**
      * Set up error handlers
      */
-    protected function setUpErrorHandlers()
+    public function setUpErrorHandlers()
     {
-        set_error_handler(function (int $severity, string $message, string $file, int $line) {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
-        }, E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_CORE_WARNING | E_COMPILE_WARNING | E_USER_WARNING | E_NOTICE | E_STRICT);
-
         set_exception_handler(function (Throwable $e) {
+            $this->reporter->leaveCrumbs("meta", ['type' => 'exception', 'env' => $this->env->value]);
             if ($e instanceof HttpException) {
                 $response = $e->handler($this);
                 !$this->isCli && !$this->async && $response->send($this->config->http->sendAndContinue);
             } else {
-                $this->reporter->reportException($e);
+                $this->reporter->exception($e);
+                !$this->isCli && !$this->async && Response::error(500, $e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine())->send($this->config->http->sendAndContinue);
             }
         });
+
+        set_error_handler(function (int $severity, string $message, string $file, ?int $line) {
+            $this->reporter->leaveCrumbs("meta", ['type' => 'error', 'severity' => error_level($severity), 'env' => $this->env->value]);
+            $this->reporter->exception(new \ErrorException($message, 0, $severity, $file, $line));
+            !$this->isCli && !$this->async && Response::error(500, $message, 0, $file, $line)->send($this->config->http->sendAndContinue);
+        }, E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_STRICT);
     }
 
     /**
@@ -571,7 +584,7 @@ class App implements HttpServerInterface, ContainerInterface
             return $e->handler($this);
         } catch (Throwable $e) {
             if ($this->async) throw $e;
-            $this->reporter->reportException($e);
+            $this->reporter->exception($e);
             return (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500);
         }
     }
@@ -599,7 +612,7 @@ class App implements HttpServerInterface, ContainerInterface
         // Leave logs for tracing
         if ($this->config->logRequest && $request instanceof RequestInterface) {
             $this->logger->debug(sprintf("Request started: id = %s, correlationId = %s, time = %s", $request->requestId(), $request->correlationId(), $startTime));
-            $this->reporter->reportInfo([
+            $this->reporter->info([
                 'time' => $startTime,
                 'requestId' => $request->requestId(),
                 'correlationId' => $request->correlationId(),
@@ -692,13 +705,13 @@ class App implements HttpServerInterface, ContainerInterface
 
         // Init Worker
         $this->worker = new Worker($ssl ? 'https://' : 'http://' . $host . ':' . $port, $context);
-        $this->worker->name = $this->config->name . ' v' . $this->config->version;
+        $this->worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
         $this->worker->count = $workers;
 
         if ($ssl) $this->worker->transport = 'ssl';
 
         $this->worker->onWorkerStart = function (Worker $worker) {
-            $this->logger->debug(sprintf("Worker %s process %s started", $worker->name, $worker->id));
+            $this->logger->debug(sprintf("%s process %s started", $worker->name, $worker->id));
 
             // Add Custom Middlewares
             $this->addMiddleware(new StatelessCookieMiddleware($this->config));
@@ -722,7 +735,7 @@ class App implements HttpServerInterface, ContainerInterface
                     $response = $this->run(Request::fromWorkerman($request, $this->config));
                     return $connection->send($response->toWorkerman());
                 } catch (Throwable $e) {
-                    $this->reporter->reportException($e);
+                    $this->reporter->exception($e);
                     $response = (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500);
                     return $connection->send($response->toWorkerman());
                 }
@@ -730,7 +743,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;
-            $this->logger->debug(sprintf("Worker %s process %s stopped", $worker->name, $worker->id));
+            $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
 
             // Unregister distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
@@ -739,7 +752,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onConnect = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to worker process %s via %s:%s started", $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+                &&  $this->logger->debug(sprintf("Connection to %s process %s from %s:%s started", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
 
             $this->reporter->leaveCrumbs("worker", [
                 'name' => $connection->worker->name,
@@ -755,10 +768,10 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onClose = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to worker process %s via %s:%s closed", $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+                &&  $this->logger->debug(sprintf("Connection to %s process %s from %s:%s closed", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
         };
         $this->worker->onError = function ($error) {
-            $this->logger->error(sprintf("Worker error: %s", strval($error)));
+            $this->logger->error(sprintf("%s error: %s", $this->worker->name, strval($error)));
         };
     }
 
@@ -770,18 +783,26 @@ class App implements HttpServerInterface, ContainerInterface
     private function setUpTaskWorker(int $workers)
     {
         $this->taskWorker = new Worker('unix:///' . $this->config->tempPath . DIRECTORY_SEPARATOR . 'task_worker.sock');
-        $this->taskWorker->name = 'Task worker';
+        $this->taskWorker->name = '[Task] ' . $this->config->name . ' v' . $this->config->version;
         $this->taskWorker->transport = 'unix';
         $this->taskWorker->count = $workers;
 
         $this->taskWorker->onWorkerStart = function (Worker $worker) {
-            $this->logger->debug(sprintf("%s process %s started", $worker->name, $worker->id));
+            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
+
+            // Set status
+            $this->status = AppStatus::RUNNNIG;
+            $this->startTimeMs = floor(microtime(true) * 1000);
 
             // Add message handler
             $worker->onMessage = function (TcpConnection $connection, $data) {
                 try {
                     $dto = unserialize($data);
-                    if ($dto instanceof TaskDto && $dto->key && $dto->key === $this->config->secret) {
+                    if (
+                        $dto instanceof TaskDto
+                        && $dto->key
+                        && $dto->key === $this->config->secret
+                    ) {
                         if (
                             $dto->class
                             && class_exists($dto->class)
@@ -791,7 +812,7 @@ class App implements HttpServerInterface, ContainerInterface
                             if ($task instanceof Task) {
                                 // Run task
                                 if ($dto->async) {
-                                    $connection->send(null);
+                                    $connection->close();
                                     return $task->run();
                                 } else {
                                     $result = $task->run();
@@ -804,12 +825,19 @@ class App implements HttpServerInterface, ContainerInterface
                         throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
                     }
                 } catch (Throwable $e) {
-                    $this->reporter->reportException($e);
-                    return $connection->send(null);
+                    $this->reporter->exception($e);
+                    $connection->close();
                 }
             };
         };
+        $this->taskWorker->onWorkerStop = function (Worker $worker) {
+            $this->status = AppStatus::STOPPED;
+            $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
+        };
         $this->taskWorker->onConnect = function (TcpConnection $connection) {
+            $this->config->logRequest
+                &&  $this->logger->debug(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
+
             $this->reporter->leaveCrumbs("worker", [
                 'name' => $connection->worker->name,
                 'id' => $connection->worker->id,
@@ -822,8 +850,12 @@ class App implements HttpServerInterface, ContainerInterface
                 'remoteAddress' => $connection->getRemoteAddress(),
             ]);
         };
-        $this->taskWorker->onWorkerStop = function (Worker $worker) {
-            $this->logger->debug(sprintf("%s process %s stopped", $worker->name, $worker->id));
+        $this->taskWorker->onClose = function (TcpConnection $connection) {
+            $this->config->logRequest
+                &&  $this->logger->debug(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
+        };
+        $this->taskWorker->onError = function ($error) {
+            $this->logger->error(sprintf("%s error: %s", $this->taskWorker->name, strval($error)));
         };
     }
 
@@ -916,64 +948,6 @@ class App implements HttpServerInterface, ContainerInterface
     #################
     # Utils & Extras
     #################
-
-    /**
-     * Show Message
-     * @param int $status Status Code
-     * @param string $message Message
-     * @param string $errorCode 
-     * @param int $errorLine 
-     * @param string $errorFile 
-     * @param array $errorTrace 
-     * @return void
-     */
-    public function showMessage(
-        $status,
-        string|null $message = null,
-        string|null $errorCode = null,
-        int|null $errorLine = null,
-        string|null $errorFile = null,
-        array $errorTrace = []
-    ) {
-        if ($this->isCli) {
-            if ($status >= 200 && $status <= 299) {
-                $this->logger->info(
-                    sprintf(
-                        "\nmessage\t-\t%s\nversion\t-\t%s",
-                        $message,
-                        $this->config->version
-                    )
-                );
-            } else {
-                $this->logger->error(
-                    sprintf(
-                        "\nmessage\t-\t%s\ncode\t-\t%s\nversion\t-\t%s\npath\t-\t%s:%s",
-                        $message,
-                        $errorCode,
-                        $this->config->version,
-                        $errorFile,
-                        $errorLine
-                    )
-                );
-            }
-        } else {
-            $response = new ResponseDto();
-            $response->success = $status == 200 || $status == 201;
-            $response->message = $message;
-            $response->env = $this->env->value;
-            $response->version = $this->config->version;
-
-            // Show more info if not production
-            if (!$response->success && $this->env !== Env::PROD) {
-                $response->errorCode = !empty($errorCode) ? $errorCode : null;
-                $response->errorLine = !empty($errorLine) ? $errorLine : null;
-                $response->errorFile = !empty($errorFile) ? $errorFile : null;
-                $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
-            }
-
-            (new Response)->json($response->toArray(), ($status >= 100 && $status < 600) ? $status : 500)->send($this->config->http->sendAndContinue);
-        }
-    }
 
     /**
      * Instantiate class with dependencies

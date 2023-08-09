@@ -7,7 +7,7 @@ use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Traits\CustomConfig;
 
 /**
- * Application Configuration
+ * HTTP Configuration
  * 
  * PHP Mini Framework
  *

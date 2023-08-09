@@ -9,8 +9,6 @@ use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\DataType;
 use Busarm\PhpMini\Interfaces\Data\ModelInterface;
 
-use function Busarm\PhpMini\Helpers\is_list;
-
 /**
  * PHP Mini Framework
  *
@@ -191,7 +189,7 @@ class ManyToMany extends Relation
         if (empty($data)) return false;
 
         // Is multiple values
-        if (is_list($data)) {
+        if (array_is_list($data)) {
             return $this->getReferenceModel()->transaction(function () use ($data) {
                 $done = true;
                 foreach ($data as $item) {

@@ -6,7 +6,7 @@ use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Traits\CustomConfig;
 
 /**
- * Application Configuration
+ * Database Configuration
  * 
  * PHP Mini Framework
  *

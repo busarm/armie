@@ -4,13 +4,13 @@ namespace Busarm\PhpMini\Data\PDO;
 
 use Busarm\PhpMini\Data\PDO\Connection;
 use Busarm\PhpMini\Helpers\StringableDateTime;
-
+use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\Data\ModelInterface;
 use Busarm\PhpMini\Traits\PropertyLoader;
 use Busarm\PhpMini\Traits\TypeResolver;
+use JsonSerializable;
 
 use function Busarm\PhpMini\Helpers\dispatch;
-use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework
@@ -18,7 +18,7 @@ use function Busarm\PhpMini\Helpers\is_list;
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-abstract class Model implements ModelInterface
+abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 {
     use TypeResolver;
 
@@ -88,7 +88,7 @@ abstract class Model implements ModelInterface
     public function __sleep()
     {
         return array_merge(
-            array_keys($this->fields()),
+            array_keys($this->defaultFields()),
             $this->__defaultExcluded(),
             [
                 'requestedRelations', 'loadedRelations', 'autoLoadRelations',
@@ -672,7 +672,7 @@ abstract class Model implements ModelInterface
      */
     public function eagerLoadRelations(array $items): array
     {
-        $relsIsList = is_list($this->requestedRelations);
+        $relsIsList = array_is_list($this->requestedRelations);
         foreach ($this->getRelations() as &$relation) {
             if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
                 // Trigger callback if available
@@ -694,7 +694,7 @@ abstract class Model implements ModelInterface
      */
     public function loadRelations(): self
     {
-        $relsIsList = is_list($this->requestedRelations);
+        $relsIsList = array_is_list($this->requestedRelations);
         foreach ($this->getRelations() as &$relation) {
             if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
                 // Trigger callback if available
@@ -742,11 +742,11 @@ abstract class Model implements ModelInterface
     public function mergeColumnsRelations(array $columns): array
     {
         if ($this->autoLoadRelations) {
-            return array_unique([...(is_list($columns) ? $columns : array_keys($columns)), ...$this->getRelationNames()]);
+            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->getRelationNames()]);
         } else if (!empty($this->loadedRelations)) {
-            return array_unique([...(is_list($columns) ? $columns : array_keys($columns)), ...$this->loadedRelations]);
+            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->loadedRelations]);
         }
-        return is_list($columns) ? $columns : array_keys($columns);
+        return array_is_list($columns) ? $columns : array_keys($columns);
     }
 
     /**
@@ -844,7 +844,7 @@ abstract class Model implements ModelInterface
         if (!empty($conditions)) {
 
             // List type ([a,b,c])
-            if (is_list($conditions)) {
+            if (array_is_list($conditions)) {
                 foreach ($conditions as $cond) {
                     if (is_array($cond)) {
                         $result = $parseArray($result, $cond);
@@ -858,7 +858,7 @@ abstract class Model implements ModelInterface
                 foreach ($conditions as $key => $cond) {
                     if (is_array($cond)) {
                         // List type ([key => [a,b,c]])
-                        if (is_list($cond)) {
+                        if (array_is_list($cond)) {
                             $result = $parseArrayList($result, $key, $cond);
                         }
                         // Key value type (['AND/OR' => [a=>1, b=>2, c=>3]])

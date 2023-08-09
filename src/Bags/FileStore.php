@@ -2,11 +2,14 @@
 
 namespace Busarm\PhpMini\Bags;
 
+use Busarm\PhpMini\Crypto;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Generator;
 
 use function Busarm\PhpMini\Helpers\async;
+use function Busarm\PhpMini\Helpers\serialize;
+use function Busarm\PhpMini\Helpers\unserialize;
 
 /**
  * Store simple plain data (string, array, object) as file
@@ -24,8 +27,10 @@ class FileStore implements StorageBagInterface
 
 	/**
 	 * @param string $basePath Storage root folder
+	 * @param string $key Secret key for encryption. Ignore to disable encryption
+	 * @param bool $async Use async file store. Default: true
 	 */
-	public function __construct(private string $basePath)
+	public function __construct(private string $basePath, private $key = null, private bool $async = true)
 	{
 	}
 
@@ -58,20 +63,31 @@ class FileStore implements StorageBagInterface
 		if (is_string($data) || is_array($data) || is_object($data)) {
 
 			$path = $this->fullPath($path);
-			$dir = \dirname($path);
+			$key = $this->key;
 
-			async(function () use ($path, $dir, $data, $sanitize) {
-				if ($data && !is_null($serialized = serialize(
-					$sanitize ? Security::clean($data) : $data
-				))) {
-					$data = $serialized;
-				}
+			$fn = function () use ($key, $path, $data, $sanitize) {
+				$dir = \dirname($path);
+
 				// Directory not available
 				if (!\is_dir($dir)) {
 					mkdir($dir, 0755, true);
 				}
+
+				// 1. Sanitize
+				$data = $sanitize ? Security::clean($data) : $data;
+				// 2. Serialize
+				if ($data && !is_null($serialized = serialize($data))) {
+					$data = $serialized;
+				}
+				// 3. Encrypt
+				$data = !empty($key) ? Crypto::encrypt($data, $key) : $data;
+
 				return \file_put_contents($path, $data);
-			});
+			};
+
+			if ($this->async) {
+				async($fn);
+			} else return $fn();
 
 			return true;
 		}
@@ -88,11 +104,17 @@ class FileStore implements StorageBagInterface
 			$path = $this->fullPath($path);
 
 			$data = \file_get_contents($path);
+
+			// 1. Decrypt
+			$data = !empty($this->key) ? Crypto::decrypt($data, $this->key) : $data;
+			// 2. Unserialize
 			if ($data && !is_null($parsed = unserialize($data))) {
 				$data = $parsed;
 			}
+			// 3. Sanitize
+			$data = $sanitize ? Security::clean($data) : $data;
 
-			return $sanitize ? Security::clean($data) : $data;
+			return $data;
 		}
 		return $default;
 	}
@@ -201,9 +223,7 @@ class FileStore implements StorageBagInterface
 	 */
 	private function fullPath(string $path): string
 	{
-		$path = $this->isStorePath($path) ?
-			sha1(str_ireplace(self::STORAGE_EXT, '', $path)) . self::STORAGE_EXT :
-			sha1($path) . self::STORAGE_EXT;
+		$path = $this->isStorePath($path) ? $path : sha1($path) . self::STORAGE_EXT;
 		return (str_starts_with($path, $this->basePath) ? $path : $this->basePath . DIRECTORY_SEPARATOR . $path);
 	}
 

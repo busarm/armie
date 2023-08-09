@@ -47,12 +47,20 @@ class Reporter implements ReportingInterface
     }
 
     /**
+     * Get bread crumbs
+     */
+    public function getBreadCrumbs()
+    {
+        return $this->breadCrumbs;
+    }
+
+    /**
      * Report Info
      *
      * @param array $data
      * @return void
      */
-    public function reportInfo(array $data)
+    public function info(array $data)
     {
         log_debug($this->toString($this->redact($data)));
     }
@@ -66,10 +74,11 @@ class Reporter implements ReportingInterface
      * @param int $line
      * @return void
      */
-    public function reportError(string $heading, string $message, string|null $file = null, int|null $line = null)
+    public function error(string $heading, string $message, string|null $file = null, int|null $line = null)
     {
-        $contexts = [];
-        if ($file) $contexts[] = $file . ':' . ($line ?? 0);
+        $contexts = array_map(function ($instance) {
+            return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
+        }, array_merge([['file' => $file, 'line' => $line]], debug_backtrace()));
         log_error($message);
         log_debug($this->toString([
             'crumbs' => $this->redact($this->breadCrumbs),
@@ -83,11 +92,11 @@ class Reporter implements ReportingInterface
      * @param \Throwable $exception
      * @return void
      */
-    public function reportException(\Throwable $exception)
+    public function exception(\Throwable $exception)
     {
         $contexts = array_map(function ($instance) {
             return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
-        }, $exception->getTrace());
+        }, array_merge([['file' => $exception->getFile(), 'line' => $exception->getLine()]], $exception->getTrace()));
         log_exception($exception);
         log_debug($this->toString([
             'crumbs' => $this->redact($this->breadCrumbs),

@@ -87,11 +87,11 @@ class CorsMiddleware implements MiddlewareInterface
             }
             // Allow only certain domains access
             // If the origin domain is in the allowed cors origins list, then add the Access Control header
-            elseif (is_array($allowedOrigins) && in_array($origin, $allowedOrigins)) {
+            else if (is_array($allowedOrigins) && in_array($origin, $allowedOrigins)) {
                 $response->setHttpHeader('Access-Control-Allow-Origin', $origin);
             }
             // Reject request if not from same origin host
-            elseif ($origin != $request->domain()) {
+            else if ($origin != $request->domain()) {
                 $response->html("Unauthorized", 401);
                 return $response;
             }
@@ -105,7 +105,7 @@ class CorsMiddleware implements MiddlewareInterface
                 $response->setHttpHeader('Cache-Control', "max-age=" . $maxAge);
                 $response->html("Preflight Ok");
             }
-        } elseif ($request->method() === HttpMethod::OPTIONS) {
+        } else if ($request->method() === HttpMethod::OPTIONS) {
             $response->html("Preflight Ok");
         }
 

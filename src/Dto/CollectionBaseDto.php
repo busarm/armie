@@ -12,8 +12,6 @@ use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Traits\TypeResolver;
 
-use function Busarm\PhpMini\Helpers\is_list;
-
 /**
  * PHP Mini Framework
  *
@@ -451,16 +449,16 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto
                         if (in_array(BaseDto::class, class_parents($this->itemClass) ?: [])) {
-                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
+                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
                         }
                         // Item class is a custom class
                         else {
-                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
+                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
                         }
                     }
                     // Item class not provided - load with custom data
                     else {
-                        $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
+                        $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
                     }
                 } else {
                     $value = $this->resolveType($this->findType($item), $item);

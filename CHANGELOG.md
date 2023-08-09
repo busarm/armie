@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1]
+
+### Added
+
+- Use PHP 8.1 Enums
+- Added Fibers support for await list
+- Added Buffer support for async
+- Added support for Promises
+
 ## [1.6.0]
 
 ### Added

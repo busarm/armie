@@ -12,6 +12,7 @@ use Busarm\PhpMini\Interfaces\Runnable;
  *
  * @copyright busarm.com
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @template T
  */
 abstract class Task implements Runnable
 {
@@ -59,4 +60,9 @@ abstract class Task implements Runnable
    * Get task params - Params passed into task's constructor
    */
   abstract function getParams(): array;
+
+  /**
+   * @return T
+   */
+  abstract public function run(): mixed;
 }

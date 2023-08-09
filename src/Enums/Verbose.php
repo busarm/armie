@@ -9,11 +9,11 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class Verbose
+enum Verbose
 {
-    const QUIET         =   0;
-    const NORMAL        =   1;
-    const VERBOSE       =   2;
-    const VERY_VERBOSE  =   3;
-    const DEBUG         =   4;
+    case QUIET;
+    case NORMAL;
+    case VERBOSE;
+    case VERY_VERBOSE;
+    case DEBUG;
 }

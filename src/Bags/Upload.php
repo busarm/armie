@@ -2,9 +2,7 @@
 
 namespace Busarm\PhpMini\Bags;
 
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use Busarm\PhpMini\Interfaces\UploadBagInterface;
-use Closure;
 
 /**
  * PHP Mini Framework

@@ -2,13 +2,14 @@
 
 namespace Busarm\PhpMini\Service;
 
+use Busarm\PhpMini\Bags\Bag;
 use Busarm\PhpMini\Dto\ServiceRegistryDto;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
 use Busarm\PhpMini\Interfaces\ServiceClientInterface;
 use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
+use Busarm\PhpMini\Interfaces\StorageBagInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
 /**
@@ -22,9 +23,9 @@ use GuzzleHttp\RequestOptions;
 class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterface, ServiceDiscoveryInterface
 {
     /**
-     * @param array<string,ServiceRegistryDto> $services
+     * @var StorageBagInterface<ServiceRegistryDto>
      */
-    protected array $registry = [];
+    protected ?StorageBagInterface $registry = null;
 
     protected bool $registered = false;
 
@@ -41,6 +42,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
      */
     public function __construct(private RemoteClient $client, private string $endpoint, private $ttl = 300, private $timeout = 10)
     {
+        $this->registry = new Bag();
     }
 
     /**
@@ -50,9 +52,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     {
         if ($name == $this->client->getName()) return null;
 
-        /** @var ServiceRegistryDto|null */
-        $service = $this->registry[$name] ?? null;
-
+        $service = $this->registry->get($name);
         if (!empty($service)) {
             if (($service->expiresAt > time())) {
                 return $service;
@@ -60,21 +60,20 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                 $http = new Client([
                     'timeout'  => $this->timeout,
                 ]);
-                $http->requestAsync(
-                    HttpMethod::GET,
+                $response  = $http->request(
+                    HttpMethod::GET->value,
                     $this->endpoint . "/$name",
                     [
                         RequestOptions::VERIFY => false
                     ]
-                )->then(
-                    function (Response $response) {
-                        if ($response && $response->getStatusCode() == 200 && !empty($result = json_decode($response->getBody(), true))) {
-                            if (isset($result['name']) && isset($result['url'])) {
-                                return $this->registry[$result['name']] = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
-                            }
-                        }
+                );
+                if ($response->getStatusCode() == 200 && !empty($result = json_decode($response->getBody(), true))) {
+                    if (isset($result['name']) && isset($result['url'])) {
+                        $service = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
+                        $this->registry->set($result['name'], new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl));
+                        return $service;
                     }
-                )->wait();
+                }
             }
         }
 
@@ -89,8 +88,8 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
         $http = new Client([
             'timeout'  => $this->timeout,
         ]);
-        $http->requestAsync(
-            HttpMethod::POST,
+        $response = $http->request(
+            HttpMethod::POST->value,
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false,
@@ -99,9 +98,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                     'url' => $this->client->getLocation()
                 ]
             ]
-        )->then(function () {
+        );
+        if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
             $this->registered = true;
-        });
+        }
     }
 
     /**
@@ -112,8 +112,8 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
         $http = new Client([
             'timeout'  => $this->timeout,
         ]);
-        $http->requestAsync(
-            HttpMethod::DELETE,
+        $response = $http->request(
+            HttpMethod::DELETE->value,
             $this->endpoint . "/" . $this->client->getName(),
             [
                 RequestOptions::VERIFY => false,
@@ -121,9 +121,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                     'url' => $this->client->getLocation()
                 ]
             ]
-        )->then(function () {
+        );
+        if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
             $this->registered = false;
-        });
+        }
     }
 
     /**
@@ -151,7 +152,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                 $service = $this->get($service->name);
                 return new RemoteClient($service->name, $service->url);
             },
-            $this->registry
+            $this->registry->all()
         );
     }
 

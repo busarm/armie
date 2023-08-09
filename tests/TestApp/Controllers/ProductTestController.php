@@ -39,6 +39,7 @@ class ProductTestController extends ResourceController
 
     public function dbAsync()
     {
-        return await(fn () => $this->repository->findById(2));
+        $repository = $this->repository;
+        return await(fn () => $repository->findById(2));
     }
 }

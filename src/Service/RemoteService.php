@@ -59,13 +59,14 @@ class RemoteService extends BaseService
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
+        $method = match ($dto->type) {
+            ServiceType::CREATE => HttpMethod::POST,
+            ServiceType::UPDATE => HttpMethod::PUT,
+            ServiceType::DELETE => HttpMethod::DELETE,
+            default   => HttpMethod::GET,
+        };
         return $client->requestAsync(
-            match ($dto->type) {
-                ServiceType::CREATE => HttpMethod::POST,
-                ServiceType::UPDATE => HttpMethod::PUT,
-                ServiceType::DELETE => HttpMethod::DELETE,
-                default   => HttpMethod::GET,
-            },
+            $method->value,
             $uri,
             $dto->type == ServiceType::READ ?
                 [
@@ -120,13 +121,14 @@ class RemoteService extends BaseService
             $client = new Client([
                 'timeout'  => $timeout,
             ]);
+            $method = match ($dto->type) {
+                ServiceType::CREATE => HttpMethod::POST,
+                ServiceType::UPDATE => HttpMethod::PUT,
+                ServiceType::DELETE => HttpMethod::DELETE,
+                default   => HttpMethod::GET,
+            };
             $client->requestAsync(
-                match ($dto->type) {
-                    ServiceType::CREATE => HttpMethod::POST,
-                    ServiceType::UPDATE => HttpMethod::PUT,
-                    ServiceType::DELETE => HttpMethod::DELETE,
-                    default   => HttpMethod::GET,
-                },
+                $method->value,
                 $uri,
                 $dto->type == ServiceType::READ ?
                     [

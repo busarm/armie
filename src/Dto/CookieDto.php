@@ -12,7 +12,6 @@ use Busarm\PhpMini\Enums\SameSite;
  */
 class CookieDto extends BaseDto
 {
-
     /** @var string */
     public string $name;
     /** @var string|array */
@@ -21,8 +20,8 @@ class CookieDto extends BaseDto
     public string|null $domain;
     /** @var string */
     public string|null $path;
-    /** @var SameSite::*|string */
-    public string|null $samesite = SameSite::LAX;
+    /** @var string */
+    public string|null $samesite;
     /** @var int */
     public int $expires = 0;
     /** @var bool */
@@ -48,7 +47,7 @@ class CookieDto extends BaseDto
         $this->value = $value;
         $this->domain = $options['domain'] ?? '';
         $this->path = $options['path'] ?? '';
-        $this->samesite = $options['samesite'] ?? '';
+        $this->samesite = $options['samesite'] ?? SameSite::LAX->name;
         $this->expires = intval($options['expires'] ?? 0);
         $this->secure = boolval($options['secure'] ?? false);
         $this->httponly = boolval($options['httponly'] ?? false);
@@ -81,7 +80,7 @@ class CookieDto extends BaseDto
     /**
      * Set the value of samesite
      *
-     * @param SameSite::* $samesite
+     * @param string $samesite
      * @return  self
      */
     public function setSamesite(string $samesite)

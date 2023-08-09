@@ -112,7 +112,7 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
             'timeout'  => $this->timeout,
         ]);
         $client->requestAsync(
-            HttpMethod::GET,
+            HttpMethod::GET->value,
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false

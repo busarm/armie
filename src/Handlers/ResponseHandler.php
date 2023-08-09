@@ -7,7 +7,6 @@ use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
 use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
 use Busarm\PhpMini\Response;
-use Generator;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -21,7 +20,7 @@ use Traversable;
  */
 final class ResponseHandler implements ResponseHandlerInterface
 {
-    public function __construct(private mixed $data, private $version = '1.1', private $format = ResponseFormat::JSON)
+    public function __construct(private mixed $data, private $version = '1.1', private ResponseFormat $format = ResponseFormat::JSON)
     {
     }
 
@@ -30,22 +29,22 @@ final class ResponseHandler implements ResponseHandlerInterface
         if ($this->data !== false) {
             if ($this->data instanceof ResponseInterface) {
                 $response = $this->data;
+            } else if ($this->data instanceof MessageResponseInterface) {
+                $response = Response::fromPsr($this->data);
+            } else if ($this->data instanceof ResponseHandlerInterface) {
+                $response = $this->data->handle();
             } else {
                 $response = new Response(statusCode: 200, version: $this->version, format: $this->format);
                 if ($this->data !== null) {
-                    if ($this->data instanceof MessageResponseInterface) {
-                        $response = Response::fromPsr($this->data);
-                    } elseif ($this->data instanceof ResponseHandlerInterface) {
-                        $response = $this->data->handle();
-                    } elseif ($this->data instanceof StreamInterface) {
+                    if ($this->data instanceof StreamInterface) {
                         $response->setBody($this->data);
-                    } elseif ($this->data instanceof Traversable) {
+                    } else if ($this->data instanceof Traversable) {
                         $response->setBody(json_encode(iterator_to_array($this->data)));
-                    } elseif ($this->data instanceof Arrayable) {
+                    } else if ($this->data instanceof Arrayable) {
                         $response->setParameters($this->data->toArray());
-                    } elseif (is_array($this->data) || is_object($this->data)) {
+                    } else if (is_array($this->data) || is_object($this->data)) {
                         $response->setBody(Stream::create(json_encode($this->data)));
-                    } elseif ($this->data !== true) {
+                    } else if ($this->data !== true) {
                         $response->html(Stream::create($this->data), 200);
                     }
                 }

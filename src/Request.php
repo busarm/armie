@@ -56,7 +56,7 @@ class Request implements RequestInterface
     protected string|null $_baseUrl         =   NULL;
     protected string|null $_path            =   NULL;
     protected string|null $_currentUrl      =   NULL;
-    protected string|null $_method          =   NULL;
+    protected HttpMethod|null $_method      =   NULL;
     protected string|null $_contentType     =   NULL;
     protected string|null $_protocol        =   NULL;
     protected mixed $_content               =   NUll;
@@ -72,6 +72,13 @@ class Request implements RequestInterface
     protected AuthResolver|null $_auth                  =   null;
     protected ServerConnectionResolver|null $_connection     =   null;
 
+    /**
+     * [RESTRICTED]
+     */
+    public function __serialize()
+    {
+        throw new SystemError("Serializing request instance is forbidden");
+    }
 
     /**
      * Capture server request or create using Globals
@@ -93,11 +100,11 @@ class Request implements RequestInterface
      * Create request object using custom URL
      *
      * @param string $url
-     * @param HttpMethod::* $method
+     * @param HttpMethod $method
      * @param Config|null $config
      * @return self
      */
-    public static function fromUrl(string $url, string $method = HttpMethod::GET, Config|null $config = null): self
+    public static function fromUrl(string $url, HttpMethod $method = HttpMethod::GET, Config|null $config = null): self
     {
         if ($validUrl = filter_var($url, FILTER_VALIDATE_URL)) {
             $uri = new Uri($validUrl);
@@ -301,21 +308,21 @@ class Request implements RequestInterface
                 $this->_headers ? $this->_headers->all() : []
             ));
             $this->_contentType  = $this->_contentType ?: $this->_server->get('CONTENT_TYPE', '');
-            $this->_method       = $this->_method ?: $this->_server->get('REQUEST_METHOD', HttpMethod::GET);
+            $this->_method       = $this->_method ?: ($this->_server->get('REQUEST_METHOD') ? HttpMethod::tryFrom($this->_server->get('REQUEST_METHOD')) : HttpMethod::GET);
             $this->_protocol     = $this->_protocol ?: $this->getServerPotocol();
 
             // Load request body
             if (
                 (!$this->_request || empty($this->_request->all())) &&
                 0 === strpos($this->_contentType, 'application/x-www-form-urlencoded') &&
-                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
+                in_array($this->_method, array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 parse_str($this->getContent(), $data);
                 $this->_request = new Bag($data);
             } else if (
                 (!$this->_request || empty($this->_request->all())) &&
                 0 === strpos($this->_contentType, 'application/json') &&
-                in_array(strtoupper($this->_method), array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
+                in_array($this->_method, array(HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE))
             ) {
                 $data = json_decode($this->getContent(), true);
                 $this->_request = new Bag($data);
@@ -391,9 +398,9 @@ class Request implements RequestInterface
     {
         if (!empty($this->_server->get('HTTPS')) && strtolower($this->_server->get('HTTPS')) !== 'off') {
             return TRUE;
-        } elseif (!empty($this->_server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->_server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
+        } else if (!empty($this->_server->get('HTTP_X_FORWARDED_PROTO')) && strtolower($this->_server->get('HTTP_X_FORWARDED_PROTO')) === 'https') {
             return TRUE;
-        } elseif (!empty($this->_server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->_server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
+        } else if (!empty($this->_server->get('HTTP_FRONT_END_HTTPS')) && strtolower($this->_server->get('HTTP_FRONT_END_HTTPS')) !== 'off') {
             return TRUE;
         }
         return FALSE;
@@ -457,7 +464,7 @@ class Request implements RequestInterface
         if ($type == 'ipv4') {
             // Validates IPV4
             $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-        } elseif ($type == 'ipv6') {
+        } else if ($type == 'ipv6') {
             // Validates IPV6
             $isValid = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
         } else {
@@ -487,7 +494,7 @@ class Request implements RequestInterface
                 $headers[substr($key, 5)] = $value;
             }
             // CONTENT_* are not prefixed with HTTP_
-            elseif (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
+            else if (in_array($key, array('CONTENT_LENGTH', 'CONTENT_MD5', 'CONTENT_TYPE'))) {
                 $headers[$key] = $value;
             }
         }
@@ -511,9 +518,9 @@ class Request implements RequestInterface
             $authorizationHeader = null;
             if (isset($server['HTTP_AUTHORIZATION'])) {
                 $authorizationHeader = $server['HTTP_AUTHORIZATION'];
-            } elseif (isset($server['REDIRECT_HTTP_AUTHORIZATION'])) {
+            } else if (isset($server['REDIRECT_HTTP_AUTHORIZATION'])) {
                 $authorizationHeader = $server['REDIRECT_HTTP_AUTHORIZATION'];
-            } elseif (function_exists('apache_request_headers')) {
+            } else if (function_exists('apache_request_headers')) {
                 $requestHeaders = (array) apache_request_headers();
 
                 // Server-side fix for bug in old Android versions (a nice side-effect of this fix means we don't care about capitalization for Authorization)
@@ -619,9 +626,9 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return HttpMethod
      */
-    public function method()
+    public function method(): HttpMethod
     {
         return $this->_method;
     }
@@ -859,7 +866,7 @@ class Request implements RequestInterface
     function toPsr(): ServerRequestInterface
     {
         $request = $this->_psr ?? (new \Nyholm\Psr7\ServerRequest(
-            $this->_method,
+            $this->_method->value,
             (new Uri($this->_currentUrl))->withQuery(strval($this->_query)),
             $this->_headers ? $this->_headers->all() : [],
             $this->_content ?: strval($this->_request),

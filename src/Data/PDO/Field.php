@@ -2,6 +2,7 @@
 
 namespace Busarm\PhpMini\Data\PDO;
 
+use Busarm\PhpMini\Enums\DataType;
 use Busarm\PhpMini\Interfaces\Data\FieldInterface;
 
 /**
@@ -14,9 +15,9 @@ class Field implements FieldInterface
 {
     /**
      * @param string $name Field name
-     * @param \Busarm\PhpMini\Enums\DataType::* $type Field type
+     * @param DataType $type Field type
      */
-    public function __construct(private string $name, private string $type)
+    public function __construct(private string $name, private DataType $type)
     {
     }
 
@@ -32,10 +33,12 @@ class Field implements FieldInterface
 
     /**
      * Get field type
+     * 
+     * @return string* 
      */
-    public function getType()
+    public function getType(): string
     {
-        return $this->type;
+        return $this->type->value;
     }
 
     /**

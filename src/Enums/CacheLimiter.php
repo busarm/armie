@@ -9,10 +9,10 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class CacheLimiter
+enum CacheLimiter: string
 {
-    const NO_CACHE          =   'nocache';
-    const PUBLIC            =   'public';
-    const PRIVATE           =   'private';
-    const PRIVATE_NO_EXPIRE =   'private_no_expire';
+    case NO_CACHE          =   'nocache';
+    case PUBLIC            =   'public';
+    case PRIVATE           =   'private';
+    case PRIVATE_NO_EXPIRE =   'private_no_expire';
 }

@@ -24,7 +24,11 @@ final class CallableTask extends Task
     public function run(): mixed
     {
         if ($this->callable && is_callable($this->callable)) {
-            return call_user_func($this->callable, $this->data);
+            if (array_is_list($this->data)) {
+                return call_user_func($this->callable, ...$this->data);
+            } else {
+                return call_user_func($this->callable, $this->data);
+            }
         }
         return null;
     }

@@ -60,24 +60,24 @@ trait TypeResolver
     /**
      * Resolve data type
      *
-     * @param ReflectionUnionType|ReflectionNamedType|\ReflectionType|string $type
+     * @param ReflectionUnionType|ReflectionNamedType|\ReflectionType|DataType|string $type
      * @param mixed $data
      * @return mixed - Variable with appropraite type
      */
     protected function resolveType($type, $data)
     {
-        $type = $this->getTypeName($type, $data);
+        $type = $this->getTypeName($type instanceof DataType ? DataType::INTEGER->value : $type, $data);
 
         if ($data !== null) {
             return match ($type) {
-                DataType::INT, DataType::INTEGER => intval($data),
-                DataType::BOOL, DataType::BOOLEAN => boolval($data),
-                DataType::FLOAT => floatval($data),
-                DataType::DOUBLE => doubleval($data),
-                DataType::ARRAY => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : ((array) $data),
-                DataType::OBJECT, DataType::JSON => is_string($data) ? json_decode($data) : (object) $data,
-                DataType::STRING => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
-                DataType::DATETIME, StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
+                DataType::INT->value, DataType::INTEGER->value => intval($data),
+                DataType::BOOL->value, DataType::BOOLEAN->value => boolval($data),
+                DataType::FLOAT->value => floatval($data),
+                DataType::DOUBLE->value => doubleval($data),
+                DataType::ARRAY->value => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : ((array) $data),
+                DataType::OBJECT->value, DataType::JSON->value => is_string($data) ? json_decode($data) : (object) $data,
+                DataType::STRING->value => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
+                DataType::DATETIME->value, StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
                     strval(StringableDateTime::createFromInterface($data)) :
                     strval(new StringableDateTime($data, new DateTimeZone(date_default_timezone_get()))),
                 ArrayObject::class => new ArrayObject(is_string($data) ? json_decode($data, true) : (array) $data),
@@ -93,26 +93,26 @@ trait TypeResolver
      *
      * @param mixed $data
      * @param ReflectionNamedType[] $types
-     * @return \Busarm\PhpMini\Enums\DataType::*|string
+     * @return DataType|string
      */
     protected function findType($data, $types = [])
     {
         $types = array_map(fn ($type) => strval($type), $types);
         if ($data !== null) {
             return match (true) {
-                is_numeric($data) && is_bool($data) && (in_array(DataType::BOOL, $types) || in_array(DataType::BOOLEAN, $types)) => DataType::BOOL,
-                is_numeric($data) && is_double($data) && in_array(DataType::DOUBLE, $types) => DataType::DOUBLE,
-                is_numeric($data) && is_double($data) && in_array(DataType::FLOAT, $types) => DataType::FLOAT,
-                is_numeric($data) && (is_integer($data) || is_int($data)) => DataType::INT,
-                is_bool($data) || $data === 'true' || $data === 'false' => DataType::BOOL,
-                is_double($data) => DataType::DOUBLE,
-                is_float($data) => DataType::FLOAT,
-                is_array($data) => DataType::ARRAY,
-                is_object($data) => DataType::OBJECT,
-                is_string($data) => $this->isDate($data) ? DataType::DATETIME : DataType::STRING,
+                is_numeric($data) && is_bool($data) && (in_array(DataType::BOOL->value, $types) || in_array(DataType::BOOLEAN->value, $types)) => DataType::BOOL,
+                is_numeric($data) && is_double($data) && in_array(DataType::DOUBLE->value, $types) => DataType::DOUBLE->value,
+                is_numeric($data) && is_double($data) && in_array(DataType::FLOAT->value, $types) => DataType::FLOAT->value,
+                is_numeric($data) && (is_integer($data) || is_int($data)) => DataType::INT->value,
+                is_bool($data) || $data === 'true' || $data === 'false' => DataType::BOOL->value,
+                is_double($data) => DataType::DOUBLE->value,
+                is_float($data) => DataType::FLOAT->value,
+                is_array($data) => DataType::ARRAY->value,
+                is_object($data) => DataType::OBJECT->value,
+                is_string($data) => $this->isDate($data) ? DataType::DATETIME->value : DataType::STRING->value,
             };
         }
-        return $types[0] ?? DataType::MIXED;
+        return $types[0] ?? DataType::MIXED->value;
     }
 
     /**

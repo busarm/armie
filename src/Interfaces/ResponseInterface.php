@@ -17,15 +17,15 @@ use Stringable;
 interface ResponseInterface extends Stringable
 {
     /**
-     * @param string $format
+     * @param ResponseFormat $format
      * @return self
      */
-    public function setFormat($format = ResponseFormat::JSON): self;
+    public function setFormat(ResponseFormat $format = ResponseFormat::JSON): self;
 
     /**
-     * @return string
+     * @return ResponseFormat
      */
-    public function getFormat(): string;
+    public function getFormat(): ResponseFormat;
 
     /**
      * @param int $statusCode

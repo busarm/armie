@@ -5,13 +5,9 @@ namespace Busarm\PhpMini\Dto;
 use Busarm\PhpMini\Helpers\Security;
 use ReflectionObject;
 use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Interfaces\Attribute\PropertyAttributeInterface;
 use Busarm\PhpMini\Traits\PropertyLoader;
 use Busarm\PhpMini\Traits\TypeResolver;
-use ReflectionProperty;
 use Stringable;
-
-use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework

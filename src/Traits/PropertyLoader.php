@@ -5,12 +5,11 @@ namespace Busarm\PhpMini\Traits;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Helpers\Security;
+use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Interfaces\Attribute\PropertyAttributeInterface;
 use ReflectionObject;
 use ReflectionProperty;
 use Stringable;
-
-use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * Manage Singletons
@@ -22,29 +21,27 @@ use function Busarm\PhpMini\Helpers\is_list;
  */
 trait PropertyLoader
 {
-
     /**
      * Explicitly selected fields
      *
      * @var array<string>
      */
-    private array $_selected = [];
+    protected array $_selected = [];
 
     /**
      * Update available
      */
-    private bool $_isDirty = false;
-
+    protected bool $_isDirty = false;
 
     /**
      * Load attribute
      */
-    private bool $_loadAttr = true;
+    protected bool $_loadAttr = true;
 
     /**
      * Load property types
      */
-    private bool $_loadTypes = true;
+    protected bool $_loadTypes = true;
 
     /**
      * Get excluded fields from properties 
@@ -52,7 +49,7 @@ trait PropertyLoader
     public function __excluded(): array
     {
         return [
-            '_selected', '_isDirty', '_loadAttr', '_excludedFields'
+            '_selected', '_isDirty', '_loadAttr', '_loadTypes'
         ];
     }
 
@@ -260,8 +257,10 @@ trait PropertyLoader
                         $result[$attr] = $value->toArray($trim, $sanitize);
                     } else if ($value instanceof BaseDto) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
+                    } else if ($value instanceof Arrayable) {
+                        $result[$attr] = $value->toArray($trim);
                     } else if (is_array($value)) {
-                        $result[$attr] = is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
+                        $result[$attr] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
                     } else {
                         $value = $this->resolveType($type ?
                             $this->getTypeName($type) :
@@ -304,8 +303,18 @@ trait PropertyLoader
      * Gets a string representation of the object
      * @return string Returns the `string` representation of the object.
      */
-    public function __toString()
+    function __toString()
     {
         return json_encode($this->toArray());
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * Serializes the object to a value that can be serialized natively by json_encode().
+     * @return mixed Returns data which can be serialized by json_encode(), which is a value of any type other than a resource .
+     */
+    function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 }

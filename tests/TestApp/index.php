@@ -50,7 +50,7 @@ $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-' . $app->env;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {

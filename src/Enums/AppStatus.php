@@ -9,9 +9,9 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class AppStatus
+enum AppStatus
 {
-    const INITIALIZING  =   -1;
-    const RUNNNIG       =   1;
-    const STOPPED       =   0;
+    case INITIALIZING;
+    case RUNNNIG;
+    case STOPPED;
 }

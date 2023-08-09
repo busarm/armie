@@ -12,6 +12,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Interfaces\ProviderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
+use Busarm\PhpMini\Promise;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
 use Busarm\PhpMini\Service\ServiceRegistryProvider;
@@ -43,7 +44,7 @@ $config = (new Config)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
     ->setLogRequest(false)
-    ->setSessionEnabled(false)
+    ->setSessionEnabled(true)
     ->setSessionLifetime(60)
     ->setDb((new PDOConfig)
             ->setConnectionDriver("mysql")
@@ -64,14 +65,18 @@ $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-' . $app->env;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
+$app->get('test/view/{name}')->call(function (RequestInterface $req, string $name) {
+    return new TestViewPage($req, $name);
+});
 $app->get('test/view')->call(function (RequestInterface $req) {
-    return new TestViewPage($req);
+    return new TestViewPage($req, "NO-NAME");
 });
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->cookie()->set("TestCookie", "test", 30);
+
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -84,6 +89,34 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'requestId' => $req->requestId(),
         'correlationId' => $req->correlationId(),
     ];
+});
+
+$app->get('test/promise')->call(function (App $app) {
+    $store = new FileStore($app->config->tempPath . '/files');
+    $result = (new Promise(function (FileStore $store, string $env) {
+        $store->set("TestSession-File", ["test", $env]);
+        print_r("Processing promise file \n");
+        return $store->all();
+    }, $store, $app->env->value))
+        ->then(function ($data) {
+            print_r("Promise Then\n");
+            print_r($data);
+            // print_r(PHP_EOL);
+            throw new \Exception("TEST EX");
+            // return $data;
+        })
+        ->catch(function (Exception $ex) {
+            print_r("Promise Catch \n");
+            print_r($ex->getMessage());
+            print_r(PHP_EOL);
+        })
+        // ->wait()
+        // ->finally(function () {
+        //     print_r("Promise Finally \n");
+        //     print_r(PHP_EOL);
+        // })
+    ;
+    return $result;
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -214,7 +247,7 @@ $app->get('test/async-list')->call(function () {
             log_debug("10 Non-wait async success");
             return $data->at(9);
         })
-    ], true);
+    ], false);
     log_debug("Completed");
     return $res;
 });
@@ -274,7 +307,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
         'timeout'  => 10000,
     ]);
     return $http->requestAsync(
-        HttpMethod::GET,
+        HttpMethod::GET->value,
         "https://busarm.com/ping",
         [
             RequestOptions::VERIFY => false
@@ -284,11 +317,14 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
     $req->session()?->set("TestSession", "test");
+    $store = new FileStore($app->config->tempPath . '/files');
+    $store->set("TestSession-File", ["test", $app->env]);
     return [
         'name' => 'v1',
         'enabled' => $app->config->sessionEnabled,
         'session' => $req->session()?->all(),
-        'cookies' => $req->cookie()->all()
+        'cookies' => $req->cookie()->all(),
+        'store' => $store->all()
     ];
 });
 
@@ -301,6 +337,4 @@ $app->start(
     8181,
     (new WorkerConfig)
         ->setLooper(Looper::SWOOLE)
-        ->setHttpWorkers(8)
-        ->setTaskWorkers(4)
 );

@@ -6,6 +6,7 @@ use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\RouteMatcher;
 use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Exceptions\BadRequestException;
+use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Interfaces\RouterInterface;
@@ -47,13 +48,20 @@ class Router implements RouterInterface
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
 
+    /**
+     * [RESTRICTED]
+     */
+    public function __serialize()
+    {
+        throw new SystemError("Serializing router instance is forbidden");
+    }
 
     /**
-     * @param \Busarm\PhpMini\Enums\HttpMethod::* $method
+     * @param HttpMethod $method
      * @param string $path
      * @return RouteInterface
      */
-    public function createRoute(string $method, string $path): RouteInterface
+    public function createRoute(HttpMethod $method, string $path): RouteInterface
     {
         $route = match ($method) {
             HttpMethod::GET     =>  Route::get($path),
@@ -166,7 +174,7 @@ class Router implements RouterInterface
             foreach ($this->routes as $route) {
                 // Find route
                 if (
-                    strtoupper($route->getMethod()) == strtoupper($request->method()) &&
+                    $route->getMethod() === $request->method() &&
                     ($params = $this->isMatch($request->path(), $route->getPath()))
                 ) {
                     // Set current route
@@ -228,7 +236,7 @@ class Router implements RouterInterface
             if (!empty($paramMatches)) {
                 $params = array_combine($paramMatches, array_splice($matches, 1));
             } else $params = array_splice($matches, 1);
-            return !empty($params) ? $params : true;
+            return !empty($params) ? Security::cleanParams($params) : true;
         }
         return false;
     }

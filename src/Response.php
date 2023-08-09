@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini;
 
+use Busarm\PhpMini\Dto\ResponseDto;
+use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\ResponseFormat;
 use InvalidArgumentException;
 use Busarm\PhpMini\Interfaces\ResponseInterface;
@@ -10,6 +12,8 @@ use Throwable;
 
 use Nyholm\Psr7\Stream;
 use Workerman\Protocols\Http\Response as HttpResponse;
+
+use function Busarm\PhpMini\Helpers\app;
 
 /**
  * HTTP Response Provider
@@ -33,9 +37,9 @@ class Response implements ResponseInterface
     protected $version;
 
     /**
-     * @var string
+     * @var ResponseFormat
      */
-    protected $format = ResponseFormat::JSON;
+    protected ResponseFormat $format = ResponseFormat::JSON;
 
     /**
      * @var int
@@ -185,20 +189,20 @@ class Response implements ResponseInterface
 
     /**
      *
-     * @return string
+     * @return ResponseFormat
      */
-    public function getFormat(): string
+    public function getFormat(): ResponseFormat
     {
         return $this->format;
     }
 
     /**
      *
-     * @param string $format
+     * @param ResponseFormat $format
      *
      * @return self
      */
-    public function setFormat($format = ResponseFormat::JSON): self
+    public function setFormat(ResponseFormat $format = ResponseFormat::JSON): self
     {
         $this->format = $format;
         return $this;
@@ -705,5 +709,38 @@ class Response implements ResponseInterface
     {
         $this->prepare();
         return new HttpResponse($this->getStatusCode(), $this->getHttpHeaders(), $this->getBody());
+    }
+
+
+    #### Helpers ####
+
+
+    /**
+     * Create Error Response
+     */
+    public static function error(
+        $status,
+        string|null $message = null,
+        string|int|null $errorCode = null,
+        string|null $errorFile = null,
+        int|null $errorLine = null,
+        array $errorTrace = []
+    ): self {
+
+        $response = new ResponseDto();
+        $response->success = false;
+        $response->message = $message;
+        $response->env = app()->env->value;
+        $response->version = app()->config->version;
+
+        // Show more info if not production
+        if (!$response->success && app()->env !== Env::PROD) {
+            $response->errorCode = !empty($errorCode) ? strval($errorCode) : null;
+            $response->errorLine = !empty($errorLine) ? $errorLine : null;
+            $response->errorFile = !empty($errorFile) ? $errorFile : null;
+            $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
+        }
+
+        return (new self)->json($response->toArray(), ($status >= 299 && $status <= 599) ? $status : 500);
     }
 }

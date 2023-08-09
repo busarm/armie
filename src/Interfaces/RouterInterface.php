@@ -2,6 +2,8 @@
 
 namespace Busarm\PhpMini\Interfaces;
 
+use Busarm\PhpMini\Enums\HttpMethod;
+
 /**
  * PHP Mini Framework
  *
@@ -12,11 +14,11 @@ namespace Busarm\PhpMini\Interfaces;
 interface RouterInterface
 {
     /**
-     * @param string $method
+     * @param HttpMethod $method
      * @param string $path
      * @return RouteInterface
      */
-    public function createRoute(string $method, string $path): RouteInterface;
+    public function createRoute(HttpMethod $method, string $path): RouteInterface;
 
     /**
      * Add single route

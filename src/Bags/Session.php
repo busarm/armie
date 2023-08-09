@@ -182,10 +182,7 @@ final class Session implements SessionStoreInterface
 
 
     /**
-     * Load attributes from external source
-     * 
-     * @param array $attributes
-     * @return self
+     * @inheritDoc
      */
     public function load(array $attributes): self
     {
@@ -198,12 +195,7 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Pull attribute: Get and delete
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     * @return mixed
+     * @inheritDoc
      */
     public function pull(string $name, $default = null, $sanitize = false): mixed
     {
@@ -213,11 +205,7 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Checks if an attribute exists
-     *
-     * @param string $name
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function has(string $name): bool
     {
@@ -225,12 +213,7 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Get attribute
-     *
-     * @param string $name
-     * @param mixed $default
-     * @param bool $sanitize
-     * @return mixed
+     * @inheritDoc
      */
     public function get(string $name, $default = null, $sanitize = false): mixed
     {
@@ -238,14 +221,9 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Set attribute
-     *
-     * @param string $name
-     * @param mixed $value
-     * @param mixed $options
+     * @inheritDoc
      *
      * @throws SessionError
-     * @return bool
      */
     public function set(string $name, mixed $value, $options = NULL): bool
     {
@@ -257,19 +235,23 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Get all attributes
-     *
-     * @return array
+     * @inheritDoc
      */
     public function all(): array
     {
         return $_SESSION ?? [];
     }
+    
+	/**
+	 * @inheritDoc
+	 */
+	public function slice(int $offset, int $length): array
+	{
+		return array_slice($_SESSION, $offset, $length);
+	}
 
     /**
-     * Get updated attributes
-     *
-     * @return array
+     * @inheritDoc
      */
     public function updates(): array
     {
@@ -277,12 +259,9 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Set bulk attributes
-     *
-     * @param array $data
-     *
+     * @inheritDoc
+     * 
      * @throws SessionError
-     * @return void
      */
     public function replace(array $data)
     {
@@ -292,23 +271,21 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Remove attribute
-     *
-     * @param string $name
+     * @inheritDoc
      * 
      * @throws SessionError
-     * @return void
      */
     public function remove(string $name)
     {
+        $this->throwIfNotStarted();
+
         if ($this->has($name)) unset($_SESSION[$name]);
     }
 
     /**
-     * Remove all attribute
+     * @inheritDoc
      *
      * @throws SessionError
-     * @return void
      */
     public function clear()
     {
@@ -318,9 +295,7 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Number of items in store
-     *
-     * @return int
+     * @inheritDoc
      */
     public function count(): int
     {

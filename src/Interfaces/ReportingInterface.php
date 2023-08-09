@@ -21,12 +21,17 @@ interface ReportingInterface
     public function leaveCrumbs(string $title, array $metadata = []);
 
     /**
+     * Get bread crumbs
+     */
+    public function getBreadCrumbs();
+    
+    /**
      * Report Info
      *
      * @param array $data
      * @return void
      */
-    public function reportInfo(array $data);
+    public function info(array $data);
 
     /**
      * Report Error
@@ -37,7 +42,7 @@ interface ReportingInterface
      * @param int $line
      * @return void
      */
-    public function reportError(string $heading, string $message, string|null $file = null, int|null $line = null);
+    public function error(string $heading, string $message, string|null $file = null, int|null $line = null);
 
     /**
      * Report Exception
@@ -45,7 +50,7 @@ interface ReportingInterface
      * @param \Throwable $exception
      * @return void
      */
-    public function reportException(\Throwable $exception);
+    public function exception(\Throwable $exception);
 
 
     /**

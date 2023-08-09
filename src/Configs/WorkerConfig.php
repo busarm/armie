@@ -3,27 +3,31 @@
 namespace Busarm\PhpMini\Configs;
 
 use Busarm\PhpMini\Enums\Looper;
+use Busarm\PhpMini\Interfaces\ConfigurationInterface;
+use Busarm\PhpMini\Traits\CustomConfig;
 
 /**
- * Application Configuration
+ * Application Worker Configuration
  * 
  * PHP Mini Framework
  *
  * @copyright busarm.com
  * @license s://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  */
-class WorkerConfig
+class WorkerConfig implements ConfigurationInterface
 {
+    use CustomConfig;
+
     /**
      * Number of http workers to spawn
      */
-    public int $httpWorkers = 4;
+    public int $httpWorkers = 2;
 
     /**
      * Number of taks workers to spawn
      */
-    public int $taskWorkers = 2;
-    
+    public int $taskWorkers = 1;
+
     /**
      * Enable task worker
      */
@@ -31,9 +35,9 @@ class WorkerConfig
 
     /**
      * Event lool type
-     * @var Looper::*
+     * @var Looper
      */
-    public int $looper = Looper::DEFAULT;
+    public Looper $looper = Looper::DEFAULT;
 
     /**
      * Full path to worker's pid file
@@ -78,7 +82,7 @@ class WorkerConfig
      * Set enable task worker
      *
      * @return  self
-     */ 
+     */
     public function setUseTaskWorker($useTaskWorker)
     {
         $this->useTaskWorker = $useTaskWorker;
@@ -89,11 +93,11 @@ class WorkerConfig
     /**
      * Set event lool type
      *
-     * @param  Looper::*  $looper  Event lool type
+     * @param  Looper  $looper  Event lool type
      *
      * @return  self
      */
-    public function setLooper(int $looper)
+    public function setLooper(Looper $looper)
     {
         $this->looper = $looper;
 

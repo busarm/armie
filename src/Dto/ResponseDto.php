@@ -41,7 +41,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setSuccess($success)
+    public function setSuccess(bool $success)
     {
         $this->success = $success;
 
@@ -53,7 +53,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setMessage($message)
+    public function setMessage(string $message)
     {
         $this->message = $message;
 
@@ -65,7 +65,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setData($data)
+    public function setData(object|array $data)
     {
         $this->data = $data;
 
@@ -77,7 +77,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setEnv($env)
+    public function setEnv(string $env)
     {
         $this->env = $env;
 
@@ -89,7 +89,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setVersion($version)
+    public function setVersion(string $version)
     {
         $this->version = $version;
 
@@ -101,7 +101,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setDuration($duration)
+    public function setDuration(int $duration)
     {
         $this->duration = $duration;
 
@@ -113,7 +113,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setErrorCode($errorCode)
+    public function setErrorCode(string $errorCode)
     {
         $this->errorCode = $errorCode;
 
@@ -125,7 +125,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setErrorLine($errorLine)
+    public function setErrorLine(int $errorLine)
     {
         $this->errorLine = $errorLine;
 
@@ -137,7 +137,7 @@ class ResponseDto extends BaseDto
      *
      * @return  self
      */
-    public function setErrorFile($errorFile)
+    public function setErrorFile(string $errorFile)
     {
         $this->errorFile = $errorFile;
 
@@ -160,11 +160,11 @@ class ResponseDto extends BaseDto
      * Initialize response dto with throwable
      *
      * @param Throwable $e
-     * @param Env::* $env App environment
+     * @param Env $env App environment
      * @param string $version App version
      * @return self
      */
-    public static function fromError(Throwable $e, $env, string $version): self
+    public static function fromError(Throwable $e, Env $env, string $version): self
     {
 
         $trace = array_map(fn ($instance) => new ErrorTraceDto($instance), $e->getTrace());
@@ -172,7 +172,7 @@ class ResponseDto extends BaseDto
         $response = new ResponseDto();
         $response->success = false;
         $response->message = $e->getMessage();
-        $response->env = $env;
+        $response->env = $env->value;
         $response->version = $version;
 
         // Show more info if not production

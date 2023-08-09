@@ -23,7 +23,7 @@ interface RequestInterface extends ContainerInterface
      * @return string
      */
     public function correlationId();
-    
+
     /**
      * @return string
      */
@@ -70,9 +70,9 @@ interface RequestInterface extends ContainerInterface
     public function segments();
 
     /**
-     * @return HttpMethod::*|string
+     * @return HttpMethod
      */
-    public function method();
+    public function method(): HttpMethod;
 
     /**
      * @return string

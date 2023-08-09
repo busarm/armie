@@ -4,9 +4,12 @@ namespace Busarm\PhpMini\Helpers;
 
 use Busarm\PhpMini\Async;
 use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Tasks\EventTask;
+use Busarm\PhpMini\Promise;
 use Busarm\PhpMini\Tasks\Task;
+use Closure;
 use Generator;
+use Laravel\SerializableClosure\SerializableClosure;
+use ReflectionObject;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
@@ -89,7 +92,7 @@ function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUER
                     $target         = array();
                     $index          = 0;
                 }
-            } elseif (isset($target[$index]) && !is_array($target[$index])) {
+            } else if (isset($target[$index]) && !is_array($target[$index])) {
                 $target[$index] = array($target[$index]);
             }
 
@@ -254,7 +257,11 @@ function log_error(...$message)
  */
 function log_exception($exception)
 {
-    log_message(\Psr\Log\LogLevel::ERROR, $exception->getMessage(), $exception->getTrace());
+    log_message(
+        \Psr\Log\LogLevel::ERROR,
+        sprintf("%s \n(%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
+        $exception->getTrace()
+    );
 }
 
 /**
@@ -381,18 +388,6 @@ function find(callable $fn, array $list): mixed
 }
 
 /**
- * Check if array is a list - [a,b,c] not [a=>1,b=>2,c=>3]
- *
- * @param array $list
- * @return boolean
- */
-function is_list(array $list): bool
-{
-    return array_values($list) === $list;
-}
-
-
-/**
  * Create 'Set-Cookie' header value
  *
  * @param string $name
@@ -496,7 +491,6 @@ function parse_php_size($sSize)
     return (int)$iValue;
 }
 
-
 /**
  * Run task as async  (NON - Blocking)
  * 
@@ -510,11 +504,13 @@ function async(Task|callable $task): mixed
 /**
  * Run task as async and wait for result (Blocking)
  * 
- * @param Task|callable $task
+ * @param Promise<T>|Task<T>|callable():T $task
+ * @return T
+ * @template T
  */
-function await(Task|callable $task): mixed
+function await(Promise|Task|callable $task): mixed
 {
-    return Async::runTask($task, true);
+    return $task instanceof Promise ? $task->wait() : Async::runTask($task, true);
 }
 
 /**
@@ -548,4 +544,194 @@ function listen(string $event, callable|string $listner)
 function dispatch(string $event, array $data = [])
 {
     app()->eventManager->dispatchEvent($event, $data);
+}
+
+
+/**
+ * Wrap data to be serialized
+ *
+ * @param mixed $data
+ * @return mixed
+ */
+function wrapSerializable($data)
+{
+    if ($data instanceof Closure) {
+        $data = new SerializableClosure($data);
+    } else if (is_callable($data)) {
+        $data = new SerializableClosure(Closure::fromCallable($data));
+    } else if (is_array($data)) {
+        $data = array_map(function ($value) {
+            return wrapSerializable($value);
+        }, $data);
+    } else if (is_object($data)) {
+        $reflection = new ReflectionObject($data);
+        do {
+            if ($reflection->isUserDefined()) {
+                foreach ($reflection->getProperties() as $prop) {
+                    if (
+                        !$prop->isStatic()
+                        && !$prop->isReadOnly()
+                        && $prop->getDeclaringClass()->isUserDefined()
+                        && $prop->isInitialized($data)
+                    ) {
+                        $value = $prop->getValue($data);
+                        if (isset($value)) {
+                            $prop->setValue($data, wrapSerializable($value));
+                        }
+                    }
+                }
+            }
+        } while ($reflection = $reflection->getParentClass());
+    }
+    return $data;
+}
+
+/**
+ * Unwrap data that was unserialized
+ *
+ * @param mixed $data
+ * @return mixed
+ */
+function unwrapSerializable($data)
+{
+    if ($data instanceof SerializableClosure) {
+        $data = $data->getClosure();
+    } else if (is_array($data)) {
+        $data = array_map(function ($value) {
+            return unwrapSerializable($value);
+        }, $data);
+    } else if (is_object($data)) {
+        $reflection = new ReflectionObject($data);
+        do {
+            if ($reflection->isUserDefined()) {
+                foreach ($reflection->getProperties() as $prop) {
+                    if (
+                        !$prop->isStatic()
+                        && !$prop->isReadOnly()
+                        && $prop->getDeclaringClass()->isUserDefined()
+                        && $prop->isInitialized($data)
+                    ) {
+                        $value = $prop->getValue($data);
+                        if (isset($value)) {
+                            $prop->setValue($data, unwrapSerializable($value));
+                        }
+                    }
+                }
+            } else break;
+        } while ($reflection = $reflection->getParentClass());
+    }
+    return $data;
+}
+
+/**
+ * Serialize
+ *
+ * @param mixed $data
+ * @return string
+ */
+function serialize($data)
+{
+    return \serialize(wrapSerializable($data));
+}
+
+/**
+ * Unserialize
+ *
+ * @param string $data
+ * @param array|null $options
+ * @return mixed
+ */
+function unserialize($data, array $options = [])
+{
+    return unwrapSerializable(\unserialize($data, $options));
+}
+
+/**
+ * Read from stream
+ * 
+ * @param resource $resource
+ * @param int $length
+ * @return string
+ */
+function stream_read(mixed $resource, int $length): string
+{
+    $response = "";
+    while (!feof($resource)) {
+        $response .= fread($resource, $length);
+        $stream_meta_data = stream_get_meta_data($resource);
+        if (($stream_meta_data['unread_bytes'] ?? 0) <= 0) break;
+    }
+    return $response;
+}
+
+/**
+ * Write to stream
+ * 
+ * @param resource $resource
+ * @param string $data
+ * @param int $length
+ */
+function stream_write(mixed $resource, string $data, int $length)
+{
+    $fwrite = $length;
+    for ($written = 0; $written < strlen($data); $written += $fwrite) {
+        $fwrite = fwrite($resource, substr($data, $written));
+        if ($fwrite === false) {
+            return;
+        }
+    }
+}
+
+/**
+ * Get text for error level
+ */
+function error_level(int $level): string
+{
+    switch ($level) {
+        case E_ERROR: // 1 //
+            return 'E_ERROR';
+
+        case E_WARNING: // 2 //
+            return 'E_WARNING';
+
+        case E_PARSE: // 4 //
+            return 'E_PARSE';
+
+        case E_NOTICE: // 8 //
+            return 'E_NOTICE';
+
+        case E_CORE_ERROR: // 16 //
+            return 'E_CORE_ERROR';
+
+        case E_CORE_WARNING: // 32 //
+            return 'E_CORE_WARNING';
+
+        case E_COMPILE_ERROR: // 64 //
+            return 'E_COMPILE_ERROR';
+
+        case E_COMPILE_WARNING: // 128 //
+            return 'E_COMPILE_WARNING';
+
+        case E_USER_ERROR: // 256 //
+            return 'E_USER_ERROR';
+
+        case E_USER_WARNING: // 512 //
+            return 'E_USER_WARNING';
+
+        case E_USER_NOTICE: // 1024 //
+            return 'E_USER_NOTICE';
+
+        case E_STRICT: // 2048 //
+            return 'E_STRICT';
+
+        case E_RECOVERABLE_ERROR: // 4096 //
+            return 'E_RECOVERABLE_ERROR';
+
+        case E_DEPRECATED: // 8192 //
+            return 'E_DEPRECATED';
+
+        case E_USER_DEPRECATED: // 16384 //
+            return 'E_USER_DEPRECATED';
+    }
+    return "";
 }

@@ -2,7 +2,6 @@
 
 namespace Busarm\PhpMini\Dto;
 
-use ArrayIterator;
 use ArrayObject;
 use InvalidArgumentException;
 use OutOfRangeException;
@@ -12,8 +11,6 @@ use Traversable;
 use Busarm\PhpMini\Interfaces\Arrayable;
 use Busarm\PhpMini\Helpers\Security;
 use Busarm\PhpMini\Traits\TypeResolver;
-
-use function Busarm\PhpMini\Helpers\is_list;
 
 /**
  * PHP Mini Framework
@@ -65,8 +62,13 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         // Append each item so to validate it's type.
         foreach ($input as $key => $value) {
             // Validate Item type if available
-            if (!empty($this->itemClass) && !($value instanceof ($this->itemClass))) {
-                throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
+            if (!empty($this->itemClass)) {
+                if (is_subclass_of($this->itemClass, BaseDto::class) && !($value instanceof BaseDto) && is_array($value)) {
+                    $value = $this->itemClass::with($value);
+                }
+                if (!($value instanceof ($this->itemClass))) {
+                    throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
+                }
             }
             $this[$key] = $sanitize ? Security::clean($value) : $value;
         }
@@ -447,16 +449,16 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto
                         if (in_array(BaseDto::class, class_parents($this->itemClass) ?: [])) {
-                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
+                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
                         }
                         // Item class is a custom class
                         else {
-                            $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
+                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
                         }
                     }
                     // Item class not provided - load with custom data
                     else {
-                        $result[$key] = is_list($item) ? (new self($item))->toArray($trim) : $item;
+                        $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
                     }
                 } else {
                     $value = $this->resolveType($this->findType($item), $item);

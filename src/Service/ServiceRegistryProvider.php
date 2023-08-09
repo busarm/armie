@@ -22,6 +22,9 @@ class ServiceRegistryProvider implements ProviderInterface
 {
     const ROUTE = 'discovery';
 
+    /**
+     * @param StorageBagInterface<array> $storage
+     */
     public function __construct(private StorageBagInterface $storage)
     {
     }

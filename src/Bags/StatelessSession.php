@@ -9,9 +9,6 @@ use Busarm\PhpMini\Interfaces\SessionStoreInterface;
 use SessionHandler;
 use SessionHandlerInterface;
 
-use function Opis\Closure\serialize;
-use function Opis\Closure\unserialize;
-
 /**
  * PHP Mini Framework
  *

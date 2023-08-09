@@ -9,12 +9,11 @@ namespace Busarm\PhpMini\Enums;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class Env
+enum Env: string
 {
-    const LOCAL     =   "local";
-    const BUILD     =   "build";
-    const DEV       =   "development";
-    const TEST      =   "testing";
-    const STG       =   "staging";
-    const PROD      =   "production";
+    case LOCAL     =   "local";
+    case DEV       =   "development";
+    case TEST      =   "testing";
+    case STG       =   "staging";
+    case PROD      =   "production";
 }

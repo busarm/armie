@@ -8,7 +8,7 @@ use Busarm\PhpMini\Errors\SystemError;
 use Busarm\PhpMini\Interfaces\MiddlewareInterface;
 use Busarm\PhpMini\Interfaces\RouteInterface;
 use Busarm\PhpMini\Traits\Container;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 
 /**
  * Application Routes Provider
@@ -22,7 +22,7 @@ class Route implements RouteInterface
 {
     use Container;
 
-    /** @var Closure Request executable function */
+    /** @var SerializableClosure|Closure Request executable function */
     protected SerializableClosure|Closure|null $callable = null;
 
     /** @var string|null Request controller */
@@ -37,8 +37,8 @@ class Route implements RouteInterface
     /** @var string|null Request path to view file relative to `Config::viewPath` or View class name*/
     protected ?string $viewPathOrClass = null;
 
-    /** @var string HTTP request method */
-    protected ?string $method = null;
+    /** @var HttpMethod HTTP request method */
+    protected ?HttpMethod $method = null;
 
     /** @var string HTTP request path */
     protected ?string $path = null;
@@ -77,8 +77,8 @@ class Route implements RouteInterface
     {
         return $this->viewPathOrClass;
     }
-    /**  @return string */
-    public function getMethod(): ?string
+    /**  @return HttpMethod */
+    public function getMethod(): ?HttpMethod
     {
         return $this->method;
     }

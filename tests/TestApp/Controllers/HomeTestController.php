@@ -20,11 +20,11 @@ class HomeTestController
 
     public function ping()
     {
-        return 'success-' . $this->app->env;
+        return 'success-' . $this->app->env->value;
     }
 
     public function pingHtml()
     {
-        return 'success-' . $this->app->env;
+        return 'success-' . $this->app->env->value;
     }
 }

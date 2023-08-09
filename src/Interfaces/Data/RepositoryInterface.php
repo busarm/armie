@@ -22,7 +22,7 @@ interface RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto
+     * @return CollectionBaseDto<BaseDto>
      */
     public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
@@ -33,7 +33,7 @@ interface RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto
+     * @return CollectionBaseDto<BaseDto>
      */
     public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
@@ -45,7 +45,7 @@ interface RepositoryInterface
      * @param array $columns Select Colomn names
      * @param int $page Page Number Default: 1
      * @param int $limit Page Limit. Default: 0 to disable
-     * @return PaginatedCollectionDto
+     * @return PaginatedCollectionDto<BaseDto>
      */
     public function paginate(array $conditions = [], array $params = [], array $columns = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 

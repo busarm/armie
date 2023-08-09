@@ -29,7 +29,6 @@ class ConnectionPool implements SingletonInterface
 
     /**
      * @var Connection[]
-     * // TODO remove from static
      */
     private static $pool = [];
 
@@ -66,13 +65,18 @@ class ConnectionPool implements SingletonInterface
         } else {
             // Using round-robin pattern
             if ($this->pattern == self::PATTERN_RR) {
-                $connection =  self::$pool[] = array_shift(self::$pool);
+                $connection = self::$pool[] = array_shift(self::$pool);
             }
             // Using random pattern
             else {
-                $connection =  self::$pool[rand(0, $this->size - 1)];
+                $connection = self::$pool[rand(0, $this->size - 1)];
             }
         }
         return $connection;
+    }
+
+    public function __destruct()
+    {
+        self::$pool = [];
     }
 }

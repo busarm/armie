@@ -11,18 +11,18 @@ use Busarm\PhpMini\Helpers\StringableDateTime;
  * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
-class DataType
+enum DataType: string
 {
-    const INT       =   'int';
-    const INTEGER   =   'integer';
-    const BOOL      =   'bool';
-    const BOOLEAN   =   'boolean';
-    const STRING    =   'string';
-    const ARRAY     =   'array';
-    const OBJECT    =   'object';
-    const JSON      =   'json';
-    const FLOAT     =   'float';
-    const DOUBLE    =   'double';
-    const DATETIME  =   'datetime';
-    const MIXED     =   'mixed';
+    case INT       =   'int';
+    case INTEGER   =   'integer';
+    case BOOL      =   'bool';
+    case BOOLEAN   =   'boolean';
+    case STRING    =   'string';
+    case ARRAY     =   'array';
+    case OBJECT    =   'object';
+    case JSON      =   'json';
+    case FLOAT     =   'float';
+    case DOUBLE    =   'double';
+    case DATETIME  =   'datetime';
+    case MIXED     =   'mixed';
 }

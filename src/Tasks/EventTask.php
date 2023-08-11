@@ -17,7 +17,7 @@ final class EventTask extends Task
 
     public function __construct(protected string $event, protected array $data = [])
     {
-        parent::__construct();
+        parent::__construct($event);
     }
 
     /**

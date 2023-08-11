@@ -64,6 +64,7 @@ use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\error_level;
 use function Busarm\PhpMini\Helpers\is_cli;
+use function Busarm\PhpMini\Helpers\log_warning;
 use function Busarm\PhpMini\Helpers\serialize;
 
 // TODO Queue Manager Interface - Handle sync and async jobs
@@ -346,11 +347,14 @@ class App implements HttpServerInterface, ContainerInterface
             }
         });
 
-        set_error_handler(function (int $severity, string $message, string $file, ?int $line) {
+        set_error_handler(function (int $severity, string $message, string $file, ?int $line = 0) {
+            if (in_array($severity, [E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING])) {
+                return log_warning($message . "\n($file:$line)");
+            }
             $this->reporter->leaveCrumbs("meta", ['type' => 'error', 'severity' => error_level($severity), 'env' => $this->env->value]);
             $this->reporter->exception(new \ErrorException($message, 0, $severity, $file, $line));
             !$this->isCli && !$this->async && Response::error(500, $message, 0, $file, $line)->send($this->config->http->sendAndContinue);
-        }, E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_STRICT);
+        });
     }
 
     /**
@@ -709,7 +713,7 @@ class App implements HttpServerInterface, ContainerInterface
         if ($ssl) $this->worker->transport = 'ssl';
 
         $this->worker->onWorkerStart = function (Worker $worker) {
-            $this->logger->debug(sprintf("%s process %s started", $worker->name, $worker->id));
+            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
             // Add Custom Middlewares
             $this->addMiddleware(new StatelessCookieMiddleware($this->config));
@@ -750,7 +754,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onConnect = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to %s process %s from %s:%s started", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+                &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s started", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
 
             $this->reporter->leaveCrumbs("worker", [
                 'name' => $connection->worker->name,
@@ -766,7 +770,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->worker->onClose = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to %s process %s from %s:%s closed", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+                &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s closed", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
         };
         $this->worker->onError = function ($error) {
             $this->logger->error(sprintf("%s error: %s", $this->worker->name, strval($error)));
@@ -916,7 +920,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->taskWorker->onConnect = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
+                &&  $this->logger->info(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
 
             $this->reporter->leaveCrumbs("worker", [
                 'name' => $connection->worker->name,
@@ -932,7 +936,7 @@ class App implements HttpServerInterface, ContainerInterface
         };
         $this->taskWorker->onClose = function (TcpConnection $connection) {
             $this->config->logRequest
-                &&  $this->logger->debug(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
+                &&  $this->logger->info(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
         };
         $this->taskWorker->onError = function ($error) {
             $this->logger->error(sprintf("%s error: %s", $this->taskWorker->name, strval($error)));

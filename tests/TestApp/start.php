@@ -1,6 +1,7 @@
 <?php
 
 use Busarm\PhpMini\App;
+use Busarm\PhpMini\Async;
 use Busarm\PhpMini\Bags\FileStore;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
@@ -14,7 +15,6 @@ use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Interfaces\ProviderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Promise;
-use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
 use Busarm\PhpMini\Service\ServiceRegistryProvider;
@@ -27,6 +27,7 @@ use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Workerman\Connection\ConnectionInterface;
+use Workerman\Timer;
 
 use function Busarm\PhpMini\Helpers\async;
 use function Busarm\PhpMini\Helpers\await;
@@ -94,7 +95,6 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'correlationId' => $req->correlationId(),
     ];
 });
-
 $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
     $address = ConnectionInterface::$statistics['total_request'];
     return (new Promise(function () use ($address) {
@@ -326,9 +326,6 @@ $app->start(
         ->addJob(new CallableTask(function () {
             log_debug("Testing EVERY_MINUTE Cron Job");
         }), Cron::EVERY_MINUTE)
-        ->addJob(new CallableTask(function () {
-            log_debug("Testing EVERY_SECOND Cron Job");
-        }), Cron::EVERY_SECOND)
         ->addJob(new CallableTask(function () {
             log_debug("Testing One-Time Job");
         }), (new DateTime('+5 seconds')))

@@ -224,7 +224,7 @@ function &router()
 function log_message($level, $message, array $context = [])
 {
     $message = is_array($message) || is_object($message) ? var_export($message, true) : (string) $message;
-    $message = date("Y-m-d H:i:s.", microtime(true)) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
+    $message = date("Y-m-d H:i:s.", time()) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
     try {
         app()->logger->log($level, $message, $context);
     } catch (\Throwable $th) {

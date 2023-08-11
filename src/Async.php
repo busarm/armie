@@ -244,7 +244,7 @@ class Async
      * @param array $params Event Loop Params
      * @return bool
      */
-    public static function streamLoop(mixed $fd, bool $readonly, callable $callback, $params = []): mixed
+    public static function streamLoop(mixed $fd, bool $readonly, callable $callback, $params = []): bool
     {
         if (!app()->async || !isset(app()->worker) || empty(Worker::getEventLoop())) {
             throw new SystemError("Event loop is not available");

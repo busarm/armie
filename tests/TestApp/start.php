@@ -7,15 +7,18 @@ use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Configs\WorkerConfig;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
+use Busarm\PhpMini\Enums\Cron;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Interfaces\ProviderInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Promise;
+use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
 use Busarm\PhpMini\Service\ServiceRegistryProvider;
+use Busarm\PhpMini\Tasks\CallableTask;
 use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
@@ -23,6 +26,7 @@ use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Workerman\Connection\ConnectionInterface;
 
 use function Busarm\PhpMini\Helpers\async;
 use function Busarm\PhpMini\Helpers\await;
@@ -91,32 +95,14 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
     ];
 });
 
-$app->get('test/promise')->call(function (App $app) {
-    $store = new FileStore($app->config->tempPath . '/files');
-    $result = (new Promise(function (FileStore $store, string $env) {
-        $store->set("TestSession-File", ["test", $env]);
-        print_r("Processing promise file \n");
-        return $store->all();
-    }, $store, $app->env->value))
-        ->then(function ($data) {
-            print_r("Promise Then\n");
-            print_r($data);
-            // print_r(PHP_EOL);
-            throw new \Exception("TEST EX");
-            // return $data;
-        })
-        ->catch(function (Exception $ex) {
-            print_r("Promise Catch \n");
-            print_r($ex->getMessage());
-            print_r(PHP_EOL);
-        })
-        // ->wait()
-        // ->finally(function () {
-        //     print_r("Promise Finally \n");
-        //     print_r(PHP_EOL);
-        // })
-    ;
-    return $result;
+$app->get('test/promise')->call(function (App $app, RequestInterface $request) {
+    $address = ConnectionInterface::$statistics['total_request'];
+    return (new Promise(function () use ($address) {
+        log_debug("1 - Processing promise db - " . $address);
+        return ProductTestModel::update(2, [
+            'name' =>  md5(uniqid())
+        ]);
+    }))->wait();
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -336,5 +322,14 @@ $app->start(
     'localhost',
     8181,
     (new WorkerConfig)
-        ->setLooper(Looper::SWOOLE)
+        ->setLooper(Looper::DEFAULT)
+        ->addJob(new CallableTask(function () {
+            log_debug("Testing EVERY_MINUTE Cron Job");
+        }), Cron::EVERY_MINUTE)
+        ->addJob(new CallableTask(function () {
+            log_debug("Testing EVERY_SECOND Cron Job");
+        }), Cron::EVERY_SECOND)
+        ->addJob(new CallableTask(function () {
+            log_debug("Testing One-Time Job");
+        }), (new DateTime('+5 seconds')))
 );

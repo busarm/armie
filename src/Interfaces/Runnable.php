@@ -12,7 +12,7 @@ namespace Busarm\PhpMini\Interfaces;
 interface Runnable
 {
     /**
-     * @return mixed
+     * @return mixed|void
      */
-    public function run(): mixed;
+    public function run();
 }

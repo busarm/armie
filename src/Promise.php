@@ -11,7 +11,6 @@ use Fiber;
 use Generator;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\app;
 use function Busarm\PhpMini\Helpers\report;
 
 /**
@@ -69,10 +68,9 @@ class Promise implements PromiseThen, PromiseCatch, PromiseFinal
      */
     public function __construct(callable $callable, ...$params)
     {
-        $this->_id = static::class . "::" . uniqid();
         $task = new CallableTask(Closure::fromCallable($callable), $params);
-        $body = strval($task->getRequest(false, app()->config->secret));
-        $this->_fiber = Async::withFiberWorker($this->_id, $body, true);
+        $this->_id = $task->getName();
+        $this->_fiber = Async::withFiberWorker($this->_id, strval($task->getRequest(false)), true);
     }
 
     /**

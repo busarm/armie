@@ -23,7 +23,7 @@ final class EventTask extends Task
     /**
      * @inheritdoc
      */
-    public function run(): mixed
+    public function run()
     {
         $listners = app()->eventManager->getEventListners($this->event);
         if ($listners) {

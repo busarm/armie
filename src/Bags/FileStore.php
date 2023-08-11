@@ -191,8 +191,16 @@ class FileStore implements StorageBagInterface
 	 */
 	public function remove(string $path)
 	{
+		$path = $this->fullPath($path);
+
+		$fn = function ()  use ($path) {
+			\unlink($path);
+		};
+
 		if ($this->has($path)) {
-			\unlink($this->fullPath($path));
+			if ($this->async) {
+				async($fn);
+			} else $fn();
 		}
 	}
 

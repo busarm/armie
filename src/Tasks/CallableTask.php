@@ -21,7 +21,7 @@ final class CallableTask extends Task
     /**
      * @inheritdoc
      */
-    public function run(): mixed
+    public function run()
     {
         if ($this->callable && is_callable($this->callable)) {
             if (array_is_list($this->data)) {

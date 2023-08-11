@@ -15,6 +15,7 @@ use Workerman\Timer;
 use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\app;
+use function Busarm\PhpMini\Helpers\report;
 use function Busarm\PhpMini\Helpers\stream_read;
 use function Busarm\PhpMini\Helpers\stream_write;
 
@@ -59,7 +60,7 @@ class Async
         app()->throwIfNotAsync();
 
         $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-        $body = strval($task->getRequest(!$wait, app()->config->secret));
+        $body = strval($task->getRequest(!$wait));
         return $wait
             ? self::withWorker($task->getName(), $body)
             : self::withBufferedWorker($task->getName(), $body);
@@ -82,7 +83,7 @@ class Async
             $fibers = [];
             foreach ($tasks as $key => $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-                $body = strval($task->getRequest(!$wait, app()->config->secret));
+                $body = strval($task->getRequest(!$wait));
                 $fibers[$key] = self::withFiberWorker($task->getName(), $body, true);
             }
             ksort($fibers);
@@ -95,7 +96,7 @@ class Async
         else {
             foreach ($tasks as $key => $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-                $body = strval($task->getRequest(!$wait, app()->config->secret));
+                $body = strval($task->getRequest(!$wait));
                 yield $key => self::withBufferedWorker($task->getName(), $body);
             }
         }
@@ -124,15 +125,19 @@ class Async
 
         // Start bufferring
         self::$bufferTimer = self::$bufferTimer ?: Timer::add(1 / 100, function ($length, $limit) {
-            $tasks = self::$buffer->slice(0, $limit);
-            foreach ($tasks as $key => $task) {
-                if (self::withWorker($key, $task, false, $length) !== false) {
-                    self::$buffer->remove($key);
+            try {
+                $tasks = self::$buffer->slice(0, $limit);
+                foreach ($tasks as $key => $task) {
+                    if (self::withWorker($key, $task, false, $length) !== false) {
+                        self::$buffer->remove($key);
+                    }
                 }
-            }
-            if (self::$buffer->count() == 0) {
-                Timer::del(self::$bufferTimer);
-                self::$bufferTimer = null;
+                if (self::$buffer->count() == 0) {
+                    Timer::del(self::$bufferTimer);
+                    self::$bufferTimer = null;
+                }
+            } catch (\Throwable $th) {
+                report()->exception($th);
             }
         }, [$length, $limit], true);
 
@@ -233,13 +238,13 @@ class Async
     /**
      * Process stream with event loop
      * 
-     * @param resource $stream Stream Resource
+     * @param resource $fd Stream File Descriptor
      * @param bool $readonly Read only stream. `false` if Read / Write
      * @param callable $callback Event Loop Callback
      * @param array $params Event Loop Params
      * @return bool
      */
-    public static function streamLoop(mixed $stream, bool $readonly, callable $callback, $params = []): mixed
+    public static function streamLoop(mixed $fd, bool $readonly, callable $callback, $params = []): mixed
     {
         if (!app()->async || !isset(app()->worker) || empty(Worker::getEventLoop())) {
             throw new SystemError("Event loop is not available");
@@ -247,7 +252,7 @@ class Async
 
         $flag = $readonly ? Event::EV_READ :  Event::EV_WRITE;
 
-        return !!Worker::getEventLoop()->add($stream, $flag, function ($stream) use ($flag, $callback, $params) {
+        return !!Worker::getEventLoop()->add($fd, $flag, function ($stream) use ($flag, $callback, $params) {
             Worker::getEventLoop()->del($stream, $flag);
             return call_user_func($callback, ...$params);
         });
@@ -275,7 +280,6 @@ class Async
         $flag = !$block
             ? ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT : STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT)
             : ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT : STREAM_CLIENT_CONNECT);
-
 
         if ($persist && $connection) {
             $socket = $connection;

@@ -9,6 +9,7 @@ use Throwable;
 use Busarm\PhpMini\Dto\ResponseDto;
 use Busarm\PhpMini\Dto\TaskDto;
 use Busarm\PhpMini\Enums\AppStatus;
+use Busarm\PhpMini\Enums\Cron;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Enums\HttpMethod;
 use Busarm\PhpMini\Enums\Looper;
@@ -58,12 +59,12 @@ use Workerman\Events\Swoole;
 use Workerman\Events\Uv;
 use Workerman\Protocols\Http\Request as HttpRequest;
 use Workerman\Protocols\Http\Session\FileSessionHandler;
+use Workerman\Timer;
 use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\error_level;
 use function Busarm\PhpMini\Helpers\is_cli;
 use function Busarm\PhpMini\Helpers\serialize;
-use function Busarm\PhpMini\Helpers\unserialize;
 
 // TODO Queue Manager Interface - Handle sync and async jobs
 // TODO PSR Cache Interface
@@ -186,9 +187,6 @@ class App implements HttpServerInterface, ContainerInterface
         if (\PHP_VERSION_ID < 80100) throw new SystemError("Only PHP 8.1 and above is supported");
 
         $this->status = AppStatus::INITIALIZING;
-
-        // Default timezone
-        date_default_timezone_set('UTC');
 
         // Set app instance
         self::$__instance = &$this;
@@ -392,7 +390,7 @@ class App implements HttpServerInterface, ContainerInterface
     public function addSingleton(string $className, &$object): static
     {
         // Prevent setting global singletons for stateless classes
-        // with async (stateless) mode if app is running
+        // if app is running in async (stateless) mode
         if (
             $this->status === AppStatus::RUNNNIG
             && $this->async
@@ -673,7 +671,7 @@ class App implements HttpServerInterface, ContainerInterface
         $this->setUpHttpWorker($host, $port, max([$config->httpWorkers, 1]));
 
         //------- Add Task Worker -------//
-        $config->useTaskWorker && $this->setUpTaskWorker(max([$config->taskWorkers, 1]));
+        $config->useTaskWorker && $this->setUpTaskWorker(max([$config->taskWorkers, 1]), $config->jobs);
 
         // TODO Add socket handler, socket request dto and socket data dto
 
@@ -779,15 +777,16 @@ class App implements HttpServerInterface, ContainerInterface
      * Setup Task worker
      * 
      * @param integer $workers
+     * @param array<string,Task[]> $jobs
      */
-    private function setUpTaskWorker(int $workers)
+    private function setUpTaskWorker(int $workers, array $jobs = [])
     {
         $this->taskWorker = new Worker('unix:///' . $this->config->tempPath . DIRECTORY_SEPARATOR . 'task_worker.sock');
         $this->taskWorker->name = '[Task] ' . $this->config->name . ' v' . $this->config->version;
         $this->taskWorker->transport = 'unix';
         $this->taskWorker->count = $workers;
 
-        $this->taskWorker->onWorkerStart = function (Worker $worker) {
+        $this->taskWorker->onWorkerStart = function (Worker $worker) use ($jobs) {
             $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
             // Set status
@@ -797,12 +796,7 @@ class App implements HttpServerInterface, ContainerInterface
             // Add message handler
             $worker->onMessage = function (TcpConnection $connection, $data) {
                 try {
-                    $dto = unserialize($data);
-                    if (
-                        $dto instanceof TaskDto
-                        && $dto->key
-                        && $dto->key === $this->config->secret
-                    ) {
+                    if ($dto = TaskDto::parse($data)) {
                         if (
                             $dto->class
                             && class_exists($dto->class)
@@ -821,14 +815,100 @@ class App implements HttpServerInterface, ContainerInterface
                             }
                         }
                         throw new Exception(sprintf("%s process %s: Bad request", $connection->worker->name, $connection->worker->id));
-                    } else {
-                        throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
                     }
+                    throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
                 } catch (Throwable $e) {
                     $this->reporter->exception($e);
                     $connection->close();
                 }
             };
+
+            // Start jobs
+            if (!empty($jobs) && $worker->id == 0) {
+                foreach ($jobs as $key => $list) {
+                    if ($key == Cron::EVERY_SECOND->value) {
+                        Timer::add(1, function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::EVERY_MINUTE->value) {
+                        Timer::add(60, function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::HOURLY->value) {
+                        Timer::add(60 * 60, function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::DAILY->value) {
+                        Timer::add(60 * 60 * 24, function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::WEEKLY->value) {
+                        Timer::add(strtotime("+1 week") - time(), function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::MONTHLY->value) {
+                        Timer::add(strtotime("+1 month") - time(), function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if ($key == Cron::YEARLY->value) {
+                        Timer::add(strtotime("+1 year") - time(), function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        });
+                    } else if (($time = strtotime($key)) > time()) {
+                        Timer::add($time - time(), function () use ($list) {
+                            try {
+                                foreach ($list as $task) {
+                                    $task->run();
+                                }
+                            } catch (Throwable $e) {
+                                $this->reporter->exception($e);
+                            }
+                        }, [], false);
+                    }
+                }
+            }
         };
         $this->taskWorker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;

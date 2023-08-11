@@ -2,9 +2,12 @@
 
 namespace Busarm\PhpMini\Configs;
 
+use Busarm\PhpMini\Enums\Cron;
 use Busarm\PhpMini\Enums\Looper;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;
+use Busarm\PhpMini\Tasks\Task;
 use Busarm\PhpMini\Traits\CustomConfig;
+use DateTimeInterface;
 
 /**
  * Application Worker Configuration
@@ -34,7 +37,7 @@ class WorkerConfig implements ConfigurationInterface
     public bool $useTaskWorker = true;
 
     /**
-     * Event lool type
+     * Event loop type
      * @var Looper
      */
     public Looper $looper = Looper::DEFAULT;
@@ -53,6 +56,13 @@ class WorkerConfig implements ConfigurationInterface
      * Full path to worker's log file
      */
     public string|null $logFilePath = null;
+
+    /**
+     * Timer Jobs
+     *
+     * @var array<string,Task[]>
+     */
+    public array $jobs = [];
 
     /**
      * Set number of http workers to spawn
@@ -136,6 +146,32 @@ class WorkerConfig implements ConfigurationInterface
     public function setLogFilePath(string $logFilePath)
     {
         $this->logFilePath = $logFilePath;
+
+        return $this;
+    }
+
+    /**
+     * Add timer Jobs
+     *
+     * @param Task $job Job to perform
+     * @param Cron|DateTimeInterface $cron When to perform job. Use `Cron::*` for recuring jobs or `DateTimeInterface` for one-time job
+     *
+     * @return  self
+     */
+    public function addJob(Task $job, Cron|DateTimeInterface $cron)
+    {
+        if ($cron instanceof Cron) {
+            if (!isset($this->jobs[$cron->value])) {
+                $this->jobs[$cron->value] = [];
+            }
+            $this->jobs[$cron->value][] = $job;
+        } else {
+            $date = $cron->format(DATE_W3C);
+            if (!isset($this->jobs[$date])) {
+                $this->jobs[$date] = [];
+            }
+            $this->jobs[$date][] = $job;
+        }
 
         return $this;
     }

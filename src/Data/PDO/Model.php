@@ -522,7 +522,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     public function save($trim = false, $relations = true): bool
     {
         // Create
-        if ($this->new || !isset($this->{$this->getKeyName()})) {
+        if ($this->new && !isset($this->{$this->getKeyName()})) {
 
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
@@ -1033,6 +1033,16 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     ##### Override #####
+
+    /**
+     * Is Dirty - Update has been made
+     *
+     * @return bool
+     */
+    public function isDirty(): bool
+    {
+        return !$this->new && $this->_isDirty;
+    }
 
     /**
      * @inheritDoc

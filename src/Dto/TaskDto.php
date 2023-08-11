@@ -2,9 +2,12 @@
 
 namespace Busarm\PhpMini\Dto;
 
+use Busarm\PhpMini\Crypto;
 use Busarm\PhpMini\Tasks\Task;
 
+use function Busarm\PhpMini\Helpers\app;
 use function Busarm\PhpMini\Helpers\serialize;
+use function Busarm\PhpMini\Helpers\unserialize;
 
 /**
  * PHP Mini Framework
@@ -15,23 +18,14 @@ use function Busarm\PhpMini\Helpers\serialize;
 class TaskDto
 {
     public string $name;
-    public bool $async = true;
-    public string|null $key = null;
+    public bool $async;
     public string|null $class = null;
     public array $params = [];
 
     public function __construct()
     {
-        $this->name = Task::class . "::" . uniqid();
-    }
-    
-    /**
-     * Gets a string representation of the object
-     * @return string Returns the `string` representation of the object.
-     */
-    public function __toString()
-    {
-        return serialize($this);
+        $this->name = Task::class . ":" . microtime(true) . ":" . bin2hex(random_bytes(8));
+        $this->async = true;
     }
 
     /**
@@ -59,18 +53,6 @@ class TaskDto
     }
 
     /**
-     * Set the value of key
-     *
-     * @return  self
-     */
-    public function setKey(string|null $key)
-    {
-        $this->key = $key;
-
-        return $this;
-    }
-
-    /**
      * Set the value of class. Subclass of `Task`
      *
      * @return  self
@@ -92,5 +74,26 @@ class TaskDto
         $this->params = $params;
 
         return $this;
+    }
+
+    /**
+     * Gets a string representation of the object
+     * @return string Returns the `string` representation of the object.
+     */
+    public function __toString()
+    {
+        return Crypto::encrypt(app()->config->secret, serialize($this),);
+    }
+
+    /**
+     * Parse request
+     */
+    public static function parse(string $payload): ?self
+    {
+        $dto = unserialize(Crypto::decrypt(app()->config->secret, $payload));
+        if ($dto && $dto instanceof self) {
+            return $dto;
+        }
+        return null;
     }
 }

@@ -175,10 +175,10 @@ class Router implements RouterInterface
                 // Find route
                 if (
                     $route->getMethod() === $request->method() &&
-                    ($params = $this->isMatch($request->path(), $route->getPath()))
+                    ($params = $this->isMatch($request->path(), $route->getPath())) !== false
                 ) {
-                    // Set current route
-                    $route->params(is_array($params) ? $params : []);
+                    // Set route params
+                    $route->params($params ?: []);
 
                     // View
                     if ($view = $route->getView()) {
@@ -212,7 +212,7 @@ class Router implements RouterInterface
      * @param string $route Route to compare to
      * @param boolean $startsWith path starts with route
      * @param boolean $startsWith path ends with route
-     * @return boolean|array
+     * @return array|false Return list of path match or `false` if failed
      */
     public function isMatch($path, $route, $startsWith = true, $endsWith = true)
     {
@@ -236,7 +236,7 @@ class Router implements RouterInterface
             if (!empty($paramMatches)) {
                 $params = array_combine($paramMatches, array_splice($matches, 1));
             } else $params = array_splice($matches, 1);
-            return !empty($params) ? Security::cleanParams($params) : true;
+            return !empty($params) ? Security::cleanParams($params) : [];
         }
         return false;
     }

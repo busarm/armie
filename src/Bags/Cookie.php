@@ -134,7 +134,7 @@ final class Cookie implements StorageBagInterface
      */
     public function slice(int $offset, int $length): array
     {
-        return array_slice($_COOKIE, $offset, $length);
+        return array_slice($_COOKIE, $offset, $length, true);
     }
 
     /**

@@ -35,6 +35,7 @@ use function Busarm\PhpMini\Helpers\dispatch;
 use function Busarm\PhpMini\Helpers\listen;
 use function Busarm\PhpMini\Helpers\log_debug;
 use function Busarm\PhpMini\Helpers\concurrent;
+use function Busarm\PhpMini\Helpers\enqueue;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -95,14 +96,32 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'correlationId' => $req->correlationId(),
     ];
 });
-$app->get('test/promise')->call(function (App $app, RequestInterface $request) {
-    $address = ConnectionInterface::$statistics['total_request'];
-    return (new Promise(function () use ($address) {
-        log_debug("1 - Processing promise db - " . $address);
+$app->get('test/queue')->call(function () {
+    enqueue(function () {
+        log_debug("1 - Processing queue");
+        return ProductTestModel::update(1, [
+            'name' =>  md5(uniqid())
+        ]);
+    });
+    enqueue(function () {
+        log_debug("2 - Processing queue");
         return ProductTestModel::update(2, [
             'name' =>  md5(uniqid())
         ]);
-    }))->wait();
+    });
+});
+$app->get('test/promise')->call(function (App $app, RequestInterface $request) {
+    $count = ConnectionInterface::$statistics['total_request'];
+    $promise = (new Promise(function () use ($count) {
+        log_debug("1 - Processing promise db - " . $count);
+        return ProductTestModel::update(2, [
+            'name' =>  md5(uniqid())
+        ]);
+    }));
+    $promise->then(function (ProductTestModel $data) {
+        log_debug("1 - Result of promise db - ", $data?->get('name'));
+    });
+    return $promise->getId();
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -118,6 +137,9 @@ listen(ProductTestModel::class, function ($data) {
     log_debug("Product event 4", $data);
 });
 $app->get('test/event')->call(function () {
+    listen(ProductTestModel::class, function ($data) {
+        log_debug("Product event 5 (running)", $data);
+    });
     dispatch(ProductTestModel::class, ProductTestModel::findById(2)?->toArray() ?? []);
 });
 $app->get('test/db')->call(function () {
@@ -233,7 +255,7 @@ $app->get('test/async-list')->call(function () {
             log_debug("10 Non-wait async success");
             return $data->at(9);
         })
-    ], false);
+    ], true);
     log_debug("Completed");
     return $res;
 });
@@ -292,13 +314,16 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
     $http = new Client([
         'timeout'  => 10000,
     ]);
-    return $http->requestAsync(
+    $http->requestAsync(
         HttpMethod::GET->value,
         "https://busarm.com/ping",
         [
             RequestOptions::VERIFY => false
         ]
-    )->wait();
+    )->then(function () {
+        print_r("Test Http Success" . PHP_EOL);
+    });
+    return "Test success";
 });
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
@@ -322,7 +347,7 @@ $app->start(
     'localhost',
     8181,
     (new WorkerConfig)
-        ->setLooper(Looper::DEFAULT)
+        ->setLooper(Looper::SWOOLE)
         ->addJob(new CallableTask(function () {
             log_debug("Testing EVERY_MINUTE Cron Job");
         }), Cron::EVERY_MINUTE)

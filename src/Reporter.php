@@ -96,7 +96,7 @@ class Reporter implements ReportingInterface
     {
         $contexts = array_map(function ($instance) {
             return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
-        }, array_merge([['file' => $exception->getFile(), 'line' => $exception->getLine()]], $exception->getTrace()));
+        },  $exception->getTrace());
         log_exception($exception);
         log_debug($this->toString([
             'crumbs' => $this->redact($this->breadCrumbs),
@@ -145,16 +145,13 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Array/Object to string
+     * Array to String
      *
-     * @param array|object|null $msg
-     * @return string|null
+     * @param array $data
+     * @return string
      */
-    protected function toString(array|object|null $msg): string|null
+    protected function toString(array $data): string
     {
-        if (is_array($msg) || is_object($msg)) {
-            return json_encode($msg, JSON_PRETTY_PRINT);
-        }
-        return $msg;
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }

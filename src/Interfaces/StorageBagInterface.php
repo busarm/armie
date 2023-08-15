@@ -29,7 +29,7 @@ interface StorageBagInterface extends Stringable
      * @param mixed $options
      * @return bool
      */
-    public function set(string $name, mixed $value, $options = NULL): bool;
+    public function set(string $name, $value, $options = NULL): bool;
     /**
      * 
      * Checks if an attribute exists

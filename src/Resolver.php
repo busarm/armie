@@ -8,12 +8,16 @@ use Busarm\PhpMini\Configs\HttpConfig;
 use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Dto\BaseDto;
 use Busarm\PhpMini\Enums\HttpMethod;
+use Busarm\PhpMini\Handlers\EventHandler;
+use Busarm\PhpMini\Handlers\QueueHandler;
 use Busarm\PhpMini\Reporter;
 use Busarm\PhpMini\Interfaces\ConfigurationInterface;
 use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
 use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
+use Busarm\PhpMini\Interfaces\EventHandlerInterface;
 use Busarm\PhpMini\Interfaces\ReportingInterface;
 use Busarm\PhpMini\Interfaces\LoaderInterface;
+use Busarm\PhpMini\Interfaces\QueueHandlerInterface;
 use Busarm\PhpMini\Interfaces\RequestInterface;
 use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
 use Busarm\PhpMini\Interfaces\Resolver\AuthUserResolver;
@@ -65,6 +69,9 @@ class Resolver implements DependencyResolverInterface
             Reporter::class, ReportingInterface::class => $this->app->reporter,
             ConsoleLogger::class, LoggerInterface::class => $this->app->logger,
             Loader::class, LoaderInterface::class => $this->app->loader,
+            DI::class => $this->app->di,
+            EventHandler::class, EventHandlerInterface::class => $this->app->eventHandler,
+            QueueHandler::class, QueueHandlerInterface::class => $this->app->queueHandler,
             Route::class, RouteInterface::class => $request && $request instanceof RouteInterface ? $request : null,
             Request::class, RequestInterface::class => $request && $request instanceof RequestInterface ? $request : null,
             Psr7Request::class, ServerRequestInterface::class, MessageRequestInterface::class => $request && $request instanceof RequestInterface ? $request->toPsr() : null,

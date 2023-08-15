@@ -154,23 +154,29 @@ class WorkerConfig implements ConfigurationInterface
      * Add timer Jobs
      *
      * @param Task $job Job to perform
-     * @param Cron|DateTimeInterface $cron When to perform job. Use `Cron::*` for recuring jobs or `DateTimeInterface` for one-time job
-     *
+     * @param Cron|DateTimeInterface|int $cron When to perform job. 
+     * Use `Cron::*` or `integer` value (seconds) for recuring jobs. 
+     * Use `DateTimeInterface` for one-time job. 
      * @return  self
      */
-    public function addJob(Task $job, Cron|DateTimeInterface $cron)
+    public function addJob(Task $job, Cron|DateTimeInterface|int $cron)
     {
         if ($cron instanceof Cron) {
             if (!isset($this->jobs[$cron->value])) {
                 $this->jobs[$cron->value] = [];
             }
             $this->jobs[$cron->value][] = $job;
-        } else {
+        } else if ($cron instanceof DateTimeInterface) {
             $date = $cron->format(DATE_W3C);
             if (!isset($this->jobs[$date])) {
                 $this->jobs[$date] = [];
             }
             $this->jobs[$date][] = $job;
+        } else {
+            if (!isset($this->jobs[$cron])) {
+                $this->jobs[$cron] = [];
+            }
+            $this->jobs[$cron][] = $job;
         }
 
         return $this;

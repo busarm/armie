@@ -247,7 +247,7 @@ final class Session implements SessionStoreInterface
 	 */
 	public function slice(int $offset, int $length): array
 	{
-		return array_slice($_SESSION, $offset, $length);
+		return array_slice($_SESSION, $offset, $length, true);
 	}
 
     /**

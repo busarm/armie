@@ -27,14 +27,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         __excluded as __defaultExcluded;
     }
 
-    const EVENT_BEFORE_QUERY    =   self::class . '::BeforeQuery';
-    const EVENT_AFTER_QUERY     =   self::class . '::AfterQuery';
-    const EVENT_BEFORE_CREATE   =   self::class . '::BeforeCreate';
-    const EVENT_AFTER_CREATE    =   self::class . '::AfterCreate';
-    const EVENT_BEFORE_UPDATE   =   self::class . '::BeforeUpdate';
-    const EVENT_AFTER_UPDATE    =   self::class . '::AfterUpdate';
-    const EVENT_BEFORE_DELETE   =   self::class . '::BeforeDelete';
-    const EVENT_AFTER_DELETE    =   self::class . '::AfterDelete';
+    const EVENT_BEFORE_QUERY    =   self::class . ':BeforeQuery';
+    const EVENT_AFTER_QUERY     =   self::class . ':AfterQuery';
+    const EVENT_BEFORE_CREATE   =   self::class . ':BeforeCreate';
+    const EVENT_AFTER_CREATE    =   self::class . ':AfterCreate';
+    const EVENT_BEFORE_UPDATE   =   self::class . ':BeforeUpdate';
+    const EVENT_AFTER_UPDATE    =   self::class . ':AfterUpdate';
+    const EVENT_BEFORE_DELETE   =   self::class . ':BeforeDelete';
+    const EVENT_AFTER_DELETE    =   self::class . ':AfterDelete';
 
     /**
      * Database connection instance.

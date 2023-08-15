@@ -111,28 +111,25 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
-        $client->requestAsync(
+        $response = $client->request(
             HttpMethod::GET->value,
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false
             ]
-        )->then(
-            function (Response $response) {
-                if ($response && $response->getBody()) {
-                    $result = json_decode($response->getBody(), true) ?? [];
-                    if (!empty($result)) {
-                        $this->services = [];
-                        foreach ($result as $name => $url) {
-                            if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
-                                $this->services[] = new RemoteClient($name, $url);
-                            }
-                        }
-                        $this->requestedAt = time();
+        );
+
+        if ($response->getBody()) {
+            $result = json_decode($response->getBody(), true) ?? [];
+            if (!empty($result)) {
+                $this->services = [];
+                foreach ($result as $name => $url) {
+                    if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
+                        $this->services[] = new RemoteClient($name, $url);
                     }
                 }
-            },
-            fn ($reason) => log_error($reason)
-        )->wait();
+                $this->requestedAt = time();
+            }
+        }
     }
 }

@@ -136,7 +136,7 @@ final class StatelessCookie implements StorageBagInterface
 	 */
 	public function slice(int $offset, int $length): array
 	{
-		return array_slice($this->data, $offset, $length);
+		return array_slice($this->data, $offset, $length, true);
 	}
 
     /**

@@ -65,7 +65,7 @@ class RemoteService extends BaseService
             ServiceType::DELETE => HttpMethod::DELETE,
             default   => HttpMethod::GET,
         };
-        return $client->requestAsync(
+        $response = $client->request(
             $method->value,
             $uri,
             $dto->type == ServiceType::READ ?
@@ -82,13 +82,13 @@ class RemoteService extends BaseService
                     RequestOptions::VERIFY => false,
                     RequestOptions::MULTIPART => !empty($dto->files) ? $dto->files : null,
                 ]
-        )->then(function (Response $response) {
-            return (new ServiceResponseDto)
-                ->setStatus($response->getStatusCode() == 200 || $response->getStatusCode() == 201)
-                ->setAsync(false)
-                ->setCode($response->getStatusCode())
-                ->setData(json_decode($response->getBody(), true) ?? []);
-        })->wait(true);
+        );
+
+        return (new ServiceResponseDto)
+            ->setStatus($response->getStatusCode() == 200 || $response->getStatusCode() == 201)
+            ->setAsync(false)
+            ->setCode($response->getStatusCode())
+            ->setData(json_decode($response->getBody(), true) ?? []);
     }
 
     /**
@@ -127,7 +127,7 @@ class RemoteService extends BaseService
                 ServiceType::DELETE => HttpMethod::DELETE,
                 default   => HttpMethod::GET,
             };
-            $client->requestAsync(
+            $client->request(
                 $method->value,
                 $uri,
                 $dto->type == ServiceType::READ ?
@@ -149,8 +149,7 @@ class RemoteService extends BaseService
 
         return (new ServiceResponseDto)
             ->setStatus(true)
-            ->setAsync(true)
-            ->setData([]);
+            ->setAsync(true);
     }
 
     /**

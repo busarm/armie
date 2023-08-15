@@ -147,7 +147,7 @@ class Bag implements StorageBagInterface
 	 */
 	public function slice(int $offset, int $length): array
 	{
-		return array_slice($this->attributes, $offset, $length);
+		return array_slice($this->attributes, $offset, $length, true);
 	}
 
 	/**

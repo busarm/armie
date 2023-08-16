@@ -21,7 +21,7 @@ An elegant PHP framework designed to provide high performance with optimal devel
 
 ### Traditional HTTP Server
 
-Traditional HTTP server sung PHP-FPM and NGINX or Apache.
+Traditional HTTP server using PHP-FPM and NGINX or Apache.
 
 #### Single Application
 

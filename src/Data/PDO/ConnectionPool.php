@@ -1,18 +1,18 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO;
+namespace Armie\Data\PDO;
 
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Interfaces\SingletonInterface;
-use Busarm\PhpMini\Traits\Singleton;
+use Armie\Configs\PDOConfig;
+use Armie\Interfaces\SingletonInterface;
+use Armie\Traits\Singleton;
 
 /**
  * Connection Pool
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ConnectionPool implements SingletonInterface
 {

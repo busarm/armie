@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use Busarm\PhpMini\Errors\SessionError;
-use Busarm\PhpMini\Handlers\EncryptedSessionHandler;
-use Busarm\PhpMini\Interfaces\SessionStoreInterface;
+use Armie\Errors\SessionError;
+use Armie\Handlers\EncryptedSessionHandler;
+use Armie\Interfaces\SessionStoreInterface;
 
 use SessionHandler;
 use SessionHandlerInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
 final class StatelessSession extends Bag implements SessionStoreInterface

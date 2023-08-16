@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Interfaces\ServiceHandlerInterface;
-use Busarm\PhpMini\Interfaces\SingletonInterface;
-use Busarm\PhpMini\Traits\Singleton;
+use Armie\Interfaces\ServiceHandlerInterface;
+use Armie\Interfaces\SingletonInterface;
+use Armie\Traits\Singleton;
 
 /**
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 abstract class BaseService implements ServiceHandlerInterface, SingletonInterface
 {

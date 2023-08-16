@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use Busarm\PhpMini\Crypto;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Armie\Crypto;
+use Armie\Interfaces\StorageBagInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  * @inheritDoc
  */

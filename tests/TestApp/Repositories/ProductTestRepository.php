@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Repositories;
+namespace Armie\Test\TestApp\Repositories;
 
-use Busarm\PhpMini\Data\PDO\Repository;
-use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
+use Armie\Data\PDO\Repository;
+use Armie\Test\TestApp\Models\ProductTestModel;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ProductTestRepository extends Repository
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Configs;
+namespace Armie\Configs;
 
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Traits\CustomConfig;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Traits\CustomConfig;
 
 /**
  * Database Configuration
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class PDOConfig implements ConfigurationInterface
 {

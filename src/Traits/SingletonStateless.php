@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Traits;
+namespace Armie\Traits;
 
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\RouteInterface;
 
-use function Busarm\PhpMini\Helpers\app;
+use function Armie\Helpers\app;
 
 /**
  * Create / Retrieve Singletons for stateless requests
  *  
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 trait SingletonStateless
 {

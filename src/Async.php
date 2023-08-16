@@ -1,11 +1,11 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\Runnable;
-use Busarm\PhpMini\Tasks\CallableTask;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\Runnable;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Fiber;
 use Generator;
@@ -13,18 +13,18 @@ use Workerman\Events\Event;
 use Workerman\Timer;
 use Workerman\Worker;
 
-use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\report;
-use function Busarm\PhpMini\Helpers\stream_read;
-use function Busarm\PhpMini\Helpers\stream_write;
+use function Armie\Helpers\app;
+use function Armie\Helpers\report;
+use function Armie\Helpers\stream_read;
+use function Armie\Helpers\stream_write;
 
 /**
  * Handle async operations
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Async
 {

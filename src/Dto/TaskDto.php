@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Dto;
+namespace Armie\Dto;
 
-use Busarm\PhpMini\Crypto;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\Crypto;
+use Armie\Tasks\Task;
 
-use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\serialize;
-use function Busarm\PhpMini\Helpers\unserialize;
+use function Armie\Helpers\app;
+use function Armie\Helpers\serialize;
+use function Armie\Helpers\unserialize;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class TaskDto
 {

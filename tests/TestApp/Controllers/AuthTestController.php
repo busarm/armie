@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Controllers;
+namespace Armie\Test\TestApp\Controllers;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Test\TestApp\Attributes\AuthorizeTestAttr;
+use Armie\App;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Test\TestApp\Attributes\AuthorizeTestAttr;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class AuthTestController
 {

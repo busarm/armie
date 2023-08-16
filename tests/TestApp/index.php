@@ -2,29 +2,24 @@
 
 /**
  * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
- * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
+ * @var \Armie\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
  */
 
-$before = memory_get_usage();
-
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Service\LocalServiceDiscovery;
-use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
-use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
-use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
+use Armie\App;
+use Armie\Config;
+use Armie\Configs\HttpConfig;
+use Armie\Configs\PDOConfig;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Enums\Env;
+use Armie\Interfaces\RequestInterface;
+use Armie\Request;
+use Armie\Response;
+use Armie\Service\LocalServiceDiscovery;
+use Armie\Test\TestApp\Controllers\AuthTestController;
+use Armie\Test\TestApp\Controllers\HomeTestController;
+use Armie\Test\TestApp\Models\CategoryTestModel;
+use Armie\Test\TestApp\Models\ProductTestModel;
 use Faker\Factory;
-
-use function Busarm\PhpMini\Helpers\dispatch;
-use function Busarm\PhpMini\Helpers\log_debug;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -98,8 +93,4 @@ $app->get('download')->call(function (Response $response) {
     return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
-$app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);
-
-$after = memory_get_usage();
-
-log_debug("Memory Used = " . (($after - $before) / 1000 / 1000) . 'mb');
+return $app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);

@@ -1,47 +1,47 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
 use LogicException;
 use Nyholm\Psr7\Uri;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Bags\Bag;
-use Busarm\PhpMini\Bags\Query;
-use Busarm\PhpMini\Bags\Upload;
-use Busarm\PhpMini\Bags\Cookie;
-use Busarm\PhpMini\Bags\Session;
-use Busarm\PhpMini\Bags\StatelessCookie;
-use Busarm\PhpMini\Bags\StatelessSession;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
-use Busarm\PhpMini\Interfaces\SessionStoreInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\UploadBagInterface;
-use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
-use Busarm\PhpMini\Interfaces\Resolver\ServerConnectionResolver;
-use Busarm\PhpMini\Resolvers\ServerConnection;
-use Busarm\PhpMini\Traits\Container;
+use Armie\Enums\HttpMethod;
+use Armie\Errors\SystemError;
+use Armie\Bags\Bag;
+use Armie\Bags\Query;
+use Armie\Bags\Upload;
+use Armie\Bags\Cookie;
+use Armie\Bags\Session;
+use Armie\Bags\StatelessCookie;
+use Armie\Bags\StatelessSession;
+use Armie\Interfaces\StorageBagInterface;
+use Armie\Interfaces\SessionStoreInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\UploadBagInterface;
+use Armie\Interfaces\Resolver\AuthResolver;
+use Armie\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Resolvers\ServerConnection;
+use Armie\Traits\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Workerman\Protocols\Http\Request as HttpRequest;
 
-use const Busarm\PhpMini\Constants\VAR_HTTP_HOST;
-use const Busarm\PhpMini\Constants\VAR_ORIG_PATH_INFO;
-use const Busarm\PhpMini\Constants\VAR_PATH_INFO;
-use const Busarm\PhpMini\Constants\VAR_REQUEST_URI;
+use const Armie\Constants\VAR_HTTP_HOST;
+use const Armie\Constants\VAR_ORIG_PATH_INFO;
+use const Armie\Constants\VAR_PATH_INFO;
+use const Armie\Constants\VAR_REQUEST_URI;
 
 /**
  * HTTP Request Provider
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the Symfony package.
  * See Symfony\Component\HttpFoundation\Request (https://github.com/symfony/symfony)
  * 
- * @see Busarm\PhpMini\Interface\RequestInterface
+ * @see Armie\Interface\RequestInterface
  * 
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Request implements RequestInterface
 {

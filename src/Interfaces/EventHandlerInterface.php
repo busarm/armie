@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces;
+namespace Armie\Interfaces;
 
-use Busarm\PhpMini\Interfaces\Runnable;
+use Armie\Interfaces\Runnable;
 
-use function Busarm\PhpMini\Helpers\listen;
+use function Armie\Helpers\listen;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface EventHandlerInterface

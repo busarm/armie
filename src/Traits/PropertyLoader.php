@@ -1,12 +1,12 @@
 <?php
 
-namespace Busarm\PhpMini\Traits;
+namespace Armie\Traits;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Interfaces\Attribute\PropertyAttributeInterface;
+use Armie\Dto\BaseDto;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Helpers\Security;
+use Armie\Interfaces\Arrayable;
+use Armie\Interfaces\Attribute\PropertyAttributeInterface;
 use ReflectionObject;
 use ReflectionProperty;
 use Stringable;
@@ -14,10 +14,10 @@ use Stringable;
 /**
  * Manage Singletons
  *  
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 trait PropertyLoader
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
 /**
  * Encryption, Decription and Hashing
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Crypto
 {

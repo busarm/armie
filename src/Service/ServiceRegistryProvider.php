@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Dto\ServiceRegistryDto;
-use Busarm\PhpMini\Exceptions\BadRequestException;
-use Busarm\PhpMini\Exceptions\NotFoundException;
-use Busarm\PhpMini\Interfaces\ProviderInterface;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
-use Busarm\PhpMini\Attributes\Request\QueryParam;
+use Armie\App;
+use Armie\Dto\ServiceRegistryDto;
+use Armie\Exceptions\BadRequestException;
+use Armie\Exceptions\NotFoundException;
+use Armie\Interfaces\ProviderInterface;
+use Armie\Interfaces\StorageBagInterface;
+use Armie\Attributes\Request\QueryParam;
 
 /**
  * Use to generate a service registry server
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ServiceRegistryProvider implements ProviderInterface
 {

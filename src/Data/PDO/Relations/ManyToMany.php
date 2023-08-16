@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO\Relations;
+namespace Armie\Data\PDO\Relations;
 
-use Busarm\PhpMini\Data\PDO\Model;
-use Busarm\PhpMini\Data\PDO\Reference;
-use Busarm\PhpMini\Data\PDO\Relation;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Enums\DataType;
-use Busarm\PhpMini\Interfaces\Data\ModelInterface;
+use Armie\Data\PDO\Model;
+use Armie\Data\PDO\Reference;
+use Armie\Data\PDO\Relation;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Enums\DataType;
+use Armie\Interfaces\Data\ModelInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ManyToMany extends Relation
 {

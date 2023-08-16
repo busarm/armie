@@ -1,18 +1,18 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Errors\LoaderError;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
+use Armie\Errors\LoaderError;
+use Armie\Interfaces\LoaderInterface;
 use Throwable;
 
 /**
  * File or Class Loader
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Loader implements LoaderInterface
 {

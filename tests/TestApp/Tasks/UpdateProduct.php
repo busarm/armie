@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Tasks;
+namespace Armie\Test\TestApp\Tasks;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Tasks\Task;
-use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
+use Armie\Dto\BaseDto;
+use Armie\Tasks\Task;
+use Armie\Test\TestApp\Repositories\ProductTestRepository;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class UpdateProduct extends Task
 {

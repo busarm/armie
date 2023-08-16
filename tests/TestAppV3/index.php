@@ -2,15 +2,15 @@
 
 /**
  * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
- * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
+ * @var \Armie\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
  */
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Service\RemoteServiceDiscovery;
+use Armie\App;
+use Armie\Config;
+use Armie\Configs\HttpConfig;
+use Armie\Interfaces\RequestInterface;
+use Armie\Request;
+use Armie\Service\RemoteServiceDiscovery;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

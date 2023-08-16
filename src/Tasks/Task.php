@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Tasks;
+namespace Armie\Tasks;
 
-use Busarm\PhpMini\Dto\TaskDto;
-use Busarm\PhpMini\Interfaces\Runnable;
+use Armie\Dto\TaskDto;
+use Armie\Interfaces\Runnable;
 
 /**
  * Define tasks operation
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @template T
  */
 abstract class Task implements Runnable

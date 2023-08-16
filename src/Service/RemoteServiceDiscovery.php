@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
-use function Busarm\PhpMini\Helpers\log_error;
+use function Armie\Helpers\log_error;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class RemoteServiceDiscovery implements ServiceDiscoveryInterface
 {

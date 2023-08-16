@@ -1,34 +1,34 @@
 <?php
 
-namespace Busarm\PhpMini\Test;
+namespace Armie\Test;
 
-use Busarm\PhpMini\Test\TestApp\Services\MockService;
+use Armie\Test\TestApp\Services\MockService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
-use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Middlewares\CorsMiddleware;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Route;
-use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Busarm\PhpMini\Bags\Bag;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
-use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
-use Busarm\PhpMini\Test\TestApp\Services\MockStatelessService;
-use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
+use Armie\App;
+use Armie\Config;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\LoaderInterface;
+use Armie\Interfaces\RouterInterface;
+use Armie\Middlewares\CorsMiddleware;
+use Armie\Request;
+use Armie\Route;
+use Armie\Test\TestApp\Controllers\HomeTestController;
+use Armie\Bags\Bag;
+use Armie\Configs\PDOConfig;
+use Armie\Interfaces\RequestInterface;
+use Armie\Test\TestApp\Controllers\AuthTestController;
+use Armie\Test\TestApp\Controllers\ProductTestController;
+use Armie\Test\TestApp\Services\MockStatelessService;
+use Armie\Test\TestApp\Views\TestViewPage;
 use Middlewares\Firewall;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @covers \Busarm\PhpMini\App
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @covers \Armie\App
  */
 final class AppTest extends TestCase
 {
@@ -39,7 +39,7 @@ final class AppTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
+        ini_set('error_log', tempnam(sys_get_temp_dir(), 'armie'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
     }
 
@@ -79,7 +79,7 @@ final class AppTest extends TestCase
     /**
      * Test app run CLI
      *
-     * @covers \Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController
+     * @covers \Armie\Test\TestApp\Controllers\HomeTestController
      * @return void
      */
     public function testAppRunCLI()
@@ -120,7 +120,7 @@ final class AppTest extends TestCase
     /**
      * Test app run mock HTTP CORS
      * 
-     * @covers \Busarm\PhpMini\Middlewares\CorsMiddleware
+     * @covers \Armie\Middlewares\CorsMiddleware
      * @return void
      */
     public function testAppRunMockHttpCORS()
@@ -256,9 +256,9 @@ final class AppTest extends TestCase
     /**
      * Test app singletons
      *
-     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
-     * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
-     * @covers \Busarm\PhpMini\Traits\Singleton
+     * @covers \Armie\Test\TestApp\Services\MockService
+     * @covers \Armie\Interfaces\SingletonInterface
+     * @covers \Armie\Traits\Singleton
      * @return void
      */
     public function testAppSingleton()
@@ -273,9 +273,9 @@ final class AppTest extends TestCase
     /**
      * Test app singletons for async class on async mode - should not be supported
      *
-     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockService
-     * @covers \Busarm\PhpMini\Interfaces\SingletonInterface
-     * @covers \Busarm\PhpMini\Traits\Singleton
+     * @covers \Armie\Test\TestApp\Services\MockService
+     * @covers \Armie\Interfaces\SingletonInterface
+     * @covers \Armie\Traits\Singleton
      * @return void
      */
     public function testAppSingletonNotSupportedOnStatelessRequest()
@@ -298,9 +298,9 @@ final class AppTest extends TestCase
      * Test stateless singletons
      *
      *
-     * @covers \Busarm\PhpMini\Test\TestApp\Services\MockStatelessService
-     * @covers \Busarm\PhpMini\Interfaces\SingletonStatelessInterface
-     * @covers \Busarm\PhpMini\Traits\SingletonStateless
+     * @covers \Armie\Test\TestApp\Services\MockStatelessService
+     * @covers \Armie\Interfaces\SingletonStatelessInterface
+     * @covers \Armie\Traits\SingletonStateless
      * @return void
      */
     public function testStatelessSingleton()
@@ -381,9 +381,9 @@ final class AppTest extends TestCase
     /**
      * Test attribute auth Ok
      *
-     * @covers \Busarm\PhpMini\Interfaces\Attributes
-     * @covers \Busarm\PhpMini\Interfaces\Attributes
-     * @covers \Busarm\PhpMini\Test\TestApp\Attributes
+     * @covers \Armie\Interfaces\Attributes
+     * @covers \Armie\Interfaces\Attributes
+     * @covers \Armie\Test\TestApp\Attributes
      * @return void
      */
     public function testAttributeAuthOk()
@@ -401,9 +401,9 @@ final class AppTest extends TestCase
     /**
      * Test attribute auth failed
      *
-     * @covers \Busarm\PhpMini\Interfaces\Attributes
-     * @covers \Busarm\PhpMini\Interfaces\Attributes
-     * @covers \Busarm\PhpMini\Test\TestApp\Attributes
+     * @covers \Armie\Interfaces\Attributes
+     * @covers \Armie\Interfaces\Attributes
+     * @covers \Armie\Test\TestApp\Attributes
      * @return void
      */
     public function testAttributeAuthFailed()

@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Data;
+namespace Armie\Interfaces\Data;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\ResourceItemRequestDto;
-use Busarm\PhpMini\Dto\ResourceListRequestDto;
-use Busarm\PhpMini\Dto\ResourcePaginatedListRequestDto;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Armie\Dto\BaseDto;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Dto\ResourceItemRequestDto;
+use Armie\Dto\ResourceListRequestDto;
+use Armie\Dto\ResourcePaginatedListRequestDto;
+use Armie\Interfaces\ResponseInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface ResourceControllerInterface

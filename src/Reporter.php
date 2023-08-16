@@ -1,20 +1,20 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Interfaces\ReportingInterface;
+use Armie\Interfaces\ReportingInterface;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-use function Busarm\PhpMini\Helpers\log_error;
-use function Busarm\PhpMini\Helpers\log_exception;
+use function Armie\Helpers\log_debug;
+use function Armie\Helpers\log_error;
+use function Armie\Helpers\log_exception;
 
 /**
  * Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Reporter implements ReportingInterface
 {

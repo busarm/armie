@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use Busarm\PhpMini\Errors\SessionError;
-use Busarm\PhpMini\Handlers\EncryptedSessionHandler;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\SessionStoreInterface;
+use Armie\Errors\SessionError;
+use Armie\Handlers\EncryptedSessionHandler;
+use Armie\Helpers\Security;
+use Armie\Interfaces\SessionStoreInterface;
 
 use SessionHandler;
 use SessionHandlerInterface;
 
-use function Busarm\PhpMini\Helpers\is_cli;
+use function Armie\Helpers\is_cli;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
 final class Session implements SessionStoreInterface

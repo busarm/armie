@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
-use Busarm\PhpMini\Crypto;
+use Armie\Crypto;
 use SessionHandlerInterface;
 use Workerman\Protocols\Http\Session\SessionHandlerInterface as WorkermanSessionHandlerInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class WorkermanSessionHandler implements SessionHandlerInterface
 {

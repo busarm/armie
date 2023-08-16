@@ -1,13 +1,13 @@
 <?php
 
-namespace Busarm\PhpMini\Helpers;
+namespace Armie\Helpers;
 
-use Busarm\PhpMini\Async;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\Runnable;
-use Busarm\PhpMini\Promise;
-use Busarm\PhpMini\Tasks\CallableTask;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\Async;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\Runnable;
+use Armie\Promise;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Generator;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -17,10 +17,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 
 ########## FEATURE HELPERS ############
@@ -144,9 +144,9 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
-    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode)->send(false);
+    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array)$data, $responseCode)->send(false);
 }
 
 
@@ -154,11 +154,11 @@ function out($data = null, $responseCode = 500)
 
 /**
  * Get current app instance
- * @return \Busarm\PhpMini\App
+ * @return \Armie\App
  */
-function app(): \Busarm\PhpMini\App
+function app(): \Armie\App
 {
-    return \Busarm\PhpMini\App::getInstance() ?? throw new SystemError('Failed to get current app instance');
+    return \Armie\App::getInstance() ?? throw new SystemError('Failed to get current app instance');
 }
 
 /**
@@ -193,7 +193,7 @@ function view(string $path, $params = [], $return = false)
 
 /**
  * Get app loader object
- * @return \Busarm\PhpMini\Interfaces\LoaderInterface
+ * @return \Armie\Interfaces\LoaderInterface
  */
 function &load()
 {
@@ -202,7 +202,7 @@ function &load()
 
 /**
  * Get app reporter object
- * @return \Busarm\PhpMini\Interfaces\ReportingInterface
+ * @return \Armie\Interfaces\ReportingInterface
  */
 function &report()
 {
@@ -211,7 +211,7 @@ function &report()
 
 /**
  * Get app router object
- * @return \Busarm\PhpMini\Interfaces\RouterInterface
+ * @return \Armie\Interfaces\RouterInterface
  */
 function &router()
 {

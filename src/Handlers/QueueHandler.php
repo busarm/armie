@@ -1,24 +1,24 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Async;
-use Busarm\PhpMini\Errors\QueueError;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\QueueHandlerInterface;
-use Busarm\PhpMini\Tasks\CallableTask;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\App;
+use Armie\Async;
+use Armie\Errors\QueueError;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\QueueHandlerInterface;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Workerman\Timer;
 
 /**
  * Handle event operations
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class QueueHandler implements QueueHandlerInterface
 {

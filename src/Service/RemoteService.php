@@ -1,28 +1,28 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Dto\ServiceRequestDto;
-use Busarm\PhpMini\Dto\ServiceResponseDto;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Enums\ServiceType;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
+use Armie\Dto\ServiceRequestDto;
+use Armie\Dto\ServiceResponseDto;
+use Armie\Enums\HttpMethod;
+use Armie\Enums\ServiceType;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Nyholm\Psr7\Uri;
 
-use function Busarm\PhpMini\Helpers\async;
-use function Busarm\PhpMini\Helpers\http_parse_query;
+use function Armie\Helpers\async;
+use function Armie\Helpers\http_parse_query;
 
 /**
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class RemoteService extends BaseService
 {

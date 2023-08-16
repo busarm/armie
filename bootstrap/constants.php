@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Constants;
+namespace Armie\Constants;
 
 const VAR_SERVER_NAME       =   'SERVER_NAME';
 const VAR_REQUEST_URI       =   'REQUEST_URI';

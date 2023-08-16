@@ -1,29 +1,29 @@
 <?php
 
-namespace Busarm\PhpMini\Test;
+namespace Armie\Test;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Data\PDO\Relation;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
-use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
-use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
+use Armie\App;
+use Armie\Config;
+use Armie\Configs\PDOConfig;
+use Armie\Data\PDO\Relation;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Test\TestApp\Models\CategoryTestModel;
+use Armie\Test\TestApp\Models\ProductTestModel;
+use Armie\Test\TestApp\Repositories\ProductTestRepository;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @covers \Busarm\PhpMini\Data\PDO\Connection
- * @covers \Busarm\PhpMini\Data\PDO\Model
- * @covers \Busarm\PhpMini\Data\PDO\Repository
- * @covers \Busarm\PhpMini\Test\TestApp\Models
- * @covers \Busarm\PhpMini\Test\TestApp\Repositories
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @covers \Armie\Data\PDO\Connection
+ * @covers \Armie\Data\PDO\Model
+ * @covers \Armie\Data\PDO\Repository
+ * @covers \Armie\Test\TestApp\Models
+ * @covers \Armie\Test\TestApp\Repositories
  * @group skip
  * @group pdo
  */
@@ -34,7 +34,7 @@ final class PDOTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
+        ini_set('error_log', tempnam(sys_get_temp_dir(), 'armie'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
     }
     /**

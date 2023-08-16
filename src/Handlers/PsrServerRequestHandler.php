@@ -1,20 +1,20 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
-use Busarm\PhpMini\Request;
+use Armie\App;
+use Armie\Config;
+use Armie\Interfaces\RequestHandlerInterface;
+use Armie\Request;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface as PsrServerRequestHandlerInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class PsrServerRequestHandler implements PsrServerRequestHandlerInterface
 {

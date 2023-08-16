@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceClientInterface;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class RemoteClient implements ServiceClientInterface
 {

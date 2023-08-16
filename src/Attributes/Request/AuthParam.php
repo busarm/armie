@@ -1,24 +1,24 @@
 <?php
 
-namespace Busarm\PhpMini\Attributes\Request;
+namespace Armie\Attributes\Request;
 
 use Attribute;
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Interfaces\Attribute\ParameterAttributeInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
-use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Resolvers\Auth;
-use Busarm\PhpMini\Traits\TypeResolver;
+use Armie\App;
+use Armie\Interfaces\Attribute\ParameterAttributeInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\Resolver\AuthResolver;
+use Armie\Interfaces\RouteInterface;
+use Armie\Resolvers\Auth;
+use Armie\Traits\TypeResolver;
 use ReflectionParameter;
 
 /**
  * Request auth user resolver
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class AuthParam implements ParameterAttributeInterface

@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Test;
+namespace Armie\Test;
 
 use PHPUnit\Framework\TestCase;
-use Busarm\PhpMini\Crypto;
+use Armie\Crypto;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @covers \Busarm\PhpMini\Crypto
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @covers \Armie\Crypto
  */
 final class CryptoTest extends TestCase
 {

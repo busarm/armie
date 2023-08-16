@@ -1,24 +1,24 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Bags\Bag;
-use Busarm\PhpMini\Dto\ServiceRegistryDto;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Armie\Bags\Bag;
+use Armie\Dto\ServiceRegistryDto;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\DistributedServiceDiscoveryInterface;
+use Armie\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Interfaces\StorageBagInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterface, ServiceDiscoveryInterface
 {

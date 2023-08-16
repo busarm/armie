@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0]
+
+Renamed to Armie
+
 ## [1.6.2]
 
 ### Added

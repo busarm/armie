@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use Busarm\PhpMini\Crypto;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Armie\Crypto;
+use Armie\Helpers\Security;
+use Armie\Interfaces\StorageBagInterface;
 use Generator;
 
-use function Busarm\PhpMini\Helpers\async;
-use function Busarm\PhpMini\Helpers\serialize;
-use function Busarm\PhpMini\Helpers\unserialize;
+use function Armie\Helpers\async;
+use function Armie\Helpers\serialize;
+use function Armie\Helpers\unserialize;
 
 /**
  * Store simple plain data (string, array, object) as file
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @inheritDoc
  */
 class FileStore implements StorageBagInterface

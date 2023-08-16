@@ -1,48 +1,48 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Configs\WorkerConfig;
-use Busarm\PhpMini\Middlewares\StatelessCookieMiddleware;
+use Armie\Configs\WorkerConfig;
+use Armie\Middlewares\StatelessCookieMiddleware;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 
-use Busarm\PhpMini\Dto\ResponseDto;
-use Busarm\PhpMini\Dto\TaskDto;
-use Busarm\PhpMini\Enums\AppStatus;
-use Busarm\PhpMini\Enums\Cron;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Enums\Looper;
-use Busarm\PhpMini\Enums\Verbose;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Handlers\EventHandler;
-use Busarm\PhpMini\Handlers\QueueHandler;
-use Busarm\PhpMini\Exceptions\HttpException;
-use Busarm\PhpMini\Handlers\RequestHandler;
-use Busarm\PhpMini\Handlers\WorkermanSessionHandler;
-use Busarm\PhpMini\Interfaces\ContainerInterface;
-use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
-use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
-use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
-use Busarm\PhpMini\Interfaces\EventHandlerInterface;
-use Busarm\PhpMini\Interfaces\HttpServerInterface;
-use Busarm\PhpMini\Interfaces\ReportingInterface;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Busarm\PhpMini\Interfaces\ProviderInterface;
-use Busarm\PhpMini\Interfaces\QueueHandlerInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
-use Busarm\PhpMini\Interfaces\SingletonInterface;
-use Busarm\PhpMini\Interfaces\SingletonStatelessInterface;
-use Busarm\PhpMini\Middlewares\PsrMiddleware;
-use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
-use Busarm\PhpMini\Tasks\Task;
-use Busarm\PhpMini\Traits\Container;
+use Armie\Dto\ResponseDto;
+use Armie\Dto\TaskDto;
+use Armie\Enums\AppStatus;
+use Armie\Enums\Cron;
+use Armie\Enums\Env;
+use Armie\Enums\HttpMethod;
+use Armie\Enums\Looper;
+use Armie\Enums\Verbose;
+use Armie\Errors\SystemError;
+use Armie\Handlers\EventHandler;
+use Armie\Handlers\QueueHandler;
+use Armie\Exceptions\HttpException;
+use Armie\Handlers\RequestHandler;
+use Armie\Handlers\WorkermanSessionHandler;
+use Armie\Interfaces\ContainerInterface;
+use Armie\Interfaces\Data\ResourceControllerInterface;
+use Armie\Interfaces\DependencyResolverInterface;
+use Armie\Interfaces\DistributedServiceDiscoveryInterface;
+use Armie\Interfaces\EventHandlerInterface;
+use Armie\Interfaces\HttpServerInterface;
+use Armie\Interfaces\ReportingInterface;
+use Armie\Interfaces\LoaderInterface;
+use Armie\Interfaces\MiddlewareInterface;
+use Armie\Interfaces\ProviderInterface;
+use Armie\Interfaces\QueueHandlerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\RouteInterface;
+use Armie\Interfaces\RouterInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Interfaces\SingletonInterface;
+use Armie\Interfaces\SingletonStatelessInterface;
+use Armie\Middlewares\PsrMiddleware;
+use Armie\Middlewares\StatelessSessionMiddleware;
+use Armie\Tasks\Task;
+use Armie\Traits\Container;
 use Exception;
 use Laravel\SerializableClosure\SerializableClosure;
 use Psr\Http\Message\RequestInterface as MessageRequestInterface;
@@ -66,11 +66,11 @@ use Workerman\Protocols\Http\Session\FileSessionHandler;
 use Workerman\Timer;
 use Workerman\Worker;
 
-use function Busarm\PhpMini\Helpers\error_level;
-use function Busarm\PhpMini\Helpers\is_cli;
-use function Busarm\PhpMini\Helpers\log_notice;
-use function Busarm\PhpMini\Helpers\log_warning;
-use function Busarm\PhpMini\Helpers\serialize;
+use function Armie\Helpers\error_level;
+use function Armie\Helpers\is_cli;
+use function Armie\Helpers\log_notice;
+use function Armie\Helpers\log_warning;
+use function Armie\Helpers\serialize;
 
 // TODO PSR Cache Interface
 // TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
@@ -79,10 +79,10 @@ use function Busarm\PhpMini\Helpers\serialize;
 /**
  * Application Factory
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class App implements HttpServerInterface, ContainerInterface
 {

@@ -1,21 +1,21 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Async;
-use Busarm\PhpMini\Enums\AppStatus;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\EventHandlerInterface;
-use Busarm\PhpMini\Interfaces\Runnable;
+use Armie\App;
+use Armie\Async;
+use Armie\Enums\AppStatus;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\EventHandlerInterface;
+use Armie\Interfaces\Runnable;
 
 /**
  * Handle event operations
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class EventHandler implements EventHandlerInterface
 {

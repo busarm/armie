@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces;
+namespace Armie\Interfaces;
 
-use Busarm\PhpMini\Enums\HttpMethod;
+use Armie\Enums\HttpMethod;
 use Closure;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
+use Armie\Interfaces\MiddlewareInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface RouteInterface extends ContainerInterface

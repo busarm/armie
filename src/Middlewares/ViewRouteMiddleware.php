@@ -1,26 +1,26 @@
 <?php
 
-namespace Busarm\PhpMini\Middlewares;
+namespace Armie\Middlewares;
 
-use Busarm\PhpMini\Handlers\ResponseHandler;
-use Busarm\PhpMini\DI;
-use Busarm\PhpMini\Enums\ResponseFormat;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Exceptions\NotFoundException;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\Handlers\ResponseHandler;
+use Armie\DI;
+use Armie\Enums\ResponseFormat;
+use Armie\Errors\SystemError;
+use Armie\Exceptions\NotFoundException;
+use Armie\Interfaces\MiddlewareInterface;
+use Armie\Interfaces\RequestHandlerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\RouteInterface;
 
-use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\view;
+use function Armie\Helpers\app;
+use function Armie\Helpers\view;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class ViewRouteMiddleware implements MiddlewareInterface
 {

@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini\Test;
+namespace Armie\Test;
 
 use PHPUnit\Framework\TestCase;
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
-use Busarm\PhpMini\Server;
-use Busarm\PhpMini\Interfaces\RouterInterface;
+use Armie\App;
+use Armie\Config;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\LoaderInterface;
+use Armie\Server;
+use Armie\Interfaces\RouterInterface;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Log\LoggerInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
- * @covers \Busarm\PhpMini\Server
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @covers \Armie\Server
  */
 final class ServerTest extends TestCase
 {
@@ -29,7 +29,7 @@ final class ServerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        ini_set('error_log', tempnam(sys_get_temp_dir(), 'php-mini'));
+        ini_set('error_log', tempnam(sys_get_temp_dir(), 'armie'));
         defined('APP_START_TIME') or define('APP_START_TIME', floor(microtime(true) * 1000));
     }
 

@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Dto;
+namespace Armie\Dto;
 
-use Busarm\PhpMini\Helpers\Security;
+use Armie\Helpers\Security;
 use ReflectionObject;
-use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Traits\PropertyLoader;
-use Busarm\PhpMini\Traits\TypeResolver;
+use Armie\Interfaces\Arrayable;
+use Armie\Traits\PropertyLoader;
+use Armie\Traits\TypeResolver;
 use Stringable;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class BaseDto implements Arrayable, Stringable
 {

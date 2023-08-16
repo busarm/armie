@@ -1,21 +1,21 @@
 <?php
 
-namespace Busarm\PhpMini\Configs;
+namespace Armie\Configs;
 
-use Busarm\PhpMini\Enums\Cron;
-use Busarm\PhpMini\Enums\Looper;
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Tasks\Task;
-use Busarm\PhpMini\Traits\CustomConfig;
+use Armie\Enums\Cron;
+use Armie\Enums\Looper;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Tasks\Task;
+use Armie\Traits\CustomConfig;
 use DateTimeInterface;
 
 /**
  * Application Worker Configuration
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license s://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license s://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class WorkerConfig implements ConfigurationInterface
 {

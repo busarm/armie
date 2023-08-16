@@ -1,26 +1,26 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Interfaces\Promise\PromiseCatch;
-use Busarm\PhpMini\Interfaces\Promise\PromiseFinal;
-use Busarm\PhpMini\Interfaces\Promise\PromiseThen;
-use Busarm\PhpMini\Tasks\CallableTask;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\Interfaces\Promise\PromiseCatch;
+use Armie\Interfaces\Promise\PromiseFinal;
+use Armie\Interfaces\Promise\PromiseThen;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Fiber;
 use Generator;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\report;
+use function Armie\Helpers\report;
 
 /**
  * Promises for async operations - built on @see Fibers 
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @inheritDoc
  * 
  * ## CAUTION ! ##

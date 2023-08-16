@@ -1,18 +1,18 @@
 <?php
 
-namespace Busarm\PhpMini\Configs;
+namespace Armie\Configs;
 
-use Busarm\PhpMini\Enums\ResponseFormat;
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Traits\CustomConfig;
+use Armie\Enums\ResponseFormat;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Traits\CustomConfig;
 
 /**
  * HTTP Configuration
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license s://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license s://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class HttpConfig implements ConfigurationInterface
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\Helpers;
+namespace Armie\Helpers;
 
 use DateTime;
 use Stringable;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class StringableDateTime extends DateTime implements Stringable
 {

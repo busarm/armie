@@ -1,12 +1,12 @@
 <?php
 
-namespace Busarm\PhpMini\Errors;
+namespace Armie\Errors;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 class LoaderError extends SystemError

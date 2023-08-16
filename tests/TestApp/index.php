@@ -2,25 +2,23 @@
 
 /**
  * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
- * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
+ * @var \Armie\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
  */
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Middlewares\SessionMiddleware;
-use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Service\LocalServiceDiscovery;
-use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
-use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
-use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
+use Armie\App;
+use Armie\Config;
+use Armie\Configs\HttpConfig;
+use Armie\Configs\PDOConfig;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Enums\Env;
+use Armie\Interfaces\RequestInterface;
+use Armie\Request;
+use Armie\Response;
+use Armie\Service\LocalServiceDiscovery;
+use Armie\Test\TestApp\Controllers\AuthTestController;
+use Armie\Test\TestApp\Controllers\HomeTestController;
+use Armie\Test\TestApp\Models\CategoryTestModel;
+use Armie\Test\TestApp\Models\ProductTestModel;
 use Faker\Factory;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -33,6 +31,7 @@ $config = (new Config())
     ->setHttp((new HttpConfig)
         ->setCheckCors(true)
         ->setAllowAnyCorsDomain(true)
+        ->setSendAndContinue(true)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
     ->setDb((new PDOConfig)
@@ -45,7 +44,9 @@ $config = (new Config())
         ->setConnectionPersist(false)
         ->setConnectionErrorMode(true));
 
+
 $app = new App($config, Env::LOCAL);
+
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
@@ -54,7 +55,7 @@ $app->get('pingHtml')->call(function (App $app) {
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
-    $req->session()->set("Name", "Samuel");
+    $req->session()?->set("Name", "Samuel");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),

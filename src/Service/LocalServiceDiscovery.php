@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
+use Armie\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class LocalServiceDiscovery implements ServiceDiscoveryInterface
 {

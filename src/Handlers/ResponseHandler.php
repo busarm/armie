@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
-use Busarm\PhpMini\Enums\ResponseFormat;
-use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
-use Busarm\PhpMini\Response;
+use Armie\Enums\ResponseFormat;
+use Armie\Interfaces\Arrayable;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\ResponseHandlerInterface;
+use Armie\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Traversable;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class ResponseHandler implements ResponseHandlerInterface
 {

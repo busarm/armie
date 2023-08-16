@@ -1,18 +1,21 @@
 <?php
 
-namespace Busarm\PhpMini\Configs;
+namespace Armie\Configs;
 
-use Busarm\PhpMini\Enums\Looper;
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Traits\CustomConfig;
+use Armie\Enums\Cron;
+use Armie\Enums\Looper;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Tasks\Task;
+use Armie\Traits\CustomConfig;
+use DateTimeInterface;
 
 /**
  * Application Worker Configuration
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license s://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license s://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class WorkerConfig implements ConfigurationInterface
 {
@@ -34,7 +37,7 @@ class WorkerConfig implements ConfigurationInterface
     public bool $useTaskWorker = true;
 
     /**
-     * Event lool type
+     * Event loop type
      * @var Looper
      */
     public Looper $looper = Looper::DEFAULT;
@@ -53,6 +56,13 @@ class WorkerConfig implements ConfigurationInterface
      * Full path to worker's log file
      */
     public string|null $logFilePath = null;
+
+    /**
+     * Timer Jobs
+     *
+     * @var array<string,Task[]>
+     */
+    public array $jobs = [];
 
     /**
      * Set number of http workers to spawn
@@ -136,6 +146,38 @@ class WorkerConfig implements ConfigurationInterface
     public function setLogFilePath(string $logFilePath)
     {
         $this->logFilePath = $logFilePath;
+
+        return $this;
+    }
+
+    /**
+     * Add timer Jobs
+     *
+     * @param Task $job Job to perform
+     * @param Cron|DateTimeInterface|int $cron When to perform job. 
+     * Use `Cron::*` or `integer` value (seconds) for recuring jobs. 
+     * Use `DateTimeInterface` for one-time job. 
+     * @return  self
+     */
+    public function addJob(Task $job, Cron|DateTimeInterface|int $cron)
+    {
+        if ($cron instanceof Cron) {
+            if (!isset($this->jobs[$cron->value])) {
+                $this->jobs[$cron->value] = [];
+            }
+            $this->jobs[$cron->value][] = $job;
+        } else if ($cron instanceof DateTimeInterface) {
+            $date = $cron->format(DATE_W3C);
+            if (!isset($this->jobs[$date])) {
+                $this->jobs[$date] = [];
+            }
+            $this->jobs[$date][] = $job;
+        } else {
+            if (!isset($this->jobs[$cron])) {
+                $this->jobs[$cron] = [];
+            }
+            $this->jobs[$cron][] = $job;
+        }
 
         return $this;
     }

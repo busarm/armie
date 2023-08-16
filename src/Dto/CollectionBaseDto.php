@@ -1,6 +1,6 @@
 <?php
 
-namespace Busarm\PhpMini\Dto;
+namespace Armie\Dto;
 
 use ArrayObject;
 use InvalidArgumentException;
@@ -8,15 +8,15 @@ use OutOfRangeException;
 use Stringable;
 use Traversable;
 
-use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Traits\TypeResolver;
+use Armie\Interfaces\Arrayable;
+use Armie\Helpers\Security;
+use Armie\Traits\TypeResolver;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @see https://stackoverflow.com/a/54096881
  * 
  * @template T Item type template

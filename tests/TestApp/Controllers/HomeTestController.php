@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Controllers;
+namespace Armie\Test\TestApp\Controllers;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Armie\App;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class HomeTestController
 {

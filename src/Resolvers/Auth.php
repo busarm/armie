@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Resolvers;
+namespace Armie\Resolvers;
 
-use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
-use Busarm\PhpMini\Interfaces\Resolver\AuthUserResolver;
+use Armie\Interfaces\Resolver\AuthResolver;
+use Armie\Interfaces\Resolver\AuthUserResolver;
 
 /**
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Auth implements AuthResolver
 {

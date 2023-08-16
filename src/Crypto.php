@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
 /**
  * Encryption, Decription and Hashing
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Crypto
 {
@@ -63,7 +63,7 @@ class Crypto
      * - `KEY_IV_LENGTH` - Default: 16. @see openssl_random_pseudo_bytes
      * @return mixed Base64 encoded result of encrypted data
      */
-    public static function encrypt(string|null $passphrase, string|null $plain, array $configs = [])
+    public static function encrypt(string $passphrase, string $plain, array $configs = [])
     {
         $method = $configs['METHOD'] ?? self::$METHOD;
         $keyHashAlgo = $configs['KEY_HASH_ALGO'] ?? self::$KEY_HASH_ALGO;
@@ -99,7 +99,7 @@ class Crypto
      * - `KEY_HASH_LENGTH` - Default: 16. @see hash_pbkdf2
      * @return string|boolean
      */
-    public static function decrypt(string|null $passphrase, string|null $cipher, array $configs = [])
+    public static function decrypt(string $passphrase, string $cipher, array $configs = [])
     {
 
         $method = $configs['METHOD'] ?? self::$METHOD;

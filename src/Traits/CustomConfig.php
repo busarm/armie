@@ -1,17 +1,33 @@
 <?php
 
-namespace Busarm\PhpMini\Traits;
+namespace Armie\Traits;
 
 /**
  *  
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 trait CustomConfig
 {
     private array $_custom   =   [];
+
+    /**
+     * Load configs
+     * 
+     * @param array<string,string|int|bool> $configs
+     */
+    public function load(array $configs)
+    {
+        foreach ($configs as $key => $config) {
+            if (property_exists($this, $key)) {
+                $this->{$key} = $config;
+            } else {
+                $this->set($key, $config);
+            }
+        }
+    }
 
     /**
      * @inheritDoc

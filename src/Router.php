@@ -1,27 +1,27 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Enums\RouteMatcher;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Exceptions\BadRequestException;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Middlewares\CallableRouteMiddleware;
-use Busarm\PhpMini\Middlewares\ControllerRouteMiddleware;
-use Busarm\PhpMini\Middlewares\ViewRouteMiddleware;
+use Armie\Enums\HttpMethod;
+use Armie\Enums\RouteMatcher;
+use Armie\Errors\SystemError;
+use Armie\Exceptions\BadRequestException;
+use Armie\Helpers\Security;
+use Armie\Interfaces\Data\ResourceControllerInterface;
+use Armie\Interfaces\RouteInterface;
+use Armie\Interfaces\RouterInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Middlewares\CallableRouteMiddleware;
+use Armie\Middlewares\ControllerRouteMiddleware;
+use Armie\Middlewares\ViewRouteMiddleware;
 
 /**
  * Application Router
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Router implements RouterInterface
 {
@@ -142,7 +142,7 @@ class Router implements RouterInterface
      * Process routing
      *
      * @param RequestInterface|RouteInterface|null $request
-     * @return \Busarm\PhpMini\Interfaces\MiddlewareInterface[]
+     * @return \Armie\Interfaces\MiddlewareInterface[]
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array
     {
@@ -175,10 +175,10 @@ class Router implements RouterInterface
                 // Find route
                 if (
                     $route->getMethod() === $request->method() &&
-                    ($params = $this->isMatch($request->path(), $route->getPath()))
+                    ($params = $this->isMatch($request->path(), $route->getPath())) !== false
                 ) {
-                    // Set current route
-                    $route->params(is_array($params) ? $params : []);
+                    // Set route params
+                    $route->params($params ?: []);
 
                     // View
                     if ($view = $route->getView()) {
@@ -212,7 +212,7 @@ class Router implements RouterInterface
      * @param string $route Route to compare to
      * @param boolean $startsWith path starts with route
      * @param boolean $startsWith path ends with route
-     * @return boolean|array
+     * @return array|false Return list of path match or `false` if failed
      */
     public function isMatch($path, $route, $startsWith = true, $endsWith = true)
     {
@@ -236,7 +236,7 @@ class Router implements RouterInterface
             if (!empty($paramMatches)) {
                 $params = array_combine($paramMatches, array_splice($matches, 1));
             } else $params = array_splice($matches, 1);
-            return !empty($params) ? Security::cleanParams($params) : true;
+            return !empty($params) ? Security::cleanParams($params) : [];
         }
         return false;
     }

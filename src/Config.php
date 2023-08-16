@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Enums\CacheLimiter;
-use Busarm\PhpMini\Enums\SameSite;
-use Busarm\PhpMini\Enums\Verbose;
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Traits\CustomConfig;
+use Armie\Configs\HttpConfig;
+use Armie\Configs\PDOConfig;
+use Armie\Enums\CacheLimiter;
+use Armie\Enums\SameSite;
+use Armie\Enums\Verbose;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Traits\CustomConfig;
 use SessionHandlerInterface;
 
 /**
  * Application Configuration
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Config implements ConfigurationInterface
 {
@@ -35,7 +35,7 @@ class Config implements ConfigurationInterface
      *
      * @var string
      */
-    public string $name = 'PHP Mini';
+    public string $name = 'Armie';
 
     /**
      * App version

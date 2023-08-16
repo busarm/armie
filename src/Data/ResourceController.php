@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini\Data;
+namespace Armie\Data;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\ResourceItemRequestDto;
-use Busarm\PhpMini\Dto\ResourceListRequestDto;
-use Busarm\PhpMini\Dto\ResourcePaginatedListRequestDto;
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\Data\RepositoryInterface;
-use Busarm\PhpMini\Interfaces\Data\ResourceControllerInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Armie\Dto\BaseDto;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Dto\ResourceItemRequestDto;
+use Armie\Dto\ResourceListRequestDto;
+use Armie\Dto\ResourcePaginatedListRequestDto;
+use Armie\Helpers\Security;
+use Armie\Interfaces\Data\RepositoryInterface;
+use Armie\Interfaces\Data\ResourceControllerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 abstract class ResourceController implements ResourceControllerInterface
 {

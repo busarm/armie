@@ -1,20 +1,20 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Controllers;
+namespace Armie\Test\TestApp\Controllers;
 
-use Busarm\PhpMini\Data\ResourceController;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Test\TestApp\Repositories\ProductTestRepository;
-use Busarm\PhpMini\Test\TestApp\Tasks\UpdateProduct;
+use Armie\Data\ResourceController;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Test\TestApp\Repositories\ProductTestRepository;
+use Armie\Test\TestApp\Tasks\UpdateProduct;
 
-use function Busarm\PhpMini\Helpers\await;
+use function Armie\Helpers\await;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ProductTestController extends ResourceController
 {

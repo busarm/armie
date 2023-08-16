@@ -1,35 +1,39 @@
 <?php
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Bags\FileStore;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Configs\WorkerConfig;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Enums\Looper;
-use Busarm\PhpMini\Interfaces\ProviderInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Promise;
-use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Service\LocalServiceDiscovery;
-use Busarm\PhpMini\Service\ServiceRegistryProvider;
-use Busarm\PhpMini\Test\TestApp\Controllers\AuthTestController;
-use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
-use Busarm\PhpMini\Test\TestApp\Controllers\ProductTestController;
-use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
-use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
+use Armie\App;
+use Armie\Bags\FileStore;
+use Armie\Config;
+use Armie\Configs\HttpConfig;
+use Armie\Configs\PDOConfig;
+use Armie\Configs\WorkerConfig;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Enums\Cron;
+use Armie\Enums\Env;
+use Armie\Enums\HttpMethod;
+use Armie\Enums\Looper;
+use Armie\Interfaces\ProviderInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Promise;
+use Armie\Response;
+use Armie\Service\LocalServiceDiscovery;
+use Armie\Service\ServiceRegistryProvider;
+use Armie\Tasks\CallableTask;
+use Armie\Test\TestApp\Controllers\AuthTestController;
+use Armie\Test\TestApp\Controllers\HomeTestController;
+use Armie\Test\TestApp\Controllers\ProductTestController;
+use Armie\Test\TestApp\Models\ProductTestModel;
+use Armie\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Workerman\Connection\ConnectionInterface;
 
-use function Busarm\PhpMini\Helpers\async;
-use function Busarm\PhpMini\Helpers\await;
-use function Busarm\PhpMini\Helpers\dispatch;
-use function Busarm\PhpMini\Helpers\listen;
-use function Busarm\PhpMini\Helpers\log_debug;
-use function Busarm\PhpMini\Helpers\concurrent;
+use function Armie\Helpers\async;
+use function Armie\Helpers\await;
+use function Armie\Helpers\dispatch;
+use function Armie\Helpers\listen;
+use function Armie\Helpers\log_debug;
+use function Armie\Helpers\concurrent;
+use function Armie\Helpers\enqueue;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -90,33 +94,32 @@ $app->get('test')->call(function (RequestInterface $req, App $app) {
         'correlationId' => $req->correlationId(),
     ];
 });
-
-$app->get('test/promise')->call(function (App $app) {
-    $store = new FileStore($app->config->tempPath . '/files');
-    $result = (new Promise(function (FileStore $store, string $env) {
-        $store->set("TestSession-File", ["test", $env]);
-        print_r("Processing promise file \n");
-        return $store->all();
-    }, $store, $app->env->value))
-        ->then(function ($data) {
-            print_r("Promise Then\n");
-            print_r($data);
-            // print_r(PHP_EOL);
-            throw new \Exception("TEST EX");
-            // return $data;
-        })
-        ->catch(function (Exception $ex) {
-            print_r("Promise Catch \n");
-            print_r($ex->getMessage());
-            print_r(PHP_EOL);
-        })
-        // ->wait()
-        // ->finally(function () {
-        //     print_r("Promise Finally \n");
-        //     print_r(PHP_EOL);
-        // })
-    ;
-    return $result;
+$app->get('test/queue')->call(function () {
+    enqueue(function () {
+        log_debug("1 - Processing queue");
+        return ProductTestModel::update(1, [
+            'name' =>  md5(uniqid())
+        ]);
+    });
+    enqueue(function () {
+        log_debug("2 - Processing queue");
+        return ProductTestModel::update(2, [
+            'name' =>  md5(uniqid())
+        ]);
+    });
+});
+$app->get('test/promise')->call(function (App $app, RequestInterface $request) {
+    $count = ConnectionInterface::$statistics['total_request'];
+    $promise = (new Promise(function () use ($count) {
+        log_debug("1 - Processing promise db - " . $count);
+        return ProductTestModel::update(2, [
+            'name' =>  md5(uniqid())
+        ]);
+    }));
+    $promise->then(function (ProductTestModel $data) {
+        log_debug("1 - Result of promise db - ", $data?->get('name'));
+    });
+    return $promise->getId();
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -132,6 +135,9 @@ listen(ProductTestModel::class, function ($data) {
     log_debug("Product event 4", $data);
 });
 $app->get('test/event')->call(function () {
+    listen(ProductTestModel::class, function ($data) {
+        log_debug("Product event 5 (running)", $data);
+    });
     dispatch(ProductTestModel::class, ProductTestModel::findById(2)?->toArray() ?? []);
 });
 $app->get('test/db')->call(function () {
@@ -306,13 +312,16 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
     $http = new Client([
         'timeout'  => 10000,
     ]);
-    return $http->requestAsync(
+    $http->requestAsync(
         HttpMethod::GET->value,
         "https://busarm.com/ping",
         [
             RequestOptions::VERIFY => false
         ]
-    )->wait();
+    )->then(function () {
+        print_r("Test Http Success" . PHP_EOL);
+    });
+    return "Test success";
 });
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
@@ -337,4 +346,10 @@ $app->start(
     8181,
     (new WorkerConfig)
         ->setLooper(Looper::SWOOLE)
+        ->addJob(new CallableTask(function () {
+            log_debug("Testing EVERY_MINUTE Cron Job");
+        }), Cron::EVERY_MINUTE)
+        ->addJob(new CallableTask(function () {
+            log_debug("Testing One-Time Job");
+        }), (new DateTime('+5 seconds')))
 );

@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Services;
+namespace Armie\Test\TestApp\Services;
 
-use Busarm\PhpMini\Interfaces\SingletonInterface;
-use Busarm\PhpMini\Traits\Singleton;
+use Armie\Interfaces\SingletonInterface;
+use Armie\Traits\Singleton;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class MockService implements SingletonInterface
 {

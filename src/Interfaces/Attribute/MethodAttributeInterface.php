@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Attribute;
+namespace Armie\Interfaces\Attribute;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\App;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\RouteInterface;
 use ReflectionMethod;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface MethodAttributeInterface

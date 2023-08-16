@@ -1,23 +1,31 @@
-[![Test](https://github.com/Busarm/php-mini/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/Busarm/php-mini/actions/workflows/php.yml)
-[![License](https://poser.pugx.org/Busarm/php-mini/license)](https://packagist.org/packages/busarm/php-mini)
-[![Latest Stable Version](https://poser.pugx.org/Busarm/php-mini/v)](https://packagist.org/packages/busarm/php-mini)
-[![PHP Version Require](https://poser.pugx.org/Busarm/php-mini/require/php)](https://packagist.org/packages/busarm/php-mini)
+[![Test](https://github.com/busarm/armie/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/busarm/armie/actions/workflows/php.yml)
+[![License](https://poser.pugx.org/busarm/armie/license)](https://packagist.org/packages/busarm/armie)
+[![Latest Stable Version](https://poser.pugx.org/busarm/armie/v)](https://packagist.org/packages/busarm/armie)
+[![PHP Version Require](https://poser.pugx.org/busarm/armie/require/php)](https://packagist.org/packages/busarm/armie)
 
-# PHP Mini
+## Introduction
 
-A micro php framework with asynchronous event driven support; designed to provide high performance with elegance and optimal developer experience.
+An elegant PHP framework designed to provide high performance with optimal developer experience. It includes support for different architecture patterns:
+
+- Model-View-Controller (MVC)
+- Service-oriented
+- Microservices
+- Event Driven
+- Asynchronous Queuing
 
 ## Installation
 
-`composer require busarm/php-mini`
-
-## Structure
-
-App folders can be structured in whatever pattern you wish.
+`composer require busarm/armie`
 
 ## Usage
 
-### Single App
+### Traditional HTTP Server
+
+Traditional HTTP server using PHP-FPM and NGINX or Apache.
+
+#### Single Application
+
+Run a single application
 
 ```php
 
@@ -37,13 +45,9 @@ App folders can be structured in whatever pattern you wish.
     $app->run();
 ```
 
-You can use PHP server built-in server to test:
+#### Multi Tenant Application
 
-```bash
-$ php -S localhost:8181 -t tests/TestServer
-```
-
-### Multi Tenancy Server
+Host multiple applications or modules. Supports path and domain routing
 
 ```php
 
@@ -57,11 +61,12 @@ $ php -S localhost:8181 -t tests/TestServer
         ->addDomainPath('dev.myapp.com', __DIR__ . '/mydevapp/public');
     $server->run();
 
+
     # ../myapp/public/index.php
 
     /**
      * @var \Psr\Http\Message\ServerRequestInterface|null $request Capture Server request
-     * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
+     * @var \Armie\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
      */
 
     require __DIR__ . '/../vendor/autoload.php';
@@ -91,8 +96,12 @@ $ php -S localhost:8181 -t tests/TestServer
 
     $app->get('/product/{id}')->to(ProductController::class, 'get');
 
-    // With Single processes
-    $app->start("localhost", 8080);
+    $app->start("localhost", 8080,
+        (new WorkerConfig)
+            ->setLooper(Looper::DEFAULT)
+            ->addJob(new CallableTask(function () {
+                log_debug("Testing EVERY_MINUTE Cron Job");
+            }), Cron::EVERY_MINUTE));
 
 ```
 
@@ -102,57 +111,122 @@ Run command to start application
 # Windows
 php start.php
 
-# Linux
+# Linux (Recommended)
 php start.php start
 ```
 
 ## Configs
 
+Configure application
+
+```php
+    $config = (new Config())
+        ->setAppPath(__DIR__)
+        ->setConfigPath('Configs')
+        ->setViewPath('Views')
+        ->setSecret("mysamplesecret123456")
+        ->setCookieEncrypt(true)
+        ->setHttp((new HttpConfig)
+            ->setCheckCors(true)
+            ->setAllowAnyCorsDomain(true)
+            ->setAllowedCorsHeaders(['*'])
+            ->setAllowedCorsMethods(['GET']))
+        ->setLogRequest(false)
+        ->setSessionEnabled(true)
+        ->setSessionLifetime(60)
+        ->setDb((new PDOConfig)
+                ->setConnectionDriver("mysql")
+                ->setConnectionHost("127.0.0.1")
+                ->setConnectionDatabase('default')
+                ->setConnectionPort(3310)
+                ->setConnectionUsername("root")
+                ->setConnectionPassword("root")
+                ->setConnectionPersist(true)
+                ->setConnectionErrorMode(true)
+                ->setConnectionPoolSize(10)
+        );
+    $app = new App($config);
+    ...
+```
+
+### Using Config Files
+
+Configs can be attached using separate configuration files.
+
+#### Create Config File
+
 Add config file to your config path. E.g `myapp/Configs/database.php`
 
 ```php
-    # index.php (initialization script)
-    ....
-    $config->addFile('database')
-    $app = new App($config);
-    ....
-
     # database.php
+
     // Use constant
     define("DB_NAME", "my-db-dev");
     define("DB_HOST", "localhost");
+
     // Use dynamic configs
     return [
         'db_name'=>'my-db-dev',
         'db_host'=>'localhost',
     ];
-
-    # Access dynamic configs
+    // Access dynamic configs
     // Set
     app()->config->set('db_name', 'my-db-dev-2');
     // Get
     app()->config->get('db_name');
 ```
 
+#### Add Config File
+
+```php
+    ....
+    $config->addFile('database')
+    $app = new App($config);
+    ....
+```
+
 ## Route
 
-### During Initialization
+Add HTTP routes.
+
+### Controller Route
 
 ```php
     ....
     $app = new App($config);
-    // Controller Route
     $app->get('/user/{id}')->to(UserController::class, 'get');
     $app->get('/user/{id}')->to(UserController::class, 'get');
     $app->post('/user/{id}')->to(UserController::class, 'create');
     $app->put('/user/{id}')->to(UserController::class, 'update'),
     $app->delete('/user/{id}')->to(UserController::class, 'delete'),
-    // Anonymous Route
+    $app->run();
+```
+
+### Anonymous Route
+
+```php
+    ....
+    $app = new App($config);
     $app->get('/user/{id}')->call(function (RequestInterface $request, string $id) {
         // Perform action ...
     });
+    $app->run();
+```
 
+### View Route
 
+```php
+    ....
+    $app = new App($config);
+    $app->get('/user/{id}')->view(UserPage::class);
+    $app->run();
+```
+
+### Custom Route Class
+
+```php
+    ....
+    $app = new App($config);
     // Using Custom Route Class - Single
     $app->router->addRoute(MyRoute::get('/user/{id}')->to(UserController::class, 'get'));
     // Using Custom Route Class - List
@@ -165,30 +239,42 @@ Add config file to your config path. E.g `myapp/Configs/database.php`
     $app->run();
 ```
 
-### In Configs
+## Providers
 
-Add route file to your config path. E.g `myapp/Configs/route.php`
+Extend application features and configurations.
+
+### Create Provider
 
 ```php
-    # index.php (initialization script)
-    ....
-    $config->addFile('route')
-    $app = new App($config);
-    ....
+class CustomProvider implements ProviderInterface
+{
 
-    # route.php
-    app()->get('/user/{id}')->to(UserController::class, 'get');
-    app()->post('/user/{id}')->to(UserController::class, 'create');
-    app()->put('/user/{id}')->to(UserController::class, 'update'),
-    app()->delete('/user/{id}')->to(UserController::class, 'delete'),
+    /**
+     * @inheritDoc
+     */
+    public function process(App $app): void
+    {
+        // Perform custom action....
+    }
+}
+```
+
+### Attach Provider
+
+```php
+    ...
+    $app = new App($config);
+    $app->addProvider(new CustomProvider());
+    ...
 ```
 
 ## Middleware
 
-PSR Middleware supported.
+Intercept HTTP request and response. PSR Middleware supported.
+
+### Create Middleware
 
 ```php
-    # AuthenticateMiddleware.php
     class AuthenticateMiddleware implements MiddlewareInterface
     {
         public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface {
@@ -197,7 +283,11 @@ PSR Middleware supported.
             return $handler->handle($request);
         }
     }
+```
 
+### Attach Middleware
+
+```php
     # Attach global middleware
     ....
     $app = new App($config);
@@ -221,14 +311,18 @@ PSR Middleware supported.
 
 Bind an interface to a particular class. Hence, the specified class object will be used when resolving dependencies.
 
+### Add Binding
+
 ```php
-    # Add bindings
     ....
     $app = new App($config);
     $app->addBinding(CacheInterface::class, RedisCache::class)
     ....
+```
 
-    # Resolve binding
+### Resolve Binding
+
+```php
     // Manually
     $cache = app()->make(CacheInterface::class)
 
@@ -289,16 +383,16 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
     }
 ```
 
-## Mini ORM
+## Database _(Armie ORM)_
 
-A database mini ORM built on top of PHP Data Objects (PDO)
+A simple but elegant database ORM built on top of PHP Data Objects (PDO)
 
 ### Define Model
 
 ```php
 class ProductModel extends Model
 {
-    /**
+    /**F
      * @inheritDoc
      */
     public function getFields(): array
@@ -320,7 +414,7 @@ class ProductModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToOne('category', $this, new Reference(new CategoryTestModel, ['categoryId' => 'id']))
+            new OneToOne('category', $this, new Reference(CategoryTestModel::class, ['categoryId' => 'id']))
         ];
     }
     /**
@@ -419,11 +513,17 @@ $result = $productRepo->paginate(1, 3);
 To execute the test suite, you'll need to install all development dependencies.
 
 ```bash
-$ git clone https://github.com/Busarm/php-mini
+$ git clone https://github.com/busarm/armie
 $ composer install
 $ composer test
 ```
 
+You can use PHP server built-in server to test:
+
+```bash
+$ php -S localhost:8181 -t tests/TestApp
+```
+
 ## License
 
-The PHP Mini Framework is licensed under the MIT license. See [License File](LICENSE) for more information.
+The Armie Framework is licensed under the MIT license. See [License File](LICENSE) for more information.

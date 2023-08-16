@@ -1,20 +1,20 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Interfaces\ReportingInterface;
+use Armie\Interfaces\ReportingInterface;
 
-use function Busarm\PhpMini\Helpers\log_debug;
-use function Busarm\PhpMini\Helpers\log_error;
-use function Busarm\PhpMini\Helpers\log_exception;
+use function Armie\Helpers\log_debug;
+use function Armie\Helpers\log_error;
+use function Armie\Helpers\log_exception;
 
 /**
  * Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Reporter implements ReportingInterface
 {
@@ -96,7 +96,7 @@ class Reporter implements ReportingInterface
     {
         $contexts = array_map(function ($instance) {
             return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
-        }, array_merge([['file' => $exception->getFile(), 'line' => $exception->getLine()]], $exception->getTrace()));
+        },  $exception->getTrace());
         log_exception($exception);
         log_debug($this->toString([
             'crumbs' => $this->redact($this->breadCrumbs),
@@ -145,16 +145,13 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Array/Object to string
+     * Array to String
      *
-     * @param array|object|null $msg
-     * @return string|null
+     * @param array $data
+     * @return string
      */
-    protected function toString(array|object|null $msg): string|null
+    protected function toString(array $data): string
     {
-        if (is_array($msg) || is_object($msg)) {
-            return json_encode($msg, JSON_PRETTY_PRINT);
-        }
-        return $msg;
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }

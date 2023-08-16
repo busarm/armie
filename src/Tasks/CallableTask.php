@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini\Tasks;
+namespace Armie\Tasks;
 
 use Closure;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class CallableTask extends Task
 {
@@ -21,7 +21,7 @@ final class CallableTask extends Task
     /**
      * @inheritdoc
      */
-    public function run(): mixed
+    public function run()
     {
         if ($this->callable && is_callable($this->callable)) {
             if (array_is_list($this->data)) {

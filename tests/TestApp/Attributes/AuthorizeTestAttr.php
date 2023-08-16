@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Attributes;
+namespace Armie\Test\TestApp\Attributes;
 
 use Attribute;
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Exceptions\HttpException;
-use Busarm\PhpMini\Interfaces\Attribute\ClassAttributeInterface;
-use Busarm\PhpMini\Interfaces\Attribute\MethodAttributeInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\App;
+use Armie\Exceptions\HttpException;
+use Armie\Interfaces\Attribute\ClassAttributeInterface;
+use Armie\Interfaces\Attribute\MethodAttributeInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\RouteInterface;
 use ReflectionClass;
 use ReflectionMethod;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class AuthorizeTestAttr implements ClassAttributeInterface, MethodAttributeInterface

@@ -1,18 +1,18 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO;
+namespace Armie\Data\PDO;
 
-use Busarm\PhpMini\Data\PDO\Model;
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Dto\PaginatedCollectionDto;
-use Busarm\PhpMini\Interfaces\Data\QueryRepositoryInterface;
+use Armie\Data\PDO\Model;
+use Armie\Dto\BaseDto;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Dto\PaginatedCollectionDto;
+use Armie\Interfaces\Data\QueryRepositoryInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Repository implements QueryRepositoryInterface
 {

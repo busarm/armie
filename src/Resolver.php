@@ -1,34 +1,38 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Configs\HttpConfig;
-use Busarm\PhpMini\Configs\PDOConfig;
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Reporter;
-use Busarm\PhpMini\Interfaces\ConfigurationInterface;
-use Busarm\PhpMini\Interfaces\DependencyResolverInterface;
-use Busarm\PhpMini\Interfaces\DistributedServiceDiscoveryInterface;
-use Busarm\PhpMini\Interfaces\ReportingInterface;
-use Busarm\PhpMini\Interfaces\LoaderInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
-use Busarm\PhpMini\Interfaces\Resolver\AuthUserResolver;
-use Busarm\PhpMini\Interfaces\Resolver\ServerConnectionResolver;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Interfaces\RouterInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
-use Busarm\PhpMini\Loader;
-use Busarm\PhpMini\Request;
-use Busarm\PhpMini\Response;
-use Busarm\PhpMini\Route;
-use Busarm\PhpMini\Router;
-use Busarm\PhpMini\Resolvers\Auth;
-use Busarm\PhpMini\Resolvers\ServerConnection;
+use Armie\App;
+use Armie\Config;
+use Armie\Configs\HttpConfig;
+use Armie\Configs\PDOConfig;
+use Armie\Dto\BaseDto;
+use Armie\Enums\HttpMethod;
+use Armie\Handlers\EventHandler;
+use Armie\Handlers\QueueHandler;
+use Armie\Reporter;
+use Armie\Interfaces\ConfigurationInterface;
+use Armie\Interfaces\DependencyResolverInterface;
+use Armie\Interfaces\DistributedServiceDiscoveryInterface;
+use Armie\Interfaces\EventHandlerInterface;
+use Armie\Interfaces\ReportingInterface;
+use Armie\Interfaces\LoaderInterface;
+use Armie\Interfaces\QueueHandlerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\Resolver\AuthResolver;
+use Armie\Interfaces\Resolver\AuthUserResolver;
+use Armie\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\RouteInterface;
+use Armie\Interfaces\RouterInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Loader;
+use Armie\Request;
+use Armie\Response;
+use Armie\Route;
+use Armie\Router;
+use Armie\Resolvers\Auth;
+use Armie\Resolvers\ServerConnection;
 use Nyholm\Psr7\Request as Psr7Request;
 use Nyholm\Psr7\Response as Psr7Response;
 use Psr\Http\Message\RequestInterface as MessageRequestInterface;
@@ -39,10 +43,10 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Workerman\Connection\ConnectionInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Resolver implements DependencyResolverInterface
 {
@@ -65,6 +69,9 @@ class Resolver implements DependencyResolverInterface
             Reporter::class, ReportingInterface::class => $this->app->reporter,
             ConsoleLogger::class, LoggerInterface::class => $this->app->logger,
             Loader::class, LoaderInterface::class => $this->app->loader,
+            DI::class => $this->app->di,
+            EventHandler::class, EventHandlerInterface::class => $this->app->eventHandler,
+            QueueHandler::class, QueueHandlerInterface::class => $this->app->queueHandler,
             Route::class, RouteInterface::class => $request && $request instanceof RouteInterface ? $request : null,
             Request::class, RequestInterface::class => $request && $request instanceof RequestInterface ? $request : null,
             Psr7Request::class, ServerRequestInterface::class, MessageRequestInterface::class => $request && $request instanceof RequestInterface ? $request->toPsr() : null,

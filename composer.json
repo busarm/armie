@@ -1,6 +1,6 @@
 {
-    "name": "busarm/php-mini",
-    "description": "A micro php framework designed for micro-services",
+    "name": "busarm/armie",
+    "description": "An elegant PHP framework designed to provide high performance with optimal developer experience",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -15,21 +15,13 @@
             "bootstrap/helpers.php"
         ],
         "psr-4": {
-            "Busarm\\PhpMini\\": "src/",
-            "Busarm\\PhpMini\\Test\\": "tests/"
+            "Armie\\": "src/",
+            "Armie\\Test\\": "tests/"
         }
     },
     "config": {
         "optimize-autoloader": true,
         "classmap-authoritative": true
-    },
-    "archive": {        
-        "exclude": [
-            "*",
-            ".*",
-            "!/bootstrap/*",
-            "!/src/*"
-        ]
     },
     "scripts": {
         "analyze": "./vendor/bin/phpstan analyse --level 3 src tests",

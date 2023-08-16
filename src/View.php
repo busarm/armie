@@ -1,24 +1,24 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Dto\BaseDto;
-use Busarm\PhpMini\Dto\CollectionBaseDto;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\ResponseHandlerInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Armie\Dto\BaseDto;
+use Armie\Dto\CollectionBaseDto;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\ResponseHandlerInterface;
+use Armie\Interfaces\ResponseInterface;
 use Stringable;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\view;
+use function Armie\Helpers\view;
 
 /**
  * Application View Provider 
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class View implements ResponseHandlerInterface, Stringable
 {

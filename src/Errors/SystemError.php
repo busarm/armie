@@ -1,21 +1,21 @@
 <?php
 
-namespace Busarm\PhpMini\Errors;
+namespace Armie\Errors;
 
-use Busarm\PhpMini\App;
-use Busarm\PhpMini\Dto\ErrorTraceDto;
-use Busarm\PhpMini\Dto\ResponseDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Exceptions\HttpException;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Response;
+use Armie\App;
+use Armie\Dto\ErrorTraceDto;
+use Armie\Dto\ResponseDto;
+use Armie\Enums\Env;
+use Armie\Exceptions\HttpException;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Response;
 use Error;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class SystemError extends HttpException
 {

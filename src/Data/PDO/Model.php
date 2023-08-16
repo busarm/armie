@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO;
+namespace Armie\Data\PDO;
 
-use Busarm\PhpMini\Data\PDO\Connection;
-use Busarm\PhpMini\Helpers\StringableDateTime;
-use Busarm\PhpMini\Interfaces\Arrayable;
-use Busarm\PhpMini\Interfaces\Data\ModelInterface;
-use Busarm\PhpMini\Traits\PropertyLoader;
-use Busarm\PhpMini\Traits\TypeResolver;
+use Armie\Data\PDO\Connection;
+use Armie\Helpers\StringableDateTime;
+use Armie\Interfaces\Arrayable;
+use Armie\Interfaces\Data\ModelInterface;
+use Armie\Traits\PropertyLoader;
+use Armie\Traits\TypeResolver;
 use JsonSerializable;
 
-use function Busarm\PhpMini\Helpers\dispatch;
+use function Armie\Helpers\dispatch;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 {
@@ -27,14 +27,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         __excluded as __defaultExcluded;
     }
 
-    const EVENT_BEFORE_QUERY    =   self::class . '::BeforeQuery';
-    const EVENT_AFTER_QUERY     =   self::class . '::AfterQuery';
-    const EVENT_BEFORE_CREATE   =   self::class . '::BeforeCreate';
-    const EVENT_AFTER_CREATE    =   self::class . '::AfterCreate';
-    const EVENT_BEFORE_UPDATE   =   self::class . '::BeforeUpdate';
-    const EVENT_AFTER_UPDATE    =   self::class . '::AfterUpdate';
-    const EVENT_BEFORE_DELETE   =   self::class . '::BeforeDelete';
-    const EVENT_AFTER_DELETE    =   self::class . '::AfterDelete';
+    const EVENT_BEFORE_QUERY    =   self::class . ':BeforeQuery';
+    const EVENT_AFTER_QUERY     =   self::class . ':AfterQuery';
+    const EVENT_BEFORE_CREATE   =   self::class . ':BeforeCreate';
+    const EVENT_AFTER_CREATE    =   self::class . ':AfterCreate';
+    const EVENT_BEFORE_UPDATE   =   self::class . ':BeforeUpdate';
+    const EVENT_AFTER_UPDATE    =   self::class . ':AfterUpdate';
+    const EVENT_BEFORE_DELETE   =   self::class . ':BeforeDelete';
+    const EVENT_AFTER_DELETE    =   self::class . ':AfterDelete';
 
     /**
      * Database connection instance.
@@ -257,14 +257,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Model relations.
      *
-     * @return \Busarm\PhpMini\Data\PDO\Relation[]
+     * @return \Armie\Data\PDO\Relation[]
      */
     abstract public function getRelations(): array;
 
     /**
      * Model fields
      *
-     * @return \Busarm\PhpMini\Data\PDO\Field[]
+     * @return \Armie\Data\PDO\Field[]
      */
     abstract public function getFields(): array;
 
@@ -522,7 +522,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     public function save($trim = false, $relations = true): bool
     {
         // Create
-        if ($this->new || !isset($this->{$this->getKeyName()})) {
+        if ($this->new && !isset($this->{$this->getKeyName()})) {
 
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
@@ -1033,6 +1033,16 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     ##### Override #####
+
+    /**
+     * Is Dirty - Update has been made
+     *
+     * @return bool
+     */
+    public function isDirty(): bool
+    {
+        return !$this->new && $this->_isDirty;
+    }
 
     /**
      * @inheritDoc

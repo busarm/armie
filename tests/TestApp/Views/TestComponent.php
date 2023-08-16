@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Views;
+namespace Armie\Test\TestApp\Views;
 
-use Busarm\PhpMini\View;
+use Armie\View;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class TestComponent extends View
 {

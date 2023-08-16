@@ -1,32 +1,32 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Dto\ResponseDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Enums\ResponseFormat;
+use Armie\Dto\ResponseDto;
+use Armie\Enums\Env;
+use Armie\Enums\ResponseFormat;
 use InvalidArgumentException;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
+use Armie\Interfaces\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Throwable;
 
 use Nyholm\Psr7\Stream;
 use Workerman\Protocols\Http\Response as HttpResponse;
 
-use function Busarm\PhpMini\Helpers\app;
+use function Armie\Helpers\app;
 
 /**
  * HTTP Response Provider
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the symfony package
  * @see Symfony\Component\HttpFoundation\Response (https://github.com/symfony/symfony)
  *
- * @see Busarm\PhpMini\Interface\ResponseInterface
+ * @see Armie\Interface\ResponseInterface
  * 
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Response implements ResponseInterface
 {

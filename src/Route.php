@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
 use Closure;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
-use Busarm\PhpMini\Traits\Container;
+use Armie\Enums\HttpMethod;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\MiddlewareInterface;
+use Armie\Interfaces\RouteInterface;
+use Armie\Traits\Container;
 use Laravel\SerializableClosure\SerializableClosure;
 
 /**
  * Application Routes Provider
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Route implements RouteInterface
 {

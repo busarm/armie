@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini\Data\PDO;
+namespace Armie\Data\PDO;
 
-use Busarm\PhpMini\Data\PDO\Model;
-use Busarm\PhpMini\Interfaces\Data\RelationInterface;
+use Armie\Data\PDO\Model;
+use Armie\Interfaces\Data\RelationInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 abstract class Relation extends Field implements RelationInterface
 {

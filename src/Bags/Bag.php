@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use Busarm\PhpMini\Helpers\Security;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
+use Armie\Helpers\Security;
+use Armie\Interfaces\StorageBagInterface;
 use Closure;
 use Laravel\SerializableClosure\SerializableClosure;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @inheritDoc
  */
 class Bag implements StorageBagInterface
@@ -147,7 +147,7 @@ class Bag implements StorageBagInterface
 	 */
 	public function slice(int $offset, int $length): array
 	{
-		return array_slice($this->attributes, $offset, $length);
+		return array_slice($this->attributes, $offset, $length, true);
 	}
 
 	/**

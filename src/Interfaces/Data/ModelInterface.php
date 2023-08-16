@@ -1,12 +1,12 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces\Data;
+namespace Armie\Interfaces\Data;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface ModelInterface
@@ -29,14 +29,14 @@ interface ModelInterface
     /**
      * Model relations.
      *
-     * @return \Busarm\PhpMini\Interfaces\Data\RelationInterface[]
+     * @return \Armie\Interfaces\Data\RelationInterface[]
      */
     public function getRelations(): array;
 
     /**
      * Model fields
      *
-     * @return \Busarm\PhpMini\Interfaces\Data\FieldInterface[]
+     * @return \Armie\Interfaces\Data\FieldInterface[]
      */
     public function getFields(): array;
 

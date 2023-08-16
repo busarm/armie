@@ -1,11 +1,13 @@
 <?php
 
-namespace Busarm\PhpMini\Helpers;
+namespace Armie\Helpers;
 
-use Busarm\PhpMini\Async;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Promise;
-use Busarm\PhpMini\Tasks\Task;
+use Armie\Async;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\Runnable;
+use Armie\Promise;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Generator;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -15,10 +17,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 
 ########## FEATURE HELPERS ############
@@ -142,9 +144,9 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Busarm\PhpMini\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
-    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Busarm\PhpMini\Response())->json((array)$data, $responseCode)->send(false);
+    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array)$data, $responseCode)->send(false);
 }
 
 
@@ -152,11 +154,11 @@ function out($data = null, $responseCode = 500)
 
 /**
  * Get current app instance
- * @return \Busarm\PhpMini\App
+ * @return \Armie\App
  */
-function app(): \Busarm\PhpMini\App
+function app(): \Armie\App
 {
-    return \Busarm\PhpMini\App::getInstance() ?? throw new SystemError('Failed to get current app instance');
+    return \Armie\App::getInstance() ?? throw new SystemError('Failed to get current app instance');
 }
 
 /**
@@ -191,7 +193,7 @@ function view(string $path, $params = [], $return = false)
 
 /**
  * Get app loader object
- * @return \Busarm\PhpMini\Interfaces\LoaderInterface
+ * @return \Armie\Interfaces\LoaderInterface
  */
 function &load()
 {
@@ -200,7 +202,7 @@ function &load()
 
 /**
  * Get app reporter object
- * @return \Busarm\PhpMini\Interfaces\ReportingInterface
+ * @return \Armie\Interfaces\ReportingInterface
  */
 function &report()
 {
@@ -209,7 +211,7 @@ function &report()
 
 /**
  * Get app router object
- * @return \Busarm\PhpMini\Interfaces\RouterInterface
+ * @return \Armie\Interfaces\RouterInterface
  */
 function &router()
 {
@@ -224,7 +226,7 @@ function &router()
 function log_message($level, $message, array $context = [])
 {
     $message = is_array($message) || is_object($message) ? var_export($message, true) : (string) $message;
-    $message = date("Y-m-d H:i:s.", microtime(true)) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
+    $message = date("Y-m-d H:i:s.", time()) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
     try {
         app()->logger->log($level, $message, $context);
     } catch (\Throwable $th) {
@@ -259,8 +261,7 @@ function log_exception($exception)
 {
     log_message(
         \Psr\Log\LogLevel::ERROR,
-        sprintf("%s \n(%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
-        $exception->getTrace()
+        sprintf("%s (%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
     );
 }
 
@@ -291,6 +292,16 @@ function log_warning(...$message)
 {
     foreach ($message as $log) {
         log_message(\Psr\Log\LogLevel::WARNING, $log);
+    }
+}
+
+/**
+ * @param mixed $message
+ */
+function log_notice(...$message)
+{
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::NOTICE, $log);
     }
 }
 
@@ -528,11 +539,11 @@ function concurrent(array $tasks, $wait = false): Generator
  * Listen to event
  * 
  * @param string $event
- * @param callable|class-string<Task> $listner
+ * @param callable|class-string<Runnable> $listner
  */
 function listen(string $event, callable|string $listner)
 {
-    app()->eventManager->addEventListner($event, $listner);
+    app()->eventHandler?->listen($event, $listner);
 }
 
 /**
@@ -543,9 +554,19 @@ function listen(string $event, callable|string $listner)
  */
 function dispatch(string $event, array $data = [])
 {
-    app()->eventManager->dispatchEvent($event, $data);
+    app()->eventHandler?->dispatch($event, $data);
 }
 
+/**
+ * Queue task
+ * 
+ * @param Task|callable $task
+ */
+function enqueue(Task|callable $task)
+{
+    $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+    app()->queueHandler?->enqueue($task);
+}
 
 /**
  * Wrap data to be serialized
@@ -553,7 +574,7 @@ function dispatch(string $event, array $data = [])
  * @param mixed $data
  * @return mixed
  */
-function wrapSerializable($data)
+function wrap_serializable($data)
 {
     if ($data instanceof Closure) {
         $data = new SerializableClosure($data);
@@ -561,7 +582,7 @@ function wrapSerializable($data)
         $data = new SerializableClosure(Closure::fromCallable($data));
     } else if (is_array($data)) {
         $data = array_map(function ($value) {
-            return wrapSerializable($value);
+            return wrap_serializable($value);
         }, $data);
     } else if (is_object($data)) {
         $reflection = new ReflectionObject($data);
@@ -576,7 +597,7 @@ function wrapSerializable($data)
                     ) {
                         $value = $prop->getValue($data);
                         if (isset($value)) {
-                            $prop->setValue($data, wrapSerializable($value));
+                            $prop->setValue($data, wrap_serializable($value));
                         }
                     }
                 }
@@ -592,13 +613,13 @@ function wrapSerializable($data)
  * @param mixed $data
  * @return mixed
  */
-function unwrapSerializable($data)
+function unwrap_serializable($data)
 {
     if ($data instanceof SerializableClosure) {
         $data = $data->getClosure();
     } else if (is_array($data)) {
         $data = array_map(function ($value) {
-            return unwrapSerializable($value);
+            return unwrap_serializable($value);
         }, $data);
     } else if (is_object($data)) {
         $reflection = new ReflectionObject($data);
@@ -613,7 +634,7 @@ function unwrapSerializable($data)
                     ) {
                         $value = $prop->getValue($data);
                         if (isset($value)) {
-                            $prop->setValue($data, unwrapSerializable($value));
+                            $prop->setValue($data, unwrap_serializable($value));
                         }
                     }
                 }
@@ -631,7 +652,7 @@ function unwrapSerializable($data)
  */
 function serialize($data)
 {
-    return \serialize(wrapSerializable($data));
+    return \serialize(wrap_serializable($data));
 }
 
 /**
@@ -643,7 +664,7 @@ function serialize($data)
  */
 function unserialize($data, array $options = [])
 {
-    return unwrapSerializable(\unserialize($data, $options));
+    return unwrap_serializable(\unserialize($data, $options));
 }
 
 /**

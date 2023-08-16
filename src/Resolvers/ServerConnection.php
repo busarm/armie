@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Resolvers;
+namespace Armie\Resolvers;
 
-use Busarm\PhpMini\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Interfaces\Resolver\ServerConnectionResolver;
 use Workerman\Connection\ConnectionInterface;
 
 /**
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ServerConnection implements ServerConnectionResolver
 {

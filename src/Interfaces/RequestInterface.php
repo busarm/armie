@@ -1,20 +1,20 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces;
+namespace Armie\Interfaces;
 
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\StorageBagInterface;
-use Busarm\PhpMini\Interfaces\SessionStoreInterface;
-use Busarm\PhpMini\Interfaces\Resolver\AuthResolver;
-use Busarm\PhpMini\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\StorageBagInterface;
+use Armie\Interfaces\SessionStoreInterface;
+use Armie\Interfaces\Resolver\AuthResolver;
+use Armie\Interfaces\Resolver\ServerConnectionResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  */
 interface RequestInterface extends ContainerInterface

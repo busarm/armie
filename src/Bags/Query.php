@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini\Bags;
+namespace Armie\Bags;
 
-use function Busarm\PhpMini\Helpers\http_parse_query;
+use function Armie\Helpers\http_parse_query;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @link https://github.com/josantonius/php-session
  */
 final class Query extends Bag

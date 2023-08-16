@@ -1,15 +1,15 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
 use Closure;
-use Busarm\PhpMini\Errors\DependencyError;
-use Busarm\PhpMini\Interfaces\Attribute\ClassAttributeInterface;
-use Busarm\PhpMini\Interfaces\Attribute\FunctionAttributeInterface;
-use Busarm\PhpMini\Interfaces\Attribute\MethodAttributeInterface;
-use Busarm\PhpMini\Interfaces\Attribute\ParameterAttributeInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\Errors\DependencyError;
+use Armie\Interfaces\Attribute\ClassAttributeInterface;
+use Armie\Interfaces\Attribute\FunctionAttributeInterface;
+use Armie\Interfaces\Attribute\MethodAttributeInterface;
+use Armie\Interfaces\Attribute\ParameterAttributeInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\RouteInterface;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -18,11 +18,11 @@ use ReflectionParameter;
 /**
  * Dependency Injector
  * 
- * PHP Mini Framework
+ * Armie Framework
  * 
  * @source https://www.php.net/manual/en/reflectionnamedtype.getname.php#122909
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class DI
 {

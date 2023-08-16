@@ -1,36 +1,36 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Dto\ErrorTraceDto;
-use Busarm\PhpMini\Dto\ResponseDto;
-use Busarm\PhpMini\Dto\ServiceRequestDto;
-use Busarm\PhpMini\Enums\Env;
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Enums\ServiceType;
-use Busarm\PhpMini\Errors\SystemError;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
-use Busarm\PhpMini\Service\LocalClient;
-use Busarm\PhpMini\Service\LocalService;
-use Busarm\PhpMini\Service\RemoteClient;
-use Busarm\PhpMini\Service\RemoteService;
+use Armie\Dto\ErrorTraceDto;
+use Armie\Dto\ResponseDto;
+use Armie\Dto\ServiceRequestDto;
+use Armie\Enums\Env;
+use Armie\Enums\HttpMethod;
+use Armie\Enums\ServiceType;
+use Armie\Errors\SystemError;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Service\LocalClient;
+use Armie\Service\LocalService;
+use Armie\Service\RemoteClient;
+use Armie\Service\RemoteService;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Nyholm\Psr7\Uri;
 use Throwable;
 
-use const Busarm\PhpMini\Constants\VAR_SERVER_NAME;
+use const Armie\Constants\VAR_SERVER_NAME;
 
 /**
  * Server Instance for handling multi tenancy
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Server
 {

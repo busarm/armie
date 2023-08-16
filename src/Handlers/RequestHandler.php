@@ -1,18 +1,18 @@
 <?php
 
-namespace Busarm\PhpMini\Handlers;
+namespace Armie\Handlers;
 
 use Closure;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\RequestHandlerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\RouteInterface;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class RequestHandler implements RequestHandlerInterface
 {

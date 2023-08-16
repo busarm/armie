@@ -1,30 +1,30 @@
 <?php
 
-namespace Busarm\PhpMini;
+namespace Armie;
 
-use Busarm\PhpMini\Interfaces\Promise\PromiseCatch;
-use Busarm\PhpMini\Interfaces\Promise\PromiseFinal;
-use Busarm\PhpMini\Interfaces\Promise\PromiseThen;
-use Busarm\PhpMini\Tasks\CallableTask;
+use Armie\Interfaces\Promise\PromiseCatch;
+use Armie\Interfaces\Promise\PromiseFinal;
+use Armie\Interfaces\Promise\PromiseThen;
+use Armie\Tasks\CallableTask;
+use Armie\Tasks\Task;
 use Closure;
 use Fiber;
 use Generator;
 use Throwable;
 
-use function Busarm\PhpMini\Helpers\app;
-use function Busarm\PhpMini\Helpers\report;
+use function Armie\Helpers\report;
 
 /**
  * Promises for async operations - built on @see Fibers 
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @inheritDoc
  * 
  * ## CAUTION ! ##
- * Be careful when using parameters with the `callable`. 
+ * Be careful when using parameters with a callable `task`. 
  * Parameters will also be serialized before sending to the task worker.
  * Hence, ensure that the parameters are simple. 
  * 
@@ -64,15 +64,14 @@ class Promise implements PromiseThen, PromiseCatch, PromiseFinal
     private ?Closure $_finallyFn = null;
 
     /**
-     * @param callable(array $params):T $callable 
-     * @param array $params
+     * @param Task|callable(array $params):T $task 
      */
-    public function __construct(callable $callable, ...$params)
+    public function __construct(Task|callable $task)
     {
-        $this->_id = static::class . "::" . uniqid();
-        $task = new CallableTask(Closure::fromCallable($callable), $params);
-        $body = strval($task->getRequest(false, app()->config->secret));
-        $this->_fiber = Async::withFiberWorker($this->_id, $body, true);
+        $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+
+        $this->_id = $task->getName();
+        $this->_fiber = Async::withFiberWorker($this->_id, strval($task->getRequest(false)), true);
     }
 
     /**
@@ -156,28 +155,13 @@ class Promise implements PromiseThen, PromiseCatch, PromiseFinal
     }
 
     /**
-     * @param mixed $value
-     * @return mixed
-     */
-    public static function suspend($value = null)
-    {
-        return Fiber::suspend($value);
-    }
-
-    /**
-     * Run tasks concurrently
+     * Resolve list of promises
      * 
-     * @param callable[] $tasks List of Task instance to run
+     * @param self[] $promises List of Promises
      * @return Generator
      */
-    public static function all(array $tasks): Generator
+    public static function all(array $promises): Generator
     {
-        /** @var self[] */
-        $promises = [];
-        foreach ($tasks as $key => $task) {
-            $promises[$key] = new self($task);
-        }
-        ksort($promises);
         foreach ($promises as $key => $promise) {
             yield $key => $promise->wait();
         }

@@ -1,14 +1,14 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces;
+namespace Armie\Interfaces;
 
 use Stringable;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
  * @template T
  */
@@ -29,7 +29,7 @@ interface StorageBagInterface extends Stringable
      * @param mixed $options
      * @return bool
      */
-    public function set(string $name, mixed $value, $options = NULL): bool;
+    public function set(string $name, $value, $options = NULL): bool;
     /**
      * 
      * Checks if an attribute exists

@@ -1,22 +1,22 @@
 <?php
 
-namespace Busarm\PhpMini\Middlewares;
+namespace Armie\Middlewares;
 
-use Busarm\PhpMini\Config;
-use Busarm\PhpMini\Dto\CookieDto;
-use Busarm\PhpMini\Interfaces\MiddlewareInterface;
-use Busarm\PhpMini\Interfaces\RequestHandlerInterface;
-use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Interfaces\ResponseInterface;
-use Busarm\PhpMini\Interfaces\RouteInterface;
+use Armie\Config;
+use Armie\Dto\CookieDto;
+use Armie\Interfaces\MiddlewareInterface;
+use Armie\Interfaces\RequestHandlerInterface;
+use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
+use Armie\Interfaces\RouteInterface;
 
-use function Busarm\PhpMini\Helpers\create_cookie_header;
+use function Armie\Helpers\create_cookie_header;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class StatelessCookieMiddleware implements MiddlewareInterface
 {

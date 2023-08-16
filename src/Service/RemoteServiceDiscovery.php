@@ -1,23 +1,23 @@
 <?php
 
-namespace Busarm\PhpMini\Service;
+namespace Armie\Service;
 
-use Busarm\PhpMini\Enums\HttpMethod;
-use Busarm\PhpMini\Interfaces\ServiceClientInterface;
-use Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface;
+use Armie\Enums\HttpMethod;
+use Armie\Interfaces\ServiceClientInterface;
+use Armie\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
-use function Busarm\PhpMini\Helpers\log_error;
+use function Armie\Helpers\log_error;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class RemoteServiceDiscovery implements ServiceDiscoveryInterface
 {
@@ -111,28 +111,25 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         $client = new Client([
             'timeout'  => $this->timeout,
         ]);
-        $client->requestAsync(
+        $response = $client->request(
             HttpMethod::GET->value,
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false
             ]
-        )->then(
-            function (Response $response) {
-                if ($response && $response->getBody()) {
-                    $result = json_decode($response->getBody(), true) ?? [];
-                    if (!empty($result)) {
-                        $this->services = [];
-                        foreach ($result as $name => $url) {
-                            if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
-                                $this->services[] = new RemoteClient($name, $url);
-                            }
-                        }
-                        $this->requestedAt = time();
+        );
+
+        if ($response->getBody()) {
+            $result = json_decode($response->getBody(), true) ?? [];
+            if (!empty($result)) {
+                $this->services = [];
+                foreach ($result as $name => $url) {
+                    if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
+                        $this->services[] = new RemoteClient($name, $url);
                     }
                 }
-            },
-            fn ($reason) => log_error($reason)
-        )->wait();
+                $this->requestedAt = time();
+            }
+        }
     }
 }

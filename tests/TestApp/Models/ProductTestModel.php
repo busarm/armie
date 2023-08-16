@@ -1,19 +1,19 @@
 <?php
 
-namespace Busarm\PhpMini\Test\TestApp\Models;
+namespace Armie\Test\TestApp\Models;
 
-use Busarm\PhpMini\Data\PDO\Field;
-use Busarm\PhpMini\Data\PDO\Model;
-use Busarm\PhpMini\Data\PDO\Reference;
-use Busarm\PhpMini\Data\PDO\Relations\ManyToMany;
-use Busarm\PhpMini\Data\PDO\Relations\OneToOne;
-use Busarm\PhpMini\Enums\DataType;
+use Armie\Data\PDO\Field;
+use Armie\Data\PDO\Model;
+use Armie\Data\PDO\Reference;
+use Armie\Data\PDO\Relations\ManyToMany;
+use Armie\Data\PDO\Relations\OneToOne;
+use Armie\Enums\DataType;
 
 /**
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ProductTestModel extends Model
 {

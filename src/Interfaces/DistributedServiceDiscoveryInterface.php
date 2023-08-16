@@ -1,16 +1,16 @@
 <?php
 
-namespace Busarm\PhpMini\Interfaces;
+namespace Armie\Interfaces;
 
-use Busarm\PhpMini\Dto\ServiceRegistryDto;
+use Armie\Dto\ServiceRegistryDto;
 
 /**
  * Error Reporting
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 interface DistributedServiceDiscoveryInterface
 {

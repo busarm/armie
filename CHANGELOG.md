@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0]
+
+Renamed to Armie
+
+## [1.6.2]
+
+### Added
+
+- Added worker queue handler
+- Added worker event handler
+- Bug fixes
+
 ## [1.6.1]
 
 ### Added

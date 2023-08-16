@@ -1,9 +1,9 @@
 <?php
 
-use Busarm\PhpMini\Server;
-use Busarm\PhpMini\Service\LocalClient;
-use Busarm\PhpMini\Service\LocalServiceDiscovery;
-use Busarm\PhpMini\Service\RemoteClient;
+use Armie\Server;
+use Armie\Service\LocalClient;
+use Armie\Service\LocalServiceDiscovery;
+use Armie\Service\RemoteClient;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

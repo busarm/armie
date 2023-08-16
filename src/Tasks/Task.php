@@ -1,17 +1,17 @@
 <?php
 
-namespace Busarm\PhpMini\Tasks;
+namespace Armie\Tasks;
 
-use Busarm\PhpMini\Dto\TaskDto;
-use Busarm\PhpMini\Interfaces\Runnable;
+use Armie\Dto\TaskDto;
+use Armie\Interfaces\Runnable;
 
 /**
  * Define tasks operation
  * 
- * PHP Mini Framework
+ * Armie Framework
  *
  * @copyright busarm.com
- * @license https://github.com/Busarm/php-mini/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @template T
  */
 abstract class Task implements Runnable
@@ -20,7 +20,7 @@ abstract class Task implements Runnable
 
   public function __construct(string $name = null)
   {
-    $this->name = $name ?: static::class . "::" . uniqid();
+    $this->name = ($name ?: static::class) . ":" . microtime(true) . ":" . bin2hex(random_bytes(8));
   }
 
   /**
@@ -43,14 +43,12 @@ abstract class Task implements Runnable
    * Convert to task request
    * 
    * @param bool $async - Async request
-   * @param string $key - Task validation key
    * @return TaskDto
    */
-  public function getRequest(bool $async = true, string|null $key = null): TaskDto
+  public function getRequest(bool $async = true): TaskDto
   {
     return (new TaskDto)
       ->setName($this->getName())
-      ->setKey($key)
       ->setAsync($async)
       ->setClass(static::class)
       ->setParams($this->getParams());
@@ -64,5 +62,5 @@ abstract class Task implements Runnable
   /**
    * @return T
    */
-  abstract public function run(): mixed;
+  abstract public function run();
 }

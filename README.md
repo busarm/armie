@@ -19,11 +19,11 @@ An elegant PHP framework designed to provide high performance with optimal devel
 
 ## Usage
 
-## Traditional HTTP Server
+### Traditional HTTP Server
 
 Traditional HTTP server sung PHP-FPM and NGINX or Apache.
 
-### Single Application
+#### Single Application
 
 Run a single application
 

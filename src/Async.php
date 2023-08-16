@@ -40,7 +40,7 @@ class Async
      */
     public static function runTask(Task|callable $task, bool $wait = false): mixed
     {
-        app()->throwIfNotAsync("Async task execution is only allowed when app is running in async mode");
+        app()->throwIfNotAsync("Async task execution is only available when app is running in async mode");
 
         $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
         $body = strval($task->getRequest(!$wait));
@@ -56,7 +56,7 @@ class Async
      */
     public static function runTasks(array $tasks, bool $wait = false): Generator
     {
-        app()->throwIfNotAsync("Async tasks execution is only allowed when app is running in async mode");
+        app()->throwIfNotAsync("Async tasks execution is only available when app is running in async mode");
 
         $fibers = array_map(function (Task|callable $task) use ($wait) {
             $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
@@ -83,6 +83,9 @@ class Async
     {
         $fiber = new Fiber(function (string $id, string $body, bool $wait, int $length) {
             $socket = self::connect($id, true, false);
+            if ($socket == false) {
+                return false;
+            }
 
             // Send the data
             if ($wait) {
@@ -96,16 +99,20 @@ class Async
             // Suspend fiber after sending requesst
             $callback = Fiber::suspend();
 
-            if (!is_null($callback) || !$wait) {
+            if ($callback && is_callable($callback)) {
                 return self::streamLoop($socket, true, function ($socket, $length, $callback) {
-                    $hasCallback = $callback && is_callable($callback);
                     // Receive the response.
-                    $response = $hasCallback ? stream_read($socket, $length) : null;
+                    $response = stream_read($socket, $length);
                     // Close socket
                     $socket && fclose($socket) && $socket = null;
                     // Return response
-                    $hasCallback && call_user_func($callback, $response ? unserialize($response) : null);
+                    call_user_func($callback, $response ? unserialize($response) : null);
                 }, [$socket, $length, $callback]);
+            } else if (!$wait) {
+                return self::streamLoop($socket, true, function ($socket) {
+                    // Close socket
+                    $socket && fclose($socket) && $socket = null;
+                }, [$socket]);
             } else {
                 // Receive the response.
                 $response = stream_read($socket, $length);

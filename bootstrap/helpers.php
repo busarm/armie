@@ -261,8 +261,7 @@ function log_exception($exception)
 {
     log_message(
         \Psr\Log\LogLevel::ERROR,
-        sprintf("%s \n(%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
-        $exception->getTrace()
+        sprintf("%s (%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
     );
 }
 
@@ -293,6 +292,16 @@ function log_warning(...$message)
 {
     foreach ($message as $log) {
         log_message(\Psr\Log\LogLevel::WARNING, $log);
+    }
+}
+
+/**
+ * @param mixed $message
+ */
+function log_notice(...$message)
+{
+    foreach ($message as $log) {
+        log_message(\Psr\Log\LogLevel::NOTICE, $log);
     }
 }
 

@@ -24,7 +24,7 @@ trait Container
      */
     public function addSingleton(string $className, &$object): static
     {
-        $this->singletons[$className] = $object;
+        $this->singletons[$className] = &$object;
         return $this;
     }
 

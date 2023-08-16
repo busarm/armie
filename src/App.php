@@ -4,6 +4,7 @@ namespace Busarm\PhpMini;
 
 use Busarm\PhpMini\Configs\WorkerConfig;
 use Busarm\PhpMini\Middlewares\StatelessCookieMiddleware;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 
 use Busarm\PhpMini\Dto\ResponseDto;
@@ -49,6 +50,7 @@ use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Server\MiddlewareInterface as ServerMiddlewareInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,6 +68,7 @@ use Workerman\Worker;
 
 use function Busarm\PhpMini\Helpers\error_level;
 use function Busarm\PhpMini\Helpers\is_cli;
+use function Busarm\PhpMini\Helpers\log_notice;
 use function Busarm\PhpMini\Helpers\log_warning;
 use function Busarm\PhpMini\Helpers\serialize;
 
@@ -208,14 +211,39 @@ class App implements HttpServerInterface, ContainerInterface
         $this->loader = new Loader($this->config);
 
         // Set logger
-        $this->logger = new ConsoleLogger(new ConsoleOutput(match ($this->config->loggerVerborsity) {
-            Verbose::QUIET => OutputInterface::VERBOSITY_QUIET,
-            Verbose::NORMAL => OutputInterface::VERBOSITY_NORMAL,
-            Verbose::VERBOSE => OutputInterface::VERBOSITY_VERBOSE,
-            Verbose::VERY_VERBOSE => OutputInterface::VERBOSITY_VERY_VERBOSE,
-            Verbose::DEBUG => OutputInterface::VERBOSITY_DEBUG,
-            default => OutputInterface::VERBOSITY_NORMAL
-        }, true));
+        $this->logger = new ConsoleLogger(
+            new ConsoleOutput(
+                match ($this->config->loggerVerborsity) {
+                    Verbose::QUIET => OutputInterface::VERBOSITY_QUIET,
+                    Verbose::NORMAL => OutputInterface::VERBOSITY_NORMAL,
+                    Verbose::VERBOSE => OutputInterface::VERBOSITY_VERBOSE,
+                    Verbose::VERY_VERBOSE => OutputInterface::VERBOSITY_VERY_VERBOSE,
+                    Verbose::DEBUG => OutputInterface::VERBOSITY_DEBUG,
+                    default => OutputInterface::VERBOSITY_NORMAL
+                },
+                true
+            ),
+            [
+                LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::NOTICE => OutputInterface::VERBOSITY_VERBOSE,
+                LogLevel::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
+                LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
+            ],
+            [
+                LogLevel::EMERGENCY => "error",
+                LogLevel::ALERT => "error",
+                LogLevel::CRITICAL => "error",
+                LogLevel::ERROR => "error",
+                LogLevel::WARNING => "comment",
+                LogLevel::NOTICE => "question",
+                LogLevel::INFO => "info",
+                LogLevel::DEBUG => "info",
+            ]
+        );
 
         // Set error reporter
         $this->reporter = new Reporter;
@@ -357,12 +385,15 @@ class App implements HttpServerInterface, ContainerInterface
         });
 
         set_error_handler(function (int $severity, string $message, string $file, ?int $line = 0) {
-            if (in_array($severity, [E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING, E_NOTICE])) {
-                return log_warning($message . "\n($file:$line)");
+            if (in_array($severity, [E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING])) {
+                return log_warning(sprintf("%s (%s:%s)", $message, $file, $line ?? 1));
+            } else if (in_array($severity, [E_NOTICE, E_USER_NOTICE])) {
+                return log_notice(sprintf("%s (%s:%s)", $message, $file, $line ?? 1));
+            } else {
+                $this->reporter->leaveCrumbs("meta", ['type' => 'error', 'severity' => error_level($severity), 'env' => $this->env->value]);
+                $this->reporter->exception(new \ErrorException($message, 0, $severity, $file, $line));
+                !$this->isCli && !$this->async && Response::error(500, $message, 0, $file, $line)->send($this->config->http->sendAndContinue);
             }
-            $this->reporter->leaveCrumbs("meta", ['type' => 'error', 'severity' => error_level($severity), 'env' => $this->env->value]);
-            $this->reporter->exception(new \ErrorException($message, 0, $severity, $file, $line));
-            !$this->isCli && !$this->async && Response::error(500, $message, 0, $file, $line)->send($this->config->http->sendAndContinue);
         });
     }
 
@@ -1129,7 +1160,7 @@ class App implements HttpServerInterface, ContainerInterface
     public function throwIfNotAsync(string|null $message = null)
     {
         if (!$this->async) {
-            throw new SystemError($message ?: 'This action is only allowed when app is running in async mode');
+            throw new SystemError($message ?: 'This action is only available when app is running in async mode');
         }
     }
 }

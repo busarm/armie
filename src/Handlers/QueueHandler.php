@@ -23,12 +23,6 @@ use Workerman\Timer;
 final class QueueHandler implements QueueHandlerInterface
 {
     /**
-     * Maximum number of task processed per second.
-     * **IMPORTANT**: To prevent denial-of-service due to queue spamming
-     */
-    const MAX_RATE_LIMIT = 1000;
-
-    /**
      * Queue store
      * @var array<Task>
      */
@@ -47,8 +41,8 @@ final class QueueHandler implements QueueHandlerInterface
 
     /**
      * @param App $app
-     * @param integer $queueRateLimit Queue rate limit: Allowed number of request processed per second. Between 0 to @see self::MAX_RATE_LIMIT
-     * @param integer $queueLimit Queue limit: Allowed number of tasks in queue
+     * @param integer $queueRateLimit Queue rate limit: Allowed number of request processed per second. Between 0 to @see self::MAX_RATE_LIMIT. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param integer $queueLimit Queue limit: Allowed number of tasks in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
      */
     public function __construct(private App $app, private int $queueRateLimit = 300, private int $queueLimit = 10000)
     {
@@ -59,7 +53,7 @@ final class QueueHandler implements QueueHandlerInterface
      */
     public function enqueue(Task $task): void
     {
-        $this->app->throwIfNotAsync("Queueing task is only allowed when app is running in async mode");
+        $this->app->throwIfNotAsync("Queueing task is only available when app is running in async mode");
 
         if (!isset($this->app->taskWorker)) {
             throw new SystemError("Task worker is required for queueing");
@@ -73,9 +67,6 @@ final class QueueHandler implements QueueHandlerInterface
 
         // Add to queue
         self::$queue[] = $task;
-
-        // Get rate limit
-        $limit = (int) ceil(min($this->queueRateLimit, self::MAX_RATE_LIMIT)) ?: 1;
 
         // Run queue
         self::$queueTimer = self::$queueTimer ?: Timer::add(1, function ($limit) {
@@ -93,7 +84,7 @@ final class QueueHandler implements QueueHandlerInterface
                 }
                 self::$queueIdle = true;
             }
-        }, [$limit], true);
+        }, [$this->queueRateLimit], true);
     }
 
     /**

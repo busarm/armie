@@ -5,6 +5,8 @@
  * @var \Busarm\PhpMini\Interfaces\ServiceDiscoveryInterface|null $discovery Capture Service discovery
  */
 
+$before = memory_get_usage();
+
 use Busarm\PhpMini\App;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
@@ -12,8 +14,6 @@ use Busarm\PhpMini\Configs\PDOConfig;
 use Busarm\PhpMini\Dto\CollectionBaseDto;
 use Busarm\PhpMini\Enums\Env;
 use Busarm\PhpMini\Interfaces\RequestInterface;
-use Busarm\PhpMini\Middlewares\SessionMiddleware;
-use Busarm\PhpMini\Middlewares\StatelessSessionMiddleware;
 use Busarm\PhpMini\Request;
 use Busarm\PhpMini\Response;
 use Busarm\PhpMini\Service\LocalServiceDiscovery;
@@ -22,6 +22,9 @@ use Busarm\PhpMini\Test\TestApp\Controllers\HomeTestController;
 use Busarm\PhpMini\Test\TestApp\Models\CategoryTestModel;
 use Busarm\PhpMini\Test\TestApp\Models\ProductTestModel;
 use Faker\Factory;
+
+use function Busarm\PhpMini\Helpers\dispatch;
+use function Busarm\PhpMini\Helpers\log_debug;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -33,6 +36,7 @@ $config = (new Config())
     ->setHttp((new HttpConfig)
         ->setCheckCors(true)
         ->setAllowAnyCorsDomain(true)
+        ->setSendAndContinue(true)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
     ->setDb((new PDOConfig)
@@ -45,7 +49,9 @@ $config = (new Config())
         ->setConnectionPersist(false)
         ->setConnectionErrorMode(true));
 
+
 $app = new App($config, Env::LOCAL);
+
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
@@ -54,7 +60,7 @@ $app->get('pingHtml')->call(function (App $app) {
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
-    $req->session()->set("Name", "Samuel");
+    $req->session()?->set("Name", "Samuel");
     return [
         'name' => 'v1',
         'discovery' => $app->serviceDiscovery?->getServiceClientsMap(),
@@ -92,4 +98,8 @@ $app->get('download')->call(function (Response $response) {
     return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
-return $app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);
+$app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);
+
+$after = memory_get_usage();
+
+log_debug("Memory Used = " . (($after - $before) / 1000 / 1000) . 'mb');

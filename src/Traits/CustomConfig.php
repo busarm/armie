@@ -14,6 +14,22 @@ trait CustomConfig
     private array $_custom   =   [];
 
     /**
+     * Load configs
+     * 
+     * @param array<string,string|int|bool> $configs
+     */
+    public function load(array $configs)
+    {
+        foreach ($configs as $key => $config) {
+            if (property_exists($this, $key)) {
+                $this->{$key} = $config;
+            } else {
+                $this->set($key, $config);
+            }
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     public function get(string $name, $default = null)

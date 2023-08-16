@@ -1,7 +1,6 @@
 <?php
 
 use Busarm\PhpMini\App;
-use Busarm\PhpMini\Async;
 use Busarm\PhpMini\Bags\FileStore;
 use Busarm\PhpMini\Config;
 use Busarm\PhpMini\Configs\HttpConfig;
@@ -27,7 +26,6 @@ use Busarm\PhpMini\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Workerman\Connection\ConnectionInterface;
-use Workerman\Timer;
 
 use function Busarm\PhpMini\Helpers\async;
 use function Busarm\PhpMini\Helpers\await;
@@ -255,7 +253,7 @@ $app->get('test/async-list')->call(function () {
             log_debug("10 Non-wait async success");
             return $data->at(9);
         })
-    ], true);
+    ], false);
     log_debug("Completed");
     return $res;
 });

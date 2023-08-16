@@ -12,6 +12,13 @@ namespace Busarm\PhpMini\Interfaces;
 interface ConfigurationInterface
 {
     /**
+     * Load configs
+     * 
+     * @param array<string,string|int|bool> $configs
+     */
+    public function load(array $configs);
+
+    /**
      * Get config
      * 
      * @param string $name

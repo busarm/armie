@@ -19,12 +19,6 @@ use Busarm\PhpMini\Interfaces\Runnable;
  */
 final class EventHandler implements EventHandlerInterface
 {
-    /**
-     * Maximum listners allowed per event.
-     * **IMPORTANT**: To prevent memory leak
-     */
-    const MAX_EVENT_LISTENERS = 10;
-
     /** 
      * Single use listeners - Listners will be removed after use
      * @var array<string, callable[]|class-string<Runnable>[]> 
@@ -37,7 +31,12 @@ final class EventHandler implements EventHandlerInterface
      */
     private $listners = [];
 
-    public function __construct(private App $app)
+    /**
+     *
+     * @param App $app
+     * @param integer $maxEventListners Maximum listners allowed per event. **IMPORTANT**: To prevent memory leak
+     */
+    public function __construct(private App $app, private $maxEventListners = 10)
     {
     }
 
@@ -57,7 +56,7 @@ final class EventHandler implements EventHandlerInterface
                 self::$singleUseListeners[$event] = [];
             }
             // Limit reached - remove earliest
-            else if (count(self::$singleUseListeners[$event]) >= self::MAX_EVENT_LISTENERS) {
+            else if (count(self::$singleUseListeners[$event]) >= $this->maxEventListners) {
                 array_shift(self::$singleUseListeners[$event]);
             }
             self::$singleUseListeners[$event][] = $listner;
@@ -69,7 +68,7 @@ final class EventHandler implements EventHandlerInterface
                 $this->listners[$event] = [];
             }
             // Limit reached - remove earliest
-            else if (count($this->listners[$event]) >= self::MAX_EVENT_LISTENERS) {
+            else if (count($this->listners[$event]) >= $this->maxEventListners) {
                 array_shift($this->listners[$event]);
             }
             $this->listners[$event][] = $listner;
@@ -81,6 +80,8 @@ final class EventHandler implements EventHandlerInterface
      */
     public function dispatch(string $event, array $data = []): void
     {
+        $this->app->throwIfNotAsync("Event dispatch is only available when app is running in async mode");
+
         if (!empty($listners = $this->listners[$event] ?? [])) {
             foreach ($listners as $listner) {
                 $this->handle($listner, $data);
@@ -105,8 +106,6 @@ final class EventHandler implements EventHandlerInterface
      */
     private function handle(callable|string $listner, array $data = []): void
     {
-        $this->app->throwIfNotAsync("Event dispatch is only allowed when app is running in async mode");
-
         if (is_callable($listner)) {
             Async::taskLoop(fn () => call_user_func($listner, $data));
         } else {

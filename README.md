@@ -1,12 +1,11 @@
-<p align='center'>
-
-![Armie_Logo_256px](https://github.com/busarm/armie/assets/25706510/ca6aed95-7931-45de-afca-4d8f9b1498a7)
-
-[![Test](https://github.com/busarm/armie/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/busarm/armie/actions/workflows/php.yml)
-[![License](https://poser.pugx.org/busarm/armie/license)](https://packagist.org/packages/busarm/armie)
-[![Latest Stable Version](https://poser.pugx.org/busarm/armie/v)](https://packagist.org/packages/busarm/armie)
-[![PHP Version Require](https://poser.pugx.org/busarm/armie/require/php)](https://packagist.org/packages/busarm/armie)
-
+<p align="center">
+<img src="https://github.com/busarm/armie/assets/25706510/ca6aed95-7931-45de-afca-4d8f9b1498a7" alt="Armie_Logo_256px"/>
+</p>
+<p align="center">
+<a href="https://github.com/busarm/armie/actions/workflows/php.yml"><img src="https://github.com/busarm/armie/actions/workflows/php.yml/badge.svg?branch=master" alt="Test"/></a>
+<a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/license" alt="Test"/></a>
+<a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/v" alt="Latest Stable Version"/></a>
+<a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/require/php" alt="PHP Version Require"/></a>
 </p>
 
 ## Introduction
@@ -90,6 +89,13 @@ Host multiple applications or modules. Supports path and domain routing
 ```
 
 ### Asynchronous HTTP Server _(powered by [workerman](https://github.com/walkor/workerman))_
+
+High perfomant Asychronous HTTP Server with support for serveral event-looping providers such as: `swoole`, `libevent`, `ev`, `libuv`, `react`. Provides the following features:
+
+- Background workers to handle asynchronous task and cron job processing
+- Concurrency with Promises and built in (`async`, `await`, `concurrent`) functions
+- Real-time events with built in (`listen`, `dispatch`) functions
+- Asynchronous queuing with built in (`enqueue`) function
 
 ```php
     # ./start.php

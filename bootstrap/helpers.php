@@ -122,8 +122,7 @@ function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUER
  */
 function env($name, $default = null)
 {
-    $data = getenv($name) ?? false;
-    return $data !== false ? $data : $default;
+    return $_ENV[$name] ?? (getenv($name, true) ?: $default);
 }
 
 /**
@@ -316,7 +315,7 @@ function log_notice(...$message)
  * @param boolean $wait Default = true
  * @return \Symfony\Component\Process\Process
  */
-function run(string $command, array $params, $timeout = 600, $wait = true)
+function run(string $command, array $params = [], $timeout = 600, $wait = true)
 {
     $process = new Process([
         $command,
@@ -351,7 +350,7 @@ function run(string $command, array $params, $timeout = 600, $wait = true)
  * @param int $timeout Default = 600 seconds
  * @return \Symfony\Component\Process\Process
  */
-function run_async(string $command, array $params, $timeout = 600)
+function run_async(string $command, array $params = [], $timeout = 600)
 {
     return run($command, $params, $timeout, false);
 }

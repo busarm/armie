@@ -126,19 +126,14 @@ class Async
         $body = strval($task->getRequest(!$wait));
 
         $fiber = new Fiber(function (string $id, string $body, bool $wait, int $length) {
+
             $socket = self::connect($id, true, false);
             if ($socket == false) {
                 return false;
             }
 
             // Send the data
-            if ($wait) {
-                stream_write($socket, $body, $length);
-            } else {
-                self::streamEventLoop($socket, false, function ($socket, $length, $body) {
-                    stream_write($socket, $body, $length);
-                }, [$socket, $length, $body]);
-            }
+            stream_write($socket, $body, $length);
 
             // Suspend fiber after sending requesst
             Fiber::suspend();

@@ -790,9 +790,12 @@ class App implements HttpServerInterface, ContainerInterface
                 try {
                     $response = $this->run(Request::fromWorkerman($request, $this->config));
                     return $connection->send($response->toWorkerman());
+                } catch (HttpException $e) {
+                    $response = $e->handle($this);
+                    $connection->send($response->toWorkerman());
+                    $connection->close();
                 } catch (Throwable $e) {
-                    $this->reporter->exception($e);
-                    $response = (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500);
+                    $response = $this->errorHandler->handle($e);
                     $connection->send($response->toWorkerman());
                     $connection->close();
                 }
@@ -879,8 +882,11 @@ class App implements HttpServerInterface, ContainerInterface
                         throw new Exception(sprintf("%s process %s: Bad request", $connection->worker->name, $connection->worker->id));
                     }
                     throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
+                } catch (HttpException $e) {
+                    $e->handle($this);
+                    $connection->close();
                 } catch (Throwable $e) {
-                    $this->reporter->exception($e);
+                    $this->errorHandler->handle($e);
                     $connection->close();
                 }
             };

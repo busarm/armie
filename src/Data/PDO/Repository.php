@@ -13,9 +13,14 @@ use Armie\Interfaces\Data\QueryRepositoryInterface;
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @template T
  */
 class Repository implements QueryRepositoryInterface
 {
+    /**
+     *
+     * @param Model&T $model
+     */
     public function __construct(private Model $model)
     {
     }

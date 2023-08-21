@@ -145,14 +145,6 @@ class Bag implements StorageBagInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function slice(int $offset, int $length): array
-	{
-		return array_slice($this->attributes, $offset, $length, true);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	public function updates(): array
 	{
 		return array_diff($this->attributes, $this->original);

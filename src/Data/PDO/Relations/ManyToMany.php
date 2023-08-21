@@ -7,13 +7,13 @@ use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relation;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\DataType;
-use Armie\Interfaces\Data\ModelInterface;
 
 /**
  * Armie Framework
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @inheritDoc
  */
 class ManyToMany extends Relation
 {
@@ -65,9 +65,8 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation data
-     * 
-     * @return ModelInterface[]
+     * @inheritDoc
+     * @return Model[]
      */
     public function get(array $conditions = []): array
     {
@@ -108,10 +107,7 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Load relation data for list of items
-     * 
-     * @param Model[] $items
-     * @return Model[] $items with loaded relations
+     * @inheritDoc
      */
     public function load(array $items): array
     {
@@ -179,10 +175,7 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Save relation data
-     * 
-     * @param array|array<array> $data Singe array item or 2D array multiple items
-     * @return bool
+     * @inheritDoc
      */
     public function save(array $data): bool
     {
@@ -237,8 +230,7 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation current model
-     * @return Model
+     * @inheritDoc
      */
     public function getCurrentModel(): Model
     {
@@ -246,8 +238,7 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation reference model
-     * @return Model
+     * @inheritDoc
      */
     public function getReferenceModel(): Model
     {
@@ -255,8 +246,7 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation references
-     * @return array
+     * @inheritDoc
      */
     public function getReferences(): array
     {

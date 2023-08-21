@@ -2,10 +2,8 @@
 
 namespace Armie;
 
-use Armie\Interfaces\Promise\PromiseCatch;
 use Armie\Interfaces\Promise\PromiseFinal;
 use Armie\Interfaces\Promise\PromiseThen;
-use Armie\Tasks\CallableTask;
 use Armie\Tasks\Task;
 use Closure;
 use Fiber;
@@ -55,61 +53,51 @@ use function Armie\Helpers\report;
  * ```
  * @template T
  */
-class Promise implements PromiseThen, PromiseCatch, PromiseFinal
+class Promise implements PromiseThen
 {
-    private string $_id;
     private Fiber $_fiber;
-    private ?Closure $_thenFn = null;
+
+    private bool $_resolving = false;
+    private bool $_done = false;
+    private mixed $_result = null;
+
     private ?Closure $_catchFn = null;
     private ?Closure $_finallyFn = null;
 
     /**
-     * @param Task|callable(array $params):T $task 
+     * @param Task|callable():T $task 
      */
     public function __construct(Task|callable $task)
     {
-        $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-
-        $this->_id = $task->getName();
-        $this->_fiber = Async::withFiberWorker($this->_id, strval($task->getRequest(false)), true);
+        $this->_fiber = Async::withFiberWorker($task, true);
     }
 
     /**
-     * Get promise Id
+     * Promise has completed
      */
-    public function getId()
+    public function done()
     {
-        return $this->_id;
+        return $this->_done;
     }
 
     /**
      * @inheritDoc
      */
-    public function then(callable $fn): PromiseCatch
+    public function then(callable $fn): PromiseThen
     {
-        $promise = &$this;
-        $this->_thenFn = Closure::fromCallable(function ($data) use ($fn, $promise) {
-            try {
-                return call_user_func($fn, $data);
-            } catch (Throwable $th) {
-                $promise->_catchFn ? call_user_func($promise->_catchFn, $th) : report()->exception($th);
-            } finally {
-                $promise->_finallyFn && call_user_func($promise->_finallyFn);
+        Async::withEventLoop(
+            function () use ($fn) {
+                try {
+                    $this->wait();
+                    $this->_result = call_user_func($fn, $this->_result) ?? $this->_result;
+                } catch (Throwable $th) {
+                    $this->_catchFn ? call_user_func($this->_catchFn, $th) : report()->exception($th);
+                } finally {
+                    $this->_finallyFn && call_user_func($this->_finallyFn);
+                }
+                return $this->_result;
             }
-            return null;
-        });
-
-        try {
-            if ($this->_fiber->isSuspended() && !$this->_fiber->isTerminated()) {
-                $this->_fiber->resume($this->_thenFn);
-            } else {
-                call_user_func($this->_thenFn, $this->_fiber->getReturn());
-            }
-        } catch (Throwable $th) {
-            $this->_catchFn ? call_user_func($this->_catchFn, $th) : report()->exception($th);
-        } finally {
-            $this->_finallyFn && call_user_func($this->_finallyFn);
-        }
+        );
 
         return $this;
     }
@@ -136,22 +124,16 @@ class Promise implements PromiseThen, PromiseCatch, PromiseFinal
      * 
      * @return T
      */
-    public function wait(): mixed
+    protected function wait(): mixed
     {
-        $suspended = null;
-
-        // Resume if suspended and nothong else is running
         while ($this->_fiber->isSuspended() && !$this->_fiber->isTerminated()) {
-            if (
-                !Fiber::getCurrent()
-                || Fiber::getCurrent()->isSuspended()
-                || Fiber::getCurrent()->isTerminated()
-            ) {
-                $suspended = $this->_fiber->resume($suspended);
-            }
+            $this->_fiber->resume();
         }
 
-        return $this->_fiber->getReturn();
+        $this->_result = $this->_fiber->getReturn();
+        $this->_done = true;
+
+        return $this->_result;
     }
 
     /**
@@ -165,5 +147,16 @@ class Promise implements PromiseThen, PromiseCatch, PromiseFinal
         foreach ($promises as $key => $promise) {
             yield $key => $promise->wait();
         }
+    }
+
+    /**
+     * Resolve promise
+     * 
+     * @param self $promise Promise
+     * @return T
+     */
+    public static function resolve(self $promise): mixed
+    {
+        return $promise->wait();
     }
 }

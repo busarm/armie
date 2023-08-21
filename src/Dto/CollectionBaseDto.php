@@ -31,7 +31,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * Store the required array type prior to parental construction.
      *
-     * @param array<T>|object $input Any data to preset the array to.
+     * @param array<T>|Traversable<int,T> $input Any data to preset the array to.
      * @param class-string<T>|null $itemClass Define the class that will be used for all items in the array.
      * 
      * @throws InvalidArgumentException
@@ -48,7 +48,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Load data
      *
-     * @param array<T>|Traversable $input
+     * @param array<T>|Traversable<int,T> $input
      * @param bool $sanitize
      * @return self
      */
@@ -476,11 +476,12 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Load dto with array
      *
-     * @param array<T>|object $data
-     * @param class-string<T>|null $itemClass
-     * @return self<T>
+     * @param array<TValue>|Traversable<int,TValue> $data
+     * @param class-string<TValue>|null $itemClass
+     * @return self<TValue>
+     * @template TValue Item type template
      */
-    public static function of(array|object $data, string $itemClass = null): self
+    public static function of(array|Traversable $data, string $itemClass = null): self
     {
         return new self($data, $itemClass);
     }

@@ -10,10 +10,10 @@ namespace Armie\Interfaces\Promise;
  * @codeCoverageIgnore
  * @template T
  */
-interface PromiseThen
+interface PromiseThen extends PromiseCatch
 {
     /**
      * @param callable(T $data): T $fn 
      */
-    public function then(callable $fn): PromiseCatch;
+    public function then(callable $fn): PromiseThen;
 }

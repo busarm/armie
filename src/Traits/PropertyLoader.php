@@ -59,6 +59,8 @@ trait PropertyLoader
      */
     public function __set($key, $value)
     {
+        $key = strip_tags(stripslashes($key));
+
         if (in_array($key, $this->__excluded())) {
             $this->{$key} = $value;
             return;
@@ -92,7 +94,7 @@ trait PropertyLoader
      */
     public function __get($key)
     {
-        return $this->{$key} ?? null;
+        return $this->{strip_tags(stripslashes($key))} ?? null;
     }
 
     /**

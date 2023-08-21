@@ -2,6 +2,7 @@
 
 namespace Armie\Interfaces\Data;
 
+use Armie\Data\PDO\Model;
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Dto\PaginatedCollectionDto;
@@ -13,6 +14,7 @@ use Armie\Interfaces\Data\RepositoryInterface;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
+ * @template T
  */
 interface QueryRepositoryInterface extends RepositoryInterface
 {
@@ -49,7 +51,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * @param string $query Model Provider Query. e.g SQL query
      * @param array $params Query Params. e.g SQL query params
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto<BaseDto>
+     * @return CollectionBaseDto<T>
      */
     public function queryList(string $query, $params = [], int $limit = 0): CollectionBaseDto;
 
@@ -59,7 +61,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param int $page Page Number Default: 1
      * @param int $limit Page Limit. Default: 0 to disable
-     * @return PaginatedCollectionDto<BaseDto>
+     * @return PaginatedCollectionDto<T>
      */
     public function queryPaginate(string $query, $params = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 }

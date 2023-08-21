@@ -4,6 +4,8 @@ namespace Armie\Helpers;
 
 use Armie\Async;
 use Armie\Errors\SystemError;
+use Armie\Interfaces\Promise\PromiseFinal;
+use Armie\Interfaces\Promise\PromiseThen;
 use Armie\Interfaces\Runnable;
 use Armie\Promise;
 use Armie\Tasks\CallableTask;
@@ -163,7 +165,7 @@ function app(): \Armie\App
 
 /**
  * 
- * Get or Set config
+ * Get or Set custom config
  *
  * @param string $name
  * @param mixed $value
@@ -229,7 +231,7 @@ function log_message($level, $message, array $context = [])
     $message = date("Y-m-d H:i:s.", time()) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
     try {
         app()->logger->log($level, $message, $context);
-    } catch (\Throwable $th) {
+    } catch (\Throwable) {
         (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
     }
 }
@@ -310,33 +312,31 @@ function log_notice(...$message)
  *
  * @param string $command
  * @param array $params
- * @param \Symfony\Component\Console\Output\OutputInterface $output
  * @param int $timeout Default = 600 seconds
  * @param boolean $wait Default = true
  * @return \Symfony\Component\Process\Process
  */
-function run(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600, $wait = true)
+function run(string $command, array $params, $timeout = 600, $wait = true)
 {
-    $output->getFormatter()->setStyle('error', new \Symfony\Component\Console\Formatter\OutputFormatterStyle('red'));
     $process = new Process([
         $command,
         ...array_filter($params, fn ($arg) => !empty($arg))
     ]);
     $process->setTimeout($timeout);
     if ($wait) {
-        $process->run(function ($type, $data) use ($output) {
+        $process->run(function ($type, $data) {
             if ($type == Process::ERR) {
-                $output->writeln('<error>' . $data . '</error>');
+                log_error($data);
             } else {
-                $output->writeln('<comment>' . $data . '</comment>');
+                log_debug($data);
             }
         });
     } else {
-        $process->start(function ($type, $data) use ($output) {
+        $process->start(function ($type, $data) {
             if ($type == Process::ERR) {
-                $output->writeln('<error>' . $data . '</error>');
+                log_error($data);
             } else {
-                $output->writeln('<comment>' . $data . '</comment>');
+                log_debug($data);
             }
         });
     }
@@ -348,13 +348,12 @@ function run(string $command, array $params, \Symfony\Component\Console\Output\O
  *
  * @param string $command
  * @param array $params
- * @param \Symfony\Component\Console\Output\OutputInterface $output
  * @param int $timeout Default = 600 seconds
  * @return \Symfony\Component\Process\Process
  */
-function run_async(string $command, array $params, \Symfony\Component\Console\Output\OutputInterface $output, $timeout = 600)
+function run_async(string $command, array $params, $timeout = 600)
 {
-    return run($command, $params, $output, $timeout, false);
+    return run($command, $params, $timeout, false);
 }
 
 
@@ -503,25 +502,25 @@ function parse_php_size($sSize)
 }
 
 /**
- * Run task as async  (NON - Blocking)
+ * Resolve Promise
  * 
- * @param Task|callable $task
- */
-function async(Task|callable $task): mixed
-{
-    return  Async::runTask($task, false);
-}
-
-/**
- * Run task as async and wait for result (Blocking)
- * 
- * @param Promise<T>|Task<T>|callable():T $task
+ * @param Promise<T>|PromiseThen<T>|PromiseFinal $promise
  * @return T
  * @template T
  */
-function await(Promise|Task|callable $task): mixed
+function await(Promise|PromiseThen|PromiseFinal $promise): mixed
 {
-    return $task instanceof Promise ? $task->wait() : Async::runTask($task, true);
+    return Promise::resolve($promise);
+}
+
+/**
+ * Run task asynchronously
+ * 
+ * @param Task|callable $task 
+ */
+function async(Task|callable $task): void
+{
+    Async::runTask($task);
 }
 
 /**
@@ -564,8 +563,12 @@ function dispatch(string $event, array $data = [])
  */
 function enqueue(Task|callable $task)
 {
+    if (!app()->queueHandler) {
+        throw new SystemError("Queue handler is not set. @see App::setQueueHandler");
+    }
+
     $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-    app()->queueHandler?->enqueue($task);
+    app()->queueHandler->enqueue($task);
 }
 
 /**

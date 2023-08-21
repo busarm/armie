@@ -4,8 +4,6 @@ namespace Armie\Interfaces;
 
 use Armie\Interfaces\Runnable;
 
-use function Armie\Helpers\listen;
-
 /**
  * Armie Framework
  *

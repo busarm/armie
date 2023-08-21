@@ -241,14 +241,6 @@ final class Session implements SessionStoreInterface
     {
         return $_SESSION ?? [];
     }
-    
-	/**
-	 * @inheritDoc
-	 */
-	public function slice(int $offset, int $length): array
-	{
-		return array_slice($_SESSION, $offset, $length, true);
-	}
 
     /**
      * @inheritDoc

@@ -4,9 +4,7 @@ namespace Armie\Configs;
 
 use Armie\Enums\Cron;
 use Armie\Enums\Looper;
-use Armie\Interfaces\ConfigurationInterface;
 use Armie\Tasks\Task;
-use Armie\Traits\CustomConfig;
 use DateTimeInterface;
 
 /**
@@ -17,10 +15,8 @@ use DateTimeInterface;
  * @copyright busarm.com
  * @license s://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-class WorkerConfig implements ConfigurationInterface
+class WorkerConfig
 {
-    use CustomConfig;
-
     /**
      * Number of http workers to spawn
      */

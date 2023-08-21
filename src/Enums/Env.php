@@ -15,5 +15,6 @@ enum Env: string
     case DEV       =   "development";
     case TEST      =   "testing";
     case STG       =   "staging";
+    case UAT       =   "uat";
     case PROD      =   "production";
 }

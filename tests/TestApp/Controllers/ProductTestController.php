@@ -8,7 +8,7 @@ use Armie\Interfaces\ResponseInterface;
 use Armie\Test\TestApp\Repositories\ProductTestRepository;
 use Armie\Test\TestApp\Tasks\UpdateProduct;
 
-use function Armie\Helpers\await;
+use function Armie\Helpers\async;
 
 /**
  * Armie Framework
@@ -26,10 +26,9 @@ class ProductTestController extends ResourceController
         parent::__construct($repository, $request, $response);
     }
 
-
     public function task()
     {
-        return await(new UpdateProduct(['name' => md5(uniqid())]));
+        async(new UpdateProduct(['name' => md5(uniqid())]));
     }
 
     public function db()
@@ -40,6 +39,6 @@ class ProductTestController extends ResourceController
     public function dbAsync()
     {
         $repository = $this->repository;
-        return await(fn () => $repository->findById(2));
+        async(fn () => $repository->findById(2));
     }
 }

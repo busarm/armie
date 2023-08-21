@@ -138,7 +138,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Set pagination limit per page.
      *
-     * @return  self
+     * @return  static
      */
     public function setPerPage(int $perPage)
     {
@@ -159,7 +159,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Set the value of new.
      * Model is new - data hasn't been saved.
      *
-     * @return  self
+     * @return  static
      */
     protected function setNew(bool $new)
     {
@@ -188,7 +188,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Set the value of autoLoadRelations.
      *
-     * @return  self
+     * @return  static
      */
     public function setAutoLoadRelations(bool $autoLoadRelations)
     {
@@ -203,7 +203,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * @param  array<string>|array<string,callable> $requestedRelations List of relation names or Relation name as key with callback as value. 
      * Only these relation names will loaded if auto load relations not enabled.
      *
-     * @return  self
+     * @return  static
      */
     public function setRequestedRelations(array $requestedRelations)
     {
@@ -217,7 +217,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      *
      * @param  array<string>  $loadedRelations  Loaded relations names.
      *
-     * @return  self
+     * @return  static
      */
     public function setLoadedRelations(array $loadedRelations)
     {
@@ -231,7 +231,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      *
      * @param  string  $loadedRelation  Loaded relations name.
      *
-     * @return  self
+     * @return  static
      */
     public function addLoadedRelation(string $loadedRelation)
     {
@@ -257,7 +257,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Model relations.
      *
-     * @return \Armie\Data\PDO\Relation[]
+     * @return \Armie\Data\PDO\Relation<static,self>[]
      */
     abstract public function getRelations(): array;
 
@@ -348,9 +348,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
-     * @return ?self
+     * @return ?static
      */
-    public function find($id, $conditions = [], $params = [], $columns = []): ?self
+    public function find($id, $conditions = [], $params = [], $columns = []): ?static
     {
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->findWhere(array_merge($conditions, [
@@ -370,9 +370,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
-     * @return ?self
+     * @return ?static
      */
-    public function findTrashed($id, $conditions = [], $params = [], $columns = []): ?self
+    public function findTrashed($id, $conditions = [], $params = [], $columns = []): ?static
     {
         return $this->findWhere(array_merge($conditions, [
             $this->getKeyName() => ':id'
@@ -383,9 +383,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
-     * @return ?self
+     * @return ?static
      */
-    public function findWhere($conditions = [], $params = [], $columns = []): ?self
+    public function findWhere($conditions = [], $params = [], $columns = []): ?static
     {
         if (empty($columns)) $columns = ["*"];
 
@@ -400,10 +400,10 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         ));
 
         // Dispatch event
-        dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+        dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
         if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
             // Dispatch event
-            dispatch(self::EVENT_AFTER_QUERY);
+            dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
             return (new static($this->db))
                 ->fastLoad($result)
                 ->setNew(false)
@@ -417,7 +417,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
-     * @return self[]
+     * @return static[]
      */
     public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
@@ -432,7 +432,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
-     * @return self[]
+     * @return static[]
      */
     public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
@@ -451,10 +451,10 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         ));
 
         // Dispatch event
-        dispatch(self::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+        dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
         if ($stmt && $stmt->execute($params) && ($results = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
             // Dispatch event
-            dispatch(self::EVENT_AFTER_QUERY);
+            dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
             return $this->processEagerLoadRelations(array_map(
                 fn ($result) => (new static($this->db))
                     ->fastLoad($result)
@@ -485,7 +485,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         else {
 
             // Dispatch event
-            dispatch(self::EVENT_BEFORE_DELETE, $this->toArray());
+            dispatch(static::EVENT_BEFORE_DELETE, $this->toArray());
 
             $stmt = $this->db->prepare(sprintf(
                 "DELETE FROM %s WHERE %s = ?",
@@ -496,7 +496,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
                 $stmt->execute([$this->{$this->getKeyName()}]);
                 if ($stmt->rowCount() > 0) {
                     // Dispatch event
-                    dispatch(self::EVENT_AFTER_DELETE);
+                    dispatch(static::EVENT_AFTER_DELETE);
                     return true;
                 }
             }
@@ -536,7 +536,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             if (empty($params)) return false;
 
             // Dispatch event
-            dispatch(self::EVENT_BEFORE_CREATE, $params);
+            dispatch(static::EVENT_BEFORE_CREATE, $params);
 
             $placeHolderKeys = implode(',', array_map(fn ($key) => "`$key`", array_keys($params)));
             $placeHolderValues = implode(',', array_fill(0, count($params), '?'));
@@ -555,7 +555,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             }
 
             // Dispatch event
-            dispatch(self::EVENT_AFTER_CREATE, $this->toArray());
+            dispatch(static::EVENT_AFTER_CREATE, $this->toArray());
 
             // Notify record exists
             $this->setNew(false);
@@ -578,7 +578,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             if (empty($params)) return false;
 
             // Dispatch event
-            dispatch(self::EVENT_BEFORE_UPDATE, $params);
+            dispatch(static::EVENT_BEFORE_UPDATE, $params);
 
             $placeHolder = implode(',', array_map(fn ($key) => "`$key` = ?", array_keys($params)));
             $stmt = $this->db->prepare(sprintf(
@@ -591,7 +591,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) return false;
 
             // Dispatch event
-            dispatch(self::EVENT_AFTER_UPDATE, $this->toArray());
+            dispatch(static::EVENT_AFTER_UPDATE, $this->toArray());
 
             // Notify record exists
             $this->setNew(false);
@@ -616,7 +616,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         foreach ($this->getRelations() as $relation) {
             $data = $this->{$relation->getName()} ?? null;
             if (isset($data)) {
-                if ($data instanceof self) {
+                if ($data instanceof static) {
                     $success = !$data->save() ? false : $success;
                 } else {
                     $success = !$relation->save((array)$data) ? false : $success;
@@ -646,8 +646,8 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Process eager loading of relations.
      *
-     * @param self[] $items
-     * @return self[]
+     * @param static[] $items
+     * @return static[]
      */
     public function processEagerLoadRelations(array $items): array
     {
@@ -657,9 +657,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Process auto loading of relations.
      *
-     * @return self
+     * @return static
      */
-    public function processAutoLoadRelations(): self
+    public function processAutoLoadRelations(): static
     {
         return $this->autoLoadRelations || !empty($this->requestedRelations) ? $this->loadRelations() : $this;
     }
@@ -667,8 +667,8 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Eager load relations.
      * 
-     * @param self[] $items
-     * @return self[]
+     * @param static[] $items
+     * @return static[]
      */
     public function eagerLoadRelations(array $items): array
     {
@@ -690,9 +690,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Load relations
      *
-     * @return self
+     * @return static
      */
-    public function loadRelations(): self
+    public function loadRelations(): static
     {
         $relsIsList = array_is_list($this->requestedRelations);
         foreach ($this->getRelations() as &$relation) {
@@ -715,9 +715,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      *
      * @param string $name
      * @param callable $callback Anonymous function with `Relation::class` as parameter
-     * @return self
+     * @return static
      */
-    public function loadRelation(string $name, callable $callback = null): self
+    public function loadRelation(string $name, callable $callback = null): static
     {
         foreach ($this->getRelations() as &$relation) {
             if (strtolower($name) === strtolower($relation->getName())) {
@@ -911,9 +911,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Create record
      *
      * @param array $data
-     * @return self|null
+     * @return static|null
      */
-    public static function create(array $data): ?self
+    public static function create(array $data): ?static
     {
         $model = new static;
         $model->load($data);
@@ -928,11 +928,11 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      *
      * @param string|int $id
      * @param array $data
-     * @return self|null
+     * @return static|null
      */
-    public static function update(string|int $id, array $data): ?self
+    public static function update(string|int $id, array $data): ?static
     {
-        $model = self::findById($id);
+        $model = static::findById($id);
         if ($model && $model->fastLoad($data)->save()) {
             return $model;
         }
@@ -946,9 +946,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
-     * @return self|null
+     * @return static|null
      */
-    public static function findById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?self
+    public static function findById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?static
     {
         return (new static)->find($id, $conditions, $params, $columns);
     }
@@ -960,9 +960,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
-     * @return self|null
+     * @return static|null
      */
-    public static function findTrashedById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?self
+    public static function findTrashedById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?static
     {
         return (new static)->findTrashed($id, $conditions, $params, $columns);
     }
@@ -974,7 +974,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
      * @param int|null $limit Query limit
-     * @return self[]
+     * @return static[]
      */
     public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
@@ -989,7 +989,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
      * @param array $columns Select Colomn names. 
      * @param int|null $limit Query limit
-     * @return self[]
+     * @return static[]
      */
     public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
     {
@@ -1002,7 +1002,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Clone model
      * 
-     * @return Model
+     * @return static
      */
     public function clone()
     {
@@ -1014,9 +1014,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Set limit to be loaded with model
      *
      * @param int $limit
-     * @return self
+     * @return static
      */
-    public function withLimit(int $limit): self
+    public function withLimit(int $limit): static
     {
         return $this->clone()->setPerPage($limit);
     }
@@ -1025,9 +1025,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Set relations to be loaded with model
      *
      * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
-     * @return self
+     * @return static
      */
-    public function withRelations(array $relations): self
+    public function withRelations(array $relations): static
     {
         return $this->clone()->setRequestedRelations($relations);
     }

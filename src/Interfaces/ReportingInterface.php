@@ -24,7 +24,7 @@ interface ReportingInterface
      * Get bread crumbs
      */
     public function getBreadCrumbs();
-    
+
     /**
      * Report Info
      *
@@ -36,13 +36,10 @@ interface ReportingInterface
     /**
      * Report Error
      *
-     * @param string $heading
      * @param string $message
-     * @param string $file
-     * @param int $line
      * @return void
      */
-    public function error(string $heading, string $message, string|null $file = null, int|null $line = null);
+    public function error(string $message);
 
     /**
      * Report Exception

@@ -30,8 +30,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Get relation data
-     * 
+     * @inheritDoc
      * @return Model|null
      */
     public function get(): ?Model
@@ -56,10 +55,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Load relation data for list of items
-     * 
-     * @param Model[] $items
-     * @return Model[] $items with loaded relations
+     * @inheritDoc
      */
     public function load(array $items): array
     {
@@ -102,10 +98,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Save relation data
-     * 
-     * @param array $data Singe array item
-     * @return bool
+     * @inheritDoc
      */
     public function save(array $data): bool
     {
@@ -153,8 +146,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Get relation current model
-     * @return Model
+     * @inheritDoc
      */
     public function getCurrentModel(): Model
     {
@@ -162,8 +154,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Get relation reference model
-     * @return Model
+     * @inheritDoc
      */
     public function getReferenceModel(): Model
     {
@@ -171,8 +162,7 @@ class OneToOne extends Relation
     }
 
     /**
-     * Get relation references
-     * @return array
+     * @inheritDoc
      */
     public function getReferences(): array
     {

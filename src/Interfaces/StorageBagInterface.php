@@ -63,12 +63,6 @@ interface StorageBagInterface extends Stringable
      */
     public function all(): array;
     /**
-     * Get slice of attributes
-     *
-     * @return array<string, T>
-     */
-    public function slice(int $from, int $to): array;
-    /**
      * Get updated attributes
      *
      * @return array<string, T>

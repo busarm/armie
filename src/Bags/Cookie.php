@@ -132,14 +132,6 @@ final class Cookie implements StorageBagInterface
     /**
      * @inheritDoc
      */
-    public function slice(int $offset, int $length): array
-    {
-        return array_slice($_COOKIE, $offset, $length, true);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function updates(): array
     {
         return array_filter($_COOKIE, fn ($k) => !isset($this->original[$k]) || $this->original[$k] != $_COOKIE[$k], ARRAY_FILTER_USE_KEY);

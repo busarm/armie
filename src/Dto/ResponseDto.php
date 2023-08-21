@@ -166,8 +166,10 @@ class ResponseDto extends BaseDto
      */
     public static function fromError(Throwable $e, Env $env, string $version): self
     {
-
-        $trace = array_map(fn ($instance) => new ErrorTraceDto($instance), $e->getTrace());
+        $trace = array_map(
+            fn ($instance) => new ErrorTraceDto($instance),
+            array_values(array_filter($e->getTrace(), fn ($trace) => isset($trace['file'])))
+        );
 
         $response = new ResponseDto();
         $response->success = false;

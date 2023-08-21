@@ -108,18 +108,25 @@ $app->get('test/queue')->call(function () {
         ]);
     });
 });
+
 $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
     $count = ConnectionInterface::$statistics['total_request'];
     $promise = (new Promise(function () use ($count) {
-        log_debug("1 - Processing promise db - " . $count);
+        log_debug("Processing promise db - count: " . $count);
         return ProductTestModel::update(2, [
             'name' =>  md5(uniqid())
         ]);
     }));
     $promise->then(function (ProductTestModel $data) {
-        log_debug("1 - Result of promise db - ", $data?->get('name'));
+        log_debug("1 - Result of promise db - " . $data?->get('name'));
+        $data->set("name", "hhahahahah");
+        return $data;
     });
-    return $promise->getId();
+    $promise->then(function (ProductTestModel $data) {
+        log_debug("2 - Result of promise db - " . $data?->get('name'));
+    });
+    $waited = await($promise);
+    log_debug("Promise completed - " . $promise->done() . ' - ' . $waited?->get('name'));
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -272,11 +279,6 @@ $app->get('test/async')->call(function () {
         CollectionBaseDto::of(ProductTestModel::getAll());
         print_r("3 Non-wait async success" . PHP_EOL);
     });
-    $response = await(function () {
-        $data = CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r("4 Wait async success" . PHP_EOL);
-        return $data->first();
-    });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::getAll());
         print_r("5 Non-wait async success" . PHP_EOL);
@@ -301,10 +303,6 @@ $app->get('test/async')->call(function () {
         CollectionBaseDto::of(ProductTestModel::getAll());
         print_r("10 Non-wait async success" . PHP_EOL);
     });
-    print_r("11 Test response from 4" . PHP_EOL);
-    print_r($response);
-    print_r(PHP_EOL);
-    print_r("12 Test  async complete" . PHP_EOL);
 });
 
 

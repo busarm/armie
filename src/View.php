@@ -8,7 +8,6 @@ use Armie\Errors\SystemError;
 use Armie\Interfaces\ResponseHandlerInterface;
 use Armie\Interfaces\ResponseInterface;
 use Stringable;
-use Throwable;
 
 use function Armie\Helpers\view;
 
@@ -20,7 +19,7 @@ use function Armie\Helpers\view;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-class View implements ResponseHandlerInterface, Stringable
+abstract class View implements ResponseHandlerInterface, Stringable
 {
     /**
      * @param BaseDto|array|null $data View Data
@@ -31,37 +30,51 @@ class View implements ResponseHandlerInterface, Stringable
     }
 
     /**
-     * Fetches the view result instead of sending it to the output buffer
+     * Get view data
      *
-     * @param BaseDto|array|null $data View Data
-     * @param array $headers Http headers
-     * @return string
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
      */
-    public static function load(BaseDto|array|null $data = null, $headers = array())
+    final protected function get(string $name, mixed $default = null): mixed
     {
-        $view = new self($data, $headers);
-        try {
-            $view->start();
-            if ($content = $view->render()) echo $content;
-            return $view->end();
-        } catch (Throwable $e) {
-            ob_end_clean();
-            throw $e;
+        if ($this->data) {
+            if ($this->data instanceof BaseDto) return $this->data->get($name, $default);
+            else if (is_array($this->data)) return $this->data[$name] ?? $default;
+            else if (is_object($this->data)) return $this->data->{$name} ?? $default;
         }
+        return $default;
     }
 
     /**
-     * Add http header 
+     * Start output buffer
      * 
-     * @param string $name
-     * @param mixed $value
-     * @return self
+     * @return void
      */
-    public function addHeader($name, $value): self
+    final protected function start()
     {
-        $this->headers[$name] = $value;
-        return $this;
+        ob_start();
     }
+
+    /**
+     * End output buffer
+     * 
+     * @return string
+     */
+    final protected function end()
+    {
+        $contents = ob_get_contents();
+        ob_end_clean();
+        return $contents;
+    }
+
+    /**
+     * 
+     * Renders the view - print out or return the view as string
+     *
+     * @return string|void
+     */
+    abstract protected function render();
 
     /**
      * Fetch view file
@@ -70,7 +83,7 @@ class View implements ResponseHandlerInterface, Stringable
      * @param bool $return
      * @return string|null 
      */
-    public function include($path, $return = false)
+    final protected function include($path, $return = false)
     {
         $params = [];
 
@@ -88,47 +101,16 @@ class View implements ResponseHandlerInterface, Stringable
     }
 
     /**
+     * Add http header 
      * 
-     * Renders the view - print out or return the view as string
-     *
-     * @return string|void
+     * @param string $name
+     * @param mixed $value
+     * @return self
      */
-    public function render()
+    public function addHeader($name, $value): self
     {
-        throw new SystemError('`render` method not implemented');
-    }
-
-    /**
-     * 
-     * Get view data
-     *
-     * @return BaseDto|array|null
-     */
-    public function data()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Start output buffer
-     * 
-     * @return void
-     */
-    protected function start()
-    {
-        ob_start();
-    }
-
-    /**
-     * End output buffer
-     * 
-     * @return string
-     */
-    protected function end()
-    {
-        $contents = ob_get_contents();
-        ob_end_clean();
-        return $contents;
+        $this->headers[$name] = $value;
+        return $this;
     }
 
     /**

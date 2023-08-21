@@ -54,7 +54,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     public function load(array $cookies): self
     {
@@ -106,7 +106,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     public function pull(string $name, $default = null, $sanitize = false): mixed
     {
@@ -116,7 +116,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     function has(string $name): bool
     {
@@ -124,23 +124,15 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     function all(): array
     {
         return $this->data ?? [];
     }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function slice(int $offset, int $length): array
-	{
-		return array_slice($this->data, $offset, $length, true);
-	}
-
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     public function updates(): array
     {
@@ -148,7 +140,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     public function replace(array $data)
     {
@@ -175,7 +167,7 @@ final class StatelessCookie implements StorageBagInterface
     }
 
     /**
-	 * @inheritDoc
+     * @inheritDoc
      */
     public function count(): int
     {

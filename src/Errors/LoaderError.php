@@ -11,4 +11,11 @@ namespace Armie\Errors;
  */
 class LoaderError extends SystemError
 {
+    /**
+     * @param string $message
+     */
+    public function __construct(string $message)
+    {
+        parent::__construct($message, 1003);
+    }
 }

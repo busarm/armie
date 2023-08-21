@@ -20,12 +20,13 @@ use Armie\Service\RemoteService;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Nyholm\Psr7\Uri;
+use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Throwable;
 
 use const Armie\Constants\VAR_SERVER_NAME;
 
 /**
- * Server Instance for handling multi tenancy
+ * PSR Request compatible server for handling multi tenancy
  * 
  * Armie Framework
  *
@@ -50,14 +51,17 @@ class Server
      * @var App[]
      */
     private $domainApps = [];
+
     /**
      * @var Response[]
      */
     private $domainStatics = [];
+
     /**
      * @var string[]
      */
     private $domainPaths = [];
+
     /**
      * @var ServiceDiscoveryInterface
      */
@@ -71,7 +75,7 @@ class Server
 
         // Set up error handler
         set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
-            $this->reporter->error("Internal Server Error", $errstr, $errfile, $errline);
+            $this->reporter->error($errstr);
             (new Response())
                 ->setParameters(
                     (new ResponseDto)
@@ -259,20 +263,20 @@ class Server
      * Run server
      *
      * @param ServerRequestInterface|null $request
-     * @return ResponseInterface
+     * @return MessageResponseInterface
      */
-    public function run(ServerRequestInterface|null $request = null): ResponseInterface
+    public function run(ServerRequestInterface|null $request = null): MessageResponseInterface
     {
         $request = $request ? Request::fromPsr($request) : Request::fromGlobal();
 
         $request->server()->set(VAR_SERVER_NAME, $this->name);
 
         if (($response = $this->runRoute($request)) !== false) {
-            return $response ? $response : (new Response())->setStatusCode(500);
+            return $response ? $response->toPsr() : (new Response())->setStatusCode(500)->toPsr();
         } else if (($response = $this->runDomain($request)) !== false) {
-            return $response ?  $response : (new Response())->setStatusCode(500);
+            return $response ?  $response->toPsr() : (new Response())->setStatusCode(500)->toPsr();
         }
-        return (new Response())->setStatusCode(404);
+        return (new Response())->setStatusCode(404)->toPsr();
     }
 
     /**

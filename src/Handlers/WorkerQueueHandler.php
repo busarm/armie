@@ -5,11 +5,11 @@ namespace Armie\Handlers;
 use Armie\App;
 use Armie\Async;
 use Armie\Errors\QueueError;
-use Armie\Errors\SystemError;
 use Armie\Interfaces\QueueHandlerInterface;
 use Armie\Tasks\CallableTask;
 use Armie\Tasks\Task;
 use Closure;
+use SplQueue;
 use Workerman\Timer;
 
 /**
@@ -20,13 +20,13 @@ use Workerman\Timer;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-final class QueueHandler implements QueueHandlerInterface
+final class WorkerQueueHandler implements QueueHandlerInterface
 {
     /**
      * Queue store
-     * @var array<Task>
+     * @var SplQueue<Task>
      */
-    public static array $queue = [];
+    public static ?SplQueue $queue;
 
     /**
      * Queue timer instance
@@ -46,6 +46,8 @@ final class QueueHandler implements QueueHandlerInterface
      */
     public function __construct(private App $app, private int $queueRateLimit = 300, private int $queueLimit = 10000)
     {
+        self::$queue = self::$queue ?? new SplQueue();
+        self::$queue->setIteratorMode(SplQueue::IT_MODE_FIFO);
     }
 
     /**
@@ -53,11 +55,8 @@ final class QueueHandler implements QueueHandlerInterface
      */
     public function enqueue(Task $task): void
     {
-        $this->app->throwIfNotAsync("Queueing task is only available when app is running in async mode");
-
-        if (!isset($this->app->taskWorker)) {
-            throw new SystemError("Task worker is required for queueing");
-        }
+        $this->app->throwIfNoEventLoop();
+        $this->app->throwIfNoTaskWorker();
 
         if (count(self::$queue) >= $this->queueLimit) {
             throw new QueueError("Queue limit exceeded. Please try again later");
@@ -66,23 +65,32 @@ final class QueueHandler implements QueueHandlerInterface
         $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
 
         // Add to queue
-        self::$queue[] = $task;
+        self::$queue->enqueue($task);
 
         // Run queue
         self::$queueTimer = self::$queueTimer ?: Timer::add(1, function ($limit) {
+
             if (self::$queueIdle) {
-                self::$queueIdle = false;
-                $results = Async::runTasks(array_slice(self::$queue, 0, $limit, true), false);
-                foreach ($results as $id => $data) {
-                    if ($data !== false) {
-                        unset(self::$queue[$id]);
+                try {
+                    self::$queueIdle = false;
+
+                    $count = 0;
+                    foreach (self::$queue as $task) {
+                        if (Async::runTask($task)) {
+                            unset(self::$queue[self::$queue->key()]);
+                            if (++$count >= $limit) break;
+                        }
                     }
+
+                    if (self::$queue->count() == 0) {
+                        Timer::del(self::$queueTimer);
+                        self::$queueTimer = null;
+                    }
+
+                    self::$queueIdle = true;
+                } catch (\Throwable $th) {
+                    $this->app->reporter->exception($th);
                 }
-                if (count(self::$queue) == 0) {
-                    Timer::del(self::$queueTimer);
-                    self::$queueTimer = null;
-                }
-                self::$queueIdle = true;
             }
         }, [$this->queueRateLimit], true);
     }
@@ -90,8 +98,8 @@ final class QueueHandler implements QueueHandlerInterface
     /**
      * @inheritDoc
      */
-    public function dequeue(string $id): void
+    public function dequeue(string|int $id = null): void
     {
-        unset(self::$queue[$id]);
+        self::$queue->offsetUnset($id ?? self::$queue->key());
     }
 }

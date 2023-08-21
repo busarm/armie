@@ -2,9 +2,6 @@
 
 namespace Armie\Configs;
 
-use Armie\Interfaces\ConfigurationInterface;
-use Armie\Traits\CustomConfig;
-
 /**
  * Database Configuration
  * 
@@ -13,11 +10,8 @@ use Armie\Traits\CustomConfig;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-class PDOConfig implements ConfigurationInterface
+class PDOConfig
 {
-
-    use CustomConfig;
-
     /**
      * PDO connection dns
      *
@@ -246,7 +240,7 @@ class PDOConfig implements ConfigurationInterface
      * @param  int  $connectionPoolSize  CUSTOM connection pool size
      *
      * @return  self
-     */ 
+     */
     public function setConnectionPoolSize(int $connectionPoolSize)
     {
         $this->connectionPoolSize = $connectionPoolSize;

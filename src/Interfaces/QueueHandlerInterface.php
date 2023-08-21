@@ -23,7 +23,7 @@ interface QueueHandlerInterface
     /**
      * Remove from queue
      * 
-     * @param string $id
+     * @param string|int|null $id If empty, top most item will be removed form queue
      */
-    public function dequeue(string $id): void;
+    public function dequeue(string|int|null $id = null): void;
 }

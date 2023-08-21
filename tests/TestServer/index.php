@@ -3,7 +3,6 @@
 use Armie\Server;
 use Armie\Service\LocalClient;
 use Armie\Service\LocalServiceDiscovery;
-use Armie\Service\RemoteClient;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -21,4 +20,5 @@ $server = (new Server("Busarm Test Server"))
         ]),
         true
     );
-$server->run()?->send();
+
+echo $server->run()->getBody();

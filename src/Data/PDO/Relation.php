@@ -10,6 +10,8 @@ use Armie\Interfaces\Data\RelationInterface;
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @template TCurrent
+ * @template TReference
  */
 abstract class Relation extends Field implements RelationInterface
 {
@@ -26,28 +28,28 @@ abstract class Relation extends Field implements RelationInterface
 
     /**
      * Get relation reference model
-     * @return Model
+     * @return Model&TReference
      */
     abstract public function getReferenceModel(): Model;
 
     /**
      * Get relation current model
-     * @return Model
+     * @return Model&TCurrent
      */
     abstract public function getCurrentModel(): Model;
 
     /**
      * Get relation data
      * 
-     * @return Model[]|Model|null
+     * @return array<Model&TReference>|(Model&TReference)|null
      */
     abstract public function get(): array|Model|null;
 
     /**
      * Load relation data for list of items
      * 
-     * @param Model[] $items
-     * @return Model[] $items with loaded relations
+     * @param array<Model&TCurrent> $items
+     * @return array<Model&TCurrent> $items with loaded relations
      */
     abstract public function load(array $items): array;
 

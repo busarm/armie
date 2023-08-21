@@ -9,6 +9,7 @@ use Armie\Errors\SystemError;
 use Armie\Interfaces\EventHandlerInterface;
 use Armie\Interfaces\Runnable;
 
+
 /**
  * Handle event operations
  * 
@@ -49,8 +50,8 @@ final class EventHandler implements EventHandlerInterface
             throw new SystemError("`$listner` does not implement " . Runnable::class);
         }
 
-        // App running - register as single-use
-        if ($this->app->status === AppStatus::RUNNNIG) {
+        // App running in async mode - register as single-use
+        if ($this->app->status === AppStatus::RUNNNIG && $this->app->async) {
             // Empty - initialize
             if (!isset(self::$singleUseListeners[$event])) {
                 self::$singleUseListeners[$event] = [];
@@ -80,8 +81,6 @@ final class EventHandler implements EventHandlerInterface
      */
     public function dispatch(string $event, array $data = []): void
     {
-        $this->app->throwIfNotAsync("Event dispatch is only available when app is running in async mode");
-
         if (!empty($listners = $this->listners[$event] ?? [])) {
             foreach ($listners as $listner) {
                 $this->handle($listner, $data);
@@ -107,11 +106,25 @@ final class EventHandler implements EventHandlerInterface
     private function handle(callable|string $listner, array $data = []): void
     {
         if (is_callable($listner)) {
-            Async::taskLoop(fn () => call_user_func($listner, $data));
+            // Use event loop
+            if ($this->app->async && $this->app->worker) {
+                Async::withEventLoop(fn () => call_user_func($listner, $data));
+            }
+            // Use default
+            else {
+                Async::withChildProcess(fn () => call_user_func($listner, $data)) or call_user_func($listner, $data);
+            }
         } else {
             $task = $this->app->di->instantiate($listner, null, $data);
             if ($task instanceof Runnable) {
-                Async::taskLoop($task);
+                // Use event loop
+                if ($this->app->async && $this->app->worker) {
+                    Async::withEventLoop($task);
+                }
+                // Use default
+                else {
+                    Async::withChildProcess($task) or $task->run();
+                }
             }
         }
     }

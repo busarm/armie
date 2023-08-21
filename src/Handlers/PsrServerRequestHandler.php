@@ -2,7 +2,6 @@
 
 namespace Armie\Handlers;
 
-use Armie\App;
 use Armie\Config;
 use Armie\Interfaces\RequestHandlerInterface;
 use Armie\Request;

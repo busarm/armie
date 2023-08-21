@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1]
+
+### Added
+
+- Async support for traditional http server using process forking
+- Error handler interface
+- Event handler for traditional http server using process forking
+- Async bug fixes
+
+### Changed
+
+- Removed `slice()` from StorageBagInterface
+- Update Queue handler for better performance
+- Simplify Promises for better performance with promise chaining
+- Update Types in docs
+
 ## [2.0]
 
 Renamed to Armie

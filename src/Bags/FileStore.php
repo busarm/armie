@@ -22,7 +22,7 @@ use function Armie\Helpers\unserialize;
  */
 class FileStore implements StorageBagInterface
 {
-	const STORAGE_EXT = '.store';
+	const STORAGE_EXT = '.astore';
 	protected array $original = [];
 
 	/**
@@ -137,25 +137,6 @@ class FileStore implements StorageBagInterface
 		$list = [];
 		foreach ($this->getFiles($this->basePath) as $path) {
 			$list[$path] = $this->get($path);
-		}
-		return $list;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function slice(int $offset, int $length): array
-	{
-		$index = 0;
-		$count = 0;
-		$list = [];
-		foreach ($this->getFiles($this->basePath) as $path) {
-			if ($index >= $offset) {
-				$list[$path] = $this->get($path);
-				$count++;
-				if ($count == $length) break;
-			}
-			$index++;
 		}
 		return $list;
 	}

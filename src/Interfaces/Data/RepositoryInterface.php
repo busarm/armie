@@ -12,6 +12,7 @@ use Armie\Dto\PaginatedCollectionDto;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  * @codeCoverageIgnore
+ * @template T
  */
 interface RepositoryInterface
 {
@@ -22,7 +23,7 @@ interface RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto<BaseDto>
+     * @return CollectionBaseDto<T>
      */
     public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
@@ -33,7 +34,7 @@ interface RepositoryInterface
      * @param array $params Query Params. e.g SQL query params
      * @param array $columns Select Colomn names
      * @param int $limit Query Limit. Default: 0 to disable
-     * @return CollectionBaseDto<BaseDto>
+     * @return CollectionBaseDto<T>
      */
     public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
 
@@ -45,7 +46,7 @@ interface RepositoryInterface
      * @param array $columns Select Colomn names
      * @param int $page Page Number Default: 1
      * @param int $limit Page Limit. Default: 0 to disable
-     * @return PaginatedCollectionDto<BaseDto>
+     * @return PaginatedCollectionDto<T>
      */
     public function paginate(array $conditions = [], array $params = [], array $columns = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 

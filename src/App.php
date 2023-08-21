@@ -4,7 +4,6 @@ namespace Armie;
 
 use Armie\Configs\WorkerConfig;
 use Armie\Middlewares\StatelessCookieMiddleware;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 
 use Armie\Dto\ResponseDto;
@@ -17,14 +16,16 @@ use Armie\Enums\Looper;
 use Armie\Enums\Verbose;
 use Armie\Errors\SystemError;
 use Armie\Handlers\EventHandler;
-use Armie\Handlers\QueueHandler;
 use Armie\Exceptions\HttpException;
+use Armie\Handlers\ErrorHandler;
 use Armie\Handlers\RequestHandler;
-use Armie\Handlers\WorkermanSessionHandler;
+use Armie\Handlers\WorkerQueueHandler;
+use Armie\Handlers\WorkerSessionHandler;
 use Armie\Interfaces\ContainerInterface;
 use Armie\Interfaces\Data\ResourceControllerInterface;
 use Armie\Interfaces\DependencyResolverInterface;
 use Armie\Interfaces\DistributedServiceDiscoveryInterface;
+use Armie\Interfaces\ErrorHandlerInterface;
 use Armie\Interfaces\EventHandlerInterface;
 use Armie\Interfaces\HttpServerInterface;
 use Armie\Interfaces\ReportingInterface;
@@ -75,6 +76,7 @@ use function Armie\Helpers\serialize;
 // TODO PSR Cache Interface
 // TODO PSR Session Interface - replace SessionStoreInterface & SessionManager
 // TODO Restructure folders to be self contained - class + it's interface
+// TODO Add support for async, event, queuing for non-async mode
 
 /**
  * Application Factory
@@ -104,7 +106,7 @@ class App implements HttpServerInterface, ContainerInterface
         RouteInterface::class
     ];
 
-    /** @var static App instance */
+    /** @var ?static App instance */
     private static ?self $__instance = null;
 
 
@@ -127,17 +129,22 @@ class App implements HttpServerInterface, ContainerInterface
     public DI $di;
 
     /**
-     * @var EventHandlerInterface
+     * @var ErrorHandlerInterface
      */
-    public ?EventHandlerInterface $eventHandler = null;
+    public ErrorHandlerInterface $errorHandler;
 
     /**
-     * @var QueueHandlerInterface
+     * @var EventHandlerInterface
+     */
+    public EventHandlerInterface $eventHandler;
+
+    /**
+     * @var ?QueueHandlerInterface
      */
     public ?QueueHandlerInterface $queueHandler = null;
 
     /**
-     * @var ServiceDiscoveryInterface
+     * @var ?ServiceDiscoveryInterface
      */
     public ?ServiceDiscoveryInterface $serviceDiscovery = null;
 
@@ -257,11 +264,11 @@ class App implements HttpServerInterface, ContainerInterface
         // Set dependency injector
         $this->di = new DI($this);
 
-        // Set event manager
-        $this->eventHandler = new EventHandler($this);
+        // Set event handler
+        $this->errorHandler = new ErrorHandler($this);
 
-        // Set queue manager
-        $this->queueHandler = new QueueHandler($this);
+        // Set event handler
+        $this->eventHandler = new EventHandler($this);
 
         // Set up error reporting
         $this->setUpErrorHandlers();
@@ -276,40 +283,31 @@ class App implements HttpServerInterface, ContainerInterface
         $this->config->secret && SerializableClosure::setSecretKey($this->config->secret);
     }
 
-    /**
-     * [RESTRICTED]
-     */
-    function __serialize()
+    public function __sleep(): array
     {
-        throw new SystemError("Serializing app instance is forbidden");
+        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
     }
 
-    /**
-     * [RESTRICTED]
-     *
-     * @param mixed $key
-     * @param mixed $val
-     */
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
+    }
+
     public function __set($key, $val)
     {
-        throw new SystemError("This action has been forbidden");
+        throw new \BadMethodCallException('Cannot set dynamic value for ' . __CLASS__);
     }
 
-    /**
-     * [RESTRICTED]
-     * 
-     * @param mixed $key
-     */
     public function __get($key)
     {
-        throw new SystemError("This action has been forbidden");
+        throw new \BadMethodCallException('Cannot get dynamic value for ' . __CLASS__);
     }
 
     /**  
      * Get application instance
-     * @return self 
+     * @return ?self 
      */
-    public static function &getInstance(): self
+    public static function &getInstance(): ?self
     {
         return self::$__instance;
     }
@@ -376,11 +374,11 @@ class App implements HttpServerInterface, ContainerInterface
         set_exception_handler(function (Throwable $e) {
             $this->reporter->leaveCrumbs("meta", ['type' => 'exception', 'env' => $this->env->value]);
             if ($e instanceof HttpException) {
-                $response = $e->handler($this);
+                $response = $e->handle($this);
                 !$this->isCli && !$this->async && $response->send($this->config->http->sendAndContinue);
             } else {
-                $this->reporter->exception($e);
-                !$this->isCli && !$this->async && Response::error(500, $e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine())->send($this->config->http->sendAndContinue);
+                $response = $this->errorHandler->handle($e);
+                !$this->isCli && !$this->async && $response->send($this->config->http->sendAndContinue);
             }
         });
 
@@ -637,11 +635,10 @@ class App implements HttpServerInterface, ContainerInterface
             return ($action)($request);
         } catch (HttpException $e) {
             if ($this->async) throw $e;
-            return $e->handler($this);
+            return $e->handle($this);
         } catch (Throwable $e) {
             if ($this->async) throw $e;
-            $this->reporter->exception($e);
-            return (new Response)->json(ResponseDto::fromError($e, $this->env, $this->config->version)->toArray(), 500);
+            return $this->errorHandler->handle($e);
         }
     }
 
@@ -759,6 +756,9 @@ class App implements HttpServerInterface, ContainerInterface
             ]
         ] : [];
 
+        // Set queue handler
+        $this->queueHandler = new WorkerQueueHandler($this);
+
         // Init Worker
         $this->worker = new Worker($ssl ? 'https://' : 'http://' . $host . ':' . $port, $context);
         $this->worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
@@ -771,7 +771,7 @@ class App implements HttpServerInterface, ContainerInterface
 
             // Add Custom Middlewares
             $this->addMiddleware(new StatelessCookieMiddleware($this->config));
-            $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkermanSessionHandler(
+            $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkerSessionHandler(
                 new FileSessionHandler($this->config->getSessionConfigs()),
                 $this->config->secret
             )));
@@ -1155,12 +1155,22 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Throw error if app is not running in async mode
+     * Throw error if app is not runinng with event loop
      */
-    public function throwIfNotAsync(string|null $message = null)
+    public function throwIfNoEventLoop(string|null $message = null)
     {
-        if (!$this->async) {
-            throw new SystemError($message ?: 'This action is only available when app is running in async mode');
+        if (!$this->async &&  !isset($this->worker) || empty(Worker::getEventLoop())) {
+            throw new SystemError($message ?: "Event Loop is required for this action. Please run app in async mode. See App::start()");
+        }
+    }
+
+    /**
+     * Throw error if app has no task worker
+     */
+    public function throwIfNoTaskWorker(string|null $message = null)
+    {
+        if (!$this->taskWorker) {
+            throw new SystemError($message ?: "Task worker is required for this action.");
         }
     }
 }

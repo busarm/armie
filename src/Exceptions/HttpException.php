@@ -44,7 +44,7 @@ class HttpException extends Exception
      */
     public function handle(App $app): ResponseInterface
     {
-        $this->getStatusCode() >= 500 and $app->reporter->exception($this);
+        $this->getStatusCode() >= 500 && $app->errorHandler->handle($this);
         return (new Response)->json(ResponseDto::fromError($this, $app->env, $app->config->version)->toArray(), $this->getStatusCode());
     }
 }

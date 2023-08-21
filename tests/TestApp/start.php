@@ -26,6 +26,7 @@ use Armie\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Workerman\Connection\ConnectionInterface;
+use Workerman\Worker;
 
 use function Armie\Helpers\async;
 use function Armie\Helpers\await;
@@ -34,6 +35,10 @@ use function Armie\Helpers\listen;
 use function Armie\Helpers\log_debug;
 use function Armie\Helpers\concurrent;
 use function Armie\Helpers\enqueue;
+use function Armie\Helpers\env;
+use function Armie\Helpers\log_info;
+use function Armie\Helpers\run;
+use function Armie\Helpers\run_async;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -62,7 +67,7 @@ $config = (new Config)
             ->setConnectionPoolSize(10)
     );
 
-$app = new App($config, Env::LOCAL);
+$app = new App($config, Env::parse(env('ENV')));
 $app->addBinding(ProviderInterface::class, ServiceRegistryProvider::class);
 $app->addProvider(new ServiceRegistryProvider(new FileStore($config->tempPath . '/store')));
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
@@ -344,6 +349,8 @@ $app->start(
     8181,
     (new WorkerConfig)
         ->setLooper(Looper::SWOOLE)
+        ->setHttpWorkers(8)
+        ->setTaskWorkers(4)
         ->addJob(new CallableTask(function () {
             log_debug("Testing EVERY_MINUTE Cron Job");
         }), Cron::EVERY_MINUTE)

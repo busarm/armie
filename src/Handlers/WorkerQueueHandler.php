@@ -41,11 +41,13 @@ final class WorkerQueueHandler implements QueueHandlerInterface
 
     /**
      * @param App $app
-     * @param integer $queueRateLimit Queue rate limit: Allowed number of request processed per second. Between 0 to @see self::MAX_RATE_LIMIT. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param integer $queueRateLimit Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 1000. Must be less than `queueLimit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
      * @param integer $queueLimit Queue limit: Allowed number of tasks in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
      */
-    public function __construct(private App $app, private int $queueRateLimit = 300, private int $queueLimit = 10000)
+    public function __construct(private App $app, private int $queueRateLimit = 100, private int $queueLimit = 10000)
     {
+        $this->queueRateLimit = min($this->queueRateLimit ?: 1, min($this->queueLimit, 1000));
+
         self::$queue = self::$queue ?? new SplQueue();
         self::$queue->setIteratorMode(SplQueue::IT_MODE_FIFO);
     }
@@ -77,9 +79,14 @@ final class WorkerQueueHandler implements QueueHandlerInterface
                     $count = 0;
                     foreach (self::$queue as $task) {
                         if (Async::runTask($task)) {
+                            // Success - remove from queue
                             unset(self::$queue[self::$queue->key()]);
-                            if (++$count >= $limit) break;
+                            $count++;
+                        } else {
+                            // Failed - move to bottom of queue
+                            self::$queue->enqueue(self::$queue->shift());
                         }
+                        if ($count >= $limit) break;
                     }
 
                     if (self::$queue->count() == 0) {

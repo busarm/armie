@@ -3,7 +3,7 @@
 namespace Armie;
 
 /**
- * Encryption, Decription and Hashing
+ * Encryption, Decryption and Hashing
  * 
  * Armie Framework
  *
@@ -124,7 +124,6 @@ class Crypto
         }
         return false;
     }
-
 
     /**
      * Generate hmac signature for data

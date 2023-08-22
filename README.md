@@ -455,7 +455,7 @@ A simple but expressive database object-relational mapper (ORM) built on top of 
 ```php
 class ProductModel extends Model
 {
-    /**F
+    /**
      * @inheritDoc
      */
     public function getFields(): array

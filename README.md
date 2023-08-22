@@ -8,9 +8,53 @@
 <a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/require/php" alt="PHP Version Require"/></a>
 </p>
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Traditional HTTP Server](#traditional-http-server)
+    - [Single Application](#single-application)
+    - [Multi Tenant Application](#multi-tenant-application)
+  - [Asynchronous HTTP Server](#asynchronous-http-server-powered-by-workerman)
+- [Configs](#configs)
+  - [Using Config Files](#using-config-files)
+    - [Create Config File](#create-config-file)
+    - [Add Config File](#add-config-file)
+- [Route](#route)
+  - [Controller Route](#controller-route)
+  - [Anonymous Route](#anonymous-route)
+  - [View Route](#view-route)
+  - [Custom Route Class](#custom-route-class)
+- [Providers](#providers)
+  - [Create Provider](#create-provider)
+  - [Attach Provider](#attach-provider)
+- [Middleware](#middleware)
+  - [Create Middleware](#create-middleware)
+  - [Attach Middleware](#attach-middleware)
+- [Bindings](#bindings)
+  - [Add Binding](#add-binding)
+  - [Resolve Binding](#resolve-binding)
+- [Views](#views)
+  - [Generic Component](#generic-component)
+  - [Dedicated View Model](#dedicated-view-model)
+- [Database](#database-armie-orm)
+  - [Define Model](#define-model)
+    - [Save Model (Create / Update)](#save-model-create-update)
+    - [Find Item](#find-item)
+    - [Get List](#get-list)
+  - [Define Repository](#define-repository)
+    - [Get Paginated List](#get-paginated-list)
+- [Tests](#tests)
+- [License](#license)
+
 ## Introduction
 
-An elegant PHP framework designed to provide high performance with optimal developer experience. It includes support for different architecture patterns:
+Armie is an expressive and very extendable light-weight PHP framework designed to provide high performance with all the basic features needed for quick application development.
+
+It is more suited for small applications but can easily handle developent of large scale applications with minimum extension or abstraction.
+
+It includes support for different design paradigms and architectural patterns:
 
 - Model-View-Controller (MVC)
 - Service-oriented
@@ -93,6 +137,7 @@ Host multiple applications or modules. Supports path and domain routing
 High perfomant Asychronous HTTP Server with support for serveral event-looping providers such as: `swoole`, `libevent`, `ev`, `libuv`, `react`. Provides the following features:
 
 - Background workers to handle asynchronous task and cron job processing
+- Socket workers to handle web socket connections
 - Concurrency with Promises and built in (`async`, `await`, `concurrent`) functions
 - Real-time events with built in (`listen`, `dispatch`) functions
 - Asynchronous queuing with built in (`enqueue`) function
@@ -109,7 +154,7 @@ High perfomant Asychronous HTTP Server with support for serveral event-looping p
     $app->get('/product/{id}')->to(ProductController::class, 'get');
 
     $app->start("localhost", 8080,
-        (new WorkerConfig)
+        (new ServerConfig)
             ->setLooper(Looper::DEFAULT)
             ->addJob(new CallableTask(function () {
                 log_debug("Testing EVERY_MINUTE Cron Job");
@@ -403,7 +448,7 @@ Add view file(s) to your view path. E.g `myapp/Views/LoginPage.php`, `myapp/View
 
 ## Database _(Armie ORM)_
 
-A simple but elegant database ORM built on top of PHP Data Objects (PDO)
+A simple but expressive database object-relational mapper (ORM) built on top of PHP Data Objects (PDO)
 
 ### Define Model
 

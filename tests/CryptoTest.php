@@ -42,7 +42,7 @@ final class CryptoTest extends TestCase
         $this->assertEquals($decrypt, $this->plainText);
     }
 
-    
+
     /**
      * Test digest
      *

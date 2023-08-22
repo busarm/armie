@@ -43,11 +43,11 @@ class Async
     public static function runTask(Task|callable $task): mixed
     {
         // Use Task Worker
-        if (app()->async && app()->taskWorker) {
+        if (app()->async && app()->getTaskWorkerAddress()) {
             return self::withWorker($task, false);
         }
         // Use event loop
-        else if (app()->async && app()->worker) {
+        else if (app()->async && app()->getHttpWorkerAddress()) {
             return self::withEventLoop($task);
         }
         // Use default
@@ -68,7 +68,7 @@ class Async
     public static function runTasks(Traversable|array $tasks, bool $wait = false): Generator
     {
         // Use Task Worker
-        if (app()->async && app()->taskWorker) {
+        if (app()->async && app()->getTaskWorkerAddress()) {
             $fibers = array_map(function (Task|callable $task) use ($wait) {
                 return self::withFiberWorker($task, $wait);
             }, $tasks);
@@ -79,7 +79,7 @@ class Async
             return null;
         }
         // Use event loop
-        else if (app()->async && app()->worker && !$wait) {
+        else if (app()->async && app()->getHttpWorkerAddress() && !$wait) {
             $results = array_map(function (Task|callable $task) {
                 return self::withEventLoop($task);
             }, $tasks);
@@ -118,7 +118,6 @@ class Async
      */
     public static function withFiberWorker(Task|callable $task, bool $wait = false, int $length = self::STREAM_BUFFER_LENGTH): Fiber
     {
-        app()->throwIfNoEventLoop();
         app()->throwIfNoTaskWorker();
 
         $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
@@ -303,12 +302,11 @@ class Async
      */
     private static function connect(string $id, bool $block = false, bool $persist = false): mixed
     {
-        app()->throwIfNoEventLoop();
         app()->throwIfNoTaskWorker();
 
         static $connection = null;
 
-        $address = app()->taskWorker->getSocketName();
+        $address = app()->getTaskWorkerAddress();
 
         $flag = $block
             ? ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT : STREAM_CLIENT_CONNECT)

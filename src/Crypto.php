@@ -2,8 +2,10 @@
 
 namespace Armie;
 
+use function Armie\Helpers\log_exception;
+
 /**
- * Encryption, Decryption and Hashing
+ * Encryption, Decryption and Hashing. Requires `openssl` extension
  * 
  * Armie Framework
  *
@@ -61,9 +63,9 @@ class Crypto
      * - `KEY_HASH_LENGTH` - Default: 16. @see hash_pbkdf2
      * - `KEY_SALT_LENGTH` - Default: 8. @see openssl_random_pseudo_bytes
      * - `KEY_IV_LENGTH` - Default: 16. @see openssl_random_pseudo_bytes
-     * @return mixed Base64 encoded result of encrypted data
+     * @return string|false Raw encrypted data or `false` if failed
      */
-    public static function encrypt(string $passphrase, string $plain, array $configs = [])
+    public static function encrypt(string $passphrase, string $plain, array $configs = []): string|false
     {
         $method = $configs['METHOD'] ?? self::$METHOD;
         $keyHashAlgo = $configs['KEY_HASH_ALGO'] ?? self::$KEY_HASH_ALGO;
@@ -74,13 +76,18 @@ class Crypto
         $keyIvLength = $configs['KEY_IV_LENGTH'] ?? self::$KEY_IV_LENGTH;
 
         if (!empty($passphrase)) {
-            $salt = openssl_random_pseudo_bytes($keySaltLength);
-            $iv = openssl_random_pseudo_bytes($keyIvLength);
-            $key = hash_pbkdf2($keyHashAlgo, $passphrase, $salt, $keyHashIterations, $keyHashLength, true);
-            $crypt = base64_encode(openssl_encrypt($plain, $method, $key, OPENSSL_RAW_DATA, $iv));
-            $hash = self::digest($crypt, md5($passphrase), $hmacHashAlgo);
-            $data =  $crypt . '*' . bin2hex($salt) . '*' . bin2hex($iv) . '*' . $hash;
-            return base64_encode($data);
+            try {
+                $salt = openssl_random_pseudo_bytes($keySaltLength);
+                $iv = openssl_random_pseudo_bytes($keyIvLength);
+                $key = hash_pbkdf2($keyHashAlgo, $passphrase, $salt, $keyHashIterations, $keyHashLength, true);
+                $crypt = (openssl_encrypt($plain, $method, $key, OPENSSL_RAW_DATA, $iv));
+
+                $hash = self::digest($crypt, md5($passphrase), $hmacHashAlgo);
+                $separator = bin2hex(openssl_random_pseudo_bytes(4));
+                return implode($separator, [bin2hex($crypt), bin2hex($salt), bin2hex($iv), $hash]) . '/' . $separator;
+            } catch (\Throwable $th) {
+                log_exception($th);
+            }
         }
         return false;
     }
@@ -97,9 +104,9 @@ class Crypto
      * - `HMAC_HASH_ALGO` - Default: sha1. @see hash_algos
      * - `KEY_HASH_ITERATIONS` - Default: 8. @see hash_pbkdf2
      * - `KEY_HASH_LENGTH` - Default: 16. @see hash_pbkdf2
-     * @return string|boolean
+     * @return string|false Decrypted data or `false` if failed
      */
-    public static function decrypt(string $passphrase, string $cipher, array $configs = [])
+    public static function decrypt(string $passphrase, string $cipher, array $configs = []): string|false
     {
 
         $method = $configs['METHOD'] ?? self::$METHOD;
@@ -108,20 +115,23 @@ class Crypto
         $keyHashIterations = $configs['KEY_HASH_ITERATIONS'] ?? self::$KEY_HASH_ITERATIONS;
         $keyHashLength = $configs['KEY_HASH_LENGTH'] ?? self::$KEY_HASH_LENGTH;
 
-        if (!empty($passphrase) && !empty($cipher) && ($data = explode('*', base64_decode($cipher) ?? '', 5))) {
-            $crypt = $data[0] ?? null;
-            $salt = $data[1] ?? null;
-            $iv  = $data[2] ?? null;
-            $hash  = $data[3] ?? null;
-            if ($crypt && $salt && $iv && $hash) {
+        if (!empty($passphrase) && !empty($cipher)) {
+            try {
+                [$data, $separator] = explode('/', $cipher, 2);
+                [$crypt, $salt, $iv, $hash] = explode($separator, $data, 4);
+                $crypt = hex2bin($crypt);
                 $salt = hex2bin($salt);
                 $iv = hex2bin($iv);
                 $key = hash_pbkdf2($keyHashAlgo, $passphrase, $salt, $keyHashIterations, $keyHashLength, true);
+
                 if ($hash == self::digest($crypt, md5($passphrase), $hmacHashAlgo)) {
-                    return openssl_decrypt(base64_decode($crypt), $method, $key, OPENSSL_RAW_DATA, $iv);
+                    return openssl_decrypt($crypt, $method, $key, OPENSSL_RAW_DATA, $iv);
                 }
+            } catch (\Throwable $th) {
+                log_exception($th);
             }
         }
+
         return false;
     }
 

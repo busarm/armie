@@ -2,7 +2,6 @@
 
 namespace Armie\Middlewares;
 
-use Armie\DI;
 use Armie\Errors\SystemError;
 use Armie\Exceptions\NotFoundException;
 use Armie\Handlers\ResponseHandler;

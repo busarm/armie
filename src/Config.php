@@ -229,37 +229,6 @@ class Config implements ConfigurationInterface
     public Verbose $loggerVerborsity = Verbose::DEBUG;
 
 
-    // ------------- SSL -----------------//
-
-    /**
-     * SSL is enabled
-     *
-     * @var bool
-     */
-    public bool $sslEnabled = false;
-
-    /**
-     * SSL certificate path
-     *
-     * @var string|null
-     */
-    public string|null $sslCertPath = null;
-
-    /**
-     * SSL primary key path
-     *
-     * @var string|null
-     */
-    public string|null $sslPkPath = null;
-
-    /**
-     * SSL verify peer
-     *
-     * @var bool
-     */
-    public bool $sslVerifyPeer = false;
-
-
     // ------------- HTTP -----------------//
 
     /**
@@ -628,7 +597,6 @@ class Config implements ConfigurationInterface
         return $this;
     }
 
-
     /**
      * Set session Handler
      *
@@ -723,62 +691,6 @@ class Config implements ConfigurationInterface
     public function setSessionEnabled(bool $sessionEnabled)
     {
         $this->sessionEnabled = $sessionEnabled;
-
-        return $this;
-    }
-
-    /**
-     * Set sSL is enabled
-     *
-     * @param  bool  $sslEnabled  SSL is enabled
-     *
-     * @return  self
-     */
-    public function setSslEnabled(bool $sslEnabled)
-    {
-        $this->sslEnabled = $sslEnabled;
-
-        return $this;
-    }
-
-    /**
-     * Set sSL certificate path
-     *
-     * @param  string|null  $sslCertPath  SSL certificate path
-     *
-     * @return  self
-     */
-    public function setSslCertPath($sslCertPath)
-    {
-        $this->sslCertPath = $sslCertPath;
-
-        return $this;
-    }
-
-    /**
-     * Set sSL primary key path
-     *
-     * @param  string|null  $sslPkPath  SSL primary key path
-     *
-     * @return  self
-     */
-    public function setSslPkPath($sslPkPath)
-    {
-        $this->sslPkPath = $sslPkPath;
-
-        return $this;
-    }
-
-    /**
-     * Set sSL verify peer
-     *
-     * @param  bool  $sslVerifyPeer  SSL verify peer
-     *
-     * @return  self
-     */
-    public function setSslVerifyPeer(bool $sslVerifyPeer)
-    {
-        $this->sslVerifyPeer = $sslVerifyPeer;
 
         return $this;
     }

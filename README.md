@@ -40,7 +40,7 @@
   - [Dedicated View Model](#dedicated-view-model)
 - [Database](#database-armie-orm)
   - [Define Model](#define-model)
-    - [Save Model (Create / Update)](#save-model-create-update)
+    - [Save Model](#save-model)
     - [Find Item](#find-item)
     - [Get List](#get-list)
   - [Define Repository](#define-repository)
@@ -518,7 +518,7 @@ class ProductModel extends Model
 }
 ```
 
-#### Save Model (Create / Update)
+#### Save Model
 
 ```php
 $model = ProductModel::create(['name' => 'IPhone 14', 'qty' => 3, 'type' => 'Mobile Phone', 'categoryId' => 1]);

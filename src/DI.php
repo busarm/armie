@@ -35,7 +35,7 @@ class DI
      *
      * @param ReflectionClass|class-string<T> $class
      * @param RequestInterface|RouteInterface|null $request Request
-     * @param array<string, mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
+     * @param array<string,mixed> $params List of Custom params. (name => value) E.g [ 'request' => $request ]
      * @return T
      * @template T Item type template
      */

@@ -5,7 +5,7 @@ use Armie\Bags\FileStore;
 use Armie\Config;
 use Armie\Configs\HttpConfig;
 use Armie\Configs\PDOConfig;
-use Armie\Configs\WorkerConfig;
+use Armie\Configs\ServerConfig;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\Cron;
 use Armie\Enums\Env;
@@ -17,16 +17,15 @@ use Armie\Promise;
 use Armie\Response;
 use Armie\Service\LocalServiceDiscovery;
 use Armie\Service\ServiceRegistryProvider;
-use Armie\Tasks\CallableTask;
 use Armie\Test\TestApp\Controllers\AuthTestController;
 use Armie\Test\TestApp\Controllers\HomeTestController;
+use Armie\Test\TestApp\Controllers\MessengerSocketController;
 use Armie\Test\TestApp\Controllers\ProductTestController;
 use Armie\Test\TestApp\Models\ProductTestModel;
 use Armie\Test\TestApp\Views\TestViewPage;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Workerman\Connection\ConnectionInterface;
-use Workerman\Worker;
 
 use function Armie\Helpers\async;
 use function Armie\Helpers\await;
@@ -36,9 +35,6 @@ use function Armie\Helpers\log_debug;
 use function Armie\Helpers\concurrent;
 use function Armie\Helpers\enqueue;
 use function Armie\Helpers\env;
-use function Armie\Helpers\log_info;
-use function Armie\Helpers\run;
-use function Armie\Helpers\run_async;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -347,14 +343,15 @@ $app->get('test/download')->call(function (Response $response) {
 $app->start(
     'localhost',
     8181,
-    (new WorkerConfig)
+    (new ServerConfig)
         ->setLooper(Looper::SWOOLE)
-        ->setHttpWorkers(8)
-        ->setTaskWorkers(4)
-        ->addJob(new CallableTask(function () {
+        ->setHttpWorkers(2)
+        ->setTaskWorkers(1)
+        ->addJob(function () {
             log_debug("Testing EVERY_MINUTE Cron Job");
-        }), Cron::EVERY_MINUTE)
-        ->addJob(new CallableTask(function () {
+        }, Cron::EVERY_MINUTE)
+        ->addJob(function () {
             log_debug("Testing One-Time Job");
-        }), (new DateTime('+5 seconds')))
+        }, (new DateTime('+5 seconds')))
+        ->addSocket(2222, MessengerSocketController::class)
 );

@@ -2,8 +2,6 @@
 
 namespace Armie\Test\TestApp\Controllers;
 
-use Armie\App;
-use Armie\Interfaces\ResponseInterface;
 use Armie\Test\TestApp\Attributes\AuthorizeTestAttr;
 
 /**

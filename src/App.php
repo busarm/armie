@@ -2,11 +2,10 @@
 
 namespace Armie;
 
-use Armie\Configs\WorkerConfig;
+use Armie\Configs\ServerConfig;
 use Armie\Middlewares\StatelessCookieMiddleware;
 use Throwable;
 
-use Armie\Dto\ResponseDto;
 use Armie\Dto\TaskDto;
 use Armie\Enums\AppStatus;
 use Armie\Enums\Cron;
@@ -40,6 +39,7 @@ use Armie\Interfaces\RouterInterface;
 use Armie\Interfaces\ServiceDiscoveryInterface;
 use Armie\Interfaces\SingletonInterface;
 use Armie\Interfaces\SingletonStatelessInterface;
+use Armie\Interfaces\SocketControllerInterface;
 use Armie\Middlewares\PsrMiddleware;
 use Armie\Middlewares\StatelessSessionMiddleware;
 use Armie\Tasks\Task;
@@ -55,6 +55,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Workerman\Connection\ConnectionInterface;
 use Workerman\Connection\TcpConnection;
 use Workerman\Events\Ev;
 use Workerman\Events\Event;
@@ -69,6 +70,7 @@ use Workerman\Worker;
 
 use function Armie\Helpers\error_level;
 use function Armie\Helpers\is_cli;
+use function Armie\Helpers\log_debug;
 use function Armie\Helpers\log_notice;
 use function Armie\Helpers\log_warning;
 use function Armie\Helpers\serialize;
@@ -156,6 +158,7 @@ class App implements HttpServerInterface, ContainerInterface
     public int|float $startTimeMs;
 
     /** 
+     * App is running in async mode
      * @var boolean 
      * If app is running in asynchronous mode and supports asynchronous requests. E.g Using event loops such as Ev, Swoole. 
      * ### NOTE: Take caution when using static variables. TAKE CAUTION when using static variables.
@@ -163,18 +166,10 @@ class App implements HttpServerInterface, ContainerInterface
     public bool $async = false;
 
     /**
-     * Application main worker - when using event loop (async) mode
-     *
-     * @var Worker|null
+     * App current status
+     * @var AppStatus
      */
-    public Worker|null $worker = null;
-
-    /**
-     * Application tasks worker - when using event loop (async) mode
-     *
-     * @var Worker|bool|null
-     */
-    public Worker|bool|null $taskWorker = null;
+    public AppStatus $status = AppStatus::STOPPED;
 
 
     /** @var ProviderInterface[] */
@@ -188,11 +183,18 @@ class App implements HttpServerInterface, ContainerInterface
 
 
     /**
-     * App current status
+     * Application http worker address - when using event loop (async) mode
      *
-     * @var AppStatus
+     * @var ?string
      */
-    public AppStatus $status = AppStatus::STOPPED;
+    private ?string $httpWorkerAddress = null;
+
+    /**
+     * Application task worker address
+     *
+     * @var ?string
+     */
+    private ?string $taskWorkerAddress = null;
 
     /**
      * @param Config $config App configuration object
@@ -312,13 +314,6 @@ class App implements HttpServerInterface, ContainerInterface
         return self::$__instance;
     }
 
-    /**
-     * App is running in worker mode
-     */
-    public function isWorker(): bool
-    {
-        return $this->async && isset($this->worker);
-    }
 
     ############################
     # Setup and Run
@@ -617,6 +612,40 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
+     * Get application http worker address - when using event loop (async) mode
+     *
+     * @return  ?string
+     */
+    public function getHttpWorkerAddress(): ?string
+    {
+        return $this->httpWorkerAddress;
+    }
+
+    /**
+     * Get application task worker address
+     *
+     * @return  ?string
+     */
+    public function getTaskWorkerAddress(): ?string
+    {
+        return $this->taskWorkerAddress;
+    }
+
+    /**
+     * Set application task worker address. Use to set external task worker address
+     *
+     * @param  string  $taskWorkerAddress  Application task worker address.
+     *
+     * @return  self
+     */
+    public function setTaskWorkerAddress(string $taskWorkerAddress)
+    {
+        $this->taskWorkerAddress = $taskWorkerAddress;
+
+        return $this;
+    }
+
+    /**
      * Process middleware
      *
      * @param RequestInterface|RouteInterface $request
@@ -694,23 +723,23 @@ class App implements HttpServerInterface, ContainerInterface
     }
 
     /**
-     * Start async http server
+     * Start asynchronous http workers. Auto start task and sockets workers.
      *
      * @param string $host Domain or IP address. E.g `www.myapp.com` or `112.33.4.55`
      * @param integer $port Remote port. Default: `80`
-     * @param WorkerConfig|null $config
+     * @param ServerConfig|null $config
      * @return void
      */
-    public function start(string $host, int $port = 80, WorkerConfig|null $config = null)
+    public function start(string $host, int $port = 80, ServerConfig|null $config = null)
     {
-        if (!extension_loaded('pcntl')) {
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('pcntl')) {
             exit("Please install pcntl extension. See http://doc3.workerman.net/install/install.html\n");
         }
-        if (!extension_loaded('posix')) {
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('posix')) {
             exit("Please install posix extension. See http://doc3.workerman.net/install/install.html\n");
         }
 
-        $config = $config ?? new WorkerConfig;
+        $config = $config ?? new ServerConfig;
 
         // App running in async mode
         $this->setAsync(true);
@@ -723,12 +752,13 @@ class App implements HttpServerInterface, ContainerInterface
         Worker::$eventLoopClass = $this->getEventLooper($config->looper);
 
         //------- Add Main HTTP Worker -------//
-        $this->setUpHttpWorker($host, $port, max([$config->httpWorkers, 1]));
+        $this->setUpHttpWorker($host, $port, $config);
 
         //------- Add Task Worker -------//
-        $config->useTaskWorker && $this->setUpTaskWorker(max([$config->taskWorkers, 1]), $config->jobs);
+        $config->taskWorkers > 0 && $this->setUpTaskWorker($config);
 
-        // TODO Add socket handler, socket request dto and socket data dto
+        //------- Add Socket Workers -------//
+        $this->setUpSocketWorkers($host, $config);
 
         //----- Start event loop ------//
         Worker::$onMasterStop = function () {
@@ -742,50 +772,50 @@ class App implements HttpServerInterface, ContainerInterface
      * 
      * @param string $host
      * @param integer $port
-     * @param integer $workers
+     * @param ServerConfig $config
      */
-    private function setUpHttpWorker(string $host, int $port = 80, $workers = 1)
+    private function setUpHttpWorker(string $host, int $port, ServerConfig $config)
     {
         // Set up SSL context.
-        $ssl = $this->config->sslEnabled && $this->config->sslCertPath && $this->config->sslPkPath;
+        $ssl = $config->sslEnabled && $config->sslCertPath && $config->sslPkPath;
         $context = $ssl ? [
             'ssl' => [
-                'local_cert'  => $this->config->sslCertPath,
-                'local_pk'    => $this->config->sslPkPath,
-                'verify_peer' => $this->config->sslVerifyPeer,
+                'local_cert'  => $config->sslCertPath,
+                'local_pk'    => $config->sslPkPath,
+                'verify_peer' => $config->sslVerifyPeer,
             ]
         ] : [];
 
         // Set queue handler
         $this->queueHandler = new WorkerQueueHandler($this);
 
+        // Add Custom Middlewares
+        $this->addMiddleware(new StatelessCookieMiddleware($this->config));
+        $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkerSessionHandler(
+            new FileSessionHandler($this->config->getSessionConfigs()),
+            $this->config->secret
+        )));
+
         // Init Worker
-        $this->worker = new Worker($ssl ? 'https://' : 'http://' . $host . ':' . $port, $context);
-        $this->worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
-        $this->worker->count = $workers;
+        $this->httpWorkerAddress = ($ssl ? 'https://' : 'http://') . $host . ':' . $port;
 
-        if ($ssl) $this->worker->transport = 'ssl';
+        $worker = new Worker($this->httpWorkerAddress, $context);
+        $worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
+        $worker->count =  max($config->httpWorkers, 1);
+        $worker->transport = $ssl ? 'ssl' : 'tcp';
 
-        $this->worker->onWorkerStart = function (Worker $worker) {
-            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
-
-            // Add Custom Middlewares
-            $this->addMiddleware(new StatelessCookieMiddleware($this->config));
-            $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkerSessionHandler(
-                new FileSessionHandler($this->config->getSessionConfigs()),
-                $this->config->secret
-            )));
-
-            // Set status
+        $worker->onWorkerStart = function (Worker $worker) {
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
+            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
             // Register distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
                 $this->serviceDiscovery->register();
             }
 
-            // Add message handler
+            // ----- Add Connection Handlers ----- //
+
             $worker->onMessage = function (TcpConnection $connection, HttpRequest $request) {
                 try {
                     $response = $this->run(Request::fromWorkerman($request, $this->config));
@@ -800,8 +830,32 @@ class App implements HttpServerInterface, ContainerInterface
                     $connection->close();
                 }
             };
+            $worker->onConnect = function (TcpConnection $connection) {
+                $this->config->logRequest
+                    &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s started", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+
+                $this->reporter->leaveCrumbs("worker", [
+                    'name' => $connection->worker->name,
+                    'id' => $connection->worker->id,
+                    'user' => $connection->worker->user,
+                    'socket' => $connection->worker->getSocketName(),
+                ]);
+                $this->reporter->leaveCrumbs("connection", [
+                    'id' => $connection->id,
+                    'status' => $connection->getStatus(),
+                    'localAddress' => $connection->getLocalAddress(),
+                    'remoteAddress' => $connection->getRemoteAddress(),
+                ]);
+            };
+            $worker->onClose = function (TcpConnection $connection) {
+                $this->config->logRequest
+                    &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s closed", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
+            };
+            $worker->onError = function (TcpConnection $connection, $id, $error) {
+                $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
+            };
         };
-        $this->worker->onWorkerStop = function (Worker $worker) {
+        $worker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;
             $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
 
@@ -810,53 +864,37 @@ class App implements HttpServerInterface, ContainerInterface
                 $this->serviceDiscovery->unregister();
             }
         };
-        $this->worker->onConnect = function (TcpConnection $connection) {
-            $this->config->logRequest
-                &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s started", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
-
-            $this->reporter->leaveCrumbs("worker", [
-                'name' => $connection->worker->name,
-                'id' => $connection->worker->id,
-                'user' => $connection->worker->user,
-                'socket' => $connection->worker->getSocketName(),
-            ]);
-            $this->reporter->leaveCrumbs("connection", [
-                'id' => $connection->id,
-                'status' => $connection->getStatus(),
-                'localAddress' => $connection->getLocalAddress(),
-                'remoteAddress' => $connection->getRemoteAddress(),
-            ]);
-        };
-        $this->worker->onClose = function (TcpConnection $connection) {
-            $this->config->logRequest
-                &&  $this->logger->info(sprintf("Connection to %s process %s from %s:%s closed", $connection->worker->name, $connection->worker->id, $connection->getRemoteIp(), $connection->getRemotePort()));
-        };
-        $this->worker->onError = function (TcpConnection $connection, $id, $error) {
-            $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
-        };
     }
 
     /**
      * Setup Task worker
      * 
-     * @param integer $workers
-     * @param array<string,Task[]> $jobs
+     * @param ServerConfig $config
      */
-    private function setUpTaskWorker(int $workers, array $jobs = [])
+    private function setUpTaskWorker(ServerConfig $config)
     {
-        $this->taskWorker = new Worker('unix:///' . $this->config->tempPath . DIRECTORY_SEPARATOR . 'task_worker.sock');
-        $this->taskWorker->name = '[Task] ' . $this->config->name . ' v' . $this->config->version;
-        $this->taskWorker->transport = 'unix';
-        $this->taskWorker->count = $workers;
+        if ($this->taskWorkerAddress) return;
 
-        $this->taskWorker->onWorkerStart = function (Worker $worker) use ($jobs) {
-            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
+        // Only supported for unix
+        if (DIRECTORY_SEPARATOR !== '/') {
+            $this->logger->error("Failed to start task worker. Multiple workers is only available for unix systems. Alternatively, you can use separate start-up scripts.");
+            return;
+        }
 
-            // Set status
+        $this->taskWorkerAddress = 'unix:///' . $this->config->tempPath . DIRECTORY_SEPARATOR . 'task_worker.sock';
+
+        $worker = new Worker($this->taskWorkerAddress);
+        $worker->name = '[Task] ' . $this->config->name . ' v' . $this->config->version;
+        $worker->transport = 'unix';
+        $worker->count = max($config->taskWorkers, 1);
+
+        $worker->onWorkerStart = function (Worker $worker) use ($config) {
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
+            $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
-            // Add message handler
+            // ----- Add Connection Handlers ----- //
+
             $worker->onMessage = function (TcpConnection $connection, $data) {
                 try {
                     if ($dto = TaskDto::parse($data)) {
@@ -890,10 +928,34 @@ class App implements HttpServerInterface, ContainerInterface
                     $connection->close();
                 }
             };
+            $worker->onConnect = function (TcpConnection $connection) {
+                $this->config->logRequest
+                    &&  $this->logger->info(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
 
-            // Start jobs
-            if (!empty($jobs) && $worker->id == 0) {
-                foreach ($jobs as $key => $list) {
+                $this->reporter->leaveCrumbs("worker", [
+                    'name' => $connection->worker->name,
+                    'id' => $connection->worker->id,
+                    'user' => $connection->worker->user,
+                    'socket' => $connection->worker->getSocketName(),
+                ]);
+                $this->reporter->leaveCrumbs("connection", [
+                    'id' => $connection->id,
+                    'status' => $connection->getStatus(),
+                ]);
+            };
+            $worker->onClose = function (TcpConnection $connection) {
+                $this->config->logRequest
+                    &&  $this->logger->info(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
+            };
+            $worker->onError = function (TcpConnection $connection, $id, $error) {
+                $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
+            };
+
+
+            // ----- Start Jobs (on only the first worker) ----- //
+
+            if (!empty($config->jobs) && $worker->id == 0) {
+                foreach ($config->jobs as $key => $list) {
                     if ($key == Cron::EVERY_SECOND->value) {
                         Timer::add(1, function () use ($list) {
                             try {
@@ -988,32 +1050,108 @@ class App implements HttpServerInterface, ContainerInterface
                 }
             }
         };
-        $this->taskWorker->onWorkerStop = function (Worker $worker) {
+        $worker->onWorkerStop = function (Worker $worker) {
             $this->status = AppStatus::STOPPED;
             $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
         };
-        $this->taskWorker->onConnect = function (TcpConnection $connection) {
-            $this->config->logRequest
-                &&  $this->logger->info(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
+    }
 
-            $this->reporter->leaveCrumbs("worker", [
-                'name' => $connection->worker->name,
-                'id' => $connection->worker->id,
-                'user' => $connection->worker->user,
-                'socket' => $connection->worker->getSocketName(),
-            ]);
-            $this->reporter->leaveCrumbs("connection", [
-                'id' => $connection->id,
-                'status' => $connection->getStatus(),
-            ]);
-        };
-        $this->taskWorker->onClose = function (TcpConnection $connection) {
-            $this->config->logRequest
-                &&  $this->logger->info(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
-        };
-        $this->taskWorker->onError = function (TcpConnection $connection, $id, $error) {
-            $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
-        };
+    /**
+     * Setup Socket workers
+     * 
+     * @param string $host
+     * @param ServerConfig $config
+     * @param array<string,class-string<SocketControllerInterface>> $sockets
+     */
+    private function setUpSocketWorkers(string $host, ServerConfig $config, array $sockets = [])
+    {
+        // Only supported for unix
+        if (DIRECTORY_SEPARATOR !== '/') {
+            $this->logger->error("Failed to start socket workers. Multiple workers is only available for unix systems. Alternatively, you can use separate start-up scripts.");
+            return;
+        }
+
+        // Set up SSL context.
+        $ssl = $config->sslEnabled && $config->sslCertPath && $config->sslPkPath;
+        $context = $ssl ? [
+            'ssl' => [
+                'local_cert'  => $config->sslCertPath,
+                'local_pk'    => $config->sslPkPath,
+                'verify_peer' => $config->sslVerifyPeer,
+            ]
+        ] : [];
+
+        // Create workers
+        foreach ($config->sockets as $port => $class) {
+
+            $worker = new Worker('websocket://' . $host . ':' . $port, $context);
+            $worker->name = '[Socket] ' . $this->config->name . ' v' . $this->config->version . " ($port)";
+            $worker->transport = $ssl ? 'ssl' : 'tcp';
+
+            $worker->onWorkerStart = function (Worker $worker) use ($class) {
+                $this->status = AppStatus::RUNNNIG;
+                $this->startTimeMs = floor(microtime(true) * 1000);
+                $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
+
+                $controller = $this->di->instantiate($class);
+
+                if ($controller && $controller instanceof SocketControllerInterface) {
+                    $worker->onMessage = function (ConnectionInterface $connection, $data) use ($controller) {
+                        try {
+                            $controller->onMessage($connection, $data);
+                        } catch (HttpException $e) {
+                            $e->handle($this);
+                        } catch (Throwable $e) {
+                            $this->errorHandler->handle($e);
+                        }
+                    };
+                    $worker->onConnect = function (TcpConnection $connection) use ($controller) {
+                        $this->config->logRequest
+                            &&  $this->logger->info(sprintf("Connection to %s process %s started", $connection->worker->name, $connection->worker->id));
+
+                        $this->reporter->leaveCrumbs("worker", [
+                            'name' => $connection->worker->name,
+                            'id' => $connection->worker->id,
+                            'user' => $connection->worker->user,
+                            'socket' => $connection->worker->getSocketName(),
+                        ]);
+                        $this->reporter->leaveCrumbs("connection", [
+                            'id' => $connection->id,
+                            'status' => $connection->getStatus(),
+                        ]);
+
+                        try {
+                            $controller->onConnect($connection);
+                        } catch (HttpException $e) {
+                            $e->handle($this);
+                        } catch (Throwable $e) {
+                            $this->errorHandler->handle($e);
+                        }
+                    };
+                    $worker->onClose = function (TcpConnection $connection) use ($controller) {
+                        $this->config->logRequest
+                            &&  $this->logger->info(sprintf("Connection to %s process %s closed", $connection->worker->name, $connection->worker->id));
+
+                        try {
+                            $controller->onClose($connection);
+                        } catch (HttpException $e) {
+                            $e->handle($this);
+                        } catch (Throwable $e) {
+                            $this->errorHandler->handle($e);
+                        }
+                    };
+                    $worker->onError = function (TcpConnection $connection, $id, $error) {
+                        $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
+                    };
+                } else {
+                    throw new SystemError("Failed to instantiate `$class`. Ensure it is a valid class that implements " . SocketControllerInterface::class);
+                }
+            };
+            $worker->onWorkerStop = function (Worker $worker) {
+                $this->status = AppStatus::STOPPED;
+                $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
+            };
+        }
     }
 
     ############################
@@ -1165,7 +1303,7 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function throwIfNoEventLoop(string|null $message = null)
     {
-        if (!$this->async &&  !isset($this->worker) || empty(Worker::getEventLoop())) {
+        if (!$this->async && empty($this->httpWorkerAddress) || empty(Worker::getEventLoop())) {
             throw new SystemError($message ?: "Event Loop is required for this action. Please run app in async mode. See App::start()");
         }
     }
@@ -1175,7 +1313,7 @@ class App implements HttpServerInterface, ContainerInterface
      */
     public function throwIfNoTaskWorker(string|null $message = null)
     {
-        if (!$this->taskWorker) {
+        if (empty($this->taskWorkerAddress)) {
             throw new SystemError($message ?: "Task worker is required for this action.");
         }
     }

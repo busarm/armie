@@ -8,7 +8,6 @@ use Armie\Exceptions\BadRequestException;
 use Armie\Exceptions\NotFoundException;
 use Armie\Interfaces\ProviderInterface;
 use Armie\Interfaces\StorageBagInterface;
-use Armie\Attributes\Request\QueryParam;
 
 /**
  * Use to generate a service registry server
@@ -25,7 +24,7 @@ class ServiceRegistryProvider implements ProviderInterface
     /**
      * @param StorageBagInterface<array> $storage
      */
-    public function __construct(private StorageBagInterface $storage)
+    public function __construct(protected StorageBagInterface $storage)
     {
     }
 
@@ -45,10 +44,10 @@ class ServiceRegistryProvider implements ProviderInterface
             throw new BadRequestException("Invaild service registry request");
         });
 
-        // Unegister service endpoint
-        $app->delete(self::ROUTE . "/{name}")->call(function (
+        // Unregister service endpoint
+        $app->delete(self::ROUTE . "/{name}/{url}")->call(function (
             string $name,
-            #[QueryParam('url', true)] string $url
+            string $url
         ) {
             $list = $this->storage->get($name);
             if (!empty($list) && is_array($list)) {

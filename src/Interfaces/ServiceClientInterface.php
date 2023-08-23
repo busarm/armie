@@ -3,7 +3,6 @@
 namespace Armie\Interfaces;
 
 /**
- * Error Reporting
  * 
  * Armie Framework
  *

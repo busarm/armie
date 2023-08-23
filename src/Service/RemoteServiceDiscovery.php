@@ -2,17 +2,15 @@
 
 namespace Armie\Service;
 
+use Armie\Bags\Bag;
 use Armie\Enums\HttpMethod;
 use Armie\Interfaces\ServiceClientInterface;
 use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Interfaces\StorageBagInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
-use function Armie\Helpers\log_error;
-
 /**
- * Error Reporting
  * 
  * Armie Framework
  *
@@ -22,9 +20,9 @@ use function Armie\Helpers\log_error;
 class RemoteServiceDiscovery implements ServiceDiscoveryInterface
 {
     /**
-     * @var ServiceClientInterface[]
+     * @var StorageBagInterface<ServiceClientInterface>
      */
-    protected array $services = [];
+    protected readonly StorageBagInterface $services;
 
     /**
      * Last registry request date
@@ -40,8 +38,10 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
      * @param integer $ttl Service registry cache ttl (seconds). Re-load list after ttl
      * @param integer $timeout Service registry request timeout (seconds)
      */
-    public function __construct(private string $endpoint, private $ttl = 300, private $timeout = 10)
+    public function __construct(protected string $endpoint, protected $ttl = 300, protected $timeout = 10)
     {
+        $this->services = new Bag();
+
         $this->load();
     }
 
@@ -71,7 +71,7 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         if (($this->requestedAt + $this->ttl <= time())) {
             $this->load();
         }
-        return $this->services;
+        return $this->services->all();
     }
 
     /**
@@ -91,16 +91,11 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
      * Get service client
      *
      * @param string $name Service Name
-     * @return ServiceClientInterface
+     * @return ?ServiceClientInterface
      */
-    private function get(string $name): ServiceClientInterface|null
+    private function get(string $name): ?ServiceClientInterface
     {
-        foreach ($this->services as $service) {
-            if (strtolower($name) === strtolower($service->getName())) {
-                return $service;
-            }
-        }
-        return null;
+        return $this->services->get($name);
     }
 
     /**
@@ -122,10 +117,9 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         if ($response->getBody()) {
             $result = json_decode($response->getBody(), true) ?? [];
             if (!empty($result)) {
-                $this->services = [];
                 foreach ($result as $name => $url) {
                     if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
-                        $this->services[] = new RemoteClient($name, $url);
+                        $this->services->set($name, new RemoteClient($name, $url));
                     }
                 }
                 $this->requestedAt = time();

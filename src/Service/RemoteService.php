@@ -10,7 +10,6 @@ use Armie\Errors\SystemError;
 use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\ServiceDiscoveryInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Nyholm\Psr7\Uri;
 
@@ -27,10 +26,10 @@ use function Armie\Helpers\http_parse_query;
 class RemoteService extends BaseService
 {
     public function __construct(
-        private string $name,
-        private ?string $location = null,
-        private ?ServiceDiscoveryInterface $discovery = null,
-        private $timeout = 10
+        protected string $name,
+        protected ?string $location = null,
+        protected ?ServiceDiscoveryInterface $discovery = null,
+        protected $timeout = 10
     ) {
     }
 

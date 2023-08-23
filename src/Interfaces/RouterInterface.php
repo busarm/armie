@@ -2,8 +2,6 @@
 
 namespace Armie\Interfaces;
 
-use Armie\Enums\HttpMethod;
-
 /**
  * Armie Framework
  *
@@ -14,11 +12,11 @@ use Armie\Enums\HttpMethod;
 interface RouterInterface
 {
     /**
-     * @param HttpMethod $method
+     * @param string $method
      * @param string $path
      * @return RouteInterface
      */
-    public function createRoute(HttpMethod $method, string $path): RouteInterface;
+    public function createRoute(string $method, string $path): RouteInterface;
 
     /**
      * Add single route

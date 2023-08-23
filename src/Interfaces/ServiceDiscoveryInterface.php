@@ -3,7 +3,6 @@
 namespace Armie\Interfaces;
 
 /**
- * Error Reporting
  * 
  * Armie Framework
  *
@@ -16,9 +15,9 @@ interface ServiceDiscoveryInterface
      * Get service client
      * 
      * @param string $name  Service Name
-     * @return ServiceClientInterface|null
+     * @return ?ServiceClientInterface
      */
-    public function getServiceClient(string $name): ServiceClientInterface|null;
+    public function getServiceClient(string $name): ?ServiceClientInterface;
 
     /**
      * Get list of service client

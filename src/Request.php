@@ -150,8 +150,8 @@ class Request implements RequestInterface
     {
         $request = new self();
         $request->initialize(
-            (new Query)->mirror($_GET),
-            (new Bag)->mirror($_POST),
+            new Query($_GET),
+            new Bag($_POST),
             (new Cookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
@@ -162,7 +162,7 @@ class Request implements RequestInterface
                 $config?->cookieEncrypt ? $config?->secret : null,
                 $config?->sessionHandler
             )) : null,
-            (new Bag)->mirror($_FILES),
+            new Bag($_FILES),
             new Bag($_SERVER)
         );
         $request->_psr = null;

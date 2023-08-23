@@ -3,7 +3,6 @@
 namespace Armie\Middlewares;
 
 use Armie\Handlers\ResponseHandler;
-use Armie\DI;
 use Armie\Enums\ResponseFormat;
 use Armie\Errors\SystemError;
 use Armie\Exceptions\NotFoundException;

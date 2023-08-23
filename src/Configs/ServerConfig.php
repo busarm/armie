@@ -22,6 +22,11 @@ use DateTimeInterface;
 class ServerConfig
 {
     /**
+     * Server Url
+     */
+    public ?string $serverUrl = null;
+
+    /**
      * Number of http worker processes to spawn. Minimum = 1
      */
     public int $httpWorkers = 2;
@@ -83,7 +88,6 @@ class ServerConfig
      */
     public bool $sslVerifyPeer = false;
 
-
     /**
      * Timer Jobs
      *
@@ -97,6 +101,18 @@ class ServerConfig
      * @var array<string,class-string<SocketControllerInterface>>
      */
     public array $sockets = [];
+
+    /**
+     * Set server Url
+     *
+     * @return  self
+     */
+    public function setServerUrl($serverUrl)
+    {
+        $this->serverUrl = $serverUrl;
+
+        return $this;
+    }
 
     /**
      * Set number of http workers to spawn. Minimum = 1

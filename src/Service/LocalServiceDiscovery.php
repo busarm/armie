@@ -2,11 +2,12 @@
 
 namespace Armie\Service;
 
+use Armie\Bags\Bag;
 use Armie\Interfaces\ServiceClientInterface;
 use Armie\Interfaces\ServiceDiscoveryInterface;
+use Armie\Interfaces\StorageBagInterface;
 
 /**
- * Error Reporting
  * 
  * Armie Framework
  *
@@ -16,22 +17,28 @@ use Armie\Interfaces\ServiceDiscoveryInterface;
 class LocalServiceDiscovery implements ServiceDiscoveryInterface
 {
     /**
-     * @var ServiceClientInterface[]
+     * @var StorageBagInterface<ServiceClientInterface>
      */
-    protected array $services = [];
+    protected readonly StorageBagInterface $services;
 
     /**
      * @param string|ServiceClientInterface[] $pathOrList Service discovery file path or list of services
      * - If file path, then file should be a json file with the list of services. Format = `{"name" : "url", ...}`
      */
-    public function __construct(private string|array $pathOrList)
+    public function __construct(string|array $pathOrList)
     {
-        if (is_string($this->pathOrList)) {
-            if (file_exists($this->pathOrList)) {
-                $this->services = json_decode(file_get_contents($this->pathOrList), true) ?? $this->services;
+        if (is_string($pathOrList)) {
+            $this->services = new Bag;
+            if (file_exists($pathOrList)) {
+                $list = json_decode(file_get_contents($pathOrList), true) ?? [];
+                if (!empty($list)) {
+                    foreach ($list as $name => $path) {
+                        $this->services->set($name, new LocalClient($name, $path));
+                    }
+                }
             }
         } else {
-            $this->services = $pathOrList;
+            $this->services = new Bag($pathOrList);
         }
     }
 
@@ -43,12 +50,7 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
      */
     public function getServiceClient(string $name): ServiceClientInterface|null
     {
-        foreach ($this->services as $service) {
-            if (strtolower($name) === strtolower($service->getName())) {
-                return $service;
-            }
-        }
-        return null;
+        return $this->services->get($name);
     }
 
     /**
@@ -57,7 +59,7 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
      */
     public function getServiceClients(): array
     {
-        return $this->services;
+        return $this->services->all();
     }
 
     /**

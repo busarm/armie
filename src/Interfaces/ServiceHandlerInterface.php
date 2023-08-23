@@ -6,7 +6,6 @@ use Armie\Dto\ServiceRequestDto;
 use Armie\Dto\ServiceResponseDto;
 
 /**
- * Error Reporting
  * 
  * Armie Framework
  *

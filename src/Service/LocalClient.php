@@ -5,7 +5,6 @@ namespace Armie\Service;
 use Armie\Interfaces\ServiceClientInterface;
 
 /**
- * Error Reporting
  * 
  * Armie Framework
  *
@@ -14,7 +13,7 @@ use Armie\Interfaces\ServiceClientInterface;
  */
 class LocalClient implements ServiceClientInterface
 {
-    public function __construct(private string $name, private string $path)
+    public function __construct(protected string $name, protected string $path)
     {
     }
 

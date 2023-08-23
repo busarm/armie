@@ -4,7 +4,6 @@ namespace Armie;
 
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
-use Armie\Errors\SystemError;
 use Armie\Interfaces\ResponseHandlerInterface;
 use Armie\Interfaces\ResponseInterface;
 use Stringable;

@@ -2,10 +2,7 @@
 
 namespace Armie\Interfaces;
 
-use Armie\Dto\ServiceRegistryDto;
-
 /**
- * Error Reporting
  * 
  * Armie Framework
  *
@@ -14,22 +11,27 @@ use Armie\Dto\ServiceRegistryDto;
  */
 interface DistributedServiceDiscoveryInterface
 {
-
     /**
      * Get service
      *
      * @param string $name Service Name
-     * @return ?ServiceRegistryDto
+     * @return ?ServiceClientInterface
      */
-    public function get(string $name): ?ServiceRegistryDto;
+    public function get(string $name): ?ServiceClientInterface;
 
     /**
      * Register service client
+     * 
+     * @param ServiceClientInterface $client
+     * @return void
      */
-    public function register(): void;
+    public function register(ServiceClientInterface $client): void;
 
     /**
      * Unregister service client
+     * 
+     * @param ServiceClientInterface $client
+     * @return void
      */
-    public function unregister(): void;
+    public function unregister(ServiceClientInterface $client): void;
 }

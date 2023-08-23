@@ -103,6 +103,6 @@ class Loader implements LoaderInterface
     public static function require($path, $data = null)
     {
         if (is_array($data)) extract($data);
-        return require $path;
+        return require($path);
     }
 }

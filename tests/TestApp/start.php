@@ -73,12 +73,10 @@ $app->get('pingHtml')->call(function (App $app) {
     return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
-$app->get('test/view/{name}')->call(function (RequestInterface $req, string $name) {
+$app->get('test/view-old/{name}')->call(function (RequestInterface $req, string $name) {
     return new TestViewPage($req, $name);
 });
-$app->get('test/view')->call(function (RequestInterface $req) {
-    return new TestViewPage($req, "NO-NAME");
-});
+$app->get('test/view/{name}')->view(TestViewPage::class);
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->cookie()->set("TestCookie", "test", 30);
 

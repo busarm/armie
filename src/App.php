@@ -4,6 +4,7 @@ namespace Armie;
 
 use Armie\Configs\ServerConfig;
 use Armie\Middlewares\StatelessCookieMiddleware;
+use Armie\Service\RemoteClient;
 use Throwable;
 
 use Armie\Dto\TaskDto;
@@ -804,14 +805,17 @@ class App implements HttpServerInterface, ContainerInterface
         $worker->count =  max($config->httpWorkers, 1);
         $worker->transport = $ssl ? 'ssl' : 'tcp';
 
-        $worker->onWorkerStart = function (Worker $worker) {
+        // Service Client
+        $client = new RemoteClient(strtolower($this->config->name), $config->serverUrl ?? $worker->getSocketName());
+
+        $worker->onWorkerStart = function (Worker $worker) use ($client) {
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
             $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
             // Register distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
-                $this->serviceDiscovery->register();
+                $this->serviceDiscovery->register($client);
             }
 
             // ----- Add Connection Handlers ----- //
@@ -855,13 +859,13 @@ class App implements HttpServerInterface, ContainerInterface
                 $this->logger->error(sprintf("Connection to %s process %s failed: [%s] %s", $connection->worker->name, $connection->worker->id, $id, $error));
             };
         };
-        $worker->onWorkerStop = function (Worker $worker) {
+        $worker->onWorkerStop = function (Worker $worker) use ($client) {
             $this->status = AppStatus::STOPPED;
             $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
 
             // Unregister distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
-                $this->serviceDiscovery->unregister();
+                $this->serviceDiscovery->unregister($client);
             }
         };
     }
@@ -1165,7 +1169,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::GET, $path);
+        return $this->router->createRoute(HttpMethod::GET->value, $path);
     }
 
     /**
@@ -1175,7 +1179,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::POST, $path);
+        return $this->router->createRoute(HttpMethod::POST->value, $path);
     }
 
     /**
@@ -1185,7 +1189,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::PUT, $path);
+        return $this->router->createRoute(HttpMethod::PUT->value, $path);
     }
 
     /**
@@ -1195,7 +1199,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::PATCH, $path);
+        return $this->router->createRoute(HttpMethod::PATCH->value, $path);
     }
 
     /**
@@ -1205,7 +1209,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::DELETE, $path);
+        return $this->router->createRoute(HttpMethod::DELETE->value, $path);
     }
 
     /**
@@ -1215,7 +1219,7 @@ class App implements HttpServerInterface, ContainerInterface
     {
         $this->throwIfRunning();
 
-        return $this->router->createRoute(HttpMethod::HEAD, $path);
+        return $this->router->createRoute(HttpMethod::HEAD->value, $path);
     }
 
     /**
@@ -1229,15 +1233,15 @@ class App implements HttpServerInterface, ContainerInterface
             throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
-        $this->router->createRoute(HttpMethod::GET, "$path/list")->to($controller, 'list');
-        $this->router->createRoute(HttpMethod::GET, "$path/paginate")->to($controller, 'paginatedList');
-        $this->router->createRoute(HttpMethod::GET, "$path/{id}")->to($controller, 'get');
-        $this->router->createRoute(HttpMethod::POST, "$path/bulk")->to($controller, 'createBulk');
-        $this->router->createRoute(HttpMethod::POST, $path)->to($controller, 'create');
-        $this->router->createRoute(HttpMethod::PUT, "$path/bulk")->to($controller, 'updateBulk');
-        $this->router->createRoute(HttpMethod::PUT, "$path/{id}")->to($controller, 'update');
-        $this->router->createRoute(HttpMethod::DELETE, "$path/bulk")->to($controller, 'deleteBulk');
-        $this->router->createRoute(HttpMethod::DELETE, "$path/{id}")->to($controller, 'delete');
+        $this->router->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
+        $this->router->createRoute(HttpMethod::GET->value, "$path/paginate")->to($controller, 'paginatedList');
+        $this->router->createRoute(HttpMethod::GET->value, "$path/{id}")->to($controller, 'get');
+        $this->router->createRoute(HttpMethod::POST->value, "$path/bulk")->to($controller, 'createBulk');
+        $this->router->createRoute(HttpMethod::POST->value, $path)->to($controller, 'create');
+        $this->router->createRoute(HttpMethod::PUT->value, "$path/bulk")->to($controller, 'updateBulk');
+        $this->router->createRoute(HttpMethod::PUT->value, "$path/{id}")->to($controller, 'update');
+        $this->router->createRoute(HttpMethod::DELETE->value, "$path/bulk")->to($controller, 'deleteBulk');
+        $this->router->createRoute(HttpMethod::DELETE->value, "$path/{id}")->to($controller, 'delete');
     }
 
     #################

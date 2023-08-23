@@ -4,10 +4,10 @@ namespace Armie\Bags;
 
 use Armie\Helpers\Security;
 use Armie\Interfaces\StorageBagInterface;
-use Closure;
-use Laravel\SerializableClosure\SerializableClosure;
 
 /**
+ * Memory (array) store
+ * 
  * Armie Framework
  *
  * @copyright busarm.com
@@ -16,8 +16,6 @@ use Laravel\SerializableClosure\SerializableClosure;
  */
 class Bag implements StorageBagInterface
 {
-	protected SerializableClosure|Closure|null $onChange = null;
-	protected SerializableClosure|Closure|null $onDelete = null;
 	protected array $keys = [];
 	protected array $original = [];
 
@@ -27,45 +25,6 @@ class Bag implements StorageBagInterface
 		foreach (array_keys($this->attributes) as $name) {
 			$this->key($name);
 		}
-	}
-
-	/**
-	 * Set on attribute change listner
-	 * 
-	 * @return self
-	 */
-	public function onChange(Closure $onChange): self
-	{
-		$this->onChange = $onChange;
-		return $this;
-	}
-
-	/**
-	 * Set on attribute delete listner
-	 * 
-	 * @return self
-	 */
-	public function onDelete(Closure $onDelete): self
-	{
-		$this->onDelete = $onDelete;
-		return $this;
-	}
-
-	/**
-	 * Mirror attributes with external source
-	 *
-	 * @param array $attributes
-	 * @return self
-	 */
-	public function mirror(&$attributes): self
-	{
-		$this->attributes = &$attributes;
-		$this->original = $this->attributes;
-		$this->keys = [];
-		foreach (array_keys($this->attributes) as $name) {
-			$this->key($name);
-		}
-		return $this;
 	}
 
 	/**
@@ -88,7 +47,6 @@ class Bag implements StorageBagInterface
 	public function set(string $name, mixed $value, $options = NULL): bool
 	{
 		$this->attributes[$this->key($name)] = $value;
-		if ($this->onChange) call_user_func($this->onChange, $name, $value);
 		return true;
 	}
 
@@ -101,7 +59,11 @@ class Bag implements StorageBagInterface
 	}
 
 	/**
-	 * @inheritDoc
+	 * Get or Set original key
+	 *
+	 * @param string $name
+	 * @param boolean $force Force get, don't set if empty
+	 * @return string
 	 */
 	public function key(string $name, $force = false): string
 	{
@@ -159,10 +121,6 @@ class Bag implements StorageBagInterface
 		foreach (array_keys($this->attributes) as $name) {
 			$this->key($name);
 		}
-
-		if ($this->onChange)
-			foreach ($data as $name => $value)
-				call_user_func($this->onChange, $name, $value);
 	}
 
 	/**
@@ -173,8 +131,7 @@ class Bag implements StorageBagInterface
 		if ($this->has($name)) {
 			unset($this->attributes[$this->key($name)]);
 			unset($this->keys[strtolower($name)]);
-		};
-		if ($this->onDelete) call_user_func($this->onDelete, $name);
+		}
 	}
 
 	/**
@@ -182,15 +139,8 @@ class Bag implements StorageBagInterface
 	 */
 	public function clear()
 	{
-		$data = $this->attributes;
 		$this->attributes = [];
 		$this->keys = [];
-
-		if ($this->onDelete)
-			foreach (array_keys($data) as $name)
-				call_user_func($this->onDelete, $name);
-
-		$data = NULL;
 	}
 
 	/**

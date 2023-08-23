@@ -57,22 +57,21 @@ class Router implements RouterInterface
     }
 
     /**
-     * @param HttpMethod $method
+     * @param string $method
      * @param string $path
      * @return RouteInterface
      */
-    public function createRoute(HttpMethod $method, string $path): RouteInterface
+    public function createRoute(string $method, string $path): RouteInterface
     {
-        $route = match ($method) {
-            HttpMethod::GET     =>  Route::get($path),
-            HttpMethod::POST    =>  Route::post($path),
-            HttpMethod::PUT     =>  Route::put($path),
-            HttpMethod::PATCH   =>  Route::patch($path),
-            HttpMethod::DELETE  =>  Route::delete($path),
-            HttpMethod::HEAD    =>  Route::head($path),
+        $route = match (strtoupper($method)) {
+            HttpMethod::GET->value     =>  Route::get($path),
+            HttpMethod::POST->value    =>  Route::post($path),
+            HttpMethod::PUT->value     =>  Route::put($path),
+            HttpMethod::PATCH->value   =>  Route::patch($path),
+            HttpMethod::DELETE->value  =>  Route::delete($path),
+            HttpMethod::HEAD->value    =>  Route::head($path),
         };
-        $this->routes[] = &$route;
-        return $route;
+        return $this->routes[] = &$route;
     }
 
     /**
@@ -116,15 +115,15 @@ class Router implements RouterInterface
             throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
-        $this->createRoute(HttpMethod::GET, "$path/list")->to($controller, 'list');
-        $this->createRoute(HttpMethod::GET, "$path/paginate")->to($controller, 'paginatedList');
-        $this->createRoute(HttpMethod::GET, "$path/{id}")->to($controller, 'get');
-        $this->createRoute(HttpMethod::POST, "$path/bulk")->to($controller, 'createBulk');
-        $this->createRoute(HttpMethod::POST, $path)->to($controller, 'create');
-        $this->createRoute(HttpMethod::PUT, "$path/bulk")->to($controller, 'updateBulk');
-        $this->createRoute(HttpMethod::PUT, "$path/{id}")->to($controller, 'update');
-        $this->createRoute(HttpMethod::DELETE, "$path/bulk")->to($controller, 'deleteBulk');
-        $this->createRoute(HttpMethod::DELETE, "$path/{id}")->to($controller, 'delete');
+        $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
+        $this->createRoute(HttpMethod::GET->value, "$path/paginate")->to($controller, 'paginatedList');
+        $this->createRoute(HttpMethod::GET->value, "$path/{id}")->to($controller, 'get');
+        $this->createRoute(HttpMethod::POST->value, "$path/bulk")->to($controller, 'createBulk');
+        $this->createRoute(HttpMethod::POST->value, $path)->to($controller, 'create');
+        $this->createRoute(HttpMethod::PUT->value, "$path/bulk")->to($controller, 'updateBulk');
+        $this->createRoute(HttpMethod::PUT->value, "$path/{id}")->to($controller, 'update');
+        $this->createRoute(HttpMethod::DELETE->value, "$path/bulk")->to($controller, 'deleteBulk');
+        $this->createRoute(HttpMethod::DELETE->value, "$path/{id}")->to($controller, 'delete');
 
         return $this;
     }
@@ -178,7 +177,7 @@ class Router implements RouterInterface
                     ($params = $this->isMatch($request->path(), $route->getPath())) !== false
                 ) {
                     // Set route params
-                    $route->params($params ?: []);
+                    $route->params(array_merge($route->getParams(), $params ?: []));
 
                     // View
                     if ($view = $route->getView()) {

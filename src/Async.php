@@ -125,29 +125,30 @@ class Async
         $body = strval($task->getRequest(!$wait));
 
         $fiber = new Fiber(function (string $id, string $body, bool $wait, int $length) {
+            try {
+                $socket = self::connect($id, true, false);
 
-            $socket = self::connect($id, true, false);
-            if ($socket == false) {
+                // Send the data
+                stream_write($socket, $body, $length);
+
+                // Suspend fiber after sending requesst
+                Fiber::suspend();
+
+                if ($wait) {
+                    // Receive the result
+                    $result = stream_read($socket, $length);
+                    // Close socket
+                    $socket && fclose($socket) && $socket = null;
+                    // Parse response
+                    return !empty($result) ? unserialize($result) : true;
+                } else {
+                    // Close socket
+                    $socket && fclose($socket) && $socket = null;
+                    return true;
+                }
+            } catch (\Throwable $th) {
+                report()->exception($th);
                 return false;
-            }
-
-            // Send the data
-            stream_write($socket, $body, $length);
-
-            // Suspend fiber after sending requesst
-            Fiber::suspend();
-
-            if ($wait) {
-                // Receive the result
-                $result = stream_read($socket, $length);
-                // Close socket
-                $socket && fclose($socket) && $socket = null;
-                // Parse response
-                return $result ? unserialize($result) : null;
-            } else {
-                // Close socket
-                $socket && fclose($socket) && $socket = null;
-                return true;
             }
         });
 
@@ -163,7 +164,7 @@ class Async
      * @param Task|callable $task Task to run
      * @param bool $wait Wait for response
      * @param int $length Max stream length in bytes
-     * @return mixed `false` if failed
+     * @return mixed `false` if failed or `true` if success with no response
      */
     public static function withWorker(Task|callable $task, bool $wait = true, int $length = self::STREAM_BUFFER_LENGTH): mixed
     {
@@ -173,26 +174,29 @@ class Async
         $id = $task->getName();
         $body = strval($task->getRequest(!$wait));
 
-        // Create connection
-        $socket = self::connect($id, $wait, $wait);
-        if ($socket == false) {
+        try {
+            $socket = self::connect($id, $wait, $wait);
+            if ($socket) {
+                if ($wait) {
+                    // Send the data
+                    stream_write($socket, $body, $length);
+                    // Receive the response.
+                    $result = stream_read($socket, $length);
+                    // Return response. 
+                    return !empty($result) ? unserialize($result) : true;
+                } else {
+                    return self::streamEventLoop($socket, false, function ($socket, $length, $body) {
+                        // Send the data
+                        stream_write($socket, $body, $length);
+                        // Close socket - for non-persistent connection
+                        $socket && fclose($socket) && $socket = null;
+                    }, [$socket, $length, $body]);
+                }
+            }
             return false;
-        }
-
-        if ($wait) {
-            // Send the data
-            stream_write($socket, $body, $length);
-            // Receive the response.
-            $response = stream_read($socket, $length);
-            // Return response. 
-            return $response ? unserialize($response) : null;
-        } else {
-            return self::streamEventLoop($socket, false, function ($socket, $length, $body) {
-                // Send the data
-                stream_write($socket, $body, $length);
-                // Close socket - for non-persistent connection
-                $socket && fclose($socket) && $socket = null;
-            }, [$socket, $length, $body]);
+        } catch (\Throwable $th) {
+            report()->exception($th);
+            return false;
         }
     }
 
@@ -206,7 +210,11 @@ class Async
     public static function withChildProcess(Runnable|callable $task, ?callable $callback = null): int|bool
     {
         if (!extension_loaded('pcntl')) {
-            log_warning("Async::withChildProcess requires `pcntl` extension");
+            log_warning("Please install `pcntl` extension. " . __FILE__ . ':' . __LINE__);
+            return false;
+        }
+        if (!extension_loaded('posix')) {
+            log_warning("Please install `posix` extension. " . __FILE__ . ':' . __LINE__);
             return false;
         }
 
@@ -232,6 +240,9 @@ class Async
         }
         // Child process
         else {
+            // Make child process the session leader
+            $sid = posix_setsid();
+            if ($sid < 0) die();
             // Set timeout alarm for child
             pcntl_alarm(self::STREAM_READ_WRITE_TIMEOUT);
             // Execute task
@@ -298,7 +309,7 @@ class Async
      * @param bool $block Blocking or Non-Blocking connection
      * @param bool $persist Peristent connection
      * @return resource|false  Return connection or `false` if failed and $async = true
-     * @throws SystemError If failed and $async = false
+     * @throws SystemError If failed and $block = true
      */
     private static function connect(string $id, bool $block = false, bool $persist = false): mixed
     {

@@ -9,6 +9,7 @@ use Armie\Interfaces\QueueHandlerInterface;
 use Armie\Tasks\CallableTask;
 use Armie\Tasks\Task;
 use Closure;
+use LimitIterator;
 use SplQueue;
 use Workerman\Timer;
 
@@ -49,7 +50,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
         $this->queueRateLimit = min($this->queueRateLimit ?: 1, min($this->queueLimit, 1000));
 
         self::$queue = self::$queue ?? new SplQueue();
-        self::$queue->setIteratorMode(SplQueue::IT_MODE_FIFO);
+        self::$queue->setIteratorMode(SplQueue::IT_MODE_FIFO | SplQueue::IT_MODE_DELETE);
     }
 
     /**
@@ -58,7 +59,6 @@ final class WorkerQueueHandler implements QueueHandlerInterface
     public function enqueue(Task $task): void
     {
         $this->app->throwIfNoEventLoop();
-        $this->app->throwIfNoTaskWorker();
 
         if (count(self::$queue) >= $this->queueLimit) {
             throw new QueueError("Queue limit exceeded. Please try again later");
@@ -71,30 +71,27 @@ final class WorkerQueueHandler implements QueueHandlerInterface
 
         // Run queue
         self::$queueTimer = self::$queueTimer ?: Timer::add(1, function ($limit) {
-
             if (self::$queueIdle) {
                 try {
+                    // --- Start Batch ---- //
                     self::$queueIdle = false;
-
-                    $count = 0;
-                    foreach (self::$queue as $task) {
-                        if (Async::runTask($task)) {
-                            // Success - remove from queue
-                            unset(self::$queue[self::$queue->key()]);
-                            $count++;
-                        } else {
-                            // Failed - move to bottom of queue
-                            self::$queue->enqueue(self::$queue->shift());
-                        }
-                        if ($count >= $limit) break;
+                    $batch = [];
+                    foreach ((new LimitIterator(self::$queue, 0, $limit)) as $task) {
+                        $batch[] = $task;
                     }
+                    foreach (Async::runTasks($batch) as $key => $result) {
+                        if ($result === false) {
+                            self::$queue->enqueue($batch[$key]); // Failed queue again
+                        }
+                    }
+                    self::$queueIdle = true;
+                    // --- End Batch ---- //
 
+                    // Queue completed
                     if (self::$queue->count() == 0) {
                         Timer::del(self::$queueTimer);
                         self::$queueTimer = null;
                     }
-
-                    self::$queueIdle = true;
                 } catch (\Throwable $th) {
                     $this->app->reporter->exception($th);
                 }

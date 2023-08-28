@@ -342,7 +342,7 @@ $app->start(
     'localhost',
     8181,
     (new ServerConfig)
-        ->setLooper(Looper::SWOOLE)
+        ->setLooper(Looper::EV)
         ->setHttpWorkers(2)
         ->setTaskWorkers(1)
         ->addJob(function () {

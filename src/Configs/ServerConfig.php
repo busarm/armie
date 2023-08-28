@@ -32,9 +32,19 @@ class ServerConfig
     public int $httpWorkers = 2;
 
     /**
+     * Max number of http requests to handle per worker before reloading worker. This is to prevent memory leak
+     */
+    public int $httpMaxRequests = 10000;
+
+    /**
      * Number of task worker processes to spawn. Set to 0 to disable task worker.
      */
     public int $taskWorkers = 1;
+
+    /**
+     * Max number of task requests to handle per worker before reloading worker. This is to prevent memory leak
+     */
+    public int $taskMaxRequests = 100000;
 
     /**
      * Event loop type
@@ -127,6 +137,18 @@ class ServerConfig
     }
 
     /**
+     * Set max number of http requests to handle per worker before reloading worker. This is to prevent memory leak
+     *
+     * @return  self
+     */ 
+    public function setHttpMaxRequests(int $httpMaxRequests)
+    {
+        $this->httpMaxRequests = $httpMaxRequests;
+
+        return $this;
+    }
+
+    /**
      * Set number of taks workers to spawn. Set to 0 or false to disable
      *
      * @return  self
@@ -134,6 +156,18 @@ class ServerConfig
     public function setTaskWorkers(int|false $taskWorkers): self
     {
         $this->taskWorkers = intval($taskWorkers);
+
+        return $this;
+    }
+
+    /**
+     * Set max number of task requests to handle per worker before reloading worker. This is to prevent memory leak
+     *
+     * @return  self
+     */ 
+    public function setTaskMaxRequests(int $taskMaxRequests)
+    {
+        $this->taskMaxRequests = $taskMaxRequests;
 
         return $this;
     }
@@ -205,11 +239,11 @@ class ServerConfig
     /**
      * Set SSL certificate path
      *
-     * @param  string|null  $sslCertPath  SSL certificate path
+     * @param  string  $sslCertPath  SSL certificate path
      *
      * @return  self
      */
-    public function setSslCertPath($sslCertPath)
+    public function setSslCertPath(string $sslCertPath)
     {
         $this->sslCertPath = $sslCertPath;
 
@@ -219,11 +253,11 @@ class ServerConfig
     /**
      * Set SSL primary key path
      *
-     * @param  string|null  $sslPkPath  SSL primary key path
+     * @param  string  $sslPkPath  SSL primary key path
      *
      * @return  self
      */
-    public function setSslPkPath($sslPkPath)
+    public function setSslPkPath(string $sslPkPath)
     {
         $this->sslPkPath = $sslPkPath;
 

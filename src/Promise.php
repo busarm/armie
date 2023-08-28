@@ -65,7 +65,7 @@ class Promise implements PromiseThen
     private ?Closure $_finallyFn = null;
 
     /**
-     * @param Task|callable():T $task 
+     * @param Task<T>|callable():T $task 
      */
     public function __construct(Task|callable $task)
     {
@@ -139,8 +139,8 @@ class Promise implements PromiseThen
     /**
      * Resolve list of promises
      * 
-     * @param self[] $promises List of Promises
-     * @return Generator
+     * @param self<T>[] $promises List of Promises
+     * @return Generator<string,T>
      */
     public static function all(array $promises): Generator
     {
@@ -152,7 +152,7 @@ class Promise implements PromiseThen
     /**
      * Resolve promise
      * 
-     * @param self $promise Promise
+     * @param self<T> $promise Promise
      * @return T
      */
     public static function resolve(self $promise): mixed

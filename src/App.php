@@ -701,7 +701,7 @@ class App implements HttpServerInterface, ContainerInterface
                 'correlationId' => $request->correlationId(),
                 'ip' => $request->ip(),
                 'url' => $request->currentUrl(),
-                'method' => $request->method(),
+                'method' => $request->method()->value,
                 'query' => $request->query()->all(),
                 'body' => $request->request()->all(),
                 'headers' => $request->request()->all(),
@@ -808,10 +808,13 @@ class App implements HttpServerInterface, ContainerInterface
         // Service Client
         $client = new RemoteClient(strtolower($this->config->name), $config->serverUrl ?? $worker->getSocketName());
 
-        $worker->onWorkerStart = function (Worker $worker) use ($client) {
+        $worker->onWorkerStart = function (Worker $worker) use ($config, $client) {
             $this->status = AppStatus::RUNNNIG;
             $this->startTimeMs = floor(microtime(true) * 1000);
             $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
+
+            // Track request counts for worker
+            $requests = 0;
 
             // Register distributed service discovery if available
             if ($this->serviceDiscovery && $this->serviceDiscovery instanceof DistributedServiceDiscoveryInterface) {
@@ -819,11 +822,10 @@ class App implements HttpServerInterface, ContainerInterface
             }
 
             // ----- Add Connection Handlers ----- //
-
-            $worker->onMessage = function (TcpConnection $connection, HttpRequest $request) {
+            $worker->onMessage = function (TcpConnection $connection, HttpRequest $request) use ($config, &$requests) {
                 try {
                     $response = $this->run(Request::fromWorkerman($request, $this->config));
-                    return $connection->send($response->toWorkerman());
+                    $connection->send($response->toWorkerman());
                 } catch (HttpException $e) {
                     $response = $e->handle($this);
                     $connection->send($response->toWorkerman());
@@ -832,6 +834,14 @@ class App implements HttpServerInterface, ContainerInterface
                     $response = $this->errorHandler->handle($e);
                     $connection->send($response->toWorkerman());
                     $connection->close();
+                }
+
+                // Retart worker if max request reached to prevent memory leak
+                if ($requests >= $config->httpMaxRequests) {
+                    $requests = 1;
+                    $connection->worker->signalHandler(\SIGUSR1);
+                } else {
+                    $requests += 1;
                 }
             };
             $worker->onConnect = function (TcpConnection $connection) {
@@ -868,6 +878,9 @@ class App implements HttpServerInterface, ContainerInterface
                 $this->serviceDiscovery->unregister($client);
             }
         };
+        $worker->onWorkerReload = function (Worker $worker) {
+            $this->logger->info(sprintf("%s process %s reloading", $worker->name, $worker->id));
+        };
     }
 
     /**
@@ -897,9 +910,11 @@ class App implements HttpServerInterface, ContainerInterface
             $this->startTimeMs = floor(microtime(true) * 1000);
             $this->logger->info(sprintf("%s process %s started", $worker->name, $worker->id));
 
-            // ----- Add Connection Handlers ----- //
+            // Track request counts for worker
+            $requests = 0;
 
-            $worker->onMessage = function (TcpConnection $connection, $data) {
+            // ----- Add Connection Handlers ----- //
+            $worker->onMessage = function (TcpConnection $connection, $data) use ($config, &$requests) {
                 try {
                     if ($dto = TaskDto::parse($data)) {
                         if (
@@ -912,24 +927,29 @@ class App implements HttpServerInterface, ContainerInterface
                                 // Run task
                                 if ($dto->async) {
                                     $connection->close();
-                                    return $task->run();
+                                    $task->run();
                                 } else {
                                     $result = $task->run();
                                     if (!feof($connection->getSocket())) $connection->send(serialize($result));
                                     else $connection->close();
-                                    return;
                                 }
-                            }
-                        }
-                        throw new Exception(sprintf("%s process %s: Bad request", $connection->worker->name, $connection->worker->id));
-                    }
-                    throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
+                            } else throw new Exception(sprintf("%s process %s: Failed to load task %s", $connection->worker->name, $connection->worker->id, $dto->class));
+                        } else throw new Exception(sprintf("%s process %s: Bad request", $connection->worker->name, $connection->worker->id));
+                    } else throw new Exception(sprintf("%s process %s: Access denied", $connection->worker->name, $connection->worker->id));
                 } catch (HttpException $e) {
                     $e->handle($this);
                     $connection->close();
                 } catch (Throwable $e) {
                     $this->errorHandler->handle($e);
                     $connection->close();
+                }
+
+                // Retart worker if max request reached to prevent memory leak
+                if ($requests >= $config->taskMaxRequests) {
+                    $requests = 1;
+                    $connection->worker->signalHandler(\SIGUSR1);
+                } else {
+                    $requests += 1;
                 }
             };
             $worker->onConnect = function (TcpConnection $connection) {
@@ -1058,6 +1078,9 @@ class App implements HttpServerInterface, ContainerInterface
             $this->status = AppStatus::STOPPED;
             $this->logger->info(sprintf("%s process %s stopped", $worker->name, $worker->id));
         };
+        $worker->onWorkerReload = function (Worker $worker) {
+            $this->logger->info(sprintf("%s process %s reloading", $worker->name, $worker->id));
+        };
     }
 
     /**
@@ -1065,9 +1088,8 @@ class App implements HttpServerInterface, ContainerInterface
      * 
      * @param string $host
      * @param ServerConfig $config
-     * @param array<string,class-string<SocketControllerInterface>> $sockets
      */
-    private function setUpSocketWorkers(string $host, ServerConfig $config, array $sockets = [])
+    private function setUpSocketWorkers(string $host, ServerConfig $config)
     {
         // Only supported for unix
         if (DIRECTORY_SEPARATOR !== '/') {

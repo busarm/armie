@@ -10,7 +10,7 @@ use Armie\Data\PDO\Relations\OneToOne;
 use Armie\Enums\DataType;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -30,7 +30,7 @@ class ProductTestModel extends Model
             new Field('categoryId', DataType::INT),
             new Field('createdAt', DataType::DATETIME),
             new Field('updatedAt', DataType::DATETIME),
-            new Field('deletedAt', DataType::DATETIME)
+            new Field('deletedAt', DataType::DATETIME),
         ];
     }
 
@@ -47,12 +47,12 @@ class ProductTestModel extends Model
                 new Reference(ProductTagTestModel::class, ['id' => 'productId']),
                 new Reference(TagTestModel::class, ['tagId' => 'id']),
                 false
-            )
+            ),
         ];
     }
 
     /**
-     * Model table name. e.g db table, collection name
+     * Model table name. e.g db table, collection name.
      *
      * @return string
      */
@@ -62,7 +62,7 @@ class ProductTestModel extends Model
     }
 
     /**
-     * Model key name. e.g table primary key, unique index
+     * Model key name. e.g table primary key, unique index.
      *
      * @return string|null
      */
@@ -72,7 +72,7 @@ class ProductTestModel extends Model
     }
 
     /**
-     * Model created date param name. e.g created_at, createdAt
+     * Model created date param name. e.g created_at, createdAt.
      *
      * @return string
      */
@@ -82,7 +82,7 @@ class ProductTestModel extends Model
     }
 
     /**
-     * Model updated date date param name. e.g updated_at, updatedAt
+     * Model updated date date param name. e.g updated_at, updatedAt.
      *
      * @return string
      */
@@ -92,7 +92,7 @@ class ProductTestModel extends Model
     }
 
     /**
-     * Model soft delete date param name. e.g deleted_at, deletedAt
+     * Model soft delete date param name. e.g deleted_at, deletedAt.
      *
      * @return string
      */

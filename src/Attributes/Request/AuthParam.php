@@ -2,7 +2,6 @@
 
 namespace Armie\Attributes\Request;
 
-use Attribute;
 use Armie\App;
 use Armie\Interfaces\Attribute\ParameterAttributeInterface;
 use Armie\Interfaces\RequestInterface;
@@ -10,11 +9,12 @@ use Armie\Interfaces\Resolver\AuthResolver;
 use Armie\Interfaces\RouteInterface;
 use Armie\Resolvers\Auth;
 use Armie\Traits\TypeResolver;
+use Attribute;
 use ReflectionParameter;
 
 /**
- * Request auth user resolver
- * 
+ * Request auth user resolver.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -23,7 +23,6 @@ use ReflectionParameter;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class AuthParam implements ParameterAttributeInterface
 {
-
     use TypeResolver;
 
     public function __construct(private string $name, private bool $sanitize = false)
@@ -41,6 +40,7 @@ class AuthParam implements ParameterAttributeInterface
         ) {
             return $request->auth();
         }
+
         return null;
     }
 }

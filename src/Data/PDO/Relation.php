@@ -2,14 +2,14 @@
 
 namespace Armie\Data\PDO;
 
-use Armie\Data\PDO\Model;
 use Armie\Interfaces\Data\RelationInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @template TCurrent
  * @template TReference
  */
@@ -21,48 +21,53 @@ abstract class Relation extends Field implements RelationInterface
     protected int $limit = -1;
 
     /**
-     * Get relation references
+     * Get relation references.
+     *
      * @return array
      */
     abstract public function getReferences(): array;
 
     /**
-     * Get relation reference model
+     * Get relation reference model.
+     *
      * @return Model&TReference
      */
     abstract public function getReferenceModel(): Model;
 
     /**
-     * Get relation current model
+     * Get relation current model.
+     *
      * @return Model&TCurrent
      */
     abstract public function getCurrentModel(): Model;
 
     /**
-     * Get relation data
-     * 
+     * Get relation data.
+     *
      * @return array<Model&TReference>|(Model&TReference)|null
      */
     abstract public function get(): array|Model|null;
 
     /**
-     * Load relation data for list of items
-     * 
+     * Load relation data for list of items.
+     *
      * @param array<Model&TCurrent> $items
+     *
      * @return array<Model&TCurrent> $items with loaded relations
      */
     abstract public function load(array $items): array;
 
     /**
-     * Save relation data
-     * 
+     * Save relation data.
+     *
      * @param array $data
+     *
      * @return bool
      */
     abstract public function save(array $data): bool;
 
     /**
-     * Get the value of conditions
+     * Get the value of conditions.
      */
     public function getConditions(): array
     {
@@ -70,9 +75,9 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of conditions
+     * Set the value of conditions.
      *
-     * @return  self
+     * @return self
      */
     public function setConditions(array $conditions)
     {
@@ -82,7 +87,7 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Get the value of params
+     * Get the value of params.
      */
     public function getParams()
     {
@@ -90,9 +95,9 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of params
+     * Set the value of params.
      *
-     * @return  self
+     * @return self
      */
     public function setParams(array $params)
     {
@@ -102,7 +107,7 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Get the value of columns
+     * Get the value of columns.
      */
     public function getColumns(): array
     {
@@ -110,9 +115,9 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of columns
+     * Set the value of columns.
      *
-     * @return  self
+     * @return self
      */
     public function setColumns(array $columns)
     {
@@ -122,7 +127,7 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Get the value of limit
+     * Get the value of limit.
      */
     public function getLimit(): int
     {
@@ -130,9 +135,9 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of limit
+     * Set the value of limit.
      *
-     * @return  self
+     * @return self
      */
     public function setLimit(int $limit)
     {

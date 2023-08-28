@@ -6,22 +6,19 @@ use Armie\Interfaces\Resolver\AuthResolver;
 use Armie\Interfaces\Resolver\AuthUserResolver;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Auth implements AuthResolver
 {
-
     public function __construct(private string $token, private AuthUserResolver $user)
     {
     }
 
-
     /**
-     * Get the value of token
+     * Get the value of token.
      */
     public function getToken(): string
     {
@@ -29,9 +26,9 @@ class Auth implements AuthResolver
     }
 
     /**
-     * Set the value of token
+     * Set the value of token.
      *
-     * @return  self
+     * @return self
      */
     public function setToken($token): self
     {
@@ -41,7 +38,7 @@ class Auth implements AuthResolver
     }
 
     /**
-     * Get the value of user
+     * Get the value of user.
      */
     public function getUser(): AuthUserResolver
     {
@@ -49,9 +46,9 @@ class Auth implements AuthResolver
     }
 
     /**
-     * Set the value of user
+     * Set the value of user.
      *
-     * @return  self
+     * @return self
      */
     public function setUser($user): self
     {

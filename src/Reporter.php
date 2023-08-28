@@ -9,8 +9,8 @@ use function Armie\Helpers\log_error;
 use function Armie\Helpers\log_exception;
 
 /**
- * Reporting
- * 
+ * Reporting.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -35,10 +35,11 @@ class Reporter implements ReportingInterface
     protected array $breadCrumbs = [];
 
     /**
-     * Leave breadcrumbs for issue tracking
+     * Leave breadcrumbs for issue tracking.
      *
      * @param mixed $title
      * @param array $metadata
+     *
      * @return void
      */
     public function leaveCrumbs($title, array $metadata = [])
@@ -47,7 +48,7 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Get bread crumbs
+     * Get bread crumbs.
      */
     public function getBreadCrumbs()
     {
@@ -55,9 +56,10 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Report Info
+     * Report Info.
      *
      * @param array $data
+     *
      * @return void
      */
     public function info(array $data)
@@ -66,52 +68,54 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Report Error
+     * Report Error.
      *
      * @param string $message
+     *
      * @return void
      */
     public function error(string $message)
     {
         $contexts = array_map(
             function ($instance) {
-                return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
+                return ($instance['file'] ?? $instance['class'] ?? '').':'.($instance['line'] ?? '1');
             },
             array_values(array_filter(debug_backtrace(), fn ($trace) => isset($trace['file'])))
         );
         log_error($message);
         log_debug($this->toString([
-            'crumbs' => $this->redact($this->breadCrumbs),
+            'crumbs'   => $this->redact($this->breadCrumbs),
             'contexts' => $contexts,
         ]));
     }
 
     /**
-     * Report Exception
+     * Report Exception.
      *
      * @param \Throwable $exception
+     *
      * @return void
      */
     public function exception(\Throwable $exception)
     {
         $contexts = array_map(
             function ($instance) {
-                return ($instance['file'] ?? $instance['class'] ?? '') . ':' . ($instance['line'] ?? '1');
+                return ($instance['file'] ?? $instance['class'] ?? '').':'.($instance['line'] ?? '1');
             },
             array_values(array_filter($exception->getTrace(), fn ($trace) => isset($trace['file'])))
         );
         log_exception($exception);
         log_debug($this->toString([
-            'crumbs' => $this->redact($this->breadCrumbs),
+            'crumbs'   => $this->redact($this->breadCrumbs),
             'contexts' => $contexts,
         ]));
     }
 
-
     /**
-     * Add list of params to be redacted from report (LOWER CASED STRINGS)
+     * Add list of params to be redacted from report (LOWER CASED STRINGS).
      *
      * @param array<string> $list
+     *
      * @return void
      */
     public function addRedactedParams(array $list)
@@ -119,12 +123,12 @@ class Reporter implements ReportingInterface
         $this->redactedParams = array_merge($this->redactedParams, $list);
     }
 
-
     /**
-     * Redact params
+     * Redact params.
      *
-     * @param array $params
+     * @param array         $params
      * @param array<string> $redactedParams
+     *
      * @return array
      */
     public function redact(array $params, $redactedParams = []): array
@@ -134,9 +138,9 @@ class Reporter implements ReportingInterface
         foreach ($params as $key => $value) {
             if ($value) {
                 if (is_array($value) || is_object($value)) {
-                    $redacted[$key] = $this->redact((array)$value, $redactedParams);
-                } else if (in_array(strtolower($key), $excluded)) {
-                    $redacted[$key] = "[REDACTED]";
+                    $redacted[$key] = $this->redact((array) $value, $redactedParams);
+                } elseif (in_array(strtolower($key), $excluded)) {
+                    $redacted[$key] = '[REDACTED]';
                 } else {
                     $redacted[$key] = $value;
                 }
@@ -144,13 +148,15 @@ class Reporter implements ReportingInterface
                 $redacted[$key] = $value;
             }
         }
+
         return $redacted;
     }
 
     /**
-     * Array to String
+     * Array to String.
      *
      * @param array $data
+     *
      * @return string
      */
     protected function toString(array $data): string

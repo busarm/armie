@@ -2,21 +2,22 @@
 
 namespace Armie\Test;
 
-use PHPUnit\Framework\TestCase;
 use Armie\App;
 use Armie\Config;
 use Armie\Enums\HttpMethod;
 use Armie\Interfaces\LoaderInterface;
-use Armie\Server;
 use Armie\Interfaces\RouterInterface;
+use Armie\Server;
 use Nyholm\Psr7\ServerRequest;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @covers \Armie\Server
  */
 final class ServerTest extends TestCase
@@ -24,8 +25,8 @@ final class ServerTest extends TestCase
     const HTTP_TEST_URL = 'http://localhost';
     const HTTP_TEST_PORT = 8181;
 
-    private Server|null $server = NULL;
-    private App|null $app = NULL;
+    private Server|null $server = null;
+    private App|null $app = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -38,9 +39,9 @@ final class ServerTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->server = new Server("Test Server");
+        $this->server = new Server('Test Server');
         $config = (new Config())
-            ->setAppPath(__DIR__ . '/TestApp')
+            ->setAppPath(__DIR__.'/TestApp')
             ->setConfigPath('Configs')
             ->setViewPath('Views')
             ->setLogRequest(false);
@@ -48,7 +49,7 @@ final class ServerTest extends TestCase
     }
 
     /**
-     * Test app setUp 
+     * Test app setUp.
      *
      * @return void
      */
@@ -65,28 +66,27 @@ final class ServerTest extends TestCase
     }
 
     /**
-     * Test app run mock HTTP For Route
+     * Test app run mock HTTP For Route.
      *
      * @return void
      */
     public function testServerRunHttpForRoute()
     {
-        $this->server->addRoutePath('v1', __DIR__ . '/TestApp');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/ping'));
+        $this->server->addRoutePath('v1', __DIR__.'/TestApp');
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/v1/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-
     /**
-     * Test app run mock HTTP For Domain
+     * Test app run mock HTTP For Domain.
      *
      * @return void
      */
     public function testServerRunHttpForDomain()
     {
-        $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/TestApp');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping'));
+        $this->server->addDomainPath('localhost:'.ServerTest::HTTP_TEST_PORT, __DIR__.'/TestApp');
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }

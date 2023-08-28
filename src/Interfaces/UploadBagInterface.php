@@ -5,69 +5,82 @@ namespace Armie\Interfaces;
 use Stringable;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @codeCoverageIgnore
  */
 interface UploadBagInterface extends Stringable
 {
     /**
-     * Set uploaded file
+     * Set uploaded file.
      *
-     * @param string $name
+     * @param string                                  $name
      * @param \Psr\Http\Message\UploadedFileInterface $value
-     * @param mixed $options
+     * @param mixed                                   $options
+     *
      * @return bool
      */
-    public function set(string $name, \Psr\Http\Message\UploadedFileInterface $value, $options = NULL): bool;
+    public function set(string $name, \Psr\Http\Message\UploadedFileInterface $value, $options = null): bool;
+
     /**
-     * 
-     * Checks if an uploaded file exists
+     * Checks if an uploaded file exists.
      *
      * @param string $name
-     * @return boolean
+     *
+     * @return bool
      */
     public function has(string $name): bool;
+
     /**
-     * Get uploaded file
+     * Get uploaded file.
      *
-     * @param string $name
+     * @param string                                       $name
      * @param \Psr\Http\Message\UploadedFileInterface|null $default
+     *
      * @return \Psr\Http\Message\UploadedFileInterface
      */
     public function get(string $name, \Psr\Http\Message\UploadedFileInterface|null $default = null): \Psr\Http\Message\UploadedFileInterface;
+
     /**
-     * Pull uploaded file: Get and delete
+     * Pull uploaded file: Get and delete.
      *
-     * @param string $name
+     * @param string                                       $name
      * @param \Psr\Http\Message\UploadedFileInterface|null $default
+     *
      * @return \Psr\Http\Message\UploadedFileInterface
      */
     public function pull(string $name, \Psr\Http\Message\UploadedFileInterface|null $default = null): \Psr\Http\Message\UploadedFileInterface;
+
     /**
-     * Get all uploaded files
+     * Get all uploaded files.
      *
      * @return \Psr\Http\Message\UploadedFileInterface[]
      */
     public function all(): array;
+
     /**
-     * Set bulk uploaded files
+     * Set bulk uploaded files.
      *
      * @param \Psr\Http\Message\UploadedFileInterface[] $data
+     *
      * @return void
      */
-    public function replace(array  $data);
+    public function replace(array $data);
+
     /**
-     * Remove uploaded file
+     * Remove uploaded file.
      *
      * @param string $name
+     *
      * @return void
      */
     public function remove(string $name);
+
     /**
-     * Remove all uploaded files
+     * Remove all uploaded files.
      *
      * @return void
      */

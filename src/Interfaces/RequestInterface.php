@@ -3,18 +3,17 @@
 namespace Armie\Interfaces;
 
 use Armie\Enums\HttpMethod;
-use Armie\Interfaces\StorageBagInterface;
-use Armie\Interfaces\SessionStoreInterface;
 use Armie\Interfaces\Resolver\AuthResolver;
 use Armie\Interfaces\Resolver\ServerConnectionResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @codeCoverageIgnore
  */
 interface RequestInterface extends ContainerInterface
@@ -135,70 +134,71 @@ interface RequestInterface extends ContainerInterface
     public function connection(): ServerConnectionResolver|null;
 
     /**
-     * Set the value of session
+     * Set the value of session.
      *
-     * @return  self
+     * @return self
      */
     public function setSession(SessionStoreInterface $session): self;
 
     /**
-     * Set the value of request
+     * Set the value of request.
      *
-     * @return  self
+     * @return self
      */
     public function setRequest(StorageBagInterface $request): self;
 
     /**
-     * Set the value of query
+     * Set the value of query.
      *
-     * @return  self
+     * @return self
      */
     public function setQuery(StorageBagInterface $query): self;
 
     /**
-     * Set the value of server
+     * Set the value of server.
      *
-     * @return  self
+     * @return self
      */
     public function setServer(StorageBagInterface $server): self;
 
     /**
-     * Set the value of files
+     * Set the value of files.
      *
-     * @return  self
+     * @return self
      */
     public function setFiles(UploadBagInterface|StorageBagInterface $files): self;
 
     /**
-     * Set the value of cookies
+     * Set the value of cookies.
      *
-     * @return  self
+     * @return self
      */
     public function setCookies(StorageBagInterface $cookies): self;
 
     /**
-     * Set the value of headers
+     * Set the value of headers.
      *
-     * @return  self
+     * @return self
      */
     public function setHeaders(StorageBagInterface $headers): self;
 
     /**
-     * Set the value of user
+     * Set the value of user.
      *
-     * @return  self
+     * @return self
      */
     public function setAuth(AuthResolver $auth): self;
 
     /**
-     * Set the value of connection
+     * Set the value of connection.
      *
-     * @return  self
+     * @return self
      */
     public function setConnection(ServerConnectionResolver $connection): self;
 
     /**
      * @param UriInterface $uri
+     *
      * @return self
      */
     public function withUri(UriInterface $uri): self;

@@ -12,7 +12,7 @@ use Armie\Interfaces\RouteInterface;
 use Armie\Response;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -24,10 +24,11 @@ class CorsMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Middleware handler
+     * Middleware handler.
      *
      * @param RequestInterface|RouteInterface $request
-     * @param RequestHandlerInterface $handler
+     * @param RequestHandlerInterface         $handler
+     *
      * @return ResponseInterface
      */
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -39,15 +40,18 @@ class CorsMiddleware implements MiddlewareInterface
                 return $result;
             }
             $response = $handler->handle($request);
+
             return $this->handle($request, $response);
         }
+
         return $handler->handle($request);
     }
 
     /**
-     * Preflight Check
+     * Preflight Check.
      *
      * @param RequestInterface $request
+     *
      * @return ResponseInterface|false
      */
     private function preflight(RequestInterface $request): ResponseInterface|bool
@@ -56,14 +60,16 @@ class CorsMiddleware implements MiddlewareInterface
         if ($request->method() === HttpMethod::OPTIONS) {
             return $this->handle($request);
         }
+
         return false;
     }
 
     /**
-     * Handle CORS process
+     * Handle CORS process.
      *
-     * @param RequestInterface $request
+     * @param RequestInterface       $request
      * @param ResponseInterface|null $response
+     *
      * @return ResponseInterface
      */
     private function handle(RequestInterface $request, ResponseInterface|null $response = null): ResponseInterface
@@ -71,15 +77,14 @@ class CorsMiddleware implements MiddlewareInterface
         $response = $response ?: new Response(version: $request->version());
 
         // Check for CORS access request
-        if ($this->config->http->checkCors == TRUE) {
+        if ($this->config->http->checkCors == true) {
+            $maxAge = $this->config->http->corsMaxAge;
+            $allowedOrigins = $this->config->http->allowAnyCorsDomain ? ['*'] : $this->config->http->allowedCorsOrigins;
+            $allowedHeaders = $this->config->http->allowedCorsHeaders;
+            $exposedHeaders = $this->config->http->exposedCorsHeaders;
+            $allowedMethods = $this->config->http->allowedCorsMethods;
 
-            $maxAge           =   $this->config->http->corsMaxAge;
-            $allowedOrigins   =   $this->config->http->allowAnyCorsDomain ? ['*'] : $this->config->http->allowedCorsOrigins;
-            $allowedHeaders   =   $this->config->http->allowedCorsHeaders;
-            $exposedHeaders   =   $this->config->http->exposedCorsHeaders;
-            $allowedMethods   =   $this->config->http->allowedCorsMethods;
-
-            $origin = trim($request->server()->get('HTTP_ORIGIN') ?: $request->server()->get('HTTP_REFERER') ?: '', "/");
+            $origin = trim($request->server()->get('HTTP_ORIGIN') ?: $request->server()->get('HTTP_REFERER') ?: '', '/');
 
             // Allow any domain access
             if (in_array('*', $allowedOrigins)) {
@@ -87,12 +92,13 @@ class CorsMiddleware implements MiddlewareInterface
             }
             // Allow only certain domains access
             // If the origin domain is in the allowed cors origins list, then add the Access Control header
-            else if (is_array($allowedOrigins) && in_array($origin, $allowedOrigins)) {
+            elseif (is_array($allowedOrigins) && in_array($origin, $allowedOrigins)) {
                 $response->setHttpHeader('Access-Control-Allow-Origin', $origin);
             }
             // Reject request if not from same origin host
-            else if ($origin != $request->domain()) {
-                $response->html("Unauthorized", 401);
+            elseif ($origin != $request->domain()) {
+                $response->html('Unauthorized', 401);
+
                 return $response;
             }
 
@@ -102,11 +108,11 @@ class CorsMiddleware implements MiddlewareInterface
             $response->setHttpHeader('Access-Control-Allow-Max-Age', $maxAge);
 
             if ($request->method() === HttpMethod::OPTIONS) {
-                $response->setHttpHeader('Cache-Control', "max-age=" . $maxAge);
-                $response->html("Preflight Ok");
+                $response->setHttpHeader('Cache-Control', 'max-age='.$maxAge);
+                $response->html('Preflight Ok');
             }
-        } else if ($request->method() === HttpMethod::OPTIONS) {
-            $response->html("Preflight Ok");
+        } elseif ($request->method() === HttpMethod::OPTIONS) {
+            $response->html('Preflight Ok');
         }
 
         return $response;

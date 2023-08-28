@@ -8,8 +8,7 @@ use ReflectionProperty;
 use Stringable;
 
 /**
- *  
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -17,85 +16,93 @@ use Stringable;
 interface PropertyResolverInterface extends Arrayable, Stringable, JsonSerializable
 {
     /**
-     * Get properties
+     * Get properties.
      *
      * @param bool $all
+     *
      * @return ReflectionProperty[]
      */
     public function properties($all = false): array;
 
     /**
-     * Get field names & types
+     * Get field names & types.
      *
-     * @param bool $all Get all or only public field
+     * @param bool $all  Get all or only public field
      * @param bool $trim Get only initialized field
+     *
      * @return array<string,string> `[name => type]`. eg. `['id' => 'int']`
      */
     public function fields($all = true, $trim = false): array;
 
     /**
-     * Quickly load data from array to class properties - Without processing property types and attributes
+     * Quickly load data from array to class properties - Without processing property types and attributes.
      *
      * @param array $data
-     * @param bool $sanitize
+     * @param bool  $sanitize
+     *
      * @return static
      */
     public function fastLoad(array $data, $sanitize = false): static;
 
     /**
-     * Load data from array to class properties
+     * Load data from array to class properties.
      *
      * @param array $data
-     * @param bool $sanitize
+     * @param bool  $sanitize
+     *
      * @return static
      */
     public function load(array $data, $sanitize = false): static;
 
     /**
-     * Is Dirty - Update has been made
+     * Is Dirty - Update has been made.
      *
      * @return bool
      */
     public function isDirty(): bool;
 
     /**
-     * Get explicitly selected fields
+     * Get explicitly selected fields.
      *
      * @return array
      */
     public function selected(): array;
 
     /**
-     * Explicitly select fields
+     * Explicitly select fields.
      *
      * @param array $fields
+     *
      * @return static
      */
     public function select(array $fields): static;
 
     /**
-     * Get property
+     * Get property.
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed;
 
     /**
-     * Set property
+     * Set property.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return mixed
      */
     public function set(string $key, mixed $value = null): mixed;
 
     /**
-     * Convert to array
-     * 
-     * @param bool $trim - Remove NULL properties
+     * Convert to array.
+     *
+     * @param bool $trim     - Remove NULL properties
      * @param bool $sanitize - Perform security cleaning
+     *
      * @return array
      */
     public function toArray($trim = true, $sanitize = false): array;

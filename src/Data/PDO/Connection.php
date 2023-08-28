@@ -10,7 +10,7 @@ use PDO;
 use function Armie\Helpers\app;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -21,14 +21,16 @@ class Connection extends PDO implements SingletonInterface
 
     /**
      * @param PDOConfig $config
-     * @param int $id
+     * @param int       $id
+     *
      * @throws \PDOException — if the attempt to connect to the requested database fails.
+     *
      * @inheritDoc
      */
     public function __construct(private PDOConfig $config, public $id = 0)
     {
         $dns = $config->connectionDNS ?? sprintf(
-            "%s:dbname=%s;host=%s;port=%s",
+            '%s:dbname=%s;host=%s;port=%s',
             $config->connectionDriver,
             $config->connectionDatabase,
             $config->connectionHost,
@@ -37,14 +39,15 @@ class Connection extends PDO implements SingletonInterface
         parent::__construct($dns, $config->connectionUsername, $config->connectionPassword, array_merge([
             self::ATTR_AUTOCOMMIT => true,
             self::ATTR_PERSISTENT => $config->connectionPersist,
-            self::ATTR_ERRMODE => $config->connectionErrorMode ? self::ERRMODE_EXCEPTION : self::ERRMODE_SILENT,
+            self::ATTR_ERRMODE    => $config->connectionErrorMode ? self::ERRMODE_EXCEPTION : self::ERRMODE_SILENT,
         ], $config->connectionOptions));
     }
 
     /**
-     * Create / Retrieve singleton instance 
+     * Create / Retrieve singleton instance.
      *
      * @param array $params
+     *
      * @return static
      */
     public static function make(array $params = []): static
@@ -54,7 +57,7 @@ class Connection extends PDO implements SingletonInterface
             /** @var static */
             return ConnectionPool::make([
                 'config' => app()->config->db,
-                'size' =>  app()->config->db->connectionPoolSize ?: app()->config->db->connectionPoolSize
+                'size'   => app()->config->db->connectionPoolSize ?: app()->config->db->connectionPoolSize,
             ])->get();
         }
 
@@ -62,23 +65,28 @@ class Connection extends PDO implements SingletonInterface
     }
 
     /**
-     * Get limit offset
+     * Get limit offset.
+     *
      * @param int $page
      * @param int $limit
+     *
      * @return int
      */
     public function getOffset($page, $limit)
     {
         $page = intval(strip_tags(stripslashes($page)));
         $limit = intval(strip_tags(stripslashes($limit)));
+
         return ($page >= 1 ? $page - 1 : 0) * $limit;
     }
 
     /**
-     * Apply limit to query
+     * Apply limit to query.
+     *
      * @param string $query
-     * @param int $page
-     * @param int $limit
+     * @param int    $page
+     * @param int    $limit
+     *
      * @return string
      */
     public function applyLimit($query, $page, $limit)
@@ -91,7 +99,7 @@ class Connection extends PDO implements SingletonInterface
         if ($page == 0 && $limit == 0) {
             // Check if limit is present in query
             if ($regexp) {
-                return preg_replace($regexp, "", $query);
+                return preg_replace($regexp, '', $query);
             } else {
                 return $query;
             }
@@ -108,14 +116,17 @@ class Connection extends PDO implements SingletonInterface
                 );
             } else {
                 $query = rtrim($query, ';');
+
                 return "$query LIMIT $offset, $limit";
             }
         }
     }
 
     /**
-     * Apply count * to query
+     * Apply count * to query.
+     *
      * @param string $query
+     *
      * @return string|false
      */
     public function applyCount($query)
@@ -123,83 +134,96 @@ class Connection extends PDO implements SingletonInterface
         // Check if select statement is present in query
         if ($regexp = $this->matchSelectQuery($query)) {
             $query = $this->applyLimit($query, 0, 0);
+
             return preg_replace(
                 $regexp,
-                "SELECT COUNT(*) FROM",
+                'SELECT COUNT(*) FROM',
                 $query
             );
         }
+
         return false;
     }
 
     /**
-     * Check if query statement is a SELECT query
+     * Check if query statement is a SELECT query.
      *
      * @param string $query
-     * @return string|boolean Return select regexp is matched else false
+     *
+     * @return string|bool Return select regexp is matched else false
      */
     public function matchSelectQuery(string $query)
     {
         $regexp = "/select\s*\n*.*\n*\s*from/im";
+
         return preg_match($regexp, $query) ? $regexp : false;
     }
 
     /**
-     * Check if query statement is a INSERT query
+     * Check if query statement is a INSERT query.
      *
      * @param string $query
-     * @return string|boolean Return select regexp is matched else false
+     *
+     * @return string|bool Return select regexp is matched else false
      */
     public function matchInsertQuery(string $query)
     {
         $regexp = "/insert\s*\n*\s*into/im";
+
         return preg_match($regexp, $query) ? $regexp : false;
     }
 
     /**
-     * Check if query statement is a UPDATE query
+     * Check if query statement is a UPDATE query.
      *
      * @param string $query
-     * @return string|boolean Return select regexp is matched else false
+     *
+     * @return string|bool Return select regexp is matched else false
      */
     public function matchUpdateQuery(string $query)
     {
         $regexp = "/update\s*\n*.*\n*\s*set/im";
+
         return preg_match($regexp, $query) ? $regexp : false;
     }
 
     /**
-     * Check if query statement is a DELETE query
+     * Check if query statement is a DELETE query.
      *
      * @param string $query
-     * @return string|boolean Return select regexp is matched else false
+     *
+     * @return string|bool Return select regexp is matched else false
      */
     public function matchDeleteQuery(string $query)
     {
         $regexp = "/delete\s*\n*\s*from/im";
+
         return preg_match($regexp, $query) ? $regexp : false;
     }
 
     /**
-     * Check if query statement contains LIMIT query
+     * Check if query statement contains LIMIT query.
      *
      * @param string $query
-     * @return string|boolean Return select regexp is matched else false
+     *
+     * @return string|bool Return select regexp is matched else false
      */
     public function matchLimitQuery(string $query)
     {
         $regexp = "/limit\s*([0-9]+(,\s*[0-9])*)/im";
+
         return preg_match($regexp, $query) ? $regexp : false;
     }
 
     /**
      * Execute query.
      *
-     * @param string $query Model Provider Query. e.g SQL query
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
+     * @param string $query  Model Provider Query. e.g SQL query
+     * @param array  $params Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     *
      * @return int|bool Returns row count for modification query or boolean success status
      */
-    public function executeQuery(string $query, array $params = array()): int|bool
+    public function executeQuery(string $query, array $params = []): int|bool
     {
         if (!empty($query)) {
             $stmt = $this->prepare($query);
@@ -207,9 +231,11 @@ class Connection extends PDO implements SingletonInterface
                 $isEdit = $this->matchInsertQuery($query) ||
                     $this->matchUpdateQuery($query) ||
                     $this->matchDeleteQuery($query);
+
                 return $isEdit ? $stmt->rowCount() : true;
             }
         }
+
         return false;
     }
 }

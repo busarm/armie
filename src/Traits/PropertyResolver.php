@@ -12,8 +12,8 @@ use ReflectionProperty;
 use Stringable;
 
 /**
- * Manage Singletons
- *  
+ * Manage Singletons.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -22,34 +22,34 @@ use Stringable;
 trait PropertyResolver
 {
     /**
-     * Explicitly selected fields
+     * Explicitly selected fields.
      *
      * @var array<string>
      */
     protected array $_selected = [];
 
     /**
-     * Update available
+     * Update available.
      */
     protected bool $_isDirty = false;
 
     /**
-     * Load attribute
+     * Load attribute.
      */
     protected bool $_loadAttr = true;
 
     /**
-     * Load property types
+     * Load property types.
      */
     protected bool $_loadTypes = true;
 
     /**
-     * Get excluded fields from properties 
+     * Get excluded fields from properties.
      */
     public function __excluded(): array
     {
         return [
-            '_selected', '_isDirty', '_loadAttr', '_loadTypes'
+            '_selected', '_isDirty', '_loadAttr', '_loadTypes',
         ];
     }
 
@@ -63,11 +63,12 @@ trait PropertyResolver
 
         if (in_array($key, $this->__excluded())) {
             $this->{$key} = $value;
+
             return;
         }
 
         if ($this->__get($key) != $value) {
-            $this->_isDirty =  true;
+            $this->_isDirty = true;
         }
 
         // If class property
@@ -98,9 +99,10 @@ trait PropertyResolver
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @param bool $all
+     *
      * @return ReflectionProperty[]
      */
     public function properties($all = false): array
@@ -113,16 +115,17 @@ trait PropertyResolver
     }
 
     /**
-     * Get field names & types
+     * Get field names & types.
      *
-     * @param bool $all Get all or only public field
+     * @param bool $all  Get all or only public field
      * @param bool $trim Get only initialized field
+     *
      * @return array<string,string> `[name => type]`. eg. `['id' => 'int']`
      */
     public function fields($all = true, $trim = false): array
     {
         $fields = [];
-        $excluded  = $this->__excluded();
+        $excluded = $this->__excluded();
         foreach ($this->properties() as $property) {
             if (($all || $property->isPublic())
                 && !$property->isStatic()
@@ -130,24 +133,30 @@ trait PropertyResolver
                 && !in_array($property->getName(), $excluded)
             ) {
                 $type = $property->getType();
-                if ($type) $fields[$property->getName()] = $this->getTypeName($type);
-                else $fields[$property->getName()] = null;
+                if ($type) {
+                    $fields[$property->getName()] = $this->getTypeName($type);
+                } else {
+                    $fields[$property->getName()] = null;
+                }
             }
         }
+
         return $fields;
     }
 
     /**
-     * Quickly load data from array to class properties - Without processing property types and attributes
+     * Quickly load data from array to class properties - Without processing property types and attributes.
      *
      * @param array $data
-     * @param bool $sanitize
+     * @param bool  $sanitize
+     *
      * @return static
      */
     public function fastLoad(array $data, $sanitize = false): static
     {
-        if ($sanitize)
+        if ($sanitize) {
             $data = Security::clean($data);
+        }
 
         if ($data) {
             $this->_loadAttr = false;
@@ -161,16 +170,18 @@ trait PropertyResolver
     }
 
     /**
-     * Load data from array to class properties
+     * Load data from array to class properties.
      *
      * @param array $data
-     * @param bool $sanitize
+     * @param bool  $sanitize
+     *
      * @return static
      */
     public function load(array $data, $sanitize = false): static
     {
-        if ($sanitize)
+        if ($sanitize) {
             $data = Security::clean($data);
+        }
 
         if ($data) {
             foreach ($data as $name => $value) {
@@ -182,7 +193,7 @@ trait PropertyResolver
     }
 
     /**
-     * Is Dirty - Update has been made
+     * Is Dirty - Update has been made.
      *
      * @return bool
      */
@@ -192,7 +203,7 @@ trait PropertyResolver
     }
 
     /**
-     * Get explicitly selected fields
+     * Get explicitly selected fields.
      *
      * @return array
      */
@@ -202,22 +213,25 @@ trait PropertyResolver
     }
 
     /**
-     * Explicitly select fields
+     * Explicitly select fields.
      *
      * @param array $fields
+     *
      * @return static
      */
     public function select(array $fields): static
     {
         $this->_selected = $fields;
+
         return $this;
     }
 
     /**
-     * Get property
+     * Get property.
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed
@@ -226,10 +240,11 @@ trait PropertyResolver
     }
 
     /**
-     * Set property
+     * Set property.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return mixed
      */
     public function set(string $key, mixed $value = null): mixed
@@ -238,10 +253,11 @@ trait PropertyResolver
     }
 
     /**
-     * Convert to array
-     * 
-     * @param bool $trim - Remove NULL properties
+     * Convert to array.
+     *
+     * @param bool $trim     - Remove NULL properties
      * @param bool $sanitize - Perform security cleaning
+     *
      * @return array
      */
     public function toArray($trim = true, $sanitize = false): array
@@ -257,11 +273,11 @@ trait PropertyResolver
                 if ($value !== null) {
                     if ($value instanceof CollectionBaseDto) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } else if ($value instanceof BaseDto) {
+                    } elseif ($value instanceof BaseDto) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } else if ($value instanceof Arrayable) {
+                    } elseif ($value instanceof Arrayable) {
                         $result[$attr] = $value->toArray($trim);
-                    } else if (is_array($value)) {
+                    } elseif (is_array($value)) {
                         $result[$attr] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
                     } else {
                         $value = $this->resolveType($type ?
@@ -278,15 +294,18 @@ trait PropertyResolver
                 }
             }
         }
+
         return $sanitize ? Security::cleanParams($result) : $result;
     }
 
     /**
-     * Process Field's Attributes
+     * Process Field's Attributes.
      *
      * @param ReflectionProperty $property
-     * @param T|null $value
+     * @param T|null             $value
+     *
      * @return T|null
+     *
      * @template T
      */
     protected function processFieldAttributes(ReflectionProperty $property, mixed $value = null)
@@ -298,14 +317,16 @@ trait PropertyResolver
                 $result = $instance->processProperty($property, $value);
             }
         }
+
         return $result;
     }
 
     /**
-     * Gets a string representation of the object
+     * Gets a string representation of the object.
+     *
      * @return string Returns the `string` representation of the object.
      */
-    function __toString()
+    public function __toString()
     {
         return json_encode($this->toArray());
     }
@@ -313,9 +334,10 @@ trait PropertyResolver
     /**
      * Specify data which should be serialized to JSON
      * Serializes the object to a value that can be serialized natively by json_encode().
+     *
      * @return mixed Returns data which can be serialized by json_encode(), which is a value of any type other than a resource .
      */
-    function jsonSerialize(): mixed
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }

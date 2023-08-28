@@ -6,7 +6,7 @@ use Armie\Interfaces\SingletonInterface;
 use Armie\Traits\Singleton;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -14,6 +14,7 @@ use Armie\Traits\Singleton;
 class MockService implements SingletonInterface
 {
     use Singleton;
+
     public function __construct(public $id)
     {
     }

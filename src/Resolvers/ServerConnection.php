@@ -6,21 +6,19 @@ use Armie\Interfaces\Resolver\ServerConnectionResolver;
 use Workerman\Connection\ConnectionInterface;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ServerConnection implements ServerConnectionResolver
 {
-
     public function __construct(private ConnectionInterface $connection)
     {
     }
 
     /**
-     * Get the value of connection
+     * Get the value of connection.
      */
     public function getConnection(): ?ConnectionInterface
     {
@@ -28,9 +26,9 @@ class ServerConnection implements ServerConnectionResolver
     }
 
     /**
-     * Set the value of connection
+     * Set the value of connection.
      *
-     * @return  self
+     * @return self
      */
     public function setConnection($connection)
     {

@@ -12,8 +12,8 @@ use Closure;
 use DateTimeInterface;
 
 /**
- * Application Worker Configuration
- * 
+ * Application Worker Configuration.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -22,17 +22,17 @@ use DateTimeInterface;
 class ServerConfig
 {
     /**
-     * Server Url
+     * Server Url.
      */
     public ?string $serverUrl = null;
 
     /**
-     * Number of http worker processes to spawn. Minimum = 1
+     * Number of http worker processes to spawn. Minimum = 1.
      */
     public int $httpWorkers = 2;
 
     /**
-     * Max number of http requests to handle per worker before reloading worker. This is to prevent memory leak
+     * Max number of http requests to handle per worker before reloading worker. This is to prevent memory leak.
      */
     public int $httpMaxRequests = 10000;
 
@@ -42,80 +42,80 @@ class ServerConfig
     public int $taskWorkers = 1;
 
     /**
-     * Max number of task requests to handle per worker before reloading worker. This is to prevent memory leak
+     * Max number of task requests to handle per worker before reloading worker. This is to prevent memory leak.
      */
     public int $taskMaxRequests = 100000;
 
     /**
-     * Event loop type
+     * Event loop type.
+     *
      * @var Looper
      */
     public Looper $looper = Looper::DEFAULT;
 
     /**
-     * Full path to worker's pid file
+     * Full path to worker's pid file.
      */
     public string|null $pidFilePath = null;
 
     /**
-     * Full path to worker's status file
+     * Full path to worker's status file.
      */
     public string|null $statusFilePath = null;
 
     /**
-     * Full path to worker's log file
+     * Full path to worker's log file.
      */
     public string|null $logFilePath = null;
-
 
     // ------------- SSL -----------------//
 
     /**
-     * SSL is enabled
+     * SSL is enabled.
      *
      * @var bool
      */
     public bool $sslEnabled = false;
 
     /**
-     * SSL certificate path
+     * SSL certificate path.
      *
      * @var string|null
      */
     public string|null $sslCertPath = null;
 
     /**
-     * SSL primary key path
+     * SSL primary key path.
      *
      * @var string|null
      */
     public string|null $sslPkPath = null;
 
     /**
-     * SSL verify peer
+     * SSL verify peer.
      *
      * @var bool
      */
     public bool $sslVerifyPeer = false;
 
     /**
-     * Timer Jobs
+     * Timer Jobs.
      *
      * @var array<string,Task[]>
      */
     public array $jobs = [];
 
     /**
-     * Socket Connection Handlers
+     * Socket Connection Handlers.
      *
      * @var array<string,class-string<SocketControllerInterface>>
      */
     public array $sockets = [];
 
     /**
-     * Set server Url
+     * Set server Url.
      *
-     * @return  self
+     * @return self
      */
     public function setServerUrl($serverUrl)
     {
@@ -125,9 +125,9 @@ class ServerConfig
     }
 
     /**
-     * Set number of http workers to spawn. Minimum = 1
+     * Set number of http workers to spawn. Minimum = 1.
      *
-     * @return  self
+     * @return self
      */
     public function setHttpWorkers(int $httpWorkers): self
     {
@@ -137,10 +137,10 @@ class ServerConfig
     }
 
     /**
-     * Set max number of http requests to handle per worker before reloading worker. This is to prevent memory leak
+     * Set max number of http requests to handle per worker before reloading worker. This is to prevent memory leak.
      *
-     * @return  self
-     */ 
+     * @return self
+     */
     public function setHttpMaxRequests(int $httpMaxRequests)
     {
         $this->httpMaxRequests = $httpMaxRequests;
@@ -149,9 +149,9 @@ class ServerConfig
     }
 
     /**
-     * Set number of taks workers to spawn. Set to 0 or false to disable
+     * Set number of taks workers to spawn. Set to 0 or false to disable.
      *
-     * @return  self
+     * @return self
      */
     public function setTaskWorkers(int|false $taskWorkers): self
     {
@@ -161,10 +161,10 @@ class ServerConfig
     }
 
     /**
-     * Set max number of task requests to handle per worker before reloading worker. This is to prevent memory leak
+     * Set max number of task requests to handle per worker before reloading worker. This is to prevent memory leak.
      *
-     * @return  self
-     */ 
+     * @return self
+     */
     public function setTaskMaxRequests(int $taskMaxRequests)
     {
         $this->taskMaxRequests = $taskMaxRequests;
@@ -173,11 +173,11 @@ class ServerConfig
     }
 
     /**
-     * Set event lool type
+     * Set event lool type.
      *
-     * @param  Looper  $looper  Event lool type
+     * @param Looper $looper Event lool type
      *
-     * @return  self
+     * @return self
      */
     public function setLooper(Looper $looper): self
     {
@@ -187,9 +187,9 @@ class ServerConfig
     }
 
     /**
-     * Set full path to worker's pid file
+     * Set full path to worker's pid file.
      *
-     * @return  self
+     * @return self
      */
     public function setPidFilePath(string $pidFilePath): self
     {
@@ -199,9 +199,9 @@ class ServerConfig
     }
 
     /**
-     * Set full path to worker's status file
+     * Set full path to worker's status file.
      *
-     * @return  self
+     * @return self
      */
     public function setStatusFilePath(string $statusFilePath): self
     {
@@ -211,9 +211,9 @@ class ServerConfig
     }
 
     /**
-     * Set full path to worker's log file
+     * Set full path to worker's log file.
      *
-     * @return  self
+     * @return self
      */
     public function setLogFilePath(string $logFilePath): self
     {
@@ -223,11 +223,11 @@ class ServerConfig
     }
 
     /**
-     * Set SSL is enabled
+     * Set SSL is enabled.
      *
-     * @param  bool  $sslEnabled  SSL is enabled
+     * @param bool $sslEnabled SSL is enabled
      *
-     * @return  self
+     * @return self
      */
     public function setSslEnabled(bool $sslEnabled)
     {
@@ -237,11 +237,11 @@ class ServerConfig
     }
 
     /**
-     * Set SSL certificate path
+     * Set SSL certificate path.
      *
-     * @param  string  $sslCertPath  SSL certificate path
+     * @param string $sslCertPath SSL certificate path
      *
-     * @return  self
+     * @return self
      */
     public function setSslCertPath(string $sslCertPath)
     {
@@ -251,11 +251,11 @@ class ServerConfig
     }
 
     /**
-     * Set SSL primary key path
+     * Set SSL primary key path.
      *
-     * @param  string  $sslPkPath  SSL primary key path
+     * @param string $sslPkPath SSL primary key path
      *
-     * @return  self
+     * @return self
      */
     public function setSslPkPath(string $sslPkPath)
     {
@@ -265,11 +265,11 @@ class ServerConfig
     }
 
     /**
-     * Set SSL verify peer
+     * Set SSL verify peer.
      *
-     * @param  bool  $sslVerifyPeer  SSL verify peer
+     * @param bool $sslVerifyPeer SSL verify peer
      *
-     * @return  self
+     * @return self
      */
     public function setSslVerifyPeer(bool $sslVerifyPeer)
     {
@@ -279,13 +279,14 @@ class ServerConfig
     }
 
     /**
-     * Add timer Jobs
+     * Add timer Jobs.
      *
-     * @param Task|callable $job Job to perform
-     * @param Cron|DateTimeInterface|int $cron When to perform job. 
-     * Use `Cron::*` or `integer` value (seconds) for recuring jobs. 
-     * Use `DateTimeInterface` for one-time job. 
-     * @return  self
+     * @param Task|callable              $job  Job to perform
+     * @param Cron|DateTimeInterface|int $cron When to perform job.
+     *                                         Use `Cron::*` or `integer` value (seconds) for recuring jobs.
+     *                                         Use `DateTimeInterface` for one-time job.
+     *
+     * @return self
      */
     public function addJob(Task|callable $job, Cron|DateTimeInterface|int $cron): self
     {
@@ -296,7 +297,7 @@ class ServerConfig
                 $this->jobs[$cron->value] = [];
             }
             $this->jobs[$cron->value][] = $job;
-        } else if ($cron instanceof DateTimeInterface) {
+        } elseif ($cron instanceof DateTimeInterface) {
             $date = $cron->format(DATE_W3C);
             if (!isset($this->jobs[$date])) {
                 $this->jobs[$date] = [];
@@ -313,20 +314,22 @@ class ServerConfig
     }
 
     /**
-     * Add socket connection
+     * Add socket connection.
      *
-     * @param integer $port Socket port
+     * @param int                                     $port       Socket port
      * @param class-string<SocketControllerInterface> $controller Socket controller class
+     *
      * @return self
      */
     public function addSocket(int $port, string $controller): self
     {
         if (!is_subclass_of($controller, SocketControllerInterface::class)) {
-            throw new SystemError("`$controller` does not implement " . SocketControllerInterface::class);
+            throw new SystemError("`$controller` does not implement ".SocketControllerInterface::class);
         }
 
-        $port = (string)$port;
+        $port = (string) $port;
         $this->sockets[$port] = $controller;
+
         return $this;
     }
 }

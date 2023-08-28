@@ -5,8 +5,7 @@ namespace Armie\Service;
 use Armie\Interfaces\ServiceClientInterface;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -18,7 +17,7 @@ class LocalClient implements ServiceClientInterface
     }
 
     /**
-     * Get service client name
+     * Get service client name.
      */
     public function getName()
     {
@@ -32,5 +31,4 @@ class LocalClient implements ServiceClientInterface
     {
         return $this->path;
     }
-
 }

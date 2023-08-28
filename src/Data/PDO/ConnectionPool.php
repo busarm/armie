@@ -7,8 +7,8 @@ use Armie\Interfaces\SingletonInterface;
 use Armie\Traits\Singleton;
 
 /**
- * Connection Pool
- * 
+ * Connection Pool.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -21,11 +21,11 @@ class ConnectionPool implements SingletonInterface
     /**
      * @var int - Round robin
      */
-    const PATTERN_RR    = 1;
+    const PATTERN_RR = 1;
     /**
      * @var int - Random
      */
-    const PATTERN_RAND  = 2;
+    const PATTERN_RAND = 2;
 
     /**
      * @var Connection[]
@@ -34,6 +34,7 @@ class ConnectionPool implements SingletonInterface
 
     /**
      * @param int $size - Pool size
+     *
      * @inheritDoc
      */
     public function __construct(private PDOConfig $config, private int $size, private $pattern = self::PATTERN_RR)
@@ -54,7 +55,7 @@ class ConnectionPool implements SingletonInterface
     }
 
     /**
-     * Get connection
+     * Get connection.
      *
      * @return Connection
      */
@@ -72,6 +73,7 @@ class ConnectionPool implements SingletonInterface
                 $connection = self::$pool[rand(0, $this->size - 1)];
             }
         }
+
         return $connection;
     }
 

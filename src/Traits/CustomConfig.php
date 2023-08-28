@@ -3,19 +3,18 @@
 namespace Armie\Traits;
 
 /**
- *  
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 trait CustomConfig
 {
-    private array $_custom   =   [];
+    private array $_custom = [];
 
     /**
-     * Load configs
-     * 
+     * Load configs.
+     *
      * @param array<string,string|int|bool> $configs
      */
     public function load(array $configs)
@@ -42,10 +41,10 @@ trait CustomConfig
             foreach ($keys as $index => $key) {
                 if ($index == 0) {
                     $config = $this->_custom[$key] ?? $this->{$key} ?? null;
-                } else if (isset($config)) {
+                } elseif (isset($config)) {
                     if (isset($config[$key])) {
                         $config = $config[$key];
-                    } else if (isset($config->{$key})) {
+                    } elseif (isset($config->{$key})) {
                         $config = $config->{$key};
                     } else {
                         break;

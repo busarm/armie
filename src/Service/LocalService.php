@@ -16,15 +16,14 @@ use Armie\Loader;
 use Armie\Request;
 use Nyholm\Psr7\Uri;
 
-use const Armie\Constants\VAR_PATH_INFO;
-use const Armie\Constants\VAR_REQUEST_URI;
-
 use function Armie\Helpers\async;
 use function Armie\Helpers\http_parse_query;
 
+use const Armie\Constants\VAR_PATH_INFO;
+use const Armie\Constants\VAR_REQUEST_URI;
+
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -45,33 +44,32 @@ class LocalService extends BaseService
     {
         $path = $this->location ?? $this->getLocation($this->name);
         if (empty($path)) {
-            throw new SystemError(self::class . ": Location for client $this->name not found");
+            throw new SystemError(self::class.": Location for client $this->name not found");
         }
 
-        $path = is_dir($path) ? $path . '/index.php' : $path;
+        $path = is_dir($path) ? $path.'/index.php' : $path;
         if (!file_exists($path)) {
-            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
+            throw new SystemError(self::class.": Client $this->name App file not found: $path");
         }
 
-        $uri = (new Uri(rtrim($request->baseUrl(), '/') . '/' . ltrim($dto->route, '/')));
+        $uri = (new Uri(rtrim($request->baseUrl(), '/').'/'.ltrim($dto->route, '/')));
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
         $dto->headers['x-trace-id'] = $request->correlationId();
 
         $server = $request->server();
-        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
-        $server->set(VAR_PATH_INFO, '/' . $dto->route);
+        $server->set(VAR_REQUEST_URI, '/'.$dto->route);
+        $server->set(VAR_PATH_INFO, '/'.$dto->route);
 
         $response = Loader::require($path, [
-            'request' =>
-            Request::fromUrl(
+            'request' => Request::fromUrl(
                 strval($uri),
                 match ($dto->type) {
                     ServiceType::CREATE => HttpMethod::POST,
                     ServiceType::UPDATE => HttpMethod::PUT,
                     ServiceType::DELETE => HttpMethod::DELETE,
-                    default   => HttpMethod::GET,
+                    default             => HttpMethod::GET,
                 }
             )->initialize(
                 new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
@@ -87,15 +85,16 @@ class LocalService extends BaseService
         ]);
 
         if ($response instanceof ResponseInterface && $response->isSuccessful()) {
-            return (new ServiceResponseDto)->setStatus(true)->setAsync(false)
+            return (new ServiceResponseDto())->setStatus(true)->setAsync(false)
                 ->setCode($response->getStatusCode())
                 ->setData($response->getParameters());
-        } else if (is_array($response) || is_object($response)) {
-            return (new ServiceResponseDto)->setStatus(true)->setAsync(false)
+        } elseif (is_array($response) || is_object($response)) {
+            return (new ServiceResponseDto())->setStatus(true)->setAsync(false)
                 ->setCode(200)
-                ->setData((array)$response);
+                ->setData((array) $response);
         }
-        return (new ServiceResponseDto)->setStatus(false)->setAsync(false);
+
+        return (new ServiceResponseDto())->setStatus(false)->setAsync(false);
     }
 
     /**
@@ -105,12 +104,12 @@ class LocalService extends BaseService
     {
         $path = $this->location ?? $this->getLocation($this->name);
         if (empty($path)) {
-            throw new SystemError(self::class . ": Location for client $this->name not found");
+            throw new SystemError(self::class.": Location for client $this->name not found");
         }
 
-        $path = is_dir($path) ? $path . '/index.php' : $path;
+        $path = is_dir($path) ? $path.'/index.php' : $path;
         if (!file_exists($path)) {
-            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
+            throw new SystemError(self::class.": Client $this->name App file not found: $path");
         }
 
         $baseUrl = $request->baseUrl();
@@ -119,8 +118,8 @@ class LocalService extends BaseService
         $dto->headers['x-trace-id'] = $request->correlationId();
 
         $server = $request->server();
-        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
-        $server->set(VAR_PATH_INFO, '/' . $dto->route);
+        $server->set(VAR_REQUEST_URI, '/'.$dto->route);
+        $server->set(VAR_PATH_INFO, '/'.$dto->route);
         $serverList = $server->all();
 
         $cookieList = $request->cookie()->all();
@@ -129,20 +128,18 @@ class LocalService extends BaseService
 
         // Call async
         async(static function () use ($path, $baseUrl, $dto, $discovery, $cookieList, $serverList) {
-
-            $uri = (new Uri(rtrim($baseUrl, '/') . '/' . ltrim($dto->route, '/')));
+            $uri = (new Uri(rtrim($baseUrl, '/').'/'.ltrim($dto->route, '/')));
             $query = http_parse_query($uri->getQuery());
 
             // Load local service with path
             Loader::require($path, [
-                'request' =>
-                Request::fromUrl(
+                'request' => Request::fromUrl(
                     strval($uri),
                     match ($dto->type) {
                         ServiceType::CREATE => HttpMethod::POST,
                         ServiceType::UPDATE => HttpMethod::PUT,
                         ServiceType::DELETE => HttpMethod::DELETE,
-                        default   => HttpMethod::GET,
+                        default             => HttpMethod::GET,
                     }
                 )->initialize(
                     new Query($dto->type == ServiceType::READ ? array_merge($dto->params, $query) : $query),
@@ -158,7 +155,7 @@ class LocalService extends BaseService
             ]);
         });
 
-        return (new ServiceResponseDto)
+        return (new ServiceResponseDto())
             ->setStatus(true)
             ->setAsync(true)
             ->setData([]);
@@ -173,6 +170,7 @@ class LocalService extends BaseService
         if ($client && $client instanceof LocalClient) {
             return $client->getLocation();
         }
+
         return null;
     }
 }

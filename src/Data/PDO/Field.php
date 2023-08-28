@@ -6,7 +6,7 @@ use Armie\Enums\DataType;
 use Armie\Interfaces\Data\FieldInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -14,7 +14,7 @@ use Armie\Interfaces\Data\FieldInterface;
 class Field implements FieldInterface
 {
     /**
-     * @param string $name Field name
+     * @param string   $name Field name
      * @param DataType $type Field type
      */
     public function __construct(private string $name, private DataType $type)
@@ -22,8 +22,8 @@ class Field implements FieldInterface
     }
 
     /**
-     * Get field name
-     * 
+     * Get field name.
+     *
      * @return string
      */
     public function getName(): string
@@ -32,9 +32,9 @@ class Field implements FieldInterface
     }
 
     /**
-     * Get field type
-     * 
-     * @return string* 
+     * Get field type.
+     *
+     * @return string*
      */
     public function getType(): string
     {

@@ -3,8 +3,8 @@
 namespace Armie\Configs;
 
 /**
- * Database Configuration
- * 
+ * Database Configuration.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -13,14 +13,15 @@ namespace Armie\Configs;
 class PDOConfig
 {
     /**
-     * PDO connection dns
+     * PDO connection dns.
      *
      * @var string|null
      */
     public string|null $connectionDNS = null;
 
     /**
-     * PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     * PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid.
+     *
      * @see https://www.php.net/manual/en/.drivers.php
      *
      * @var string|null
@@ -28,63 +29,63 @@ class PDOConfig
     public string|null $connectionDriver = null;
 
     /**
-     * PDO connection host. Host IP or Url
+     * PDO connection host. Host IP or Url.
      *
      * @var string|null
      */
     public string|null $connectionHost = null;
 
     /**
-     * PDO connection port
+     * PDO connection port.
      *
      * @var int|null
      */
     public int|null $connectionPort = null;
 
     /**
-     * PDO connection database name
+     * PDO connection database name.
      *
      * @var string|null
      */
     public string|null $connectionDatabase = null;
 
     /**
-     * PDO connection username
+     * PDO connection username.
      *
      * @var string|null
      */
     public string|null $connectionUsername = null;
 
     /**
-     * PDO connection password
+     * PDO connection password.
      *
      * @var string|null
      */
     public string|null $connectionPassword = null;
 
     /**
-     * PDO connection persist
+     * PDO connection persist.
      *
      * @var bool
      */
     public bool $connectionPersist = false;
 
     /**
-     * PDO connection activate error mode
+     * PDO connection activate error mode.
      *
      * @var bool
      */
     public bool $connectionErrorMode = true;
 
     /**
-     * PDO connection options
+     * PDO connection options.
      *
      * @var array
      */
     public array $connectionOptions = [];
 
     /**
-     * CUSTOM connection pool size
+     * CUSTOM connection pool size.
      *
      * @var int
      */
@@ -95,11 +96,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection dns
+     * Set PDO connection dns.
      *
-     * @param  string|null  $connectionDNS  PDO connection dns
+     * @param string|null $connectionDNS PDO connection dns
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionDNS($connectionDNS)
     {
@@ -109,11 +110,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     * Set PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid.
      *
-     * @param  string|null  $connectionDriver  PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
+     * @param string|null $connectionDriver PDO connection driver. e.g mysql, sqlite, pgsql, sqlsvr, cubrid
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionDriver($connectionDriver)
     {
@@ -123,11 +124,11 @@ class PDOConfig
     }
 
     /**
-     * Set pDO connection database name
+     * Set pDO connection database name.
      *
-     * @param  string|null  $connectionDatabase  PDO connection database name
+     * @param string|null $connectionDatabase PDO connection database name
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionDatabase($connectionDatabase)
     {
@@ -137,11 +138,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection host. Host IP or Url
+     * Set PDO connection host. Host IP or Url.
      *
-     * @param  string|null  $connectionHost  PDO connection host. Host IP or Url
+     * @param string|null $connectionHost PDO connection host. Host IP or Url
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionHost($connectionHost)
     {
@@ -151,11 +152,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection port
+     * Set PDO connection port.
      *
-     * @param  int|null  $connectionPort  PDO connection port
+     * @param int|null $connectionPort PDO connection port
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionPort($connectionPort)
     {
@@ -165,11 +166,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection username
+     * Set PDO connection username.
      *
-     * @param  string|null  $connectionUsername  PDO connection username
+     * @param string|null $connectionUsername PDO connection username
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionUsername($connectionUsername)
     {
@@ -179,11 +180,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection password
+     * Set PDO connection password.
      *
-     * @param  string|null  $connectionPassword  PDO connection password
+     * @param string|null $connectionPassword PDO connection password
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionPassword($connectionPassword)
     {
@@ -193,11 +194,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection persist
+     * Set PDO connection persist.
      *
-     * @param  bool  $connectionPersist  PDO connection persist
+     * @param bool $connectionPersist PDO connection persist
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionPersist(bool $connectionPersist)
     {
@@ -207,11 +208,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection activate error mode
+     * Set PDO connection activate error mode.
      *
-     * @param  bool  $connectionErrorMode  PDO connection activate error mode
+     * @param bool $connectionErrorMode PDO connection activate error mode
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionErrorMode(bool $connectionErrorMode)
     {
@@ -221,11 +222,11 @@ class PDOConfig
     }
 
     /**
-     * Set PDO connection options
+     * Set PDO connection options.
      *
-     * @param  array  $connectionOptions  PDO connection options
+     * @param array $connectionOptions PDO connection options
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionOptions(array $connectionOptions)
     {
@@ -235,11 +236,11 @@ class PDOConfig
     }
 
     /**
-     * Set Custom connection pool size
+     * Set Custom connection pool size.
      *
-     * @param  int  $connectionPoolSize  CUSTOM connection pool size
+     * @param int $connectionPoolSize CUSTOM connection pool size
      *
-     * @return  self
+     * @return self
      */
     public function setConnectionPoolSize(int $connectionPoolSize)
     {

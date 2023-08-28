@@ -13,7 +13,7 @@ use Armie\Interfaces\RouteInterface;
 use function Armie\Helpers\create_cookie_header;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -25,10 +25,11 @@ final class StatelessCookieMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Middleware handler
+     * Middleware handler.
      *
      * @param RequestInterface|RouteInterface $request
-     * @param RequestHandlerInterface $handler
+     * @param RequestHandlerInterface         $handler
+     *
      * @return ResponseInterface
      */
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -70,8 +71,10 @@ final class StatelessCookieMiddleware implements MiddlewareInterface
 
             // Clear current cookie list from memory
             $request->cookie()->clear();
+
             return $response;
         }
+
         return $handler->handle($request);
     }
 }

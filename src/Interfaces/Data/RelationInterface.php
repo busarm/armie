@@ -3,52 +3,57 @@
 namespace Armie\Interfaces\Data;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @codeCoverageIgnore
  */
 interface RelationInterface
 {
-
     /**
-     * Get relation references
+     * Get relation references.
+     *
      * @return array
      */
     public function getReferences(): array;
 
     /**
-     * Get relation reference model
+     * Get relation reference model.
+     *
      * @return ModelInterface
      */
     public function getReferenceModel(): ModelInterface;
 
     /**
-     * Get relation current model
+     * Get relation current model.
+     *
      * @return ModelInterface
      */
     public function getCurrentModel(): ModelInterface;
 
     /**
-     * Get relation data
-     * 
+     * Get relation data.
+     *
      * @return ModelInterface[]|ModelInterface|null
      */
     public function get(): array|ModelInterface|null;
 
     /**
-     * Load relation data for list of items
-     * 
+     * Load relation data for list of items.
+     *
      * @param ModelInterface[] $items
+     *
      * @return ModelInterface[] $items with loaded relations
      */
     public function load(array $items): array;
 
     /**
-     * Save relation data
-     * 
+     * Save relation data.
+     *
      * @param array $data
+     *
      * @return bool
      */
     public function save(array $data): bool;

@@ -7,8 +7,8 @@ use Armie\Interfaces\ConfigurationInterface;
 use Armie\Traits\CustomConfig;
 
 /**
- * HTTP Configuration
- * 
+ * HTTP Configuration.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -18,12 +18,11 @@ class HttpConfig implements ConfigurationInterface
 {
     use CustomConfig;
 
-
     /**
      * CORS Check
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS). Useful if you
      * are hosting your API on a different domain from the application that
-     * will access it through a browser
+     * will access it through a browser.
      *
      * @var bool
      */
@@ -32,7 +31,7 @@ class HttpConfig implements ConfigurationInterface
     /**
      * CORS Allow Any Domain
      * Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
-     * source domain
+     * source domain.
      *
      * @var bool
      */
@@ -41,7 +40,7 @@ class HttpConfig implements ConfigurationInterface
     /**
      * CORS Allowable Domains
      * Set the allowable domains within the array
-     * e.g. ['://www.example.com', 's://spa.example.com']
+     * e.g. ['://www.example.com', 's://spa.example.com'].
      *
      * @var array
      */
@@ -49,7 +48,7 @@ class HttpConfig implements ConfigurationInterface
 
     /**
      * CORS Allowable Headers
-     * If using CORS checks, set the allowable headers here
+     * If using CORS checks, set the allowable headers here.
      *
      * @var array
      */
@@ -57,7 +56,7 @@ class HttpConfig implements ConfigurationInterface
 
     /**
      * CORS Allowable Methods
-     * If using CORS checks, you can set the methods you want to be allowed
+     * If using CORS checks, you can set the methods you want to be allowed.
      *
      * @var array
      */
@@ -65,7 +64,7 @@ class HttpConfig implements ConfigurationInterface
 
     /**
      * CORS Exposed Headers
-     * If using CORS checks, set the headers permitted to be sent to client here
+     * If using CORS checks, set the headers permitted to be sent to client here.
      *
      * @var array
      */
@@ -81,26 +80,25 @@ class HttpConfig implements ConfigurationInterface
     public int $corsMaxAge = -1;
 
     /**
-     * Send HTTP response without exiting. `json`|`xml`
-     * 
+     * Send HTTP response without exiting. `json`|`xml`.
+     *
      * @var bool
      */
     public bool $sendAndContinue = false;
 
     /**
-     * HTPP default response format
-     * 
+     * HTPP default response format.
+     *
      * @var ResponseFormat
      */
     public ResponseFormat $responseFormat = ResponseFormat::JSON;
 
-
     /**
-     * Set will access it through a browser
+     * Set will access it through a browser.
      *
-     * @param  bool  $checkCors  will access it through a browser
+     * @param bool $checkCors will access it through a browser
      *
-     * @return  self
+     * @return self
      */
     public function setCheckCors(bool $checkCors)
     {
@@ -110,11 +108,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set source domain
+     * Set source domain.
      *
-     * @param  bool  $allowAnyCorsDomain  source domain
+     * @param bool $allowAnyCorsDomain source domain
      *
-     * @return  self
+     * @return self
      */
     public function setAllowAnyCorsDomain(bool $allowAnyCorsDomain)
     {
@@ -124,11 +122,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set e.g. ['://www.example.com', 's://spa.example.com']
+     * Set e.g. ['://www.example.com', 's://spa.example.com'].
      *
-     * @param  array  $allowedCorsOrigins  e.g. ['://www.example.com', 's://spa.example.com']
+     * @param array $allowedCorsOrigins e.g. ['://www.example.com', 's://spa.example.com']
      *
-     * @return  self
+     * @return self
      */
     public function setAllowedCorsOrigins(array $allowedCorsOrigins)
     {
@@ -138,11 +136,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set if using CORS checks, you can set the methods you want to be allowed
+     * Set if using CORS checks, you can set the methods you want to be allowed.
      *
-     * @param  array  $allowedCorsMethods  If using CORS checks, you can set the methods you want to be allowed
+     * @param array $allowedCorsMethods If using CORS checks, you can set the methods you want to be allowed
      *
-     * @return  self
+     * @return self
      */
     public function setAllowedCorsMethods(array $allowedCorsMethods)
     {
@@ -152,11 +150,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set if using CORS checks, set the allowable headers here
+     * Set if using CORS checks, set the allowable headers here.
      *
-     * @param  array  $allowedCorsHeaders  If using CORS checks, set the allowable headers here
+     * @param array $allowedCorsHeaders If using CORS checks, set the allowable headers here
      *
-     * @return  self
+     * @return self
      */
     public function setAllowedCorsHeaders(array $allowedCorsHeaders)
     {
@@ -166,11 +164,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set if using CORS checks, set the headers permitted to be sent to client here
+     * Set if using CORS checks, set the headers permitted to be sent to client here.
      *
-     * @param  array  $exposedCorsHeaders  If using CORS checks, set the headers permitted to be sent to client here
+     * @param array $exposedCorsHeaders If using CORS checks, set the headers permitted to be sent to client here
      *
-     * @return  self
+     * @return self
      */
     public function setExposedCorsHeaders(array $exposedCorsHeaders)
     {
@@ -182,9 +180,9 @@ class HttpConfig implements ConfigurationInterface
     /**
      * Set -1 for disabling caching.
      *
-     * @param  int  $corsMaxAge  -1 for disabling caching.
+     * @param int $corsMaxAge -1 for disabling caching.
      *
-     * @return  self
+     * @return self
      */
     public function setCorsMaxAge(int $corsMaxAge)
     {
@@ -194,11 +192,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set send HTTP response without exiting
+     * Set send HTTP response without exiting.
      *
-     * @param  bool  $sendAndContinue  Send HTTP response without exiting
+     * @param bool $sendAndContinue Send HTTP response without exiting
      *
-     * @return  self
+     * @return self
      */
     public function setSendAndContinue(bool $sendAndContinue)
     {
@@ -208,11 +206,11 @@ class HttpConfig implements ConfigurationInterface
     }
 
     /**
-     * Set HTPP default response format
+     * Set HTPP default response format.
      *
-     * @param ResponseFormat  $responseFormat  HTPP default response format. `json`|`xml`
+     * @param ResponseFormat $responseFormat HTPP default response format. `json`|`xml`
      *
-     * @return  self
+     * @return self
      */
     public function setResponseFormat(ResponseFormat $responseFormat)
     {

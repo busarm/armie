@@ -10,8 +10,8 @@ use Armie\Interfaces\ProviderInterface;
 use Armie\Interfaces\StorageBagInterface;
 
 /**
- * Use to generate a service registry server
- * 
+ * Use to generate a service registry server.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -39,13 +39,15 @@ class ServiceRegistryProvider implements ProviderInterface
                 $list = $this->storage->get($dto->name, []);
                 $list[] = $dto->toArray();
                 $this->storage->set($dto->name, $list);
+
                 return true;
             }
-            throw new BadRequestException("Invaild service registry request");
+
+            throw new BadRequestException('Invaild service registry request');
         });
 
         // Unregister service endpoint
-        $app->delete(self::ROUTE . "/{name}/{url}")->call(function (
+        $app->delete(self::ROUTE.'/{name}/{url}')->call(function (
             string $name,
             string $url
         ) {
@@ -58,29 +60,33 @@ class ServiceRegistryProvider implements ProviderInterface
                 }
                 $this->storage->set($name, $list);
             }
+
             throw new NotFoundException("Service not found for name: $name");
         });
 
         // Get service endpoint
-        $app->get(self::ROUTE . "/{name}")->call(function (string $name) {
+        $app->get(self::ROUTE.'/{name}')->call(function (string $name) {
             $list = $this->storage->get($name);
             if (!empty($list) && is_array($list)) {
                 return $this->leastUsed($list);
             }
+
             throw new NotFoundException("Service not found for name: $name");
         });
     }
 
     /**
-     * Get least used service
+     * Get least used service.
      *
      * @param array $list
+     *
      * @return ServiceRegistryDto
      */
     private function leastUsed(array $list): ServiceRegistryDto
     {
         if (count($list) == 1) {
             $data = $list[0];
+
             return new ServiceRegistryDto($data['name'], $data['url'], $data['expiresAt'], $data['requestCount']);
         } else {
             return array_reduce($list, function (ServiceRegistryDto|null $carry, $data) {

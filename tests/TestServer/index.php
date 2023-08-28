@@ -4,9 +4,9 @@ use Armie\Server;
 use Armie\Service\LocalClient;
 use Armie\Service\LocalServiceDiscovery;
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__.'/../../vendor/autoload.php';
 
-$server = (new Server("Busarm Test Server"))
+$server = (new Server('Busarm Test Server'))
     // ->addServiceDiscovery(new LocalServiceDiscovery([
     //     new RemoteClient('v1',  "http://v1"),
     //     new RemoteClient('v2',  "http://v2"),
@@ -14,9 +14,9 @@ $server = (new Server("Busarm Test Server"))
     // ]));
     ->addServiceDiscovery(
         new LocalServiceDiscovery([
-            new LocalClient('v1', __DIR__ . "/../TestApp"),
-            new LocalClient('v2', __DIR__ . "/../TestAppV2"),
-            new LocalClient('v3', __DIR__ . "/../TestAppV3"),
+            new LocalClient('v1', __DIR__.'/../TestApp'),
+            new LocalClient('v2', __DIR__.'/../TestAppV2'),
+            new LocalClient('v3', __DIR__.'/../TestAppV3'),
         ]),
         true
     );

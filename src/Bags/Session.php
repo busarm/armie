@@ -6,17 +6,17 @@ use Armie\Errors\SessionError;
 use Armie\Handlers\EncryptedSessionHandler;
 use Armie\Helpers\Security;
 use Armie\Interfaces\SessionStoreInterface;
-
 use SessionHandler;
 use SessionHandlerInterface;
 
 use function Armie\Helpers\is_cli;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @link https://github.com/josantonius/php-session
  */
 final class Session implements SessionStoreInterface
@@ -25,7 +25,7 @@ final class Session implements SessionStoreInterface
 
     /**
      * @param array $options
-     * List of available `$options` with their default values:
+     *                       List of available `$options` with their default values:
      *
      * * cache_expire: "180" (minutes)
      * * cache_limiter: "nocache"
@@ -53,8 +53,9 @@ final class Session implements SessionStoreInterface
      * * use_only_cookies: "1"
      * * use_strict_mode: "0"
      * * use_trans_sid: "0"
-     * @param string $secret Encryption key
+     * @param string                                      $secret  Encryption key
      * @param SessionHandler|SessionHandlerInterface|null $handler Session handler
+     *
      * @throws SessionError
      */
     public function __construct(private array $options = [], string|null $secret = null, SessionHandler|SessionHandlerInterface|null $handler = null)
@@ -64,9 +65,10 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Start session
+     * Start session.
      *
      * @param string $id
+     *
      * @return bool
      */
     public function start($id = null): bool
@@ -82,11 +84,12 @@ final class Session implements SessionStoreInterface
         if ($done) {
             $this->original = $this->all();
         }
+
         return $done;
     }
 
     /**
-     * Save session
+     * Save session.
      *
      * @return bool
      */
@@ -98,23 +101,24 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Destroy session
+     * Destroy session.
      *
      * @throws SessionError
+     *
      * @return bool
      */
     public function destroy(): bool
     {
-
         $this->throwIfNotStarted();
 
         return session_destroy();
     }
 
     /**
-     * Regenerate session
+     * Regenerate session.
      *
      * @param bool $deleteOld
+     *
      * @return bool
      */
     public function regenerate(bool $deleteOld = false): bool
@@ -124,7 +128,7 @@ final class Session implements SessionStoreInterface
 
     /**
      * Get session store name.
-     * 
+     *
      * @return string
      */
     public function getName(): string
@@ -136,7 +140,7 @@ final class Session implements SessionStoreInterface
 
     /**
      * Get current session ID.
-     * 
+     *
      * @return string
      */
     public function getId(): string|null
@@ -148,8 +152,9 @@ final class Session implements SessionStoreInterface
      * Set current session ID.
      *
      * @param string $sessionId
-     * 
+     *
      * @throws SessionError
+     *
      * @return self
      */
     public function setId(string $sessionId): self
@@ -162,9 +167,10 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Set session handler
+     * Set session handler.
      *
      * @param SessionHandler|SessionHandlerInterface $handler
+     *
      * @return self
      */
     public function setHandler(SessionHandler|SessionHandlerInterface|null $handler): self
@@ -174,12 +180,11 @@ final class Session implements SessionStoreInterface
             $this->throwIfStarted();
             session_set_save_handler($handler);
         }
+
         return $this;
     }
 
-
     //--------- Manipulate Session --------//
-
 
     /**
      * @inheritDoc
@@ -201,6 +206,7 @@ final class Session implements SessionStoreInterface
     {
         $value = $this->get($name, $default, $sanitize);
         $this->remove($name);
+
         return $value;
     }
 
@@ -225,7 +231,7 @@ final class Session implements SessionStoreInterface
      *
      * @throws SessionError
      */
-    public function set(string $name, mixed $value, $options = NULL): bool
+    public function set(string $name, mixed $value, $options = null): bool
     {
         $this->throwIfNotStarted();
 
@@ -252,7 +258,7 @@ final class Session implements SessionStoreInterface
 
     /**
      * @inheritDoc
-     * 
+     *
      * @throws SessionError
      */
     public function replace(array $data)
@@ -264,14 +270,16 @@ final class Session implements SessionStoreInterface
 
     /**
      * @inheritDoc
-     * 
+     *
      * @throws SessionError
      */
     public function remove(string $name)
     {
         $this->throwIfNotStarted();
 
-        if ($this->has($name)) unset($_SESSION[$name]);
+        if ($this->has($name)) {
+            unset($_SESSION[$name]);
+        }
     }
 
     /**
@@ -294,9 +302,7 @@ final class Session implements SessionStoreInterface
         return count($this->all());
     }
 
-
     //--------- Utils --------//
-
 
     /**
      * Checks if the session is started.
@@ -364,7 +370,7 @@ final class Session implements SessionStoreInterface
     }
 
     /**
-     * Gets a string representation of the object
+     * Gets a string representation of the object.
      *
      * @return string Returns the `string` representation of the object.
      */

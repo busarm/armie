@@ -7,7 +7,7 @@ use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relations\OneToMany;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -37,12 +37,12 @@ class CategoryTestModel extends Model
     public function getRelations(): array
     {
         return [
-            new OneToMany('products', $this, new Reference(ProductTestModel::class, ['id' => 'categoryId']))
+            new OneToMany('products', $this, new Reference(ProductTestModel::class, ['id' => 'categoryId'])),
         ];
     }
 
     /**
-     * Model table name. e.g db table, collection name
+     * Model table name. e.g db table, collection name.
      *
      * @return string
      */
@@ -52,7 +52,7 @@ class CategoryTestModel extends Model
     }
 
     /**
-     * Model key name. e.g table primary key, unique index
+     * Model key name. e.g table primary key, unique index.
      *
      * @return string|null
      */
@@ -62,7 +62,7 @@ class CategoryTestModel extends Model
     }
 
     /**
-     * Model created date param name. e.g created_at, createdAt
+     * Model created date param name. e.g created_at, createdAt.
      *
      * @return string
      */
@@ -72,7 +72,7 @@ class CategoryTestModel extends Model
     }
 
     /**
-     * Model updated date date param name. e.g updated_at, updatedAt
+     * Model updated date date param name. e.g updated_at, updatedAt.
      *
      * @return string
      */

@@ -13,44 +13,46 @@ use Throwable;
 use function Armie\Helpers\report;
 
 /**
- * Promises for async operations - built on @see Fibers 
- * 
+ * Promises for async operations - built on @see Fibers.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @inheritDoc
- * 
+ *
  * ## CAUTION ! ##
- * Be careful when using parameters with a callable `task`. 
+ * Be careful when using parameters with a callable `task`.
  * Parameters will also be serialized before sending to the task worker.
- * Hence, ensure that the parameters are simple. 
- * 
- * E.g 
- * 
+ * Hence, ensure that the parameters are simple.
+ *
+ * E.g
+ *
  * #### DON'T do this: ####
  * ```
- * new Promise(function () use ($app) { 
- *      $secret = $app->config->secret; 
+ * new Promise(function () use ($app) {
+ *      $secret = $app->config->secret;
  *      // Use secret
  * });
  * ```
- * 
+ *
  * #### DO this: ####
  * ```
- * $secret = $app->config->secret; 
- * new Promise(function () use ($secret) { 
+ * $secret = $app->config->secret;
+ * new Promise(function () use ($secret) {
  *      // Use secret
  * });
  * ```
- * 
+ *
  * #### or DO this: ####
  * ```
- * new Promise(function ($secret) { 
+ * new Promise(function ($secret) {
  *      // Use secret
  * }, $app->config->secret);
- * 
+ *
  * ```
+ *
  * @template T
  */
 class Promise implements PromiseThen
@@ -65,7 +67,7 @@ class Promise implements PromiseThen
     private ?Closure $_finallyFn = null;
 
     /**
-     * @param Task<T>|callable():T $task 
+     * @param Task<T>|callable():T $task
      */
     public function __construct(Task|callable $task)
     {
@@ -73,7 +75,7 @@ class Promise implements PromiseThen
     }
 
     /**
-     * Promise has completed
+     * Promise has completed.
      */
     public function done()
     {
@@ -95,6 +97,7 @@ class Promise implements PromiseThen
                 } finally {
                     $this->_finallyFn && call_user_func($this->_finallyFn);
                 }
+
                 return $this->_result;
             }
         );
@@ -108,6 +111,7 @@ class Promise implements PromiseThen
     public function catch(callable $fn): PromiseFinal
     {
         $this->_catchFn = Closure::fromCallable($fn);
+
         return $this;
     }
 
@@ -120,8 +124,8 @@ class Promise implements PromiseThen
     }
 
     /**
-     * Wait for process to complete (with response)
-     * 
+     * Wait for process to complete (with response).
+     *
      * @return T
      */
     protected function wait(): mixed
@@ -137,9 +141,10 @@ class Promise implements PromiseThen
     }
 
     /**
-     * Resolve list of promises
-     * 
+     * Resolve list of promises.
+     *
      * @param self<T>[] $promises List of Promises
+     *
      * @return Generator<string,T>
      */
     public static function all(array $promises): Generator
@@ -150,9 +155,10 @@ class Promise implements PromiseThen
     }
 
     /**
-     * Resolve promise
-     * 
+     * Resolve promise.
+     *
      * @param self<T> $promise Promise
+     *
      * @return T
      */
     public static function resolve(self $promise): mixed

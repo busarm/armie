@@ -2,39 +2,37 @@
 
 namespace Armie\Data\PDO;
 
-use Armie\Data\PDO\Connection;
 use Armie\Helpers\StringableDateTime;
-use Armie\Interfaces\Arrayable;
 use Armie\Interfaces\Data\ModelInterface;
-use Armie\Traits\PropertyLoader;
+use Armie\Interfaces\Data\PropertyResolverInterface;
+use Armie\Traits\PropertyResolver;
 use Armie\Traits\TypeResolver;
-use JsonSerializable;
 
 use function Armie\Helpers\dispatch;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-abstract class Model implements ModelInterface, Arrayable, JsonSerializable
+abstract class Model implements ModelInterface, PropertyResolverInterface
 {
     use TypeResolver;
 
-    use PropertyLoader {
+    use PropertyResolver {
         fields as defaultFields;
         __excluded as __defaultExcluded;
     }
 
-    const EVENT_BEFORE_QUERY    =   self::class . ':BeforeQuery';
-    const EVENT_AFTER_QUERY     =   self::class . ':AfterQuery';
-    const EVENT_BEFORE_CREATE   =   self::class . ':BeforeCreate';
-    const EVENT_AFTER_CREATE    =   self::class . ':AfterCreate';
-    const EVENT_BEFORE_UPDATE   =   self::class . ':BeforeUpdate';
-    const EVENT_AFTER_UPDATE    =   self::class . ':AfterUpdate';
-    const EVENT_BEFORE_DELETE   =   self::class . ':BeforeDelete';
-    const EVENT_AFTER_DELETE    =   self::class . ':AfterDelete';
+    const EVENT_BEFORE_QUERY = self::class.':BeforeQuery';
+    const EVENT_AFTER_QUERY = self::class.':AfterQuery';
+    const EVENT_BEFORE_CREATE = self::class.':BeforeCreate';
+    const EVENT_AFTER_CREATE = self::class.':AfterCreate';
+    const EVENT_BEFORE_UPDATE = self::class.':BeforeUpdate';
+    const EVENT_AFTER_UPDATE = self::class.':AfterUpdate';
+    const EVENT_BEFORE_DELETE = self::class.':BeforeDelete';
+    const EVENT_AFTER_DELETE = self::class.':AfterDelete';
 
     /**
      * Database connection instance.
@@ -46,21 +44,21 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Max number of items to return in list.
      *
-     * @var integer
+     * @var int
      */
     protected int $perPage = 20;
 
     /**
      * Model is new - not saved yet.
      *
-     * @var boolean
+     * @var bool
      */
     protected bool $new = true;
 
     /**
      * Auto populate relations.
      *
-     * @var boolean
+     * @var bool
      */
     protected bool $autoLoadRelations = true;
 
@@ -78,7 +76,6 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      */
     protected array $requestedRelations = [];
 
-
     final public function __construct(Connection|null $db = null)
     {
         $this->db = $db ?? Connection::make();
@@ -92,7 +89,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             $this->__defaultExcluded(),
             [
                 'requestedRelations', 'loadedRelations', 'autoLoadRelations',
-                'new', 'perPage'
+                'new', 'perPage',
             ]
         );
     }
@@ -103,7 +100,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Get properties to be excluded from model's entity fields  
+     * Get properties to be excluded from model's entity fields.
      */
     public function __excluded(): array
     {
@@ -111,14 +108,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             $this->__defaultExcluded(),
             [
                 'requestedRelations', 'loadedRelations', 'autoLoadRelations',
-                'db', 'new', 'perPage'
+                'db', 'new', 'perPage',
             ]
         );
     }
 
     /**
      * Set up model.
-     * Override to add customizations when model is initialized
+     * Override to add customizations when model is initialized.
      *
      * @return static
      */
@@ -128,7 +125,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Get the database connection
+     * Get the database connection.
      */
     public function getDatabase(): Connection
     {
@@ -138,7 +135,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Set pagination limit per page.
      *
-     * @return  static
+     * @return static
      */
     public function setPerPage(int $perPage)
     {
@@ -159,7 +156,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Set the value of new.
      * Model is new - data hasn't been saved.
      *
-     * @return  static
+     * @return static
      */
     protected function setNew(bool $new)
     {
@@ -188,7 +185,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Set the value of autoLoadRelations.
      *
-     * @return  static
+     * @return static
      */
     public function setAutoLoadRelations(bool $autoLoadRelations)
     {
@@ -198,12 +195,12 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Set requested relations
+     * Set requested relations.
      *
-     * @param  array<string>|array<string,callable> $requestedRelations List of relation names or Relation name as key with callback as value. 
-     * Only these relation names will loaded if auto load relations not enabled.
+     * @param array<string>|array<string,callable> $requestedRelations List of relation names or Relation name as key with callback as value.
+     *                                                                 Only these relation names will loaded if auto load relations not enabled.
      *
-     * @return  static
+     * @return static
      */
     public function setRequestedRelations(array $requestedRelations)
     {
@@ -215,9 +212,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Set loaded relations names.
      *
-     * @param  array<string>  $loadedRelations  Loaded relations names.
+     * @param array<string> $loadedRelations Loaded relations names.
      *
-     * @return  static
+     * @return static
      */
     public function setLoadedRelations(array $loadedRelations)
     {
@@ -229,9 +226,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * Add loaded relations name.
      *
-     * @param  string  $loadedRelation  Loaded relations name.
+     * @param string $loadedRelation Loaded relations name.
      *
-     * @return  static
+     * @return static
      */
     public function addLoadedRelation(string $loadedRelation)
     {
@@ -241,14 +238,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Model table name. e.g db table, collection name
+     * Model table name. e.g db table, collection name.
      *
      * @return string
      */
     abstract public function getTableName(): string;
 
     /**
-     * Model key name. e.g table primary key, unique index
+     * Model key name. e.g table primary key, unique index.
      *
      * @return string|null
      */
@@ -262,7 +259,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     abstract public function getRelations(): array;
 
     /**
-     * Model fields
+     * Model fields.
      *
      * @return \Armie\Data\PDO\Field[]
      */
@@ -288,11 +285,12 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         $fields = $this->getFields();
         $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys($this->fields());
         $relationNames = $this->getRelationNames();
+
         return array_diff($fieldNames, $relationNames);
     }
 
     /**
-     * Model created date param name. e.g created_at, createdAt
+     * Model created date param name. e.g created_at, createdAt.
      *
      * @return string
      */
@@ -302,7 +300,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Model soft delete date param name. e.g deleted_at, deletedAt
+     * Model soft delete date param name. e.g deleted_at, deletedAt.
      *
      * @return string
      */
@@ -312,7 +310,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Model soft delete date param name. e.g deleted_at, deletedAt
+     * Model soft delete date param name. e.g deleted_at, deletedAt.
      *
      * @return string
      */
@@ -322,8 +320,8 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Check if model was soft deleted
-     * 
+     * Check if model was soft deleted.
+     *
      * @return bool
      */
     public function isTrashed(): bool
@@ -334,20 +332,22 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     /**
      * @inheritDoc
      */
-    public function count(string|null $query = null, $params = array()): int
+    public function count(string|null $query = null, $params = []): int
     {
-        $query = $query ? $this->getDatabase()->applyCount($query) : sprintf("SELECT COUNT(*) FROM %s", $this->getTableName());
+        $query = $query ? $this->getDatabase()->applyCount($query) : sprintf('SELECT COUNT(*) FROM %s', $this->getTableName());
         if ($query) {
             $stmt = $this->getDatabase()->prepare($query);
             if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchColumn())) {
                 return intval($result);
             }
         }
+
         return 0;
     }
 
     /**
      * @inheritDoc
+     *
      * @return ?static
      */
     public function find($id, $conditions = [], $params = [], $columns = []): ?static
@@ -355,48 +355,52 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->findWhere(array_merge($conditions, [
                 $this->getKeyName() => ':id',
-                sprintf("ISNULL(%s)", $this->getSoftDeleteDateName())
+                sprintf('ISNULL(%s)', $this->getSoftDeleteDateName()),
             ]), array_merge($params, [
-                ':id' => $id
+                ':id' => $id,
             ]), $columns);
         } else {
             return $this->findWhere(array_merge($conditions, [
                 $this->getKeyName() => ':id',
             ]), array_merge($params, [
-                ':id' => $id
+                ':id' => $id,
             ]), $columns);
         }
     }
 
     /**
      * @inheritDoc
+     *
      * @return ?static
      */
     public function findTrashed($id, $conditions = [], $params = [], $columns = []): ?static
     {
         return $this->findWhere(array_merge($conditions, [
-            $this->getKeyName() => ':id'
+            $this->getKeyName() => ':id',
         ]), array_merge($params, [
-            ':id' => $id
+            ':id' => $id,
         ]), $columns);
     }
 
     /**
      * @inheritDoc
+     *
      * @return ?static
      */
     public function findWhere($conditions = [], $params = [], $columns = []): ?static
     {
-        if (empty($columns)) $columns = ["*"];
+        if (empty($columns)) {
+            $columns = ['*'];
+        }
 
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
 
         $stmt = $this->db->prepare(sprintf(
-            "SELECT %s FROM %s %s LIMIT 1",
+            'SELECT %s FROM %s %s LIMIT 1',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
         ));
 
         // Dispatch event
@@ -404,6 +408,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
             return (new static($this->db))
                 ->fastLoad($result)
                 ->setNew(false)
@@ -412,18 +417,20 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
                 ->processAutoLoadRelations()
                 ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns));
         }
+
         return null;
     }
 
     /**
      * @inheritDoc
+     *
      * @return static[]
      */
     public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->allTrashed(array_merge($conditions, [
-                sprintf("ISNULL(%s)", $this->getSoftDeleteDateName())
+                sprintf('ISNULL(%s)', $this->getSoftDeleteDateName()),
             ]), $params, $columns, $limit);
         } else {
             return $this->allTrashed($conditions, $params, $columns, $limit);
@@ -432,22 +439,25 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * @inheritDoc
+     *
      * @return static[]
      */
     public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array
     {
-        if (empty($columns)) $columns = ["*"];
+        if (empty($columns)) {
+            $columns = ['*'];
+        }
 
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
         $limit = $limit > 0 ? $limit : $this->getPerPage();
 
         $stmt = $this->db->prepare(sprintf(
-            "SELECT %s FROM %s %s %s",
+            'SELECT %s FROM %s %s %s',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : '',
-            $limit >= 0 ? 'LIMIT ' . intval($limit) : ''
+            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : '',
+            $limit >= 0 ? 'LIMIT '.intval($limit) : ''
         ));
 
         // Dispatch event
@@ -455,6 +465,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         if ($stmt && $stmt->execute($params) && ($results = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
             return $this->processEagerLoadRelations(array_map(
                 fn ($result) => (new static($this->db))
                     ->fastLoad($result)
@@ -477,18 +488,18 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     {
         // Soft delele
         if (!$force && !empty($this->getSoftDeleteDateName())) {
-            $this->{$this->getSoftDeleteDateName()} = strval(new StringableDateTime);
+            $this->{$this->getSoftDeleteDateName()} = strval(new StringableDateTime());
+
             return $this->save() !== false;
         }
 
         // Permanent delete
         else {
-
             // Dispatch event
             dispatch(static::EVENT_BEFORE_DELETE, $this->toArray());
 
             $stmt = $this->db->prepare(sprintf(
-                "DELETE FROM %s WHERE %s = ?",
+                'DELETE FROM %s WHERE %s = ?',
                 $this->getTableName(),
                 $this->getKeyName()
             ));
@@ -497,9 +508,11 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
                 if ($stmt->rowCount() > 0) {
                     // Dispatch event
                     dispatch(static::EVENT_AFTER_DELETE);
+
                     return true;
                 }
             }
+
             return false;
         }
     }
@@ -510,9 +523,11 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     public function restore(): bool
     {
         if ($this->getSoftDeleteDateName() && isset($this->{$this->getSoftDeleteDateName()})) {
-            $this->{$this->getSoftDeleteDateName()} = NULL;
+            $this->{$this->getSoftDeleteDateName()} = null;
+
             return $this->save() !== false;
         }
+
         return false;
     }
 
@@ -523,17 +538,18 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     {
         // Create
         if ($this->new && !isset($this->{$this->getKeyName()})) {
-
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
-                $this->{$this->getCreatedDateName()} = strval(new StringableDateTime);
+                $this->{$this->getCreatedDateName()} = strval(new StringableDateTime());
             }
             if (!empty($this->getUpdatedDateName())) {
-                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime);
+                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
-            if (empty($params)) return false;
+            if (empty($params)) {
+                return false;
+            }
 
             // Dispatch event
             dispatch(static::EVENT_BEFORE_CREATE, $params);
@@ -541,13 +557,15 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             $placeHolderKeys = implode(',', array_map(fn ($key) => "`$key`", array_keys($params)));
             $placeHolderValues = implode(',', array_fill(0, count($params), '?'));
             $stmt = $this->db->prepare(sprintf(
-                "INSERT INTO %s (%s) VALUES (%s)",
+                'INSERT INTO %s (%s) VALUES (%s)',
                 $this->getTableName(),
                 $placeHolderKeys,
                 $placeHolderValues
             ));
 
-            if (!$stmt || !$stmt->execute(array_values($params))) return false;
+            if (!$stmt || !$stmt->execute(array_values($params))) {
+                return false;
+            }
 
             // Update id for Auto Increment
             if (!isset($this->{$this->getKeyName()}) && !empty($id = $this->db->lastInsertId())) {
@@ -567,28 +585,31 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         }
 
         // Update
-        else if ($this->isDirty()) {
-
+        elseif ($this->isDirty()) {
             // Add updated date if not available
             if (!empty($this->getUpdatedDateName())) {
-                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime);
+                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
-            if (empty($params)) return false;
+            if (empty($params)) {
+                return false;
+            }
 
             // Dispatch event
             dispatch(static::EVENT_BEFORE_UPDATE, $params);
 
             $placeHolder = implode(',', array_map(fn ($key) => "`$key` = ?", array_keys($params)));
             $stmt = $this->db->prepare(sprintf(
-                "UPDATE %s SET %s WHERE %s = ?",
+                'UPDATE %s SET %s WHERE %s = ?',
                 $this->getTableName(),
                 $placeHolder,
                 $this->getKeyName()
             ));
 
-            if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) return false;
+            if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) {
+                return false;
+            }
 
             // Dispatch event
             dispatch(static::EVENT_AFTER_UPDATE, $this->toArray());
@@ -606,8 +627,8 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Save relations
-     * 
+     * Save relations.
+     *
      * @return bool
      */
     protected function saveRelations(): bool
@@ -619,17 +640,19 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
                 if ($data instanceof static) {
                     $success = !$data->save() ? false : $success;
                 } else {
-                    $success = !$relation->save((array)$data) ? false : $success;
+                    $success = !$relation->save((array) $data) ? false : $success;
                 }
             }
         }
+
         return $success;
     }
 
     /**
      * Perform database transaction. Auto rollback if unsuccessful.
-     * 
+     *
      * @param callable $callable Return FALSE if unsuccessful
+     *
      * @return mixed result of $callable.
      */
     public function transaction(callable $callable)
@@ -640,6 +663,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             $this->db->rollBack();
         }
         $this->db->commit();
+
         return $result;
     }
 
@@ -647,6 +671,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
      * Process eager loading of relations.
      *
      * @param static[] $items
+     *
      * @return static[]
      */
     public function processEagerLoadRelations(array $items): array
@@ -666,8 +691,9 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
     /**
      * Eager load relations.
-     * 
+     *
      * @param static[] $items
+     *
      * @return static[]
      */
     public function eagerLoadRelations(array $items): array
@@ -688,7 +714,7 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Load relations
+     * Load relations.
      *
      * @return static
      */
@@ -711,10 +737,11 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Load single relation by name
+     * Load single relation by name.
      *
-     * @param string $name
+     * @param string   $name
      * @param callable $callback Anonymous function with `Relation::class` as parameter
+     *
      * @return static
      */
     public function loadRelation(string $name, callable $callback = null): static
@@ -722,10 +749,13 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         foreach ($this->getRelations() as &$relation) {
             if (strtolower($name) === strtolower($relation->getName())) {
                 // Trigger callback if available
-                if ($callback) $callback($relation);
+                if ($callback) {
+                    $callback($relation);
+                }
 
                 $this->{$relation->getName()} = $relation->get();
                 $this->loadedRelations[] = $relation->getName();
+
                 return $this;
             }
         }
@@ -734,25 +764,28 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Merge columns with relation names
+     * Merge columns with relation names.
      *
      * @param array $columns
+     *
      * @return array
      */
     public function mergeColumnsRelations(array $columns): array
     {
         if ($this->autoLoadRelations) {
             return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->getRelationNames()]);
-        } else if (!empty($this->loadedRelations)) {
+        } elseif (!empty($this->loadedRelations)) {
             return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->loadedRelations]);
         }
+
         return array_is_list($columns) ? $columns : array_keys($columns);
     }
 
     /**
-     * Parse query colomns
+     * Parse query colomns.
      *
      * @param array $columns
+     *
      * @return string
      */
     public function parseColumns(array $columns): string
@@ -775,23 +808,25 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
         foreach ($columns as $key => $col) {
             if (!str_starts_with($col, '-')) {
-                if ($col === "*") {
+                if ($col === '*') {
                     if (!in_array($col, $cols)) {
                         $cols = [$col];
                         break;
                     }
                 } else {
-                    $cols[] = is_numeric($key) ? "`$col`" : sprintf("`%s` AS %s", $this->cleanCond($key), $this->cleanCond($col));
+                    $cols[] = is_numeric($key) ? "`$col`" : sprintf('`%s` AS %s', $this->cleanCond($key), $this->cleanCond($col));
                 }
             }
         }
+
         return  implode(',', $cols);
     }
 
     /**
-     * Parse query conditions
+     * Parse query conditions.
      *
      * @param array $conditions
+     *
      * @return string
      */
     public function parseConditions(array $conditions): string
@@ -800,49 +835,48 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
 
         $parseCondtionalArray = function ($result, $key, $cond) {
             $key = strtoupper($key);
+
             return  $result ?
-                $result . sprintf(" %s %s", in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
-                sprintf("%s %s", $key == 'NOT' ? $key : '', $this->parseConditions($cond));
+                $result.sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
+                sprintf('%s %s', $key == 'NOT' ? $key : '', $this->parseConditions($cond));
         };
         $parseArrayList = function ($result, $key, $cond) {
             return $result ?
-                $result . " AND " . sprintf("`%s` IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
-                sprintf("`%s` IN (%s)", $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
+                $result.' AND '.sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
         };
         $parseArray = function ($result, $cond) {
             return  $result ?
-                $result . " AND " . sprintf("%s", $this->parseConditions($cond)) :
-                sprintf("%s", $this->parseConditions($cond));
+                $result.' AND '.sprintf('%s', $this->parseConditions($cond)) :
+                sprintf('%s', $this->parseConditions($cond));
         };
         $parseString = function ($result, $cond) {
             return $result ?
-                $result . " AND " . sprintf("(%s)", $this->cleanCond($cond)) :
-                sprintf("(%s)", $this->cleanCond($cond));
+                $result.' AND '.sprintf('(%s)', $this->cleanCond($cond)) :
+                sprintf('(%s)', $this->cleanCond($cond));
         };
         $parseKeyedString = function ($result, $key, $cond) {
-            // Key is a conditional operator 
+            // Key is a conditional operator
             if (in_array(strtoupper($key), ['AND', 'OR'])) {
                 return $result ?
-                    $result  . sprintf(" %s (%s)", strtoupper($key), $this->cleanCond($cond)) :
-                    sprintf("(%s)", $this->cleanCond($cond));
+                    $result.sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
+                    sprintf('(%s)', $this->cleanCond($cond));
             }
-            // Key is a conditional (NOT) operator 
-            else if (strtoupper($key) == 'NOT') {
+            // Key is a conditional (NOT) operator
+            elseif (strtoupper($key) == 'NOT') {
                 return $result ?
-                    $result  . sprintf("(%s)", $this->cleanCond($cond)) :
-                    sprintf("%s (%s)", $key, $this->cleanCond($cond));
+                    $result.sprintf('(%s)', $this->cleanCond($cond)) :
+                    sprintf('%s (%s)', $key, $this->cleanCond($cond));
             }
             // Key is a parameter
             else {
                 return $result ?
-                    $result . " AND " . sprintf("`%s` = %s", $key, $this->escapeCond($cond)) :
-                    sprintf("`%s` = %s", $key, $this->escapeCond($cond));
+                    $result.' AND '.sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
+                    sprintf('`%s` = %s', $key, $this->escapeCond($cond));
             }
         };
 
-
         if (!empty($conditions)) {
-
             // List type ([a,b,c])
             if (array_is_list($conditions)) {
                 foreach ($conditions as $cond) {
@@ -879,13 +913,14 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             }
         }
 
-        return $result ? '(' . $result . ')' : '';
+        return $result ? '('.$result.')' : '';
     }
 
     /**
-     * Add quotes to condition if needed
+     * Add quotes to condition if needed.
      *
      * @param string $cond
+     *
      * @return string
      */
     private function escapeCond(string $cond): string
@@ -894,40 +929,43 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Remove undesirable values from condition
+     * Remove undesirable values from condition.
      *
      * @param string $cond
+     *
      * @return string
      */
     private function cleanCond(string $cond): string
     {
-        return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '',  $cond));
+        return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '', $cond));
     }
 
-
-    ##### Statics #####
+    //#### Statics #####
 
     /**
-     * Create record
+     * Create record.
      *
      * @param array $data
+     *
      * @return static|null
      */
     public static function create(array $data): ?static
     {
-        $model = new static;
+        $model = new static();
         $model->load($data);
         if ($model->save()) {
             return $model;
         }
+
         return null;
     }
 
     /**
-     * Update record
+     * Update record.
      *
      * @param string|int $id
-     * @param array $data
+     * @param array      $data
+     *
      * @return static|null
      */
     public static function update(string|int $id, array $data): ?static
@@ -936,84 +974,93 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         if ($model && $model->fastLoad($data)->save()) {
             return $model;
         }
+
         return null;
     }
 
     /**
-     * Find model for id. Without trashed (deleted) models
+     * Find model for id. Without trashed (deleted) models.
      *
      * @param string|int $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
+     * @param array      $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array      $columns    Select Colomn names.
+     *
      * @return static|null
      */
     public static function findById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?static
     {
-        return (new static)->find($id, $conditions, $params, $columns);
+        return (new static())->find($id, $conditions, $params, $columns);
     }
 
     /**
-     * Find model for id. With trashed (deleted) models
+     * Find model for id. With trashed (deleted) models.
      *
      * @param string|int $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
+     * @param array      $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array      $columns    Select Colomn names.
+     *
      * @return static|null
      */
     public static function findTrashedById(string|int $id, array $conditions = [], array $params = [], array $columns = []): ?static
     {
-        return (new static)->findTrashed($id, $conditions, $params, $columns);
+        return (new static())->findTrashed($id, $conditions, $params, $columns);
     }
 
     /**
-     * Get list of model. Without trashed (deleted) models
+     * Get list of model. Without trashed (deleted) models.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @param int|null $limit Query limit
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
+     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $columns    Select Colomn names.
+     * @param int|null $limit      Query limit
+     *
      * @return static[]
      */
-    public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
+    public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): array
     {
-        $model = (new static);
+        $model = (new static());
+
         return $model->setAutoLoadRelations(false)->all($conditions, $params, $columns, $limit ?? 0);
     }
 
     /**
-     * Get list of model. With trashed (deleted) models
+     * Get list of model. With trashed (deleted) models.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params Query Params. e.g SQL query params `[$id]` or [':id' => $id] 
-     * @param array $columns Select Colomn names. 
-     * @param int|null $limit Query limit
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
+     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $columns    Select Colomn names.
+     * @param int|null $limit      Query limit
+     *
      * @return static[]
      */
-    public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = NULL): array
+    public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): array
     {
-        $model = (new static);
+        $model = (new static());
+
         return $model->setAutoLoadRelations(false)->allTrashed($conditions, $params, $columns, $limit ?? 0);
     }
 
-    ##### Clones #####
+    //#### Clones #####
 
     /**
-     * Clone model
-     * 
+     * Clone model.
+     *
      * @return static
      */
     public function clone()
     {
         $model = (clone $this);
+
         return $model;
     }
 
     /**
-     * Set limit to be loaded with model
+     * Set limit to be loaded with model.
      *
      * @param int $limit
+     *
      * @return static
      */
     public function withLimit(int $limit): static
@@ -1022,9 +1069,10 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
     }
 
     /**
-     * Set relations to be loaded with model
+     * Set relations to be loaded with model.
      *
      * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
+     *
      * @return static
      */
     public function withRelations(array $relations): static
@@ -1032,10 +1080,10 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
         return $this->clone()->setRequestedRelations($relations);
     }
 
-    ##### Override #####
+    //#### Override #####
 
     /**
-     * Is Dirty - Update has been made
+     * Is Dirty - Update has been made.
      *
      * @return bool
      */
@@ -1053,14 +1101,16 @@ abstract class Model implements ModelInterface, Arrayable, JsonSerializable
             $attrs = [];
             if ($this->autoLoadRelations) {
                 $fields = array_merge($fields, $this->getRelations());
-            } else if (!empty($this->loadedRelations)) {
+            } elseif (!empty($this->loadedRelations)) {
                 $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->loadedRelations)));
             }
             foreach ($fields as $field) {
                 $attrs[$field->getName()] = $field->getType();
             }
+
             return $attrs;
         }
+
         return $this->defaultFields($all, $trim);
     }
 }

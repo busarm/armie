@@ -8,8 +8,8 @@ use Armie\Interfaces\RouteInterface;
 use function Armie\Helpers\app;
 
 /**
- * Create / Retrieve Singletons for stateless requests
- *  
+ * Create / Retrieve Singletons for stateless requests.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -18,10 +18,11 @@ use function Armie\Helpers\app;
 trait SingletonStateless
 {
     /**
-     * Create / Retrieve stateless singleton instance
+     * Create / Retrieve stateless singleton instance.
      *
      * @param RequestInterface|RouteInterface $request
-     * @param array $params
+     * @param array                           $params
+     *
      * @return static
      */
     public static function make(RequestInterface|RouteInterface $request, array $params = []): static

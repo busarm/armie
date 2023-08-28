@@ -3,6 +3,7 @@
 </p>
 <p align="center">
 <a href="https://github.com/busarm/armie/actions/workflows/php.yml"><img src="https://github.com/busarm/armie/actions/workflows/php.yml/badge.svg?branch=master" alt="Test"/></a>
+  <a href="https://github.styleci.io/repos/531441028?branch=dev"><img src="https://github.styleci.io/repos/531441028/shield?branch=master" alt="StyleCI"></a>
 <a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/license" alt="Test"/></a>
 <a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/v" alt="Latest Stable Version"/></a>
 <a href="https://packagist.org/packages/busarm/armie"><img src="https://poser.pugx.org/busarm/armie/require/php" alt="PHP Version Require"/></a>

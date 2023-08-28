@@ -2,18 +2,18 @@
 
 namespace Armie\Attributes\Request;
 
-use Attribute;
 use Armie\App;
 use Armie\Exceptions\BadRequestException;
 use Armie\Interfaces\Attribute\ParameterAttributeInterface;
 use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\RouteInterface;
 use Armie\Traits\TypeResolver;
+use Attribute;
 use ReflectionParameter;
 
 /**
- * Request query parameters resolver
- * 
+ * Request query parameters resolver.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -22,7 +22,6 @@ use ReflectionParameter;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class QueryParam implements ParameterAttributeInterface
 {
-
     use TypeResolver;
 
     public function __construct(private string $name, private bool $required = false, private bool $sanitize = false)
@@ -37,10 +36,12 @@ class QueryParam implements ParameterAttributeInterface
         if ($request instanceof RequestInterface) {
             $value = $request->query()->get($this->name, $value, $this->sanitize);
             if ($this->required && !isset($value)) {
-                throw new BadRequestException(sprintf("%s query param is required", $this->name));
+                throw new BadRequestException(sprintf('%s query param is required', $this->name));
             }
+
             return $this->resolveType($parameter->getType() ?: $this->findType($value), $value);
         }
+
         return null;
     }
 }

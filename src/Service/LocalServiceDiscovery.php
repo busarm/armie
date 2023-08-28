@@ -8,8 +8,8 @@ use Armie\Interfaces\ServiceDiscoveryInterface;
 use Armie\Interfaces\StorageBagInterface;
 
 /**
- * Load local/remote service registry from local source such as: file or array list
- * 
+ * Load local/remote service registry from local source such as: file or array list.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -24,22 +24,23 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
 
     /**
      * @param string|ServiceClientInterface[] $pathOrList Service discovery file path or list of services
-     * - If file path, the file should be a JSON with the list of services. Format = `{"name" : "path", ...}`
+     *                                                    - If file path, the file should be a JSON with the list of services. Format = `{"name" : "path", ...}`
      */
     public function __construct(protected string|array $pathOrList)
     {
         if (is_array($pathOrList)) {
             $this->services = new Bag($pathOrList);
         } else {
-            $this->services = new Bag;
+            $this->services = new Bag();
             $this->load();
         }
     }
 
     /**
-     * Get service client
+     * Get service client.
      *
      * @param string $name Service Name
+     *
      * @return ServiceClientInterface|null
      */
     public function getServiceClient(string $name): ServiceClientInterface|null
@@ -48,7 +49,8 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
     }
 
     /**
-     * Get list of service client
+     * Get list of service client.
+     *
      * @return ServiceClientInterface[]
      */
     public function getServiceClients(): array
@@ -57,20 +59,21 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
     }
 
     /**
-     * Get `name=>location` map list of service clienta
-     * 
+     * Get `name=>location` map list of service clienta.
+     *
      * @return array<string,string>
      */
     public function getServiceClientsMap(): array
     {
         return array_reduce($this->getServiceClients(), function ($carry, ServiceClientInterface $current) {
             $carry[$current->getName()] = $current->getLocation();
+
             return $carry;
         }, []);
     }
 
     /**
-     * Load service clients
+     * Load service clients.
      */
     private function load(): void
     {
@@ -80,7 +83,7 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
                 foreach ($list as $name => $path) {
                     if (filter_var($path, FILTER_VALIDATE_URL)) {
                         $this->services->set($name, new RemoteClient($name, $path));
-                    } else if (is_dir($path) || file_exists($path)) {
+                    } elseif (is_dir($path) || file_exists($path)) {
                         $this->services->set($name, new LocalClient($name, $path));
                     }
                 }

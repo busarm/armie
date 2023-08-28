@@ -2,14 +2,15 @@
 
 namespace Armie\Test;
 
-use PHPUnit\Framework\TestCase;
 use Armie\Crypto;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @covers \Armie\Crypto
  */
 final class CryptoTest extends TestCase
@@ -22,12 +23,12 @@ final class CryptoTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->key = md5(uniqid() . time());
+        $this->key = md5(uniqid().time());
         $this->plainText = 'Samuel Gabriel Test';
     }
 
     /**
-     * Test encryption and decryption
+     * Test encryption and decryption.
      *
      * @return void
      */
@@ -42,9 +43,8 @@ final class CryptoTest extends TestCase
         $this->assertEquals($decrypt, $this->plainText);
     }
 
-
     /**
-     * Test digest
+     * Test digest.
      *
      * @return void
      */

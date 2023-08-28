@@ -5,7 +5,7 @@ namespace Armie\Dto;
 use Armie\Enums\SameSite;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -29,17 +29,16 @@ class CookieDto extends BaseDto
     /** @var bool */
     public bool $httponly = false;
 
-
     /**
-     * @param string $name 
-     * @param string|array|null $value 
-     * @param array $options 
-     * * domain: ""
-     * * httponly: "0"
-     * * expires: "0" (seconds)
-     * * path: "/"
-     * * samesite: ""
-     * * secure: "0"
+     * @param string            $name
+     * @param string|array|null $value
+     * @param array             $options
+     *                                   * domain: ""
+     *                                   * httponly: "0"
+     *                                   * expires: "0" (seconds)
+     *                                   * path: "/"
+     *                                   * samesite: ""
+     *                                   * secure: "0"
      */
     public function __construct($name, $value = null, $options = [])
     {
@@ -54,9 +53,9 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of domain
+     * Set the value of domain.
      *
-     * @return  self
+     * @return self
      */
     public function setDomain($domain)
     {
@@ -66,9 +65,9 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of path
+     * Set the value of path.
      *
-     * @return  self
+     * @return self
      */
     public function setPath($path)
     {
@@ -78,10 +77,11 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of samesite
+     * Set the value of samesite.
      *
      * @param string $samesite
-     * @return  self
+     *
+     * @return self
      */
     public function setSamesite(string $samesite)
     {
@@ -91,9 +91,9 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of expires
+     * Set the value of expires.
      *
-     * @return  self
+     * @return self
      */
     public function setExpires(int $expires)
     {
@@ -103,9 +103,9 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of secure
+     * Set the value of secure.
      *
-     * @return  self
+     * @return self
      */
     public function setSecure(bool $secure)
     {
@@ -115,9 +115,9 @@ class CookieDto extends BaseDto
     }
 
     /**
-     * Set the value of httponly
+     * Set the value of httponly.
      *
-     * @return  self
+     * @return self
      */
     public function setHttponly(bool $httponly)
     {

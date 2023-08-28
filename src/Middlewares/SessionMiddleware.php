@@ -12,7 +12,7 @@ use Armie\Interfaces\SessionStoreInterface;
 use SessionHandlerInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -24,16 +24,16 @@ final class SessionMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Middleware handler
+     * Middleware handler.
      *
      * @param RequestInterface|RouteInterface $request
-     * @param RequestHandlerInterface $handler
+     * @param RequestHandlerInterface         $handler
+     *
      * @return ResponseInterface
      */
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($request instanceof RequestInterface && $this->config->sessionEnabled) {
-
             if ($this->session) {
                 if ($this->session instanceof SessionStoreInterface) {
                     $request->setSession($this->session);
@@ -46,6 +46,7 @@ final class SessionMiddleware implements MiddlewareInterface
                 $request->session()->start();
             }
         }
+
         return $handler->handle($request);
     }
 }

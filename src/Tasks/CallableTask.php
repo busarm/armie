@@ -5,14 +5,13 @@ namespace Armie\Tasks;
 use Closure;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 final class CallableTask extends Task
 {
-
     public function __construct(protected Closure $callable, protected array $data = [])
     {
         parent::__construct();
@@ -30,6 +29,7 @@ final class CallableTask extends Task
                 return call_user_func($this->callable, $this->data);
             }
         }
+
         return null;
     }
 
@@ -40,7 +40,7 @@ final class CallableTask extends Task
     {
         return [
             'callable' => $this->callable,
-            'data' => $this->data,
+            'data'     => $this->data,
         ];
     }
 }

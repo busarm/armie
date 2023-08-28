@@ -6,14 +6,14 @@ use Armie\Enums\Env;
 use Throwable;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class ResponseDto extends BaseDto
 {
-    /**  @var bool */
+    /** @var bool */
     public bool $success;
     /** @var string */
     public string|null $message;
@@ -37,9 +37,9 @@ class ResponseDto extends BaseDto
     public array|null $errorTrace;
 
     /**
-     * Set the value of success
+     * Set the value of success.
      *
-     * @return  self
+     * @return self
      */
     public function setSuccess(bool $success)
     {
@@ -49,9 +49,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of message
+     * Set the value of message.
      *
-     * @return  self
+     * @return self
      */
     public function setMessage(string $message)
     {
@@ -61,9 +61,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of data
+     * Set the value of data.
      *
-     * @return  self
+     * @return self
      */
     public function setData(object|array $data)
     {
@@ -73,9 +73,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of env
+     * Set the value of env.
      *
-     * @return  self
+     * @return self
      */
     public function setEnv(string $env)
     {
@@ -85,9 +85,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of version
+     * Set the value of version.
      *
-     * @return  self
+     * @return self
      */
     public function setVersion(string $version)
     {
@@ -97,9 +97,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of duration
+     * Set the value of duration.
      *
-     * @return  self
+     * @return self
      */
     public function setDuration(int $duration)
     {
@@ -109,9 +109,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of errorCode
+     * Set the value of errorCode.
      *
-     * @return  self
+     * @return self
      */
     public function setErrorCode(string $errorCode)
     {
@@ -121,9 +121,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of errorLine
+     * Set the value of errorLine.
      *
-     * @return  self
+     * @return self
      */
     public function setErrorLine(int $errorLine)
     {
@@ -133,9 +133,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of errorFile
+     * Set the value of errorFile.
      *
-     * @return  self
+     * @return self
      */
     public function setErrorFile(string $errorFile)
     {
@@ -145,9 +145,9 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of errorTrace
+     * Set the value of errorTrace.
      *
-     * @return  self
+     * @return self
      */
     public function setErrorTrace(array $errorTrace)
     {
@@ -157,11 +157,12 @@ class ResponseDto extends BaseDto
     }
 
     /**
-     * Initialize response dto with throwable
+     * Initialize response dto with throwable.
      *
      * @param Throwable $e
-     * @param Env $env App environment
-     * @param string $version App version
+     * @param Env       $env     App environment
+     * @param string    $version App version
+     *
      * @return self
      */
     public static function fromError(Throwable $e, Env $env, string $version): self

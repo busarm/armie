@@ -4,130 +4,150 @@ namespace Armie\Interfaces;
 
 use Armie\Enums\HttpMethod;
 use Closure;
-use Armie\Interfaces\MiddlewareInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @codeCoverageIgnore
  */
 interface RouteInterface extends ContainerInterface
 {
     /**  @return Closure|null */
     public function getCallable(): ?Closure;
+
     /**  @return string|null */
     public function getController(): ?string;
+
     /**  @return string|null */
     public function getFunction(): ?string;
+
     /**  @return array<string, mixed> */
     public function getParams(): array;
+
     /**  @return string|null */
     public function getView(): ?string;
+
     /**  @return HttpMethod|null */
     public function getMethod(): ?HttpMethod;
+
     /**  @return string|null */
     public function getPath(): ?string;
+
     /**  @return MiddlewareInterface[] */
     public function getMiddlewares(): array;
 
     /**
-     * Set callable route destination
-     * 
+     * Set callable route destination.
+     *
      * @param Closure $callable Function to execute for route
+     *
      * @return self
      */
     public function call(Closure $callable): self;
 
     /**
-     * Set controller route destination
-     * 
+     * Set controller route destination.
+     *
      * @param string $controller Application Controller class name e.g Home
-     * @param string $function Application Controller (public) function. e.g index
+     * @param string $function   Application Controller (public) function. e.g index
+     *
      * @return self
      */
     public function to(string $controller, string $function): self;
 
     /**
-     * Set view component route destination
-     * 
+     * Set view component route destination.
+     *
      * @param string $viewPathOrClass Path to view file relative to `Config::viewPath` or View class name
+     *
      * @return self
      */
     public function view(string $viewPathOrClass): self;
 
     /**
-     * Add route middlewares
-     * 
+     * Add route middlewares.
+     *
      * @param MiddlewareInterface[] $middlewares Array of Middleware Interface.
+     *
      * @return self
      */
     public function middlewares(array $middlewares = []): self;
 
     /**
-     * Add route middleware
-     * 
+     * Add route middleware.
+     *
      * @param MiddlewareInterface $middleware
+     *
      * @return self
      */
     public function middleware(MiddlewareInterface $middleware): self;
 
     /**
      * Add route params.
+     *
      * @param array<string, mixed> $params
-     * List of key => value params. 
-     * Where:
-     * - `key` = function paramater name 
-     * - `value` =  function paramater value
-     * @return self 
+     *                                     List of key => value params.
+     *                                     Where:
+     *                                     - `key` = function paramater name
+     *                                     - `value` =  function paramater value
+     *
+     * @return self
      */
     public function params(array $params): self;
 
     /**
-     * Set HTTP GET routes
-     * 
+     * Set HTTP GET routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function get(string $path): RouteInterface;
 
     /**
-     * Set HTTP POST routes
-     * 
+     * Set HTTP POST routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function post(string $path): RouteInterface;
 
     /**
-     * Set HTTP PUT routes
-     * 
+     * Set HTTP PUT routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function put(string $path): RouteInterface;
 
     /**
-     * Set HTTP PATCH routes
-     * 
+     * Set HTTP PATCH routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function patch(string $path): RouteInterface;
 
     /**
-     * Set HTTP DELETE routes
-     * 
+     * Set HTTP DELETE routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function delete(string $path): RouteInterface;
 
     /**
-     * Set HTTP HEAD routes
-     * 
+     * Set HTTP HEAD routes.
+     *
      * @param string $path HTTP path. e.g /home. See `Router::MATCHER_REGX` for list of parameters matching keywords
+     *
      * @return RouteInterface
      */
     public static function head(string $path): RouteInterface;

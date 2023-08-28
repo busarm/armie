@@ -3,7 +3,7 @@
 namespace Armie\Dto;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -16,9 +16,9 @@ class ServiceResponseDto extends BaseDto
     public array $data = [];
 
     /**
-     * Set the value of status
+     * Set the value of status.
      *
-     * @return  self
+     * @return self
      */
     public function setStatus(bool $status)
     {
@@ -28,9 +28,9 @@ class ServiceResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of async
+     * Set the value of async.
      *
-     * @return  self
+     * @return self
      */
     public function setAsync(bool $async)
     {
@@ -40,9 +40,9 @@ class ServiceResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of data
+     * Set the value of data.
      *
-     * @return  self
+     * @return self
      */
     public function setData(array $data)
     {
@@ -52,10 +52,10 @@ class ServiceResponseDto extends BaseDto
     }
 
     /**
-     * Set the value of code
+     * Set the value of code.
      *
-     * @return  self
-     */ 
+     * @return self
+     */
     public function setCode(int $code)
     {
         $this->code = $code;

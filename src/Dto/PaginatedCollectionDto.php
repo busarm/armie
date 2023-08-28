@@ -3,10 +3,11 @@
 namespace Armie\Dto;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @template T
  */
 class PaginatedCollectionDto extends BaseDto
@@ -49,9 +50,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of data
+     * Set the value of data.
      *
-     * @return  self
+     * @return self
      */
     public function setData(CollectionBaseDto|array $data)
     {
@@ -61,9 +62,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of count
+     * Set the value of count.
      *
-     * @return  self
+     * @return self
      */
     public function setCount(int $count)
     {
@@ -73,9 +74,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of current
+     * Set the value of current.
      *
-     * @return  self
+     * @return self
      */
     public function setCurrent(int $current)
     {
@@ -85,9 +86,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of next
+     * Set the value of next.
      *
-     * @return  self
+     * @return self
      */
     public function setNext(int $next)
     {
@@ -97,9 +98,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of previous
+     * Set the value of previous.
      *
-     * @return  self
+     * @return self
      */
     public function setPrevious(int $previous)
     {
@@ -109,9 +110,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of first
+     * Set the value of first.
      *
-     * @return  self
+     * @return self
      */
     public function setFirst(int $first)
     {
@@ -121,9 +122,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of last
+     * Set the value of last.
      *
-     * @return  self
+     * @return self
      */
     public function setLast(int $last)
     {
@@ -133,9 +134,9 @@ class PaginatedCollectionDto extends BaseDto
     }
 
     /**
-     * Set the value of total
+     * Set the value of total.
      *
-     * @return  self
+     * @return self
      */
     public function setTotal(int $total)
     {

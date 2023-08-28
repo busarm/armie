@@ -7,7 +7,7 @@ use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relations\ManyToMany;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -36,12 +36,12 @@ class TagTestModel extends Model
                 $this,
                 new Reference(ProductTagTestModel::class, ['id' => 'tagId']),
                 new Reference(ProductTestModel::class, ['productId' => 'id'])
-            )
+            ),
         ];
     }
 
     /**
-     * Model table name. e.g db table, collection name
+     * Model table name. e.g db table, collection name.
      *
      * @return string
      */
@@ -51,7 +51,7 @@ class TagTestModel extends Model
     }
 
     /**
-     * Model key name. e.g table primary key, unique index
+     * Model key name. e.g table primary key, unique index.
      *
      * @return string|null
      */

@@ -8,18 +8,20 @@ use Armie\Data\PDO\Relation;
 use Armie\Enums\DataType;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @inheritDoc
  */
 class OneToMany extends Relation
 {
     /**
-     * @param string $name Relation attribute name in Current Model
-     * @param Model $model Current Model 
+     * @param string    $name      Relation attribute name in Current Model
+     * @param Model     $model     Current Model
      * @param Reference $reference Relation Reference
+     *
      * @return void
      */
     public function __construct(
@@ -32,6 +34,7 @@ class OneToMany extends Relation
 
     /**
      * @inheritDoc
+     *
      * @return Model[]
      */
     public function get(): array
@@ -52,6 +55,7 @@ class OneToMany extends Relation
                 $this->columns
             );
         }
+
         return [];
     }
 
@@ -60,7 +64,9 @@ class OneToMany extends Relation
      */
     public function load(array $items): array
     {
-        if (empty($items)) return [];
+        if (empty($items)) {
+            return [];
+        }
 
         $referenceConditions = [];
         $referenceParams = [];
@@ -71,7 +77,6 @@ class OneToMany extends Relation
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {
-
             // Get relation results for all items
             $results = $this->getReferenceModel()->clone()->setAutoLoadRelations(false)->setPerPage($this->limit * count($items))->all(
                 array_merge($referenceConditions, $this->conditions),
@@ -95,16 +100,18 @@ class OneToMany extends Relation
 
             return $items;
         }
+
         return [];
     }
-
 
     /**
      * @inheritDoc
      */
     public function save(array $data): bool
     {
-        if (empty($data)) return false;
+        if (empty($data)) {
+            return false;
+        }
 
         // Is multiple values
         if (array_is_list($data)) {
@@ -112,9 +119,12 @@ class OneToMany extends Relation
                 $done = true;
                 foreach ($data as $item) {
                     if (is_array($item)) {
-                        if (!$this->save($item)) $done = false;
+                        if (!$this->save($item)) {
+                            $done = false;
+                        }
                     }
                 }
+
                 return $done;
             });
         }
@@ -132,7 +142,6 @@ class OneToMany extends Relation
         // Save reference model
         $referenceModel->fastLoad($data);
         if ($referenceModel->save()) {
-
             $modelData = [];
 
             // Load current model keys

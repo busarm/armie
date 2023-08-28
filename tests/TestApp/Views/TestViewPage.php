@@ -6,7 +6,7 @@ use Armie\Interfaces\RequestInterface;
 use Armie\View;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -23,7 +23,8 @@ class TestViewPage extends View
      */
     public function render()
     {
-        $header = new TestComponent;
+        $header = new TestComponent();
+
         return <<<HTML
         <html>
             <body>

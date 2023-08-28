@@ -6,11 +6,14 @@ use Armie\Enums\ResponseFormat;
 use Armie\Interfaces\Arrayable;
 use Armie\Interfaces\ResponseInterface;
 use Armie\Interfaces\ResponseHandlerInterface;
+use Armie\Promise;
 use Armie\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Traversable;
+
+use function Armie\Helpers\await;
 
 /**
  * Armie Framework
@@ -38,6 +41,8 @@ final class ResponseHandler implements ResponseHandlerInterface
                 if ($this->data !== null) {
                     if ($this->data instanceof StreamInterface) {
                         $response->setBody($this->data);
+                    } else if ($this->data instanceof Promise) {
+                        $response->setBody(json_encode(await($this->data)));
                     } else if ($this->data instanceof Traversable) {
                         $response->setBody(json_encode(iterator_to_array($this->data)));
                     } else if ($this->data instanceof Arrayable) {

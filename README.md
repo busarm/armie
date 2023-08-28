@@ -136,7 +136,7 @@ Host multiple applications or modules. Supports path and domain routing
 
 High perfomant Asychronous HTTP Server with support for serveral event-looping providers such as: `swoole`, `libevent`, `ev`, `libuv`, `react`. Provides the following features:
 
-- Background workers to handle asynchronous task and cron job processing
+- Background workers to handle multi processing, asynchronous task and cron job processing
 - Socket workers to handle web socket connections
 - Concurrency with Promises and built in (`async`, `await`, `concurrent`) functions
 - Real-time events with built in (`listen`, `dispatch`) functions
@@ -155,10 +155,20 @@ High perfomant Asychronous HTTP Server with support for serveral event-looping p
 
     $app->start("localhost", 8080,
         (new ServerConfig)
-            ->setLooper(Looper::DEFAULT)
-            ->addJob(new CallableTask(function () {
+            ->setLooper(Looper::EV)
+            ->setHttpWorkers(8)
+            ->setTaskWorkers(4)
+            ->addJob(function () {
                 log_debug("Testing EVERY_MINUTE Cron Job");
-            }), Cron::EVERY_MINUTE));
+            }, Cron::EVERY_MINUTE)
+            ->addJob(function () {
+                log_debug("Testing Custom Seconds Cron Job");
+            }, 600)
+            ->addJob(function () {
+                log_debug("Testing One-Time Only Job");
+            }, (new DateTime('+30 seconds')))
+            // MessengerSocketController implements SocketControllerInterface
+            ->addSocket(2222, MessengerSocketController::class));
 
 ```
 

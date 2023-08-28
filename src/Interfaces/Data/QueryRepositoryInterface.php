@@ -2,7 +2,6 @@
 
 namespace Armie\Interfaces\Data;
 
-use Armie\Data\PDO\Model;
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Dto\PaginatedCollectionDto;

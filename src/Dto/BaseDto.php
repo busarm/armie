@@ -2,12 +2,9 @@
 
 namespace Armie\Dto;
 
-use Armie\Helpers\Security;
-use ReflectionObject;
-use Armie\Interfaces\Arrayable;
-use Armie\Traits\PropertyLoader;
+use Armie\Interfaces\Data\PropertyResolverInterface;
+use Armie\Traits\PropertyResolver;
 use Armie\Traits\TypeResolver;
-use Stringable;
 
 /**
  * Armie Framework
@@ -15,10 +12,10 @@ use Stringable;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-class BaseDto implements Arrayable, Stringable
+class BaseDto implements PropertyResolverInterface
 {
     use TypeResolver;
-    use PropertyLoader;
+    use PropertyResolver;
 
     /**
      * Load dto with array of class attibutes

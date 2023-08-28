@@ -4,11 +4,10 @@ namespace Armie\Data\PDO;
 
 use Armie\Data\PDO\Connection;
 use Armie\Helpers\StringableDateTime;
-use Armie\Interfaces\Arrayable;
 use Armie\Interfaces\Data\ModelInterface;
-use Armie\Traits\PropertyLoader;
+use Armie\Interfaces\Data\PropertyResolverInterface;
+use Armie\Traits\PropertyResolver;
 use Armie\Traits\TypeResolver;
-use JsonSerializable;
 
 use function Armie\Helpers\dispatch;
 
@@ -18,11 +17,11 @@ use function Armie\Helpers\dispatch;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-abstract class Model implements ModelInterface, Arrayable, JsonSerializable
+abstract class Model implements ModelInterface, PropertyResolverInterface
 {
     use TypeResolver;
 
-    use PropertyLoader {
+    use PropertyResolver {
         fields as defaultFields;
         __excluded as __defaultExcluded;
     }

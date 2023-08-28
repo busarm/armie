@@ -3,14 +3,11 @@
 namespace Armie\Service;
 
 use Armie\Bags\Bag;
-use Armie\Enums\HttpMethod;
-use Armie\Interfaces\ServiceClientInterface;
 use Armie\Interfaces\ServiceDiscoveryInterface;
 use Armie\Interfaces\StorageBagInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 
 /**
+ * Load remote service registry from external source
  * 
  * Armie Framework
  *
@@ -20,7 +17,7 @@ use GuzzleHttp\RequestOptions;
 class RemoteServiceDiscovery implements ServiceDiscoveryInterface
 {
     /**
-     * @var StorageBagInterface<ServiceClientInterface>
+     * @var StorageBagInterface<RemoteClient>
      */
     protected readonly StorageBagInterface $services;
 
@@ -32,16 +29,13 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
     private int $requestedAt = 0;
 
     /**
-     *
-     * @param string $endpoint Service registry endpoint
-     * - Endpoint must be an HTTP GET request and should provide a response of list of services. Format = `{"name" : "url", ...}`
-     * @param integer $ttl Service registry cache ttl (seconds). Re-load list after ttl
-     * @param integer $timeout Service registry request timeout (seconds)
+     * @param string $endpoint Service registry url endpoint
+     * - If url or file path, the file or response should be a JSON with the list of services. Format = `{"name" : "url", ...}`
+     * @param integer $ttl Service registry cache ttl (seconds). Reload list after ttl
      */
-    public function __construct(protected string $endpoint, protected $ttl = 300, protected $timeout = 10)
+    public function __construct(protected string $endpoint, protected int $ttl = 300)
     {
-        $this->services = new Bag();
-
+        $this->services = new Bag;
         $this->load();
     }
 
@@ -49,26 +43,23 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
      * Get service client
      *
      * @param string $name Service Name
-     * @return ServiceClientInterface
+     * @return RemoteClient
      */
-    public function getServiceClient(string $name): ServiceClientInterface|null
+    public function getServiceClient(string $name): RemoteClient|null
     {
-        if (($this->requestedAt + $this->ttl <= time()) ||
-            !($client = $this->get(($name)))
-        ) {
+        if ($this->hasExpired()) {
             $this->load();
-            $client = $this->get(($name));
         }
-        return $client ?? null;
+        return $this->get(($name));
     }
 
     /**
      * Get list of service client
-     * @return ServiceClientInterface[]
+     * @return RemoteClient[]
      */
     public function getServiceClients(): array
     {
-        if (($this->requestedAt + $this->ttl <= time())) {
+        if ($this->hasExpired()) {
             $this->load();
         }
         return $this->services->all();
@@ -81,19 +72,27 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
      */
     public function getServiceClientsMap(): array
     {
-        return array_reduce($this->getServiceClients(), function ($carry, ServiceClientInterface $current) {
+        return array_reduce($this->getServiceClients(), function ($carry, RemoteClient $current) {
             $carry[$current->getName()] = $current->getLocation();
             return $carry;
         }, []);
     }
 
     /**
+     * Check if registry cache has expired
+     */
+    private function hasExpired(): bool
+    {
+        return $this->requestedAt && ($this->requestedAt + $this->ttl <= time());
+    }
+
+    /**
      * Get service client
      *
      * @param string $name Service Name
-     * @return ?ServiceClientInterface
+     * @return ?RemoteClient
      */
-    private function get(string $name): ?ServiceClientInterface
+    private function get(string $name): ?RemoteClient
     {
         return $this->services->get($name);
     }
@@ -101,25 +100,14 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
     /**
      * Load service clients
      */
-    private function load()
+    private function load(): void
     {
-        $client = new Client([
-            'timeout'  => $this->timeout,
-        ]);
-        $response = $client->request(
-            HttpMethod::GET->value,
-            $this->endpoint,
-            [
-                RequestOptions::VERIFY => false
-            ]
-        );
-
-        if ($response->getBody()) {
-            $result = json_decode($response->getBody(), true) ?? [];
-            if (!empty($result)) {
-                foreach ($result as $name => $url) {
-                    if ($url = filter_var($url, FILTER_VALIDATE_URL)) {
-                        $this->services->set($name, new RemoteClient($name, $url));
+        if ((filter_var($this->endpoint, FILTER_VALIDATE_URL) || file_exists($this->endpoint))) {
+            $list = json_decode(file_get_contents($this->endpoint), true) ?? [];
+            if (!empty($list)) {
+                foreach ($list as $name => $path) {
+                    if (filter_var($path, FILTER_VALIDATE_URL)) {
+                        $this->services->set($name, new RemoteClient($name, $path));
                     }
                 }
                 $this->requestedAt = time();

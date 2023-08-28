@@ -8,6 +8,7 @@ use Armie\Interfaces\ServiceDiscoveryInterface;
 use Armie\Interfaces\StorageBagInterface;
 
 /**
+ * Load local/remote service registry from local source such as: file or array list
  * 
  * Armie Framework
  *
@@ -23,22 +24,15 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
 
     /**
      * @param string|ServiceClientInterface[] $pathOrList Service discovery file path or list of services
-     * - If file path, then file should be a json file with the list of services. Format = `{"name" : "url", ...}`
+     * - If file path, the file should be a JSON with the list of services. Format = `{"name" : "path", ...}`
      */
-    public function __construct(string|array $pathOrList)
+    public function __construct(protected string|array $pathOrList)
     {
-        if (is_string($pathOrList)) {
-            $this->services = new Bag;
-            if (file_exists($pathOrList)) {
-                $list = json_decode(file_get_contents($pathOrList), true) ?? [];
-                if (!empty($list)) {
-                    foreach ($list as $name => $path) {
-                        $this->services->set($name, new LocalClient($name, $path));
-                    }
-                }
-            }
-        } else {
+        if (is_array($pathOrList)) {
             $this->services = new Bag($pathOrList);
+        } else {
+            $this->services = new Bag;
+            $this->load();
         }
     }
 
@@ -73,5 +67,24 @@ class LocalServiceDiscovery implements ServiceDiscoveryInterface
             $carry[$current->getName()] = $current->getLocation();
             return $carry;
         }, []);
+    }
+
+    /**
+     * Load service clients
+     */
+    private function load(): void
+    {
+        if (is_string($this->pathOrList) && file_exists($this->pathOrList)) {
+            $list = json_decode(file_get_contents($this->pathOrList), true) ?? [];
+            if (!empty($list)) {
+                foreach ($list as $name => $path) {
+                    if (filter_var($path, FILTER_VALIDATE_URL)) {
+                        $this->services->set($name, new RemoteClient($name, $path));
+                    } else if (is_dir($path) || file_exists($path)) {
+                        $this->services->set($name, new LocalClient($name, $path));
+                    }
+                }
+            }
+        }
     }
 }

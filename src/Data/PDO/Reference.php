@@ -6,7 +6,7 @@ use Exception;
 use Stringable;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -15,19 +15,20 @@ class Reference implements Stringable
 {
     /**
      * @param Model|class-string<Model> $model Reference Model or Model Class Name
-     * @param array $keys Reference keys e.g. `['fromModelKey1' => 'toModelKey1', 'fromModelKey2' => 'toModelKey2']`
+     * @param array                     $keys  Reference keys e.g. `['fromModelKey1' => 'toModelKey1', 'fromModelKey2' => 'toModelKey2']`
      */
     public function __construct(private Model|string $model, private array $keys)
     {
         if (!($model instanceof Model) && !is_subclass_of($model, Model::class)) {
-            throw new Exception('Reference `model` must be a subclass of ' . Model::class);
+            throw new Exception('Reference `model` must be a subclass of '.Model::class);
         }
     }
 
     /**
-     * Get reference 
-     * 
+     * Get reference.
+     *
      * @param Connection|null $db
+     *
      * @return Model
      */
     public function getModel(Connection|null $db = null): Model
@@ -38,8 +39,8 @@ class Reference implements Stringable
     }
 
     /**
-     * Get reference keys
-     * 
+     * Get reference keys.
+     *
      * @return array
      */
     public function getKeys(): array
@@ -48,8 +49,8 @@ class Reference implements Stringable
     }
 
     /**
-     * Get reference name
-     * 
+     * Get reference name.
+     *
      * @return string
      */
     public function getName(): string

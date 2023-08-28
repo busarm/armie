@@ -3,8 +3,7 @@
 namespace Armie\Interfaces;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -12,25 +11,28 @@ namespace Armie\Interfaces;
 interface DistributedServiceDiscoveryInterface
 {
     /**
-     * Get service
+     * Get service.
      *
      * @param string $name Service Name
+     *
      * @return ?ServiceClientInterface
      */
     public function get(string $name): ?ServiceClientInterface;
 
     /**
-     * Register service client
-     * 
+     * Register service client.
+     *
      * @param ServiceClientInterface $client
+     *
      * @return void
      */
     public function register(ServiceClientInterface $client): void;
 
     /**
-     * Unregister service client
-     * 
+     * Unregister service client.
+     *
      * @param ServiceClientInterface $client
+     *
      * @return void
      */
     public function unregister(ServiceClientInterface $client): void;

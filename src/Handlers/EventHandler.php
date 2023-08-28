@@ -9,10 +9,9 @@ use Armie\Errors\SystemError;
 use Armie\Interfaces\EventHandlerInterface;
 use Armie\Interfaces\Runnable;
 
-
 /**
- * Handle event operations
- * 
+ * Handle event operations.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -20,22 +19,23 @@ use Armie\Interfaces\Runnable;
  */
 final class EventHandler implements EventHandlerInterface
 {
-    /** 
-     * Single use listeners - Listners will be removed after use
-     * @var array<string, callable[]|class-string<Runnable>[]> 
+    /**
+     * Single use listeners - Listners will be removed after use.
+     *
+     * @var array<string, callable[]|class-string<Runnable>[]>
      */
     private static $singleUseListeners = [];
 
-    /** 
-     * Event listners
-     * @var array<string, callable[]|class-string<Runnable>[]> 
+    /**
+     * Event listners.
+     *
+     * @var array<string, callable[]|class-string<Runnable>[]>
      */
     private $listners = [];
 
     /**
-     *
      * @param App $app
-     * @param integer $maxEventListners Maximum listners allowed per event. **IMPORTANT**: To prevent memory leak
+     * @param int $maxEventListners Maximum listners allowed per event. **IMPORTANT**: To prevent memory leak
      */
     public function __construct(private App $app, private $maxEventListners = 10)
     {
@@ -47,7 +47,7 @@ final class EventHandler implements EventHandlerInterface
     public function listen(string $event, callable|string $listner): void
     {
         if (is_string($listner) && !in_array(Runnable::class, class_implements($listner))) {
-            throw new SystemError("`$listner` does not implement " . Runnable::class);
+            throw new SystemError("`$listner` does not implement ".Runnable::class);
         }
 
         // App running in async mode - register as single-use
@@ -57,7 +57,7 @@ final class EventHandler implements EventHandlerInterface
                 self::$singleUseListeners[$event] = [];
             }
             // Limit reached - remove earliest
-            else if (count(self::$singleUseListeners[$event]) >= $this->maxEventListners) {
+            elseif (count(self::$singleUseListeners[$event]) >= $this->maxEventListners) {
                 array_shift(self::$singleUseListeners[$event]);
             }
             self::$singleUseListeners[$event][] = $listner;
@@ -69,7 +69,7 @@ final class EventHandler implements EventHandlerInterface
                 $this->listners[$event] = [];
             }
             // Limit reached - remove earliest
-            else if (count($this->listners[$event]) >= $this->maxEventListners) {
+            elseif (count($this->listners[$event]) >= $this->maxEventListners) {
                 array_shift($this->listners[$event]);
             }
             $this->listners[$event][] = $listner;
@@ -97,10 +97,11 @@ final class EventHandler implements EventHandlerInterface
     }
 
     /**
-     * Proccess event
+     * Proccess event.
      *
      * @param callable|class-string<Runnable> $listner
-     * @param array $data
+     * @param array                           $data
+     *
      * @return void
      */
     private function handle(callable|string $listner, array $data = []): void

@@ -6,11 +6,13 @@ use Armie\Crypto;
 use Armie\Interfaces\StorageBagInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @link https://github.com/josantonius/php-session
+ *
  * @inheritDoc
  */
 final class Cookie implements StorageBagInterface
@@ -19,7 +21,7 @@ final class Cookie implements StorageBagInterface
 
     /**
      * @param array $options Cookie config options
-     * List of available `$options` with their default values:
+     *                       List of available `$options` with their default values:
      *
      * * domain: ""
      * * httponly: "0"
@@ -27,7 +29,6 @@ final class Cookie implements StorageBagInterface
      * * path: "/"
      * * samesite: ""
      * * secure: "0"
-     * 
      * @param string|null $prefix Prefix for cookies
      * @param string|null $secret Cookie Secret for encryption
      */
@@ -37,14 +38,15 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Get key exact key for name
+     * Get key exact key for name.
      *
      * @param string $name
+     *
      * @return string
      */
     public function key(string $name): string
     {
-        return str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
+        return str_starts_with($name, $this->prefix) ? $name : $this->prefix.'_'.$name;
     }
 
     /**
@@ -52,27 +54,28 @@ final class Cookie implements StorageBagInterface
      */
     public function load(array $cookies): self
     {
-        if ($cookies !=  $_COOKIE) {
+        if ($cookies != $_COOKIE) {
             foreach ($cookies as $name => $cookie) {
                 $_COOKIE[$this->key($name)] = $cookie;
             }
         }
 
         $this->original = $this->all();
+
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function set(string $name, mixed $cookie, $options = NULL): bool
+    public function set(string $name, mixed $cookie, $options = null): bool
     {
         $name = $this->key($name);
         $value = !empty($cookie) ?
             (!empty($this->secret) ?
                 Crypto::encrypt($this->secret, $cookie) :
                 $cookie) :
-            "";
+            '';
         $options = is_int($options) ?
             // Is int - add expiry
             array_merge($this->options, ['expires' => time() + $options]) :
@@ -80,6 +83,7 @@ final class Cookie implements StorageBagInterface
             (is_array($options) ? array_merge($this->options, $options) : $this->options);
 
         $_COOKIE[$name] = $value;
+
         return setcookie(
             $name,
             $value,
@@ -93,10 +97,10 @@ final class Cookie implements StorageBagInterface
     public function get(string $name, $default = null, $sanitize = false): mixed
     {
         $name = $this->key($name);
-        $value =  $this->has($name) ?  $_COOKIE[$name] : null;
+        $value = $this->has($name) ? $_COOKIE[$name] : null;
         if (!empty($value)) {
             return !empty($this->secret) ?
-                (Crypto::decrypt($this->secret, $value) ?: NULL) :
+                (Crypto::decrypt($this->secret, $value) ?: null) :
                 $value;
         }
 
@@ -110,13 +114,14 @@ final class Cookie implements StorageBagInterface
     {
         $value = $this->get($name, $default, $sanitize);
         $this->remove($name);
+
         return $value;
     }
 
     /**
      * @inheritDoc
      */
-    function has(string $name): bool
+    public function has(string $name): bool
     {
         return isset($_COOKIE[$this->key($name)]);
     }
@@ -124,7 +129,7 @@ final class Cookie implements StorageBagInterface
     /**
      * @inheritDoc
      */
-    function all(): array
+    public function all(): array
     {
         return $_COOKIE;
     }
@@ -147,7 +152,6 @@ final class Cookie implements StorageBagInterface
         }
     }
 
-
     /**
      * @inheritDoc
      */
@@ -163,7 +167,9 @@ final class Cookie implements StorageBagInterface
      */
     public function clear()
     {
-        foreach (array_keys($_COOKIE) as $name) $this->remove($name);
+        foreach (array_keys($_COOKIE) as $name) {
+            $this->remove($name);
+        }
     }
 
     /**
@@ -175,7 +181,7 @@ final class Cookie implements StorageBagInterface
     }
 
     /**
-     * Gets a string representation of the object
+     * Gets a string representation of the object.
      *
      * @return string Returns the `string` representation of the object.
      */

@@ -5,7 +5,7 @@ namespace Armie\Errors;
 use Armie\Exceptions\HttpException;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -14,7 +14,7 @@ class SystemError extends HttpException
 {
     /**
      * @param string $message
-     * @param integer $errorCode
+     * @param int    $errorCode
      */
     public function __construct(string $message, int $errorCode = 1000)
     {

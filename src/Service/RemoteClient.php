@@ -5,8 +5,7 @@ namespace Armie\Service;
 use Armie\Interfaces\ServiceClientInterface;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -26,11 +25,10 @@ class RemoteClient implements ServiceClientInterface
     }
 
     /**
-     * Get the value of location
+     * Get the value of location.
      */
     public function getLocation()
     {
         return $this->url;
     }
-
 }

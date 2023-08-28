@@ -14,8 +14,8 @@ use SplQueue;
 use Workerman\Timer;
 
 /**
- * Handle event operations
- * 
+ * Handle event operations.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -24,26 +24,26 @@ use Workerman\Timer;
 final class WorkerQueueHandler implements QueueHandlerInterface
 {
     /**
-     * Queue store
+     * Queue store.
+     *
      * @var SplQueue<Task>
      */
     public static ?SplQueue $queue;
 
     /**
-     * Queue timer instance
+     * Queue timer instance.
      */
     public static $queueTimer = null;
 
     /**
-     * Queue is idle - not running any task
+     * Queue is idle - not running any task.
      */
     public static bool $queueIdle = true;
 
-
     /**
      * @param App $app
-     * @param integer $queueRateLimit Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 1000. Must be less than `queueLimit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
-     * @param integer $queueLimit Queue limit: Allowed number of tasks in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int $queueRateLimit Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 1000. Must be less than `queueLimit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int $queueLimit     Queue limit: Allowed number of tasks in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
      */
     public function __construct(private App $app, private int $queueRateLimit = 100, private int $queueLimit = 10000)
     {
@@ -61,7 +61,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
         $this->app->throwIfNoEventLoop();
 
         if (count(self::$queue) >= $this->queueLimit) {
-            throw new QueueError("Queue limit exceeded. Please try again later");
+            throw new QueueError('Queue limit exceeded. Please try again later');
         }
 
         $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));

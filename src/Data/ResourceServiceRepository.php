@@ -4,10 +4,10 @@ namespace Armie\Data;
 
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
+use Armie\Dto\PaginatedCollectionDto;
 use Armie\Dto\ResourceItemRequestDto;
 use Armie\Dto\ResourceListRequestDto;
 use Armie\Dto\ResourcePaginatedListRequestDto;
-use Armie\Dto\PaginatedCollectionDto;
 use Armie\Dto\ServiceRequestDto;
 use Armie\Enums\ServiceType;
 use Armie\Interfaces\Data\ResourceServiceRepositoryInterface;
@@ -15,8 +15,7 @@ use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\ServiceHandlerInterface;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -34,7 +33,8 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function get(ResourceItemRequestDto $dto): ?BaseDto
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('/')
                 ->setType(ServiceType::READ)
                 ->setParams($dto->toArray()),
@@ -43,6 +43,7 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
         if ($response->status && $response->data && !empty($result = $response->data)) {
             return BaseDto::with($result, true);
         }
+
         return null;
     }
 
@@ -51,7 +52,8 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function list(ResourceListRequestDto $dto): CollectionBaseDto
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('list')
                 ->setType(ServiceType::READ)
                 ->setParams($dto->toArray()),
@@ -60,6 +62,7 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
         if ($response->status && $response->data && !empty($result = $response->data)) {
             return CollectionBaseDto::of($result, true);
         }
+
         return CollectionBaseDto::of([]);
     }
 
@@ -68,16 +71,18 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function paginatedList(ResourcePaginatedListRequestDto $dto): PaginatedCollectionDto
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('paginate')
                 ->setType(ServiceType::READ)
                 ->setParams($dto->toArray()),
             $this->request
         );
         if ($response->status && $response->data && !empty($result = $response->data)) {
-            return (new PaginatedCollectionDto)->load($result, true);
+            return (new PaginatedCollectionDto())->load($result, true);
         }
-        return new PaginatedCollectionDto;
+
+        return new PaginatedCollectionDto();
     }
 
     /**
@@ -85,12 +90,14 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function create(BaseDto $dto): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('/')
                 ->setType(ServiceType::CREATE)
                 ->setParams($dto->toArray()),
             $this->request
         );
+
         return $response->status;
     }
 
@@ -99,12 +106,14 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function createBulk(CollectionBaseDto $dto): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('bulk')
                 ->setType(ServiceType::CREATE)
                 ->setParams($dto->toArray()),
             $this->request
         );
+
         return $response->status;
     }
 
@@ -113,12 +122,14 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function update(int|string $id, BaseDto $dto): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute($id)
                 ->setType(ServiceType::UPDATE)
                 ->setParams($dto->toArray()),
             $this->request
         );
+
         return $response->status;
     }
 
@@ -127,12 +138,14 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function updateBulk(CollectionBaseDto $dto): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('bulk')
                 ->setType(ServiceType::UPDATE)
                 ->setParams($dto->toArray()),
             $this->request
         );
+
         return $response->status;
     }
 
@@ -141,11 +154,13 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function delete(int|string $id): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute($id)
                 ->setType(ServiceType::DELETE),
             $this->request
         );
+
         return $response->status;
     }
 
@@ -154,12 +169,14 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
      */
     public function deleteBulk(CollectionBaseDto $dto): bool
     {
-        $response = $this->serviceProvider->call((new ServiceRequestDto)
+        $response = $this->serviceProvider->call(
+            (new ServiceRequestDto())
                 ->setRoute('bulk')
                 ->setType(ServiceType::DELETE)
                 ->setParams($dto->toArray()),
             $this->request
         );
+
         return $response->status;
     }
 }

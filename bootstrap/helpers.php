@@ -19,94 +19,99 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 
-########## FEATURE HELPERS ############
+//######### FEATURE HELPERS ############
 
 /**
- * Convert to proper unit
+ * Convert to proper unit.
+ *
  * @param int|float $size
+ *
  * @return string
  */
 function unit_convert($size)
 {
-    $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+    $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
     $index = floor(log($size, 1024));
-    return (round($size / pow(1024, ($index)), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
+
+    return (round($size / pow(1024, $index), 2) ?? 0).' '.$unit[$index] ?? '~';
 }
 
 /**
- * Parses http query string into an array
+ * Parses http query string into an array.
  *
  * @author Alxcube <alxcube@gmail.com>
  *
- * @param string $queryString String to parse
+ * @param string $queryString  String to parse
  * @param string $argSeparator Query arguments separator
- * @param integer $decType Decoding type
+ * @param int    $decType      Decoding type
+ *
  * @return array
  */
 function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUERY_RFC1738)
 {
-    $result             = array();
-    $parts              = explode($argSeparator, $queryString);
+    $result = [];
+    $parts = explode($argSeparator, $queryString);
 
     foreach ($parts as $part) {
         $partList = explode('=', $part, 2);
-        if (count($partList) !== 2) continue;
-        list($paramName, $paramValue)   = $partList;
+        if (count($partList) !== 2) {
+            continue;
+        }
+        list($paramName, $paramValue) = $partList;
 
         switch ($decType) {
             case PHP_QUERY_RFC3986:
-                $paramName      = rawurldecode($paramName);
-                $paramValue     = rawurldecode($paramValue);
+                $paramName = rawurldecode($paramName);
+                $paramValue = rawurldecode($paramValue);
                 break;
 
             case PHP_QUERY_RFC1738:
             default:
-                $paramName      = urldecode($paramName);
-                $paramValue     = urldecode($paramValue);
+                $paramName = urldecode($paramName);
+                $paramValue = urldecode($paramValue);
                 break;
         }
 
-
         if (preg_match_all('/\[([^\]]*)\]/m', $paramName, $matches)) {
-            $paramName      = substr($paramName, 0, strpos($paramName, '['));
-            $keys           = array_merge(array($paramName), $matches[1]);
+            $paramName = substr($paramName, 0, strpos($paramName, '['));
+            $keys = array_merge([$paramName], $matches[1]);
         } else {
-            $keys           = array($paramName);
+            $keys = [$paramName];
         }
 
-        $target         = &$result;
+        $target = &$result;
 
         foreach ($keys as $index) {
             if ($index === '') {
                 if (isset($target)) {
                     if (is_array($target)) {
-                        $intKeys        = array_filter(array_keys($target), 'is_int');
-                        $index  = count($intKeys) ? max($intKeys) + 1 : 0;
+                        $intKeys = array_filter(array_keys($target), 'is_int');
+                        $index = count($intKeys) ? max($intKeys) + 1 : 0;
                     } else {
-                        $target = array($target);
-                        $index  = 1;
+                        $target = [$target];
+                        $index = 1;
                     }
                 } else {
-                    $target         = array();
-                    $index          = 0;
+                    $target = [];
+                    $index = 0;
                 }
-            } else if (isset($target[$index]) && !is_array($target[$index])) {
-                $target[$index] = array($target[$index]);
+            } elseif (isset($target[$index]) && !is_array($target[$index])) {
+                $target[$index] = [$target[$index]];
             }
 
-            $target         = &$target[$index];
+            $target = &$target[$index];
         }
 
         if (is_array($target)) {
-            $target[]   = $paramValue;
+            $target[] = $paramValue;
         } else {
-            $target     = $paramValue;
+            $target = $paramValue;
         }
     }
 
@@ -114,10 +119,11 @@ function http_parse_query($queryString, $argSeparator = '&', $decType = PHP_QUER
 }
 
 /**
- * Get Server Variable
+ * Get Server Variable.
  *
  * @param string $name
  * @param string $default
+ *
  * @return string
  */
 function env($name, $default = null)
@@ -130,31 +136,33 @@ function env($name, $default = null)
  *
  * Test to see if a request was made from the command line.
  *
- * @return 	bool
+ * @return bool
  */
 function is_cli()
 {
-    return (PHP_SAPI === 'cli' or defined('STDIN'));
+    return PHP_SAPI === 'cli' or defined('STDIN');
 }
 
 /**
- * Print output end exit
+ * Print output end exit.
+ *
  * @param mixed $data
- * @param int $responseCode
+ * @param int   $responseCode
  */
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? die(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? exit(PHP_EOL.$data.PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
-    return is_cli() ? die(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array)$data, $responseCode)->send(false);
+
+    return is_cli() ? exit(PHP_EOL.var_export($data, true).PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
 }
 
-
-########## APPLICATION HELPERS ############
+//######### APPLICATION HELPERS ############
 
 /**
- * Get current app instance
+ * Get current app instance.
+ *
  * @return \Armie\App
  */
 function app(): \Armie\App
@@ -163,11 +171,11 @@ function app(): \Armie\App
 }
 
 /**
- * 
- * Get or Set custom config
+ * Get or Set custom config.
  *
  * @param string $name
- * @param mixed $value
+ * @param mixed  $value
+ *
  * @return mixed
  */
 function config($name, $value = null)
@@ -180,11 +188,12 @@ function config($name, $value = null)
 }
 
 /**
- * Load view file
+ * Load view file.
  *
  * @param string $path
- * @param array $params
- * @param boolean $return Print out view or return content
+ * @param array  $params
+ * @param bool   $return Print out view or return content
+ *
  * @return mixed
  */
 function view(string $path, $params = [], $return = false)
@@ -193,7 +202,8 @@ function view(string $path, $params = [], $return = false)
 }
 
 /**
- * Get app loader object
+ * Get app loader object.
+ *
  * @return \Armie\Interfaces\LoaderInterface
  */
 function &load()
@@ -202,7 +212,8 @@ function &load()
 }
 
 /**
- * Get app reporter object
+ * Get app reporter object.
+ *
  * @return \Armie\Interfaces\ReportingInterface
  */
 function &report()
@@ -211,7 +222,8 @@ function &report()
 }
 
 /**
- * Get app router object
+ * Get app router object.
+ *
  * @return \Armie\Interfaces\RouterInterface
  */
 function &router()
@@ -220,14 +232,15 @@ function &router()
 }
 
 /**
- * @param string $level @see \Psr\Log\LogLevel
- * @param mixed $message
- * @param array $context
+ * @param string $level   @see \Psr\Log\LogLevel
+ * @param mixed  $message
+ * @param array  $context
  */
 function log_message($level, $message, array $context = [])
 {
     $message = is_array($message) || is_object($message) ? var_export($message, true) : (string) $message;
-    $message = date("Y-m-d H:i:s.", time()) . substr(gettimeofday()["usec"] ?? '0000', 0, 4) . " - " . $message;
+    $message = date('Y-m-d H:i:s.', time()).substr(gettimeofday()['usec'] ?? '0000', 0, 4).' - '.$message;
+
     try {
         app()->logger->log($level, $message, $context);
     } catch (\Throwable) {
@@ -262,7 +275,7 @@ function log_exception($exception)
 {
     log_message(
         \Psr\Log\LogLevel::ERROR,
-        sprintf("%s (%s:%s)", $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
+        sprintf('%s (%s:%s)', $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
     );
 }
 
@@ -307,19 +320,20 @@ function log_notice(...$message)
 }
 
 /**
- * Run external command
+ * Run external command.
  *
  * @param string $command
- * @param array $params
- * @param int $timeout Default = 600 seconds
- * @param boolean $wait Default = true
+ * @param array  $params
+ * @param int    $timeout Default = 600 seconds
+ * @param bool   $wait    Default = true
+ *
  * @return \Symfony\Component\Process\Process
  */
 function run(string $command, array $params = [], $timeout = 600, $wait = true)
 {
     $process = new Process([
         $command,
-        ...array_filter($params, fn ($arg) => !empty($arg))
+        ...array_filter($params, fn ($arg) => !empty($arg)),
     ]);
     $process->setTimeout($timeout);
     if ($wait) {
@@ -339,15 +353,17 @@ function run(string $command, array $params = [], $timeout = 600, $wait = true)
             }
         });
     }
+
     return $process;
 }
 
 /**
- * Run external command asynchronously
+ * Run external command asynchronously.
  *
  * @param string $command
- * @param array $params
- * @param int $timeout Default = 600 seconds
+ * @param array  $params
+ * @param int    $timeout Default = 600 seconds
+ *
  * @return \Symfony\Component\Process\Process
  */
 function run_async(string $command, array $params = [], $timeout = 600)
@@ -355,14 +371,14 @@ function run_async(string $command, array $params = [], $timeout = 600)
     return run($command, $params, $timeout, false);
 }
 
-
-########### ARRAY HELPERS #################
+//########## ARRAY HELPERS #################
 
 /**
- * Check if any item in array validates to `true`
+ * Check if any item in array validates to `true`.
  *
  * @param array $list
- * @return boolean
+ *
+ * @return bool
  */
 function any(array $list): bool
 {
@@ -370,10 +386,11 @@ function any(array $list): bool
 }
 
 /**
- * Check if all items in array validates to `true`
+ * Check if all items in array validates to `true`.
  *
  * @param array $list
- * @return boolean
+ *
+ * @return bool
  */
 function all(array $list): bool
 {
@@ -381,70 +398,75 @@ function all(array $list): bool
 }
 
 /**
- * Find item in list by checking against predicate function
+ * Find item in list by checking against predicate function.
  *
- * @param callable $fn Predicate function. Return `true` if matched, else `false`
- * @param array $list List to check
+ * @param callable $fn   Predicate function. Return `true` if matched, else `false`
+ * @param array    $list List to check
+ *
  * @return mixed found item or `null` if failed
  */
 function find(callable $fn, array $list): mixed
 {
     foreach ($list as $item) {
-        if ($fn($item) != false)
+        if ($fn($item) != false) {
             return $item;
+        }
     }
+
     return null;
 }
 
 /**
- * Create 'Set-Cookie' header value
+ * Create 'Set-Cookie' header value.
  *
  * @param string $name
  * @param string $value
- * @param integer $expires
+ * @param int    $expires
  * @param string $path
  * @param string $domain
  * @param string $samesite
- * @param boolean $secure
- * @param boolean $httponly
+ * @param bool   $secure
+ * @param bool   $httponly
+ *
  * @return string
  */
 function create_cookie_header(
     string $name,
     string $value,
     int $expires = 0,
-    string $path = "",
-    string $domain = "",
-    string $samesite = "",
+    string $path = '',
+    string $domain = '',
+    string $samesite = '',
     bool $secure = false,
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    $date = date("D, d-M-Y H:i:s", $expires) . ' GMT';
+    $date = date('D, d-M-Y H:i:s', $expires).' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
-        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
+        $header .= "; Expires={$date}; Max-Age=".($expires - time());
     }
-    if ($path != "") {
-        $header .= "; Path=" . $path;
+    if ($path != '') {
+        $header .= '; Path='.$path;
     }
-    if ($domain != "") {
-        $header .= "; Domain=" . $domain;
+    if ($domain != '') {
+        $header .= '; Domain='.$domain;
     }
-    if ($samesite != "") {
-        $header .= "; SameSite=" . $samesite;
+    if ($samesite != '') {
+        $header .= '; SameSite='.$samesite;
     }
     if ($secure) {
-        $header .= "; Secure";
+        $header .= '; Secure';
     }
     if ($httponly) {
-        $header .= "; HttpOnly";
+        $header .= '; HttpOnly';
     }
+
     return $header;
 }
 
 /**
- * Find a free port on the system
+ * Find a free port on the system.
  *
  * @return int
  */
@@ -458,8 +480,9 @@ function find_free_port()
 }
 
 /**
- * This function returns the maximum files size that can be uploaded 
- * in PHP
+ * This function returns the maximum files size that can be uploaded
+ * in PHP.
+ *
  * @return int size in kilobytes
  **/
 function get_max_upload_size($default = 1024)
@@ -468,16 +491,17 @@ function get_max_upload_size($default = 1024)
 }
 
 /**
- * This function transforms the php.ini notation for numbers (like '2M') to an integer (2*1024*1024 in this case)
- * 
+ * This function transforms the php.ini notation for numbers (like '2M') to an integer (2*1024*1024 in this case).
+ *
  * @param string $sSize
- * @return integer The value in bytes
+ *
+ * @return int The value in bytes
  */
 function parse_php_size($sSize)
 {
     $sSuffix = strtoupper(substr($sSize, -1));
-    if (!in_array($sSuffix, array('P', 'T', 'G', 'M', 'K'))) {
-        return (int)$sSize;
+    if (!in_array($sSuffix, ['P', 'T', 'G', 'M', 'K'])) {
+        return (int) $sSize;
     }
     $iValue = substr($sSize, 0, -1);
     switch ($sSuffix) {
@@ -497,14 +521,17 @@ function parse_php_size($sSize)
             $iValue *= 1024;
             break;
     }
-    return (int)$iValue;
+
+    return (int) $iValue;
 }
 
 /**
- * Resolve Promise
- * 
+ * Resolve Promise.
+ *
  * @param Promise<T>|PromiseThen<T>|PromiseFinal $promise
+ *
  * @return T
+ *
  * @template T
  */
 function await(Promise|PromiseThen|PromiseFinal $promise): mixed
@@ -513,9 +540,9 @@ function await(Promise|PromiseThen|PromiseFinal $promise): mixed
 }
 
 /**
- * Run task asynchronously
- * 
- * @param Task|callable $task 
+ * Run task asynchronously.
+ *
+ * @param Task|callable $task
  */
 function async(Task|callable $task): void
 {
@@ -523,10 +550,10 @@ function async(Task|callable $task): void
 }
 
 /**
- * Run task list concurrently
- * 
+ * Run task list concurrently.
+ *
  * @param Task[]|callable[] $task
- * @param bool $wait
+ * @param bool              $wait
  */
 function concurrent(array $tasks, $wait = false): Generator
 {
@@ -534,9 +561,9 @@ function concurrent(array $tasks, $wait = false): Generator
 }
 
 /**
- * Listen to event
- * 
- * @param string $event
+ * Listen to event.
+ *
+ * @param string                          $event
  * @param callable|class-string<Runnable> $listner
  */
 function listen(string $event, callable|string $listner)
@@ -545,10 +572,10 @@ function listen(string $event, callable|string $listner)
 }
 
 /**
- * Dispatch event
- * 
+ * Dispatch event.
+ *
  * @param string $event
- * @param array $data
+ * @param array  $data
  */
 function dispatch(string $event, array $data = [])
 {
@@ -556,14 +583,14 @@ function dispatch(string $event, array $data = [])
 }
 
 /**
- * Queue task
- * 
+ * Queue task.
+ *
  * @param Task|callable $task
  */
 function enqueue(Task|callable $task)
 {
     if (!app()->queueHandler) {
-        throw new SystemError("Queue handler is not set. @see App::setQueueHandler");
+        throw new SystemError('Queue handler is not set. @see App::setQueueHandler');
     }
 
     $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
@@ -571,22 +598,23 @@ function enqueue(Task|callable $task)
 }
 
 /**
- * Wrap data to be serialized
+ * Wrap data to be serialized.
  *
  * @param mixed $data
+ *
  * @return mixed
  */
 function wrap_serializable($data)
 {
     if ($data instanceof Closure) {
         $data = new SerializableClosure($data);
-    } else if (is_callable($data)) {
+    } elseif (is_callable($data)) {
         $data = new SerializableClosure(Closure::fromCallable($data));
-    } else if (is_array($data)) {
+    } elseif (is_array($data)) {
         $data = array_map(function ($value) {
             return wrap_serializable($value);
         }, $data);
-    } else if (is_object($data)) {
+    } elseif (is_object($data)) {
         $reflection = new ReflectionObject($data);
         do {
             if ($reflection->isUserDefined()) {
@@ -606,24 +634,26 @@ function wrap_serializable($data)
             }
         } while ($reflection = $reflection->getParentClass());
     }
+
     return $data;
 }
 
 /**
- * Unwrap data that was unserialized
+ * Unwrap data that was unserialized.
  *
  * @param mixed $data
+ *
  * @return mixed
  */
 function unwrap_serializable($data)
 {
     if ($data instanceof SerializableClosure) {
         $data = $data->getClosure();
-    } else if (is_array($data)) {
+    } elseif (is_array($data)) {
         $data = array_map(function ($value) {
             return unwrap_serializable($value);
         }, $data);
-    } else if (is_object($data)) {
+    } elseif (is_object($data)) {
         $reflection = new ReflectionObject($data);
         do {
             if ($reflection->isUserDefined()) {
@@ -640,16 +670,20 @@ function unwrap_serializable($data)
                         }
                     }
                 }
-            } else break;
+            } else {
+                break;
+            }
         } while ($reflection = $reflection->getParentClass());
     }
+
     return $data;
 }
 
 /**
- * Serialize
+ * Serialize.
  *
  * @param mixed $data
+ *
  * @return string
  */
 function serialize($data)
@@ -658,10 +692,11 @@ function serialize($data)
 }
 
 /**
- * Unserialize
+ * Unserialize.
  *
- * @param string $data
+ * @param string     $data
  * @param array|null $options
+ *
  * @return mixed
  */
 function unserialize($data, array $options = [])
@@ -670,29 +705,33 @@ function unserialize($data, array $options = [])
 }
 
 /**
- * Read from stream
- * 
+ * Read from stream.
+ *
  * @param resource $resource
- * @param int $length
+ * @param int      $length
+ *
  * @return string
  */
 function stream_read(mixed $resource, int $length): string
 {
-    $response = "";
+    $response = '';
     while (!feof($resource)) {
         $response .= fread($resource, $length);
         $stream_meta_data = stream_get_meta_data($resource);
-        if (($stream_meta_data['unread_bytes'] ?? 0) <= 0) break;
+        if (($stream_meta_data['unread_bytes'] ?? 0) <= 0) {
+            break;
+        }
     }
+
     return $response;
 }
 
 /**
- * Write to stream
- * 
+ * Write to stream.
+ *
  * @param resource $resource
- * @param string $data
- * @param int $length
+ * @param string   $data
+ * @param int      $length
  */
 function stream_write(mixed $resource, string $data, int $length)
 {
@@ -706,7 +745,7 @@ function stream_write(mixed $resource, string $data, int $length)
 }
 
 /**
- * Get text for error level
+ * Get text for error level.
  */
 function error_level(int $level): string
 {
@@ -756,5 +795,6 @@ function error_level(int $level): string
         case E_USER_DEPRECATED: // 16384 //
             return 'E_USER_DEPRECATED';
     }
-    return "";
+
+    return '';
 }

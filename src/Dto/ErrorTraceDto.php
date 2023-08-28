@@ -1,9 +1,9 @@
 <?php
 
-namespace Armie\Dto; 
+namespace Armie\Dto;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -21,10 +21,10 @@ class ErrorTraceDto extends BaseDto
 
     /**
      * @param array $trace Instance of Error Trace
-     * - file
-     * - line
-     * - class
-     * - function
+     *                     - file
+     *                     - line
+     *                     - class
+     *                     - function
      */
     public function __construct($trace = [])
     {
@@ -35,9 +35,9 @@ class ErrorTraceDto extends BaseDto
     }
 
     /**
-     * Set the value of class
+     * Set the value of class.
      *
-     * @return  self
+     * @return self
      */
     public function setClass($class)
     {
@@ -47,9 +47,9 @@ class ErrorTraceDto extends BaseDto
     }
 
     /**
-     * Set the value of line
+     * Set the value of line.
      *
-     * @return  self
+     * @return self
      */
     public function setLine($line)
     {
@@ -59,9 +59,9 @@ class ErrorTraceDto extends BaseDto
     }
 
     /**
-     * Set the value of file
+     * Set the value of file.
      *
-     * @return  self
+     * @return self
      */
     public function setFile($file)
     {
@@ -71,9 +71,9 @@ class ErrorTraceDto extends BaseDto
     }
 
     /**
-     * Set the value of function
+     * Set the value of function.
      *
-     * @return  self
+     * @return self
      */
     public function setFunction($function)
     {

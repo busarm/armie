@@ -7,8 +7,7 @@ use Armie\Interfaces\SingletonInterface;
 use Armie\Traits\Singleton;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -18,9 +17,10 @@ abstract class BaseService implements ServiceHandlerInterface, SingletonInterfac
     use Singleton;
 
     /**
-     * Get service location for name
-     * 
+     * Get service location for name.
+     *
      * @param string $name
+     *
      * @return string|null
      */
     abstract protected function getLocation($name);

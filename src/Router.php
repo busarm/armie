@@ -8,16 +8,16 @@ use Armie\Errors\SystemError;
 use Armie\Exceptions\BadRequestException;
 use Armie\Helpers\Security;
 use Armie\Interfaces\Data\ResourceControllerInterface;
+use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\RouteInterface;
 use Armie\Interfaces\RouterInterface;
-use Armie\Interfaces\RequestInterface;
 use Armie\Middlewares\CallableRouteMiddleware;
 use Armie\Middlewares\ControllerRouteMiddleware;
 use Armie\Middlewares\ViewRouteMiddleware;
 
 /**
- * Application Router
- * 
+ * Application Router.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -25,94 +25,100 @@ use Armie\Middlewares\ViewRouteMiddleware;
  */
 class Router implements RouterInterface
 {
-    const PATH_EXCLUDE_LIST = ["$", "<", ">", "[", "]", "{", "}", "^", "\\", "|", "%"];
+    const PATH_EXCLUDE_LIST = ['$', '<', '>', '[', ']', '{', '}', '^', '\\', '|', '%'];
     const ESCAPE_LIST = [
-        "/" => "\/",
-        "." => "\."
+        '/' => "\/",
+        '.' => "\.",
     ];
     const MATCHER_REGX = [
-        "/\(" . RouteMatcher::ALPHA . "\)/" => "([a-zA-Z]+)",
-        "/\(" . RouteMatcher::ALPHA_NUM . "\)/" => "([a-zA-Z-_]+)",
-        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => "([a-zA-Z0-9-_]+)",
-        "/\(" . RouteMatcher::NUM . "\)/" => "([0-9]+)",
-        "/\(" . RouteMatcher::ANY . "\)/" => "(.+)"
+        "/\(".RouteMatcher::ALPHA."\)/"          => '([a-zA-Z]+)',
+        "/\(".RouteMatcher::ALPHA_NUM."\)/"      => '([a-zA-Z-_]+)',
+        "/\(".RouteMatcher::ALPHA_NUM_DASH."\)/" => '([a-zA-Z0-9-_]+)',
+        "/\(".RouteMatcher::NUM."\)/"            => '([0-9]+)',
+        "/\(".RouteMatcher::ANY."\)/"            => '(.+)',
     ];
 
     /**
-     * Use to match route path to an exact variable name. e.g $uid = /user/{uid}
+     * Use to match route path to an exact variable name. e.g $uid = /user/{uid}.
      */
     const PARAM_NAME_REGX = [
-        "/\{\w*\}/" => "([a-zA-Z0-9-_]+)"
+        "/\{\w*\}/" => '([a-zA-Z0-9-_]+)',
     ];
 
     /** @var RouteInterface[] HTTP routes */
     protected array $routes = [];
 
     /**
-     * [RESTRICTED]
+     * [RESTRICTED].
      */
     public function __serialize()
     {
-        throw new SystemError("Serializing router instance is forbidden");
+        throw new SystemError('Serializing router instance is forbidden');
     }
 
     /**
      * @param string $method
      * @param string $path
+     *
      * @return RouteInterface
      */
     public function createRoute(string $method, string $path): RouteInterface
     {
         $route = match (strtoupper($method)) {
-            HttpMethod::GET->value     =>  Route::get($path),
-            HttpMethod::POST->value    =>  Route::post($path),
-            HttpMethod::PUT->value     =>  Route::put($path),
-            HttpMethod::PATCH->value   =>  Route::patch($path),
-            HttpMethod::DELETE->value  =>  Route::delete($path),
-            HttpMethod::HEAD->value    =>  Route::head($path),
+            HttpMethod::GET->value     => Route::get($path),
+            HttpMethod::POST->value    => Route::post($path),
+            HttpMethod::PUT->value     => Route::put($path),
+            HttpMethod::PATCH->value   => Route::patch($path),
+            HttpMethod::DELETE->value  => Route::delete($path),
+            HttpMethod::HEAD->value    => Route::head($path),
         };
+
         return $this->routes[] = &$route;
     }
 
     /**
-     * Add single route
-     * 
-     * @param RouteInterface $route 
+     * Add single route.
+     *
+     * @param RouteInterface $route
+     *
      * @return RouterInterface
      */
     public function addRoute(RouteInterface $route): RouterInterface
     {
         $this->routes[] = $route;
+
         return $this;
     }
 
     /**
-     * Add list of routes
-     * 
+     * Add list of routes.
+     *
      * @param RouteInterface[] $routes
+     *
      * @return RouterInterface
      */
     public function addRoutes(array $routes): RouterInterface
     {
         $this->routes = array_merge($this->routes, $routes);
+
         return $this;
     }
 
     /**
-     * Add Resource (CREATE/READ/UPDATE/DELETE) routes for controller. 
-     * Controller must implement ResourceControllerInterface
-     * 
+     * Add Resource (CREATE/READ/UPDATE/DELETE) routes for controller.
+     * Controller must implement ResourceControllerInterface.
+     *
      * @see ResourceControllerInterface
-     * 
-     * @param string $path HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
+     *
+     * @param string                                    $path       HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
      * @param class-string<ResourceControllerInterface> $controller Application Controller class name e.g Home
+     *
      * @return RouterInterface
      */
     public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
-
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
@@ -137,39 +143,41 @@ class Router implements RouterInterface
     }
 
     /**
-     * 
-     * Process routing
+     * Process routing.
      *
      * @param RequestInterface|RouteInterface|null $request
+     *
      * @return \Armie\Interfaces\MiddlewareInterface[]
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array
     {
         // If custom routes
         if ($request instanceof RouteInterface) {
-
             // View
             if ($view = $request->getView()) {
                 $routeMiddleware = $request->getMiddlewares() ?? [];
                 $routeMiddleware[] = new ViewRouteMiddleware($view, $request->getParams());
+
                 return $routeMiddleware;
             }
             // Callable
-            else if ($callable = $request->getCallable()) {
+            elseif ($callable = $request->getCallable()) {
                 $routeMiddleware = $request->getMiddlewares() ?? [];
                 $routeMiddleware[] = new CallableRouteMiddleware($callable, $request->getParams());
+
                 return $routeMiddleware;
             }
             // Controller
             else {
                 $routeMiddleware = $request->getMiddlewares() ?? [];
                 $routeMiddleware[] = new ControllerRouteMiddleware($request->getController(), $request->getFunction(), $request->getParams());
+
                 return $routeMiddleware;
             }
         }
 
         // If http request
-        else if ($request instanceof RequestInterface) {
+        elseif ($request instanceof RequestInterface) {
             foreach ($this->routes as $route) {
                 // Find route
                 if (
@@ -183,18 +191,21 @@ class Router implements RouterInterface
                     if ($view = $route->getView()) {
                         $routeMiddleware = $route->getMiddlewares() ?? [];
                         $routeMiddleware[] = new ViewRouteMiddleware($view, $route->getParams());
+
                         return $routeMiddleware;
                     }
                     // Callable
                     if ($callable = $route->getCallable()) {
                         $routeMiddleware = $route->getMiddlewares() ?? [];
                         $routeMiddleware[] = new CallableRouteMiddleware($callable, $route->getParams());
+
                         return $routeMiddleware;
                     }
                     // Controller
                     else {
                         $routeMiddleware = $route->getMiddlewares() ?? [];
                         $routeMiddleware[] = new ControllerRouteMiddleware($route->getController(), $route->getFunction(), $route->getParams());
+
                         return $routeMiddleware;
                     }
                 }
@@ -205,12 +216,13 @@ class Router implements RouterInterface
     }
 
     /**
-     * Check if path matches
+     * Check if path matches.
      *
-     * @param string $path Request path
-     * @param string $route Route to compare to
-     * @param boolean $startsWith path starts with route
-     * @param boolean $startsWith path ends with route
+     * @param string $path       Request path
+     * @param string $route      Route to compare to
+     * @param bool   $startsWith path starts with route
+     * @param bool   $startsWith path ends with route
+     *
      * @return array|false Return list of path match or `false` if failed
      */
     public function isMatch($path, $route, $startsWith = true, $endsWith = true)
@@ -221,40 +233,49 @@ class Router implements RouterInterface
         // Decode url
         $path = urldecode($path);
         // Remove unwanted characters from path
-        $path = str_replace(self::PATH_EXCLUDE_LIST, "", $path, $excludeCount);
-        if ($excludeCount > 0) throw new BadRequestException(sprintf("The following charaters are not allowed in the url: %s", implode(',', array_values(self::PATH_EXCLUDE_LIST))));
+        $path = str_replace(self::PATH_EXCLUDE_LIST, '', $path, $excludeCount);
+        if ($excludeCount > 0) {
+            throw new BadRequestException(sprintf('The following charaters are not allowed in the url: %s', implode(',', array_values(self::PATH_EXCLUDE_LIST))));
+        }
         // Escape charaters to be a safe Regexp
         $route = str_replace(array_keys(self::ESCAPE_LIST), array_values(self::ESCAPE_LIST), $route);
-        // Replace matching keywords with regexp 
+        // Replace matching keywords with regexp
         $route = preg_replace(array_keys(self::MATCHER_REGX), array_values(self::MATCHER_REGX), $route);
-        // Replace matching parameters keywords with regexp 
+        // Replace matching parameters keywords with regexp
         $route = $this->createMatchParamsRoute($route, $paramMatches);
         // Search request path against route
         $result = preg_match($startsWith ? ($endsWith ? "/^$route$/i" : "/^$route/i") : ($endsWith ? "/$route$/i" : "/$route/i"), $path, $matches);
         if (!empty($path) && $result >= 1) {
             if (!empty($paramMatches)) {
                 $params = array_combine($paramMatches, array_splice($matches, 1));
-            } else $params = array_splice($matches, 1);
+            } else {
+                $params = array_splice($matches, 1);
+            }
+
             return !empty($params) ? Security::cleanParams($params) : [];
         }
+
         return false;
     }
 
     /**
-     * Create route to be used for params matching
+     * Create route to be used for params matching.
      *
      * @param string $route
-     * @param array $paramMatches
+     * @param array  $paramMatches
+     *
      * @return string New route for regexp matching
      */
     protected function createMatchParamsRoute($route, &$paramMatches = [])
     {
         $count = 0;
         $regxList = array_values(self::PARAM_NAME_REGX);
+
         return preg_replace_callback(array_keys(self::PARAM_NAME_REGX), function ($match) use ($count, &$paramMatches, $regxList) {
-            $paramMatches[] = str_replace(['{', '}'], ['', ''], ($match[0] ?? $match));
+            $paramMatches[] = str_replace(['{', '}'], ['', ''], $match[0] ?? $match);
             $replace = $regxList[$count] ?? '';
-            ++$count;
+            $count++;
+
             return $replace;
         }, $route, -1, $count);
     }

@@ -8,7 +8,7 @@ use Armie\Data\PDO\Relation;
 use Armie\Enums\DataType;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -16,9 +16,10 @@ use Armie\Enums\DataType;
 class OneToOne extends Relation
 {
     /**
-     * @param string $name Relation attribute name in Current Model
-     * @param Model $model Current Model 
+     * @param string    $name      Relation attribute name in Current Model
+     * @param Model     $model     Current Model
      * @param Reference $reference Relation Reference
+     *
      * @return void
      */
     public function __construct(
@@ -31,6 +32,7 @@ class OneToOne extends Relation
 
     /**
      * @inheritDoc
+     *
      * @return Model|null
      */
     public function get(): ?Model
@@ -51,6 +53,7 @@ class OneToOne extends Relation
                 $this->columns
             );
         }
+
         return null;
     }
 
@@ -59,7 +62,9 @@ class OneToOne extends Relation
      */
     public function load(array $items): array
     {
-        if (empty($items)) return [];
+        if (empty($items)) {
+            return [];
+        }
 
         $referenceConditions = [];
         $referenceParams = [];
@@ -70,7 +75,6 @@ class OneToOne extends Relation
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {
-
             // Get relation results for all items
             $results = $this->getReferenceModel()->clone()->setAutoLoadRelations(false)->setPerPage(count($items))->all(
                 array_merge($referenceConditions, $this->conditions),
@@ -94,6 +98,7 @@ class OneToOne extends Relation
 
             return $items;
         }
+
         return [];
     }
 
@@ -102,7 +107,9 @@ class OneToOne extends Relation
      */
     public function save(array $data): bool
     {
-        if (empty($data)) return false;
+        if (empty($data)) {
+            return false;
+        }
 
         // Is multiple values - select last, as 1:1 relation only supports single item
         if (array_is_list($data)) {
@@ -122,7 +129,6 @@ class OneToOne extends Relation
         // Save reference model
         $referenceModel->fastLoad($data);
         if ($referenceModel->save()) {
-
             $modelData = [];
 
             // Load current model keys

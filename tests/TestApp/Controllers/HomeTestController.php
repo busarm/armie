@@ -3,11 +3,9 @@
 namespace Armie\Test\TestApp\Controllers;
 
 use Armie\App;
-use Armie\Interfaces\RequestInterface;
-use Armie\Interfaces\ResponseInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -20,11 +18,11 @@ class HomeTestController
 
     public function ping()
     {
-        return 'success-' . $this->app->env->value;
+        return 'success-'.$this->app->env->value;
     }
 
     public function pingHtml()
     {
-        return 'success-' . $this->app->env->value;
+        return 'success-'.$this->app->env->value;
     }
 }

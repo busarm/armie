@@ -7,8 +7,8 @@ use Armie\Interfaces\ServiceDiscoveryInterface;
 use Armie\Interfaces\StorageBagInterface;
 
 /**
- * Load remote service registry from external source
- * 
+ * Load remote service registry from external source.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -22,27 +22,28 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
     protected readonly StorageBagInterface $services;
 
     /**
-     * Last registry request date
-     * 
-     * @var integer
+     * Last registry request date.
+     *
+     * @var int
      */
     private int $requestedAt = 0;
 
     /**
      * @param string $endpoint Service registry url endpoint
-     * - If url or file path, the file or response should be a JSON with the list of services. Format = `{"name" : "url", ...}`
-     * @param integer $ttl Service registry cache ttl (seconds). Reload list after ttl
+     *                         - If url or file path, the file or response should be a JSON with the list of services. Format = `{"name" : "url", ...}`
+     * @param int    $ttl      Service registry cache ttl (seconds). Reload list after ttl
      */
     public function __construct(protected string $endpoint, protected int $ttl = 300)
     {
-        $this->services = new Bag;
+        $this->services = new Bag();
         $this->load();
     }
 
     /**
-     * Get service client
+     * Get service client.
      *
      * @param string $name Service Name
+     *
      * @return RemoteClient
      */
     public function getServiceClient(string $name): RemoteClient|null
@@ -50,11 +51,13 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         if ($this->hasExpired()) {
             $this->load();
         }
-        return $this->get(($name));
+
+        return $this->get($name);
     }
 
     /**
-     * Get list of service client
+     * Get list of service client.
+     *
      * @return RemoteClient[]
      */
     public function getServiceClients(): array
@@ -62,24 +65,26 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
         if ($this->hasExpired()) {
             $this->load();
         }
+
         return $this->services->all();
     }
 
     /**
-     * Get `name=>location` map list of service clienta
-     * 
+     * Get `name=>location` map list of service clienta.
+     *
      * @return array<string,string>
      */
     public function getServiceClientsMap(): array
     {
         return array_reduce($this->getServiceClients(), function ($carry, RemoteClient $current) {
             $carry[$current->getName()] = $current->getLocation();
+
             return $carry;
         }, []);
     }
 
     /**
-     * Check if registry cache has expired
+     * Check if registry cache has expired.
      */
     private function hasExpired(): bool
     {
@@ -87,9 +92,10 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
     }
 
     /**
-     * Get service client
+     * Get service client.
      *
      * @param string $name Service Name
+     *
      * @return ?RemoteClient
      */
     private function get(string $name): ?RemoteClient
@@ -98,11 +104,11 @@ class RemoteServiceDiscovery implements ServiceDiscoveryInterface
     }
 
     /**
-     * Load service clients
+     * Load service clients.
      */
     private function load(): void
     {
-        if ((filter_var($this->endpoint, FILTER_VALIDATE_URL) || file_exists($this->endpoint))) {
+        if (filter_var($this->endpoint, FILTER_VALIDATE_URL) || file_exists($this->endpoint)) {
             $list = json_decode(file_get_contents($this->endpoint), true) ?? [];
             if (!empty($list)) {
                 foreach ($list as $name => $path) {

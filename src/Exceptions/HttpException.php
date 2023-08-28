@@ -3,15 +3,13 @@
 namespace Armie\Exceptions;
 
 use Armie\App;
-use Armie\Dto\ErrorTraceDto;
 use Armie\Dto\ResponseDto;
-use Armie\Enums\Env;
 use Armie\Interfaces\ResponseInterface;
 use Armie\Response;
 use Exception;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -22,8 +20,8 @@ class HttpException extends Exception
 
     /**
      * @param string $message
-     * @param integer $statusCode
-     * @param integer $errorCode
+     * @param int    $statusCode
+     * @param int    $errorCode
      */
     public function __construct($message, int $statusCode, int $errorCode = 0)
     {
@@ -37,14 +35,16 @@ class HttpException extends Exception
     }
 
     /**
-     * Error handler
-     * 
+     * Error handler.
+     *
      * @param App $app
+     *
      * @return ResponseInterface
      */
     public function handle(App $app): ResponseInterface
     {
         $this->getStatusCode() >= 500 && $app->errorHandler->handle($this);
-        return (new Response)->json(ResponseDto::fromError($this, $app->env, $app->config->version)->toArray(), $this->getStatusCode());
+
+        return (new Response())->json(ResponseDto::fromError($this, $app->env, $app->config->version)->toArray(), $this->getStatusCode());
     }
 }

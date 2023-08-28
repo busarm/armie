@@ -7,7 +7,7 @@ use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relations\OneToOne;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -38,7 +38,7 @@ class ProductTagTestModel extends Model
     }
 
     /**
-     * Model table name. e.g db table, collection name
+     * Model table name. e.g db table, collection name.
      *
      * @return string
      */
@@ -48,7 +48,7 @@ class ProductTagTestModel extends Model
     }
 
     /**
-     * Model key name. e.g table primary key, unique index
+     * Model key name. e.g table primary key, unique index.
      *
      * @return string|null
      */

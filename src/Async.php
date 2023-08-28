@@ -21,8 +21,8 @@ use function Armie\Helpers\stream_read;
 use function Armie\Helpers\stream_write;
 
 /**
- * Handle async operations
- * 
+ * Handle async operations.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -36,8 +36,8 @@ class Async
     const MAX_CHILD_PROCESSES = 10;
 
     /**
-     * Run task asynchronously
-     * 
+     * Run task asynchronously.
+     *
      * @param Task|callable $task Task instance or Callable function to run
      */
     public static function runTask(Task|callable $task): mixed
@@ -47,22 +47,24 @@ class Async
             return self::withWorker($task, false);
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress()) {
+        elseif (app()->async && app()->getHttpWorkerAddress()) {
             return self::withEventLoop($task);
         }
         // Use default
         else {
             // Try process forking
             $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+
             return self::withChildProcess($task) ?: $task->run();
         }
     }
 
     /**
-     * Run tasks asynchronously
-     * 
+     * Run tasks asynchronously.
+     *
      * @param Task[]|callable[]|Traversable<Task|callable> $tasks List of Task instance to run
-     * @param bool $wait Wait for result
+     * @param bool                                         $wait  Wait for result
+     *
      * @return Generator
      */
     public static function runTasks(Traversable|array $tasks, bool $wait = false): Generator
@@ -76,10 +78,11 @@ class Async
                 $fiber->resume();
                 yield $key => $fiber->getReturn();
             }
+
             return null;
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress() && !$wait) {
+        elseif (app()->async && app()->getHttpWorkerAddress() && !$wait) {
             $results = array_map(function (Task|callable $task) {
                 return self::withEventLoop($task);
             }, $tasks);
@@ -88,9 +91,10 @@ class Async
             }
         }
         // Use process forking
-        else if (!$wait) {
+        elseif (!$wait) {
             $results = array_map(function (Task|callable $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+
                 return self::withChildProcess($task) ?: $task->run();
             }, $tasks);
             foreach ($results as $key => $result) {
@@ -110,10 +114,11 @@ class Async
 
     /**
      * Run task using task worker with fibers.
-     * 
-     * @param Task|callable $task Task to run
-     * @param bool $wait Wait for response
-     * @param int $length Max stream length in bytes
+     *
+     * @param Task|callable $task   Task to run
+     * @param bool          $wait   Wait for response
+     * @param int           $length Max stream length in bytes
+     *
      * @return Fiber
      */
     public static function withFiberWorker(Task|callable $task, bool $wait = false, int $length = self::STREAM_BUFFER_LENGTH): Fiber
@@ -144,10 +149,12 @@ class Async
                 } else {
                     // Close socket
                     $socket && fclose($socket) && $socket = null;
+
                     return true;
                 }
             } catch (\Throwable $th) {
                 report()->exception($th);
+
                 return false;
             }
         });
@@ -159,11 +166,12 @@ class Async
     }
 
     /**
-     * Run task using task worker
-     * 
-     * @param Task|callable $task Task to run
-     * @param bool $wait Wait for response
-     * @param int $length Max stream length in bytes
+     * Run task using task worker.
+     *
+     * @param Task|callable $task   Task to run
+     * @param bool          $wait   Wait for response
+     * @param int           $length Max stream length in bytes
+     *
      * @return mixed `false` if failed or `true` if success with no response
      */
     public static function withWorker(Task|callable $task, bool $wait = true, int $length = self::STREAM_BUFFER_LENGTH): mixed
@@ -182,7 +190,7 @@ class Async
                     stream_write($socket, $body, $length);
                     // Receive the response.
                     $result = stream_read($socket, $length);
-                    // Return response. 
+                    // Return response.
                     return !empty($result) ? unserialize($result) : true;
                 } else {
                     return self::streamEventLoop($socket, false, function ($socket, $length, $body) {
@@ -193,28 +201,33 @@ class Async
                     }, [$socket, $length, $body]);
                 }
             }
+
             return false;
         } catch (\Throwable $th) {
             report()->exception($th);
+
             return false;
         }
     }
 
     /**
-     * Run task using independent child process
-     * 
-     * @param Runnable|callable $task Task to run
-     * @param ?callable $callback Event Loop Callback
+     * Run task using independent child process.
+     *
+     * @param Runnable|callable $task     Task to run
+     * @param ?callable         $callback Event Loop Callback
+     *
      * @return int|bool PID of child process or `false` if failed
      */
     public static function withChildProcess(Runnable|callable $task, ?callable $callback = null): int|bool
     {
         if (!extension_loaded('pcntl')) {
-            log_warning("Please install `pcntl` extension. " . __FILE__ . ':' . __LINE__);
+            log_warning('Please install `pcntl` extension. '.__FILE__.':'.__LINE__);
+
             return false;
         }
         if (!extension_loaded('posix')) {
-            log_warning("Please install `posix` extension. " . __FILE__ . ':' . __LINE__);
+            log_warning('Please install `posix` extension. '.__FILE__.':'.__LINE__);
+
             return false;
         }
 
@@ -230,35 +243,39 @@ class Async
             return false;
         }
         // Fork success
-        else if ($pid) {
+        elseif ($pid) {
             $children++;
             $status = null;
             if ($children >= self::MAX_CHILD_PROCESSES) {
                 pcntl_waitpid($pid, $status, WNOHANG);
             }
+
             return $pid;
         }
         // Child process
         else {
             // Make child process the session leader
             $sid = posix_setsid();
-            if ($sid < 0) die();
+            if ($sid < 0) {
+                exit;
+            }
             // Set timeout alarm for child
             pcntl_alarm(self::STREAM_READ_WRITE_TIMEOUT);
             // Execute task
-            $result =  $task->run();
+            $result = $task->run();
             $callback && call_user_func($callback, $result);
             // Exit child process if not waited
             $children = max($children - 1, 0);
-            die();
+            exit;
         }
     }
 
     /**
-     * Run task with event loop
-     * 
-     * @param Runnable|callable $task Task to run
-     * @param ?callable $callback Event Loop Callback
+     * Run task with event loop.
+     *
+     * @param Runnable|callable $task     Task to run
+     * @param ?callable         $callback Event Loop Callback
+     *
      * @return int|bool Timer Id of `fale` if failed
      */
     public static function withEventLoop(Runnable|callable $task, ?callable $callback = null): int|bool
@@ -278,12 +295,13 @@ class Async
     }
 
     /**
-     * Process stream with event loop
-     * 
-     * @param resource $fd Stream File Descriptor
-     * @param bool $readonly Read only stream. `false` if Read / Write
+     * Process stream with event loop.
+     *
+     * @param resource $fd       Stream File Descriptor
+     * @param bool     $readonly Read only stream. `false` if Read / Write
      * @param callable $callback Event Loop Callback
-     * @param array $params Event Loop Params
+     * @param array    $params   Event Loop Params
+     *
      * @return bool
      */
     public static function streamEventLoop(mixed $fd, bool $readonly, callable $callback, array $params = []): bool
@@ -292,7 +310,7 @@ class Async
 
         $flag = $readonly ? Event::EV_READ : Event::EV_WRITE;
 
-        return !!Worker::getEventLoop()->add($fd, $flag, function ($stream) use ($flag, $callback, $params) {
+        return (bool) Worker::getEventLoop()->add($fd, $flag, function ($stream) use ($flag, $callback, $params) {
             try {
                 Worker::getEventLoop()->del($stream, $flag);
                 call_user_func($callback, ...$params);
@@ -303,13 +321,15 @@ class Async
     }
 
     /**
-     * Connect to task worker
-     * 
-     * @param string $id Task request id
-     * @param bool $block Blocking or Non-Blocking connection
-     * @param bool $persist Peristent connection
-     * @return resource|false  Return connection or `false` if failed and $async = true
+     * Connect to task worker.
+     *
+     * @param string $id      Task request id
+     * @param bool   $block   Blocking or Non-Blocking connection
+     * @param bool   $persist Peristent connection
+     *
      * @throws SystemError If failed and $block = true
+     *
+     * @return resource|false Return connection or `false` if failed and $async = true
      */
     private static function connect(string $id, bool $block = false, bool $persist = false): mixed
     {
@@ -325,8 +345,11 @@ class Async
 
         if ($persist && $connection) {
             $socket = $connection;
-        } else if (!($socket = stream_socket_client($address, $errorCode, $errorMsg, self::STREAM_TIMEOUT, $flag))) {
-            if ($block) throw new SystemError(sprintf("Failed to connect to %s for %s: [%s] %s.", $address,  $id, $errorCode, $errorMsg));
+        } elseif (!($socket = stream_socket_client($address, $errorCode, $errorMsg, self::STREAM_TIMEOUT, $flag))) {
+            if ($block) {
+                throw new SystemError(sprintf('Failed to connect to %s for %s: [%s] %s.', $address, $id, $errorCode, $errorMsg));
+            }
+
             return false;
         }
 

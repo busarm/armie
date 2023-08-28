@@ -13,8 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 
 /**
- * 
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -24,14 +23,14 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     protected bool $registered = false;
 
     /**
-     * @param string $endpoint Service registry endpoint
-     * #### Endpoint must expose:
-     * - `GET /{name}`           - Get service client by name. Format: `{"name":"<name>", "url":"<url>"}`
-     * - `POST /`                - Register current service client. Accepts body with format: `{"name":"<name>", "url":"<url>"}`
-     * - `DELETE /{name}/{url}`  - Unregister current service client
-     * @param integer $timeout Service registry request timeout (seconds). Default: 10secs
-     * @param integer $ttl Service registry cache ttl (seconds). Re-load after ttl. Default: 300secs
-     * @param StorageBagInterface<ServiceRegistryDto> $store Service registry cache store. Default: Bag (memory store)
+     * @param string                                  $endpoint Service registry endpoint
+     *                                                          #### Endpoint must expose:
+     *                                                          - `GET /{name}`           - Get service client by name. Format: `{"name":"<name>", "url":"<url>"}`
+     *                                                          - `POST /`                - Register current service client. Accepts body with format: `{"name":"<name>", "url":"<url>"}`
+     *                                                          - `DELETE /{name}/{url}`  - Unregister current service client
+     * @param int                                     $timeout  Service registry request timeout (seconds). Default: 10secs
+     * @param int                                     $ttl      Service registry cache ttl (seconds). Re-load after ttl. Default: 300secs
+     * @param StorageBagInterface<ServiceRegistryDto> $store    Service registry cache store. Default: Bag (memory store)
      */
     public function __construct(protected string $endpoint, protected $timeout = 10, protected $ttl = 300, protected ?StorageBagInterface $store = null)
     {
@@ -45,23 +44,24 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     {
         $service = $this->store->get($name);
         if (!empty($service)) {
-            if (($service->expiresAt > time())) {
+            if ($service->expiresAt > time()) {
                 return new RemoteClient($service->name, $service->url);
             } else {
                 $http = new Client([
                     'timeout'  => $this->timeout,
                 ]);
-                $response  = $http->request(
+                $response = $http->request(
                     HttpMethod::GET->value,
-                    $this->endpoint . "/$name",
+                    $this->endpoint."/$name",
                     [
-                        RequestOptions::VERIFY => false
+                        RequestOptions::VERIFY => false,
                     ]
                 );
                 if ($response->getStatusCode() == 200 && !empty($result = json_decode($response->getBody(), true))) {
                     if (isset($result['name']) && isset($result['url'])) {
                         $service = new ServiceRegistryDto($result['name'], $result['url'], time() + $this->ttl);
                         $this->store->set($service->name, new ServiceRegistryDto($service->name, $service->url, time() + $this->ttl));
+
                         return new RemoteClient($service->name, $service->url);
                     }
                 }
@@ -84,10 +84,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
             $this->endpoint,
             [
                 RequestOptions::VERIFY => false,
-                RequestOptions::BODY => [
+                RequestOptions::BODY   => [
                     'name' => $client->getName(),
-                    'url' => $client->getLocation()
-                ]
+                    'url'  => $client->getLocation(),
+                ],
             ]
         );
         if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
@@ -105,9 +105,9 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
         ]);
         $response = $http->request(
             HttpMethod::DELETE->value,
-            $this->endpoint . "/" . $client->getName() . "/" . urlencode($client->getLocation()),
+            $this->endpoint.'/'.$client->getName().'/'.urlencode($client->getLocation()),
             [
-                RequestOptions::VERIFY => false
+                RequestOptions::VERIFY => false,
             ]
         );
         if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
@@ -116,9 +116,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     }
 
     /**
-     * Get service client
+     * Get service client.
      *
      * @param string $name Service Name
+     *
      * @return ?ServiceClientInterface
      */
     public function getServiceClient(string $name): ?ServiceClientInterface
@@ -127,7 +128,8 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     }
 
     /**
-     * Get list of service client
+     * Get list of service client.
+     *
      * @return ServiceClientInterface[]
      */
     public function getServiceClients(): array
@@ -141,14 +143,15 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
     }
 
     /**
-     * Get `name=>location` map list of service clienta
-     * 
+     * Get `name=>location` map list of service clienta.
+     *
      * @return array<string,string>
      */
     public function getServiceClientsMap(): array
     {
         return array_reduce($this->getServiceClients(), function ($carry, ServiceClientInterface $current) {
             $carry[$current->getName()] = $current->getLocation();
+
             return $carry;
         }, []);
     }

@@ -5,33 +5,31 @@ namespace Armie;
 use Armie\Dto\ResponseDto;
 use Armie\Enums\Env;
 use Armie\Enums\ResponseFormat;
-use InvalidArgumentException;
 use Armie\Interfaces\ResponseInterface;
+use InvalidArgumentException;
+use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Throwable;
-
-use Nyholm\Psr7\Stream;
 use Workerman\Protocols\Http\Response as HttpResponse;
 
 use function Armie\Helpers\app;
 
 /**
- * HTTP Response Provider
- * 
+ * HTTP Response Provider.
+ *
  * Armie Framework
  *
  * This class borrows heavily from the Symfony2 Framework and is part of the symfony package
- * @see Symfony\Component\HttpFoundation\Response (https://github.com/symfony/symfony)
  *
+ * @see Symfony\Component\HttpFoundation\Response (https://github.com/symfony/symfony)
  * @see Armie\Interface\ResponseInterface
- * 
+ *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class Response implements ResponseInterface
 {
     /**
-     * 
      * @var string
      */
     protected $version;
@@ -54,27 +52,27 @@ class Response implements ResponseInterface
     /**
      * @var \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      */
-    protected $body = NULL;
+    protected $body = null;
 
     /**
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * @var array
      */
-    protected $httpHeaders = array();
+    protected $httpHeaders = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $clearBuffer = false;
 
     /**
      * @var array
      */
-    public static $statusTexts = array(
+    public static $statusTexts = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',
@@ -117,27 +115,30 @@ class Response implements ResponseInterface
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
-    );
+    ];
 
     /**
      * @param \Psr\Http\Message\StreamInterface|\Stringable|resource|string|array|null $body
-     * @param int   $statusCode
-     * @param array $headers
-     * @param string $version
+     * @param int                                                                      $statusCode
+     * @param array                                                                    $headers
+     * @param string                                                                   $version
      */
-    public function __construct($body = null, $statusCode = 200, $headers = array(), $version = '1.1', $format = ResponseFormat::JSON)
+    public function __construct($body = null, $statusCode = 200, $headers = [], $version = '1.1', $format = ResponseFormat::JSON)
     {
         $this->version = $version;
         $this->setFormat($format);
         $this->setStatusCode($statusCode);
         $this->setHttpHeaders($headers);
-        if (is_array($body)) $this->setParameters($body);
-        else $this->setBody($body);
+        if (is_array($body)) {
+            $this->setParameters($body);
+        } else {
+            $this->setBody($body);
+        }
     }
 
     /**
-     * Create response object from PSR7 response
-     * 
+     * Create response object from PSR7 response.
+     *
      * @return self
      */
     public static function fromPsr(MessageResponseInterface $psr): self
@@ -151,7 +152,7 @@ class Response implements ResponseInterface
                 'application/json' => ResponseFormat::JSON,
                 'text/html', 'text/plain' => ResponseFormat::HTML,
                 'text/xml' => ResponseFormat::XML,
-                default => ResponseFormat::BIN
+                default    => ResponseFormat::BIN
             }
         );
     }
@@ -163,14 +164,14 @@ class Response implements ResponseInterface
      */
     public function __toString()
     {
-        $headers = array();
+        $headers = [];
         foreach ($this->httpHeaders as $name => $value) {
             $headers[$name] = (array) $value;
         }
 
         return
-            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText) . "\r\n" .
-            $this->getHttpHeadersAsString($headers) . "\r\n" .
+            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
+            $this->getHttpHeadersAsString($headers)."\r\n".
             strval($this->getResponseBody());
     }
 
@@ -188,7 +189,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     *
      * @return ResponseFormat
      */
     public function getFormat(): ResponseFormat
@@ -197,7 +197,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     *
      * @param ResponseFormat $format
      *
      * @return self
@@ -205,6 +204,7 @@ class Response implements ResponseInterface
     public function setFormat(ResponseFormat $format = ResponseFormat::JSON): self
     {
         $this->format = $format;
+
         return $this;
     }
 
@@ -217,9 +217,11 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param int $statusCode
+     * @param int    $statusCode
      * @param string $text
+     *
      * @throws InvalidArgumentException
+     *
      * @return self
      */
     public function setStatusCode($statusCode, $text = null): self
@@ -230,6 +232,7 @@ class Response implements ResponseInterface
         }
 
         $this->statusText = false === $text ? '' : (null === $text ? self::$statusTexts[$this->statusCode] : $text);
+
         return $this;
     }
 
@@ -243,11 +246,13 @@ class Response implements ResponseInterface
 
     /**
      * @param \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null $body
+     *
      * @return self
      */
     public function setBody(mixed $body): self
     {
         $this->body = $body;
+
         return $this;
     }
 
@@ -261,37 +266,45 @@ class Response implements ResponseInterface
 
     /**
      * @param array $parameters
+     *
      * @return self
      */
     public function addParameters(array $parameters): self
     {
         $this->parameters = array_merge($this->parameters, $parameters);
+
         return $this;
     }
 
     /**
      * @param array $parameters
+     *
      * @return self
      */
     public function setParameters(array $parameters): self
     {
         $this->parameters = $parameters;
+
         return $this;
     }
+
     /**
      * @param string $name
      * @param mixed  $value
+     *
      * @return self
      */
     public function setParameter($name, $value): self
     {
         $this->parameters[$name] = $value;
+
         return $this;
     }
 
     /**
      * @param string $name
      * @param mixed  $default
+     *
      * @return mixed
      */
     public function getParameter($name, $default = null): mixed
@@ -309,38 +322,45 @@ class Response implements ResponseInterface
 
     /**
      * @param array $httpHeaders
+     *
      * @return self
      */
     public function addHttpHeaders(array $httpHeaders): self
     {
         $this->httpHeaders = array_merge($this->httpHeaders, $httpHeaders);
+
         return $this;
     }
 
     /**
      * @param array $httpHeaders
+     *
      * @return self
      */
     public function setHttpHeaders(array $httpHeaders): self
     {
         $this->httpHeaders = $httpHeaders;
+
         return $this;
     }
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return self
      */
     public function setHttpHeader($name, $value): self
     {
         $this->httpHeaders[$name] = $value;
+
         return $this;
     }
 
     /**
      * @param string $name
      * @param mixed  $default
+     *
      * @return mixed
      */
     public function getHttpHeader($name, $default = null): mixed
@@ -357,12 +377,13 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set Redirect Headers
+     * Set Redirect Headers.
      *
-     * @param string $uri URL
+     * @param string    $uri     URL
      * @param int|false $refresh Refresh page timeout. False to disable refresh redirect
-     * 
+     *
      * @throws InvalidArgumentException If invalid url
+     *
      * @return self
      */
     public function redirect($uri, $refresh = false): self
@@ -377,12 +398,14 @@ class Response implements ResponseInterface
         } else {
             $this->setHttpHeader('Location', $uri);
         }
+
         return $this;
     }
 
     /**
-     * @return \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      * @throws InvalidArgumentException
+     *
+     * @return \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null
      */
     public function getResponseBody()
     {
@@ -391,6 +414,7 @@ class Response implements ResponseInterface
                 if (!empty($this->body)) {
                     return strval($this->body);
                 }
+
                 return json_encode($this->parameters);
             case ResponseFormat::XML:
                 if (!empty($this->body)) {
@@ -402,6 +426,7 @@ class Response implements ResponseInterface
                 foreach ($this->parameters as $key => $param) {
                     $xml->addChild($key, $param);
                 }
+
                 return $xml->asXML();
             default:
                 if (!empty($this->body)) {
@@ -414,6 +439,7 @@ class Response implements ResponseInterface
 
     /**
      * @param bool $continue
+     *
      * @return self
      */
     public function send($continue = false): self
@@ -439,7 +465,7 @@ class Response implements ResponseInterface
             // headers
             foreach ($this->getHttpHeaders() as $name => $header) {
                 if (is_array($header) || is_object($header)) {
-                    foreach ((array)$header as $value) {
+                    foreach ((array) $header as $value) {
                         header(sprintf('%s: %s', $name, $value));
                     }
                 } else {
@@ -451,9 +477,12 @@ class Response implements ResponseInterface
 
             // Clear buffer on the next response
             $this->clearBuffer = !$continue;
-            if (!$continue) die;
+            if (!$continue) {
+                exit;
+            }
         } catch (Throwable $e) {
             ob_end_clean();
+
             throw $e;
         }
 
@@ -476,15 +505,18 @@ class Response implements ResponseInterface
                 $this->setHttpHeader('Content-Type', 'text/html');
                 break;
             default:
-                if (!$this->getHttpHeader('Content-Type'))
+                if (!$this->getHttpHeader('Content-Type')) {
                     $this->setHttpHeader('Content-Type', 'application/octet-stream');
+                }
         }
+
         return $this;
     }
 
     /**
      * @param \Psr\Http\Message\StreamInterface|string|null $data
-     * @param int $code response code
+     * @param int                                           $code response code
+     *
      * @return self
      */
     public function raw($data, $code = 200): self
@@ -493,12 +525,14 @@ class Response implements ResponseInterface
         $this->setBody($data);
         $this->setStatusCode($code);
         $this->setFormat(ResponseFormat::BIN);
+
         return $this;
     }
 
     /**
      * @param array $data
-     * @param int $code response code
+     * @param int   $code response code
+     *
      * @return self
      */
     public function json($data, $code = 200): self
@@ -507,12 +541,14 @@ class Response implements ResponseInterface
         $this->setParameters($data);
         $this->setStatusCode($code);
         $this->setFormat(ResponseFormat::JSON);
+
         return $this;
     }
 
     /**
      * @param mixed $data
-     * @param int $code response code
+     * @param int   $code response code
+     *
      * @return self
      */
     public function xml($data, $code = 200): self
@@ -521,12 +557,14 @@ class Response implements ResponseInterface
         $this->setParameters($data);
         $this->setStatusCode($code);
         $this->setFormat(ResponseFormat::XML);
+
         return $this;
     }
 
     /**
      * @param \Psr\Http\Message\StreamInterface|string|null $data
-     * @param int $code response code
+     * @param int                                           $code response code
+     *
      * @return self
      */
     public function html($data, $code = 200): self
@@ -535,47 +573,62 @@ class Response implements ResponseInterface
         $this->setBody($data);
         $this->setStatusCode($code);
         $this->setFormat(ResponseFormat::HTML);
+
         return $this;
     }
 
     /**
      * @param \Psr\Http\Message\StreamInterface|string|null $data
-     * @param string $name
-     * @param bool $inline
-     * @param string $contentType
+     * @param string                                        $name
+     * @param bool                                          $inline
+     * @param string                                        $contentType
+     *
      * @return self
      */
     public function download($data, $name = null, $inline = false, $contentType = null): self
     {
         $this->setParameters([]);
         $this->setBody($data);
-        if ($name) $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"$name\"");
-        else $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"download-" . time() . "\"");
-        if ($contentType) $this->setHttpHeader('Content-Type', $contentType);
+        if ($name) {
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ')."filename=\"$name\"");
+        } else {
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ').'filename="download-'.time().'"');
+        }
+        if ($contentType) {
+            $this->setHttpHeader('Content-Type', $contentType);
+        }
         $this->setFormat(ResponseFormat::BIN);
+
         return $this;
     }
 
     /**
      * @param string $path
      * @param string $name
-     * @param bool $inline
+     * @param bool   $inline
      * @param string $contentType
+     *
      * @return self
      */
     public function downloadFile(string $path, $name = null, $inline = false, $contentType = null): self
     {
         $this->setParameters([]);
         $this->setBody(file_exists($path) ? fopen($path, 'rb') : null);
-        if ($name) $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"$name\"");
-        else $this->setHttpHeader('Content-Disposition', ($inline ? "inline; " : 'attachment; ') . "filename=\"download-" . time() . "\"");
-        if ($contentType) $this->setHttpHeader('Content-Type', $contentType);
+        if ($name) {
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ')."filename=\"$name\"");
+        } else {
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ').'filename="download-'.time().'"');
+        }
+        if ($contentType) {
+            $this->setHttpHeader('Content-Type', $contentType);
+        }
         $this->setFormat(ResponseFormat::BIN);
+
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      *
@@ -587,7 +640,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -597,7 +650,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -607,7 +660,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -617,7 +670,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -627,7 +680,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -637,9 +690,10 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Function from Symfony2 HttpFoundation - output pretty header
+     * Function from Symfony2 HttpFoundation - output pretty header.
      *
      * @param array $headers
+     *
      * @return string
      */
     private function getHttpHeadersAsString($headers)
@@ -653,7 +707,7 @@ class Response implements ResponseInterface
         ksort($headers);
         foreach ($headers as $name => $values) {
             foreach ($values as $value) {
-                $content .= sprintf("%-{$max}s %s\r\n", $this->beautifyHeaderName($name) . ':', $value);
+                $content .= sprintf("%-{$max}s %s\r\n", $this->beautifyHeaderName($name).':', $value);
             }
         }
 
@@ -661,30 +715,32 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Function from Symfony2 HttpFoundation - output pretty header
+     * Function from Symfony2 HttpFoundation - output pretty header.
      *
      * @param string $name
+     *
      * @return mixed
      */
     private function beautifyHeaderName($name)
     {
-        return preg_replace_callback('/\-(.)/', array($this, 'beautifyCallback'), ucfirst($name));
+        return preg_replace_callback('/\-(.)/', [$this, 'beautifyCallback'], ucfirst($name));
     }
 
     /**
-     * Function from Symfony2 HttpFoundation - output pretty header
+     * Function from Symfony2 HttpFoundation - output pretty header.
      *
      * @param array $match
+     *
      * @return string
      */
     private function beautifyCallback($match)
     {
-        return '-' . strtoupper($match[1]);
+        return '-'.strtoupper($match[1]);
     }
 
     /**
-     * Get PSR7 response
-     * 
+     * Get PSR7 response.
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function toPsr(): MessageResponseInterface
@@ -697,26 +753,26 @@ class Response implements ResponseInterface
             $this->version,
             $this->statusText
         );
+
         return $response;
     }
 
     /**
-     * Get Workerman response
-     * 
+     * Get Workerman response.
+     *
      * @return HttpResponse
      */
     public function toWorkerman(): HttpResponse
     {
         $this->prepare();
+
         return new HttpResponse($this->getStatusCode(), $this->getHttpHeaders(), $this->getBody());
     }
 
-
-    #### Helpers ####
-
+    //### Helpers ####
 
     /**
-     * Create Error Response
+     * Create Error Response.
      */
     public static function error(
         $status,
@@ -726,7 +782,6 @@ class Response implements ResponseInterface
         int|null $errorLine = null,
         array $errorTrace = []
     ): self {
-
         $response = new ResponseDto();
         $response->success = false;
         $response->message = $message;
@@ -741,6 +796,6 @@ class Response implements ResponseInterface
             $response->errorTrace = !empty($errorTrace) ? json_decode(json_encode($errorTrace), 1) : null;
         }
 
-        return (new self)->json($response->toArray(), ($status >= 299 && $status <= 599) ? $status : 500);
+        return (new self())->json($response->toArray(), ($status >= 299 && $status <= 599) ? $status : 500);
     }
 }

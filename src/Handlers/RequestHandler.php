@@ -2,14 +2,14 @@
 
 namespace Armie\Handlers;
 
-use Closure;
-use Armie\Interfaces\ResponseInterface;
 use Armie\Interfaces\RequestHandlerInterface;
 use Armie\Interfaces\RequestInterface;
+use Armie\Interfaces\ResponseInterface;
 use Armie\Interfaces\RouteInterface;
+use Closure;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)

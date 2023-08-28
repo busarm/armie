@@ -5,8 +5,8 @@ namespace Armie\Traits;
 use function Armie\Helpers\app;
 
 /**
- * Create / Retrieve Singletons
- *  
+ * Create / Retrieve Singletons.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -15,9 +15,10 @@ use function Armie\Helpers\app;
 trait Singleton
 {
     /**
-     * Create / Retrieve singleton instance 
+     * Create / Retrieve singleton instance.
      *
      * @param array $params
+     *
      * @return static
      */
     public static function make(array $params = []): static

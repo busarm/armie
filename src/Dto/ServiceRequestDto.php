@@ -5,7 +5,7 @@ namespace Armie\Dto;
 use Armie\Enums\ServiceType;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -23,11 +23,10 @@ class ServiceRequestDto extends BaseDto
     /** @var array<string,\Psr\Http\Message\StreamInterface|resource|string> Service files */
     public array $files = [];
 
-
     /**
-     * Set the value of route
+     * Set the value of route.
      *
-     * @return  self
+     * @return self
      */
     public function setRoute($route)
     {
@@ -37,10 +36,11 @@ class ServiceRequestDto extends BaseDto
     }
 
     /**
-     * Set the value of type
-     * 
+     * Set the value of type.
+     *
      * @param ServiceType $type
-     * @return  self
+     *
+     * @return self
      */
     public function setType(ServiceType $type)
     {
@@ -50,9 +50,9 @@ class ServiceRequestDto extends BaseDto
     }
 
     /**
-     * Set the value of params
+     * Set the value of params.
      *
-     * @return  self
+     * @return self
      */
     public function setParams($params)
     {
@@ -62,9 +62,9 @@ class ServiceRequestDto extends BaseDto
     }
 
     /**
-     * Set the value of headers
+     * Set the value of headers.
      *
-     * @return  self
+     * @return self
      */
     public function setHeaders(array $headers)
     {

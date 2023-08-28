@@ -12,8 +12,8 @@ use Armie\Traits\CustomConfig;
 use SessionHandlerInterface;
 
 /**
- * Application Configuration
- * 
+ * Application Configuration.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -23,22 +23,22 @@ class Config implements ConfigurationInterface
 {
     use CustomConfig;
 
-    /** 
-     * Custom config files
-     * 
-     * @var array 
+    /**
+     * Custom config files.
+     *
+     * @var array
      */
     public array $files = [];
 
     /**
-     * App name
+     * App name.
      *
      * @var string
      */
     public string $name = 'Armie';
 
     /**
-     * App version
+     * App version.
      *
      * @var string
      */
@@ -46,7 +46,7 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to temporary folder
-     * (Without trailing slash)
+     * (Without trailing slash).
      *
      * @var string
      */
@@ -54,7 +54,7 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to cache folder
-     * (Without trailing slash)
+     * (Without trailing slash).
      *
      * @var string
      */
@@ -62,7 +62,7 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to upload folder
-     * (Without trailing slash)
+     * (Without trailing slash).
      *
      * @var string
      */
@@ -70,7 +70,7 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to app folder - relative to system base path. e.g `/var/www/html/app`
-     * (Without leading or trailing slash)
+     * (Without leading or trailing slash).
      *
      * @var string
      */
@@ -78,7 +78,7 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to view folder - relative to system base path or app folder.
-     * (Without leading or trailing slash)
+     * (Without leading or trailing slash).
      *
      * @var string
      */
@@ -86,84 +86,79 @@ class Config implements ConfigurationInterface
 
     /**
      * Path to custom config folder - relative to system base path or app folder.
-     * (Without leading or trailing slash)
+     * (Without leading or trailing slash).
      *
      * @var string
      */
     public string $configPath = '';
 
     /**
-     * App secret key
+     * App secret key.
      *
      * @var string|null
      */
-    public string|null $secret = NULL;
-
+    public string|null $secret = null;
 
     // ------------- COOKIE -----------------//
 
-
     /**
-     * Cookie Prefix
+     * Cookie Prefix.
      *
      * @var string|null
      */
-    public string|null $cookiePrefix = NULL;
+    public string|null $cookiePrefix = null;
 
     /**
-     * Cookie Duration in seconds
+     * Cookie Duration in seconds.
      *
      * @var int
      */
     public int $cookieDuration = 3600;
 
     /**
-     * Cookie Path
+     * Cookie Path.
      *
      * @var string
      */
     public string $cookiePath = '/';
 
     /**
-     * Cookie Domain
+     * Cookie Domain.
      *
      * @var string
      */
     public string $cookieDomain = '';
 
     /**
-     * Cookie Secure: Use with secure HTTPS connections only
+     * Cookie Secure: Use with secure HTTPS connections only.
      *
      * @var bool
      */
     public bool $cookieSecure = false;
     /**
-     * Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     * Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script.
      *
      * @var bool
      */
-
     public bool $cookieHttpOnly = false;
     /**
-     * Cookie should be encyrpted
+     * Cookie should be encyrpted.
      *
      * @var bool
      */
     public bool $cookieEncrypt = true;
 
     /**
-     * Cookie Same Site Policy
-     * 
+     * Cookie Same Site Policy.
+     *
      * @var SameSite
      */
     public SameSite $cookieSameSite = SameSite::LAX;
 
-
     // ------------- SESSION -----------------//
 
-
     /**
-     * Session Enabled
+     * Session Enabled.
      *
      * @var bool
      */
@@ -171,105 +166,98 @@ class Config implements ConfigurationInterface
 
     /**
      * Session save path
-     * (Without trailing slash)
+     * (Without trailing slash).
      *
      * @var string
      */
     public string $sessionPath = '';
 
     /**
-     * Session Name
+     * Session Name.
      *
      * @var string
      */
     public string|null $sessionName = null;
 
-
     /**
-     * Session Lifetime (seconds). e.g 10 for 10 seconds
+     * Session Lifetime (seconds). e.g 10 for 10 seconds.
      *
      * @var int
      */
     public int|null $sessionLifetime = null;
 
     /**
-     * Session Handler
+     * Session Handler.
      *
      * @var SessionHandlerInterface
      */
     public SessionHandlerInterface|null $sessionHandler = null;
 
-
     // ------------- CACHE -----------------//
 
-
     /**
-     * Cache Limiter
+     * Cache Limiter.
      *
      * @var CacheLimiter
      */
     public CacheLimiter $cacheLimiter = CacheLimiter::NO_CACHE;
 
-
     // ------------- LOG -----------------//
 
-
     /**
-     * Log request info for every request
+     * Log request info for every request.
      *
-     * @var boolean
+     * @var bool
      */
     public bool $logRequest = false;
 
     /**
-     * Logger verbosity
-     * 
+     * Logger verbosity.
+     *
      * @var Verbose
      */
     public Verbose $loggerVerborsity = Verbose::DEBUG;
 
-
     // ------------- HTTP -----------------//
 
     /**
-     * HTTP Configurations
+     * HTTP Configurations.
      *
      * @var HttpConfig
      */
     public HttpConfig $http;
 
-
     // ------------- DATABASE -----------------//
 
     /**
-     * Database Configurations
+     * Database Configurations.
      *
      * @var PDOConfig
      */
     public PDOConfig $db;
 
     /**
-     * @param string $name App name
+     * @param string $name    App name
      * @param string $version App version
      */
     public function __construct(?string $name = null, ?string $version = null)
     {
-        $this->name = $name ?: $this->name . '_' . uniqid();
+        $this->name = $name ?: $this->name.'_'.uniqid();
         $this->version = $version ?: $this->version;
 
-        $prefix =  str_replace([' ', '-', '.'], ['_', '_', ''], strtolower($this->name . '-' . $this->version));
+        $prefix = str_replace([' ', '-', '.'], ['_', '_', ''], strtolower($this->name.'-'.$this->version));
 
-        $this->setTempPath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . $prefix);
-        $this->setCachePath($this->tempPath . '/cache');
-        $this->setSessionPath($this->tempPath . '/session');
-        $this->setUploadPath($this->tempPath . '/upload');
+        $this->setTempPath(sys_get_temp_dir().DIRECTORY_SEPARATOR.$prefix);
+        $this->setCachePath($this->tempPath.'/cache');
+        $this->setSessionPath($this->tempPath.'/session');
+        $this->setUploadPath($this->tempPath.'/upload');
 
-        $this->setHttp(new HttpConfig);
-        $this->setDb(new PDOConfig);
+        $this->setHttp(new HttpConfig());
+        $this->setDb(new PDOConfig());
     }
 
     /**
-     * Get cookie configs
+     * Get cookie configs.
      *
      * @return array
      */
@@ -277,68 +265,70 @@ class Config implements ConfigurationInterface
     {
         return [
             'cookie_lifetime' => $this->sessionLifetime ?: $this->cookieDuration,
-            'cookie_path' => $this->cookiePath,
-            'cookie_domain' => $this->cookieDomain,
-            'cookie_secure' => $this->cookieSecure,
+            'cookie_path'     => $this->cookiePath,
+            'cookie_domain'   => $this->cookieDomain,
+            'cookie_secure'   => $this->cookieSecure,
             'cookie_httponly' => $this->cookieHttpOnly,
             'cookie_samesite' => $this->cookieSameSite->value,
-            'cache_limiter' => $this->cacheLimiter->value,
-            'save_path' => $this->sessionPath,
-            'name' => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)) . '_sess'
+            'cache_limiter'   => $this->cacheLimiter->value,
+            'save_path'       => $this->sessionPath,
+            'name'            => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)).'_sess',
         ];
     }
 
     /**
-     * Get cookie configs
+     * Get cookie configs.
      *
      * @return array
      */
     public function getCookieConfigs(): array
     {
         return [
-            'expires' => time() + $this->cookieDuration,
-            'path' => $this->cookiePath,
-            'domain' => $this->cookieDomain,
-            'secure' => $this->cookieSecure,
+            'expires'  => time() + $this->cookieDuration,
+            'path'     => $this->cookiePath,
+            'domain'   => $this->cookieDomain,
+            'secure'   => $this->cookieSecure,
             'httponly' => $this->cookieHttpOnly,
             'samesite' => $this->cookieSameSite->value,
         ];
     }
 
-
     // --------------- Setters ------------------- //
 
-
     /**
-     * Add custom config file
-     * 
+     * Add custom config file.
+     *
      * @param string $config Config file name/path relative to Config Path @see self::setConfigPath
+     *
      * @return self
      */
     public function addFile(string $config)
     {
         $this->files[] = $config;
+
         return $this;
     }
 
     /**
-     * Add custom config files
-     * 
+     * Add custom config files.
+     *
      * @param array $configs List of config file name/path relative to Config Path @see self::setConfigPath
+     *
      * @return self
      */
-    public function addFiles($configs = array())
+    public function addFiles($configs = [])
     {
         $this->files = array_merge($this->files, $configs);
+
         return $this;
     }
 
     /**
-     * Set app name
+     * Set app name.
      *
-     * @param  string  $name  App name
+     * @param string $name App name
      *
-     * @return  self
+     * @return self
      */
     public function setName($name)
     {
@@ -348,11 +338,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set app version
+     * Set app version.
      *
-     * @param  string  $version  App version
+     * @param string $version App version
      *
-     * @return  self
+     * @return self
      */
     public function setVersion($version)
     {
@@ -362,11 +352,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set (Without trailing slash)
+     * Set (Without trailing slash).
      *
-     * @param  string  $tempPath  (Without trailing slash)
+     * @param string $tempPath (Without trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setTempPath(string $tempPath)
     {
@@ -379,11 +369,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set (Without trailing slash)
+     * Set (Without trailing slash).
      *
-     * @param  string  $cachePath  (Without trailing slash)
+     * @param string $cachePath (Without trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setCachePath(string $cachePath)
     {
@@ -396,11 +386,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set (Without trailing slash)
+     * Set (Without trailing slash).
      *
-     * @param  string  $sessionPath  (Without trailing slash)
+     * @param string $sessionPath (Without trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setSessionPath(string $sessionPath)
     {
@@ -413,11 +403,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set (Without trailing slash)
+     * Set (Without trailing slash).
      *
-     * @param  string  $uploadPath  (Without trailing slash)
+     * @param string $uploadPath (Without trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setUploadPath(string $uploadPath)
     {
@@ -430,11 +420,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set path to app folder - relative to system base path. e.g `/var/www/html/app`
+     * Set path to app folder - relative to system base path. e.g `/var/www/html/app`.
      *
-     * @param  string  $appPath  (Without leading or trailing slash)
+     * @param string $appPath (Without leading or trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setAppPath($appPath)
     {
@@ -444,11 +434,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set path to view folder - relative to system base path or app folder. e.g `/var/www/html/view` or `view` - ('/var/www/html/app/view')
+     * Set path to view folder - relative to system base path or app folder. e.g `/var/www/html/view` or `view` - ('/var/www/html/app/view').
      *
-     * @param  string  $viewPath  (Without leading or trailing slash)
+     * @param string $viewPath (Without leading or trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setViewPath($viewPath)
     {
@@ -458,11 +448,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set path to custom config files - relative to system base path or app folder. e.g `/var/www/html/config` or `config` ('/var/www/html/app/config')
+     * Set path to custom config files - relative to system base path or app folder. e.g `/var/www/html/config` or `config` ('/var/www/html/app/config').
      *
-     * @param  string  $configPath  (Without leading or trailing slash)
+     * @param string $configPath (Without leading or trailing slash)
      *
-     * @return  self
+     * @return self
      */
     public function setConfigPath($configPath)
     {
@@ -472,11 +462,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set secret key
+     * Set secret key.
      *
-     * @param  string  $secret
+     * @param string $secret
      *
-     * @return  self
+     * @return self
      */
     public function setSecret($secret)
     {
@@ -486,11 +476,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie prefix
+     * Set cookie prefix.
      *
-     * @param  string  $cookiePrefix
+     * @param string $cookiePrefix
      *
-     * @return  self
+     * @return self
      */
     public function setCookiePrefix($cookiePrefix)
     {
@@ -500,11 +490,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie duration
+     * Set cookie duration.
      *
-     * @param  int  $cookieDuration
+     * @param int $cookieDuration
      *
-     * @return  self
+     * @return self
      */
     public function setCookieDuration($cookieDuration)
     {
@@ -514,11 +504,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie path
+     * Set cookie path.
      *
-     * @param  string  $cookiePath
+     * @param string $cookiePath
      *
-     * @return  self
+     * @return self
      */
     public function setCookiePath($cookiePath)
     {
@@ -528,11 +518,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie domain
+     * Set cookie domain.
      *
-     * @param  string  $cookieDomain
+     * @param string $cookieDomain
      *
-     * @return  self
+     * @return self
      */
     public function setCookieDomain($cookieDomain)
     {
@@ -542,11 +532,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Cookie Secure: Use with secure HTTPS connections only
+     * Cookie Secure: Use with secure HTTPS connections only.
      *
-     * @param  bool  $cookieSecure  Cookie Secure: Use with secure HTTPS connections only
+     * @param bool $cookieSecure Cookie Secure: Use with secure HTTPS connections only
      *
-     * @return  self
+     * @return self
      */
     public function setCookieSecure(bool $cookieSecure)
     {
@@ -556,11 +546,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     * Set cookie Http Only: Use with HTTP requests only - can't be accessed via browser script.
      *
-     * @param  bool  $cookieHttpOnly  Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
+     * @param bool $cookieHttpOnly Cookie Http Only: Use with HTTP requests only - can't be accessed via browser script
      *
-     * @return  self
+     * @return self
      */
     public function setCookieHttpOnly(bool $cookieHttpOnly)
     {
@@ -570,11 +560,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie should be encyrpted
+     * Set cookie should be encyrpted.
      *
-     * @param  bool  $cookieEncrypt  Cookie should be encyrpted
+     * @param bool $cookieEncrypt Cookie should be encyrpted
      *
-     * @return  self
+     * @return self
      */
     public function setCookieEncrypt(bool $cookieEncrypt)
     {
@@ -584,11 +574,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cookie Same Site Policy
+     * Set cookie Same Site Policy.
      *
-     * @param  SameSite  $cookieSameSite  Cookie Same Site Policy
+     * @param SameSite $cookieSameSite Cookie Same Site Policy
      *
-     * @return  self
+     * @return self
      */
     public function setCookieSameSite(SameSite $cookieSameSite)
     {
@@ -598,11 +588,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set session Handler
+     * Set session Handler.
      *
-     * @param  SessionHandlerInterface  $sessionHandler  Session Handler
+     * @param SessionHandlerInterface $sessionHandler Session Handler
      *
-     * @return  self
+     * @return self
      */
     public function setSessionHandler(SessionHandlerInterface $sessionHandler)
     {
@@ -612,11 +602,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set session Name
+     * Set session Name.
      *
-     * @param  string  $sessionName  Session Name
+     * @param string $sessionName Session Name
      *
-     * @return  self
+     * @return self
      */
     public function setSessionName(string $sessionName)
     {
@@ -626,11 +616,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set cache Limiter
+     * Set cache Limiter.
      *
-     * @param  CacheLimiter  $cacheLimiter  Cache Limiter
+     * @param CacheLimiter $cacheLimiter Cache Limiter
      *
-     * @return  self
+     * @return self
      */
     public function setCacheLimiter(CacheLimiter $cacheLimiter)
     {
@@ -639,13 +629,12 @@ class Config implements ConfigurationInterface
         return $this;
     }
 
-
     /**
-     * Set log request info for every request
+     * Set log request info for every request.
      *
-     * @param  boolean  $logRequest  Log request info for every request
+     * @param bool $logRequest Log request info for every request
      *
-     * @return  self
+     * @return self
      */
     public function setLogRequest(bool $logRequest)
     {
@@ -653,12 +642,13 @@ class Config implements ConfigurationInterface
 
         return $this;
     }
+
     /**
-     * Set logger verbosity
+     * Set logger verbosity.
      *
-     * @param  Verbose  $loggerVerborsity  Logger verbosity
+     * @param Verbose $loggerVerborsity Logger verbosity
      *
-     * @return  self
+     * @return self
      */
     public function setLoggerVerborsity(Verbose $loggerVerborsity)
     {
@@ -668,11 +658,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set session lifetime (seconds). e.g 10 for 10 seconds
+     * Set session lifetime (seconds). e.g 10 for 10 seconds.
      *
-     * @param  int  $sessionLifetime  Session Lifetime (seconds). e.g 10 for 10 seconds
+     * @param int $sessionLifetime Session Lifetime (seconds). e.g 10 for 10 seconds
      *
-     * @return  self
+     * @return self
      */
     public function setSessionLifetime(int $sessionLifetime)
     {
@@ -682,11 +672,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set session enabled
+     * Set session enabled.
      *
-     * @param  bool  $sessionEnabled  Session Enabled
+     * @param bool $sessionEnabled Session Enabled
      *
-     * @return  self
+     * @return self
      */
     public function setSessionEnabled(bool $sessionEnabled)
     {
@@ -696,11 +686,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set hTTP Configurations
+     * Set hTTP Configurations.
      *
-     * @param  HttpConfig  $http  HTTP Configurations
+     * @param HttpConfig $http HTTP Configurations
      *
-     * @return  self
+     * @return self
      */
     public function setHttp(HttpConfig $http)
     {
@@ -710,11 +700,11 @@ class Config implements ConfigurationInterface
     }
 
     /**
-     * Set database Configurations
+     * Set database Configurations.
      *
-     * @param  PDOConfig  $db  Database Configurations
+     * @param PDOConfig $db Database Configurations
      *
-     * @return  self
+     * @return self
      */
     public function setDb(PDOConfig $db)
     {

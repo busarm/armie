@@ -7,8 +7,8 @@ use Armie\Interfaces\LoaderInterface;
 use Throwable;
 
 /**
- * File or Class Loader
- * 
+ * File or Class Loader.
+ *
  * Armie Framework
  *
  * @copyright busarm.com
@@ -21,69 +21,87 @@ class Loader implements LoaderInterface
     }
 
     /**
-     * Fetches print result instead of sending it to the output buffer
+     * Fetches print result instead of sending it to the output buffer.
      *
      * @param string $path
-     * @param array $data
+     * @param array  $data
+     *
      * @return string The rendered content
      */
     public static function load($path, $data = null)
     {
         try {
             ob_start();
-            if (is_array($data)) extract($data);
+            if (is_array($data)) {
+                extract($data);
+            }
             include $path;
             $contents = ob_get_contents();
             ob_end_clean();
+
             return $contents;
         } catch (Throwable $e) {
             ob_end_clean();
+
             throw $e;
         }
     }
 
     /**
-     * Load View File
-     * 
-     * @param $path
+     * Load View File.
+     *
+     * @param       $path
      * @param array $vars
-     * @param bool $return
-     * 
+     * @param bool  $return
+     *
      * @throws LoaderError
+     *
      * @return string
      */
-    public function view($path, $vars = array(), $return = false): ?string
+    public function view($path, $vars = [], $return = false): ?string
     {
-        if (empty($this->config->viewPath)) throw new LoaderError("`viewPath` config should not be empty");
+        if (empty($this->config->viewPath)) {
+            throw new LoaderError('`viewPath` config should not be empty');
+        }
 
         $path = (str_starts_with($this->config->viewPath, $this->config->appPath) ?
             $this->config->viewPath :
-            $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
+            $this->config->appPath.DIRECTORY_SEPARATOR.$this->config->viewPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
 
         if (file_exists($path)) {
             $content = self::load($path, $vars);
-            if ($return) return $content;
-            else echo $content;
+            if ($return) {
+                return $content;
+            } else {
+                echo $content;
+            }
         } else {
-            if (!$return) throw new LoaderError("View file '$path' not found");
+            if (!$return) {
+                throw new LoaderError("View file '$path' not found");
+            }
         }
+
         return null;
     }
 
     /**
-     * Load Config File
-     * 
+     * Load Config File.
+     *
      * @param $path
+     *
      * @throws LoaderError
+     *
      * @return mixed
      */
     public function config($path): mixed
     {
-        if (empty($this->config->configPath)) throw new LoaderError("`configPath` config should not be empty");
+        if (empty($this->config->configPath)) {
+            throw new LoaderError('`configPath` config should not be empty');
+        }
 
         $path = (str_starts_with($this->config->configPath, $this->config->appPath) ?
             $this->config->configPath :
-            $this->config->appPath . DIRECTORY_SEPARATOR . $this->config->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
+            $this->config->appPath.DIRECTORY_SEPARATOR.$this->config->configPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
         if (file_exists($path)) {
             return require_once $path;
         } else {
@@ -91,18 +109,22 @@ class Loader implements LoaderInterface
         }
     }
 
-    ################# STATICS ##################
+    //################ STATICS ##################
 
     /**
-     * Require file
+     * Require file.
      *
      * @param string $path
-     * @param array $data
+     * @param array  $data
+     *
      * @return mixed
      */
     public static function require($path, $data = null)
     {
-        if (is_array($data)) extract($data);
-        return require($path);
+        if (is_array($data)) {
+            extract($data);
+        }
+
+        return require $path;
     }
 }

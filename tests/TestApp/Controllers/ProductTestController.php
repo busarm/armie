@@ -11,7 +11,7 @@ use Armie\Test\TestApp\Tasks\UpdateProduct;
 use function Armie\Helpers\async;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)

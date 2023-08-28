@@ -14,7 +14,7 @@ use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\ResponseInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -39,6 +39,7 @@ abstract class ResourceController implements ResourceControllerInterface
             Security::cleanQueryParamValues($dto->query),
             Security::cleanParams($dto->columns)
         );
+
         return $data ? $this->response->json($data->toArray(), 200) : $this->response->setStatusCode(404);
     }
 
@@ -74,6 +75,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function create(BaseDto $dto): ResponseInterface
     {
         $data = $this->repository->create($dto->toArray(true, true));
+
         return $data ? $this->response->json($data->toArray(), 200) : $this->response->setStatusCode(400);
     }
 
@@ -83,6 +85,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function createBulk(CollectionBaseDto $dto): ResponseInterface
     {
         $done = $this->repository->createBulk($dto->toArray(true, true));
+
         return $done ? $this->response->json([], 200) : $this->response->setStatusCode(400);
     }
 
@@ -92,6 +95,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function update(int|string $id, BaseDto $dto): ResponseInterface
     {
         $done = $this->repository->updateById($id, $dto->toArray(true, true));
+
         return $done ? $this->response->json([], 200) : $this->response->setStatusCode(400);
     }
 
@@ -101,6 +105,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function updateBulk(CollectionBaseDto $dto): ResponseInterface
     {
         $done = $this->repository->updateBulk($dto->toArray(true, true));
+
         return $done ? $this->response->json([], 200) : $this->response->setStatusCode(400);
     }
 
@@ -110,6 +115,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function delete(int|string $id): ResponseInterface
     {
         $done = $this->repository->deleteById($id, (bool) $this->request->query()->get('force', false));
+
         return $done ? $this->response->json([], 200) : $this->response->setStatusCode(500);
     }
 
@@ -119,6 +125,7 @@ abstract class ResourceController implements ResourceControllerInterface
     public function deleteBulk(CollectionBaseDto $dto): ResponseInterface
     {
         $done = $this->repository->deleteBulk($dto->toArray(true, true), (bool) $this->request->query()->get('force', false));
+
         return $done ? $this->response->json([], 200) : $this->response->setStatusCode(500);
     }
 }

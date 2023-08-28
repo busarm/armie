@@ -9,20 +9,22 @@ use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\DataType;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @inheritDoc
  */
 class ManyToMany extends Relation
 {
     /**
-     * @param string $name Relation attribute name in Current Model
-     * @param Model $model Current Model 
+     * @param string    $name           Relation attribute name in Current Model
+     * @param Model     $model          Current Model
      * @param Reference $pivotReference Pivot Relation Reference
-     * @param Reference $itemReference Item Relation Reference
-     * @param bool $fullMode Defaut: `true`. Get or Load full relation data with pivot relation or only item relation
+     * @param Reference $itemReference  Item Relation Reference
+     * @param bool      $fullMode       Defaut: `true`. Get or Load full relation data with pivot relation or only item relation
+     *
      * @return void
      */
     public function __construct(
@@ -36,9 +38,9 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Set the value of fullMode
+     * Set the value of fullMode.
      *
-     * @return  self
+     * @return self
      */
     public function setFullMode(bool $fullMode)
     {
@@ -50,8 +52,8 @@ class ManyToMany extends Relation
     /**
      * Get item relation in pivot model to be loaded
      * * Only load relation if it's linked to item model (self::getItemModel)
-     * * Ensure that relation is a One to One relation to avoid infinite loops
-     * 
+     * * Ensure that relation is a One to One relation to avoid infinite loops.
+     *
      * @return string|null
      */
     private function getItemRelationName(): ?string
@@ -61,11 +63,13 @@ class ManyToMany extends Relation
                 return $relation->getName();
             }
         }
+
         return null;
     }
 
     /**
      * @inheritDoc
+     *
      * @return Model[]
      */
     public function get(array $conditions = []): array
@@ -88,7 +92,7 @@ class ManyToMany extends Relation
                             ->setParams($this->params)
                             ->setColumns($this->columns)
                             ->setLimit($this->limit);
-                    }
+                    },
                 ]) : [])
                 ->setAutoLoadRelations(false)
                 ->setPerPage($this->fullMode ? $this->limit : -1)
@@ -101,8 +105,10 @@ class ManyToMany extends Relation
             if (!$this->fullMode && $itemRelationName) {
                 return CollectionBaseDto::of($results)->pluck($itemRelationName);
             }
+
             return $results;
         }
+
         return [];
     }
 
@@ -111,7 +117,9 @@ class ManyToMany extends Relation
      */
     public function load(array $items): array
     {
-        if (empty($items)) return [];
+        if (empty($items)) {
+            return [];
+        }
 
         $referenceConditions = [];
         $referenceParams = [];
@@ -122,7 +130,6 @@ class ManyToMany extends Relation
         }
 
         if (count($referenceConditions) && count($referenceConditions)) {
-
             // Get relation results for all items
             $results = $this->getReferenceModel()
                 ->clone()
@@ -157,7 +164,7 @@ class ManyToMany extends Relation
                                 ->setParams($this->params)
                                 ->setColumns($this->columns)
                                 ->setLimit($this->limit);
-                        }
+                        },
                     ]) : [])->eagerLoadRelations($data);
 
                 // Get item relation if full mode not supported
@@ -171,6 +178,7 @@ class ManyToMany extends Relation
 
             return $items;
         }
+
         return [];
     }
 
@@ -179,7 +187,9 @@ class ManyToMany extends Relation
      */
     public function save(array $data): bool
     {
-        if (empty($data)) return false;
+        if (empty($data)) {
+            return false;
+        }
 
         // Is multiple values
         if (array_is_list($data)) {
@@ -187,9 +197,12 @@ class ManyToMany extends Relation
                 $done = true;
                 foreach ($data as $item) {
                     if (is_array($item)) {
-                        if (!$this->save($item)) $done = false;
+                        if (!$this->save($item)) {
+                            $done = false;
+                        }
                     }
                 }
+
                 return $done;
             });
         }
@@ -200,7 +213,6 @@ class ManyToMany extends Relation
         // Save related model
         $itemModel->fastLoad($data);
         if ($itemModel->save()) {
-
             $pivotData = [];
 
             $reFieldNames = $referenceModel->getFieldNames();
@@ -254,7 +266,8 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation related model
+     * Get relation related model.
+     *
      * @return Model
      */
     public function getItemModel(): Model
@@ -263,7 +276,8 @@ class ManyToMany extends Relation
     }
 
     /**
-     * Get relation related model references
+     * Get relation related model references.
+     *
      * @return array
      */
     public function getItemReferences(): array

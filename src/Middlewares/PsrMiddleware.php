@@ -13,7 +13,7 @@ use Armie\Response;
 use Psr\Http\Server\MiddlewareInterface as PsrMiddlewareInterface;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -25,10 +25,11 @@ final class PsrMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Middleware handler
+     * Middleware handler.
      *
      * @param RequestInterface|RouteInterface $request
-     * @param RequestHandlerInterface $handler
+     * @param RequestHandlerInterface         $handler
+     *
      * @return ResponseInterface
      */
     public function process(RequestInterface|RouteInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -36,6 +37,7 @@ final class PsrMiddleware implements MiddlewareInterface
         if ($request instanceof RequestInterface) {
             return Response::fromPsr($this->psr->process($request->toPsr(), new PsrServerRequestHandler($handler, $this->config)));
         }
+
         return $handler->handle($request);
     }
 }

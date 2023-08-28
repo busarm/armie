@@ -2,41 +2,40 @@
 
 namespace Armie\Dto;
 
+use Armie\Helpers\Security;
+use Armie\Interfaces\Arrayable;
+use Armie\Traits\TypeResolver;
 use ArrayObject;
 use InvalidArgumentException;
 use OutOfRangeException;
 use Stringable;
 use Traversable;
 
-use Armie\Interfaces\Arrayable;
-use Armie\Helpers\Security;
-use Armie\Traits\TypeResolver;
-
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ *
  * @see https://stackoverflow.com/a/54096881
- * 
+ *
  * @template T Item type template
  */
 class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
 {
     use TypeResolver;
 
-
     /**
-     * Constructor
+     * Constructor.
      *
      * Store the required array type prior to parental construction.
      *
-     * @param array<T>|Traversable<int,T> $input Any data to preset the array to.
-     * @param class-string<T>|null $itemClass Define the class that will be used for all items in the array.
-     * 
+     * @param array<T>|Traversable<int,T> $input     Any data to preset the array to.
+     * @param class-string<T>|null        $itemClass Define the class that will be used for all items in the array.
+     *
      * @throws InvalidArgumentException
      */
-    protected function __construct($input = [],  private $itemClass = null)
+    protected function __construct($input = [], private $itemClass = null)
     {
         // Create an empty array.
         parent::__construct();
@@ -46,10 +45,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Load data
+     * Load data.
      *
      * @param array<T>|Traversable<int,T> $input
-     * @param bool $sanitize
+     * @param bool                        $sanitize
+     *
      * @return self
      */
     public function load(array|Traversable $input, $sanitize = false): self
@@ -87,9 +87,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Inserting the provided element at the index. If index is negative, it will be calculated from the end of the Array Object
+     * Inserting the provided element at the index. If index is negative, it will be calculated from the end of the Array Object.
      *
-     * @param int $index
+     * @param int   $index
      * @param mixed $element
      */
     public function insert(int $index, $element)
@@ -108,9 +108,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @see array_splice()
      *
-     * @param int $offset
+     * @param int      $offset
      * @param int|null $length
-     * @param mixed $replacement
+     * @param mixed    $replacement
      *
      * @return self
      */
@@ -130,7 +130,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Adding a new value at the beginning of the collection
+     * Adding a new value at the beginning of the collection.
      *
      * @param mixed $value
      *
@@ -150,9 +150,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @see array_slice()
      *
-     * @param int $offset
+     * @param int      $offset
      * @param int|null $length
-     * @param bool $preserveKeys
+     * @param bool     $preserveKeys
      *
      * @return self
      */
@@ -180,11 +180,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Apply a user supplied function to every member of an array
+     * Apply a user supplied function to every member of an array.
      *
      * @see array_walk
      *
-     * @param callable $callback
+     * @param callable   $callback
      * @param mixed|null $userData
      *
      * @return bool Returns true on success, otherwise false
@@ -201,9 +201,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Chunks the object into ArrayObject containing
+     * Chunks the object into ArrayObject containing.
      *
-     * @param int $size
+     * @param int  $size
      * @param bool $preserveKeys
      *
      * @return ArrayObject
@@ -262,10 +262,10 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param int $index
      *
-     * @return T
-     *
      * @throws InvalidArgumentException
      * @throws OutOfRangeException
+     *
+     * @return T
      */
     public function at(int $index)
     {
@@ -275,7 +275,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Returns values in items of $key
+     * Returns values in items of $key.
      *
      * @param string $key
      *
@@ -283,11 +283,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      */
     public function pluck(string $key)
     {
-        return array_column((array)$this, $key);
+        return array_column((array) $this, $key);
     }
 
     /**
-     * Validates a number to be used as an index
+     * Validates a number to be used as an index.
      *
      * @param int $index The number to be validated as an index
      *
@@ -309,9 +309,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param int $index
      *
-     * @return bool
-     *
      * @throws InvalidArgumentException
+     *
+     * @return bool
      */
     public function indexExists(int $index)
     {
@@ -323,7 +323,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Finding the first element in the Array, for which $callback returns true
+     * Finding the first element in the Array, for which $callback returns true.
      *
      * @param callable $callback
      *
@@ -341,11 +341,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Filtering the array by retrieving only these elements for which callback returns true
+     * Filtering the array by retrieving only these elements for which callback returns true.
      *
      * @param callable $callback
-     * @param int $flag Use ARRAY_FILTER_USE_KEY to pass key as the only argument to $callback instead of value.
-     *                  Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback instead of value.
+     * @param int      $flag     Use ARRAY_FILTER_USE_KEY to pass key as the only argument to $callback instead of value.
+     *                           Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback instead of value.
      *
      * @return self
      *
@@ -362,9 +362,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Reset the array pointer to the first element and return the element.
      *
-     * @return T
-     *
      * @throws \OutOfBoundsException
+     *
+     * @return T
      */
     public function first()
     {
@@ -378,9 +378,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Reset the array pointer to the last element and return the element.
      *
-     * @return T
-     *
      * @throws \OutOfBoundsException
+     *
+     * @return T
      */
     public function last()
     {
@@ -392,7 +392,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Apply a user supplied function to every member of an array
+     * Apply a user supplied function to every member of an array.
      *
      * @see array_reverse
      *
@@ -406,8 +406,8 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Get list of keys
-     * 
+     * Get list of keys.
+     *
      * @return array
      */
     public function keys(): array
@@ -418,7 +418,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Use a user supplied callback to reduce the array to a single member and return it.
      *
-     * @param callable $callback
+     * @param callable   $callback
      * @param mixed|null $initial
      *
      * @return mixed
@@ -429,27 +429,28 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Convert dto to array
-     * 
-     * @param bool $trim - Remove NULL properties
+     * Convert dto to array.
+     *
+     * @param bool $trim     - Remove NULL properties
      * @param bool $sanitize - Perform security cleaning
+     *
      * @return array
      */
     public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
         foreach ($this as $key => $item) {
-            if ((!$trim || $item !== NULL)) {
+            if (!$trim || $item !== null) {
                 if ($item instanceof self) {
                     $result[$key] = $item->toArray($trim);
-                } else if ($item instanceof BaseDto) {
+                } elseif ($item instanceof BaseDto) {
                     $result[$key] = $item->toArray($trim);
-                } else if (is_array($item)) {
+                } elseif (is_array($item)) {
                     // Item class provided
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto
                         if (in_array(BaseDto::class, class_parents($this->itemClass) ?: [])) {
-                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : call_user_func(array($this->itemClass, 'with'), $item)->toArray($trim);
+                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : call_user_func([$this->itemClass, 'with'], $item)->toArray($trim);
                         }
                         // Item class is a custom class
                         else {
@@ -470,15 +471,18 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
                 }
             }
         }
+
         return $sanitize ? Security::cleanParams($result) : $result;
     }
 
     /**
-     * Load dto with array
+     * Load dto with array.
      *
      * @param array<TValue>|Traversable<int,TValue> $data
-     * @param class-string<TValue>|null $itemClass
+     * @param class-string<TValue>|null             $itemClass
+     *
      * @return self<TValue>
+     *
      * @template TValue Item type template
      */
     public static function of(array|Traversable $data, string $itemClass = null): self
@@ -487,7 +491,8 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     }
 
     /**
-     * Gets a string representation of the object
+     * Gets a string representation of the object.
+     *
      * @return string Returns the `string` representation of the object.
      */
     public function __toString()

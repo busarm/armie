@@ -10,7 +10,7 @@ use function Armie\Helpers\serialize;
 use function Armie\Helpers\unserialize;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -24,14 +24,14 @@ class TaskDto
 
     public function __construct()
     {
-        $this->name = Task::class . ":" . microtime(true) . ":" . bin2hex(random_bytes(8));
+        $this->name = Task::class.':'.microtime(true).':'.bin2hex(random_bytes(8));
         $this->async = true;
     }
 
     /**
-     * Set the value of name
+     * Set the value of name.
      *
-     * @return  self
+     * @return self
      */
     public function setName(string $name)
     {
@@ -41,9 +41,9 @@ class TaskDto
     }
 
     /**
-     * Set the value of async
+     * Set the value of async.
      *
-     * @return  self
+     * @return self
      */
     public function setAsync($async)
     {
@@ -53,9 +53,9 @@ class TaskDto
     }
 
     /**
-     * Set the value of class. Subclass of `Task`
+     * Set the value of class. Subclass of `Task`.
      *
-     * @return  self
+     * @return self
      */
     public function setClass(string|null $class)
     {
@@ -65,9 +65,9 @@ class TaskDto
     }
 
     /**
-     * Set the value of params
+     * Set the value of params.
      *
-     * @return  self
+     * @return self
      */
     public function setParams(array $params)
     {
@@ -77,16 +77,17 @@ class TaskDto
     }
 
     /**
-     * Gets a string representation of the object
+     * Gets a string representation of the object.
+     *
      * @return string Returns the `string` representation of the object.
      */
     public function __toString()
     {
-        return Crypto::encrypt(app()->config->secret, serialize($this),);
+        return Crypto::encrypt(app()->config->secret, serialize($this));
     }
 
     /**
-     * Parse request
+     * Parse request.
      */
     public static function parse(string $payload): ?self
     {
@@ -94,6 +95,7 @@ class TaskDto
         if ($dto && $dto instanceof self) {
             return $dto;
         }
+
         return null;
     }
 }

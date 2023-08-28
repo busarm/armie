@@ -123,12 +123,12 @@ class LocalService extends BaseService
         $server->set(VAR_PATH_INFO, '/' . $dto->route);
         $serverList = $server->all();
 
-        $cookieList = $request->server()->all();
+        $cookieList = $request->cookie()->all();
 
         $discovery = $this->discovery;
 
         // Call async
-        async(function () use ($path, $baseUrl, $dto, $discovery, $cookieList, $serverList) {
+        async(static function () use ($path, $baseUrl, $dto, $discovery, $cookieList, $serverList) {
 
             $uri = (new Uri(rtrim($baseUrl, '/') . '/' . ltrim($dto->route, '/')));
             $query = http_parse_query($uri->getQuery());
@@ -170,7 +170,7 @@ class LocalService extends BaseService
     protected function getLocation($name)
     {
         $client = $this->discovery?->getServiceClient($name);
-        if ($client) {
+        if ($client && $client instanceof LocalClient) {
             return $client->getLocation();
         }
         return null;

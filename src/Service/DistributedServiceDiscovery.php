@@ -25,10 +25,10 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
 
     /**
      * @param string $endpoint Service registry endpoint
-     * - Endpoint must expose:
-     * -- GET /{name}           - Get service client by name. Format = `{"name":"<name>", "url":"<url>"}`
-     * -- POST /                - Register current service client
-     * -- DELETE /{name}/{url}  - Unregister current service client
+     * #### Endpoint must expose:
+     * - `GET /{name}`           - Get service client by name. Format: `{"name":"<name>", "url":"<url>"}`
+     * - `POST /`                - Register current service client. Accepts body with format: `{"name":"<name>", "url":"<url>"}`
+     * - `DELETE /{name}/{url}`  - Unregister current service client
      * @param integer $timeout Service registry request timeout (seconds). Default: 10secs
      * @param integer $ttl Service registry cache ttl (seconds). Re-load after ttl. Default: 300secs
      * @param StorageBagInterface<ServiceRegistryDto> $store Service registry cache store. Default: Bag (memory store)
@@ -105,12 +105,9 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
         ]);
         $response = $http->request(
             HttpMethod::DELETE->value,
-            $this->endpoint . "/" . $client->getName(),
+            $this->endpoint . "/" . $client->getName() . "/" . urlencode($client->getLocation()),
             [
-                RequestOptions::VERIFY => false,
-                RequestOptions::QUERY => [
-                    'url' => $client->getLocation()
-                ]
+                RequestOptions::VERIFY => false
             ]
         );
         if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {

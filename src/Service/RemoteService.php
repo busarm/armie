@@ -111,7 +111,7 @@ class RemoteService extends BaseService
         $timeout = $this->timeout;
 
         // Call async
-        async(function () use ($url, $dto, $timeout) {
+        async(static function () use ($url, $dto, $timeout) {
 
             $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
             $query = http_parse_query($uri->getQuery());
@@ -157,7 +157,7 @@ class RemoteService extends BaseService
     protected function getLocation($name)
     {
         $client = $this->discovery?->getServiceClient($name);
-        if ($client) {
+        if ($client && $client instanceof RemoteClient) {
             return $client->getLocation();
         }
         return null;

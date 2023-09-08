@@ -5,6 +5,7 @@ namespace Armie\Bags;
 use Armie\Crypto;
 use Armie\Dto\CookieDto;
 use Armie\Interfaces\StorageBagInterface;
+use Generator;
 
 /**
  * Armie Framework.
@@ -51,7 +52,7 @@ final class StatelessCookie implements StorageBagInterface
      */
     public function key(string $name): string
     {
-        return str_starts_with($name, $this->prefix) ? $name : $this->prefix.'_'.$name;
+        return str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
     }
 
     /**
@@ -143,6 +144,19 @@ final class StatelessCookie implements StorageBagInterface
     public function updates(): array
     {
         return array_filter($this->data, fn ($v, $k) => !isset($this->original[$k]) || strval($this->original[$k]) != strval($v), ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function itterate(bool $delete = false): Generator
+    {
+        foreach ($this->data as $key => $item) {
+            if ($delete) $this->remove($key);
+            yield $key => $item;
+        }
+
+        return null;
     }
 
     /**

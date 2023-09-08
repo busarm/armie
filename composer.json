@@ -50,6 +50,7 @@
     "require": {
         "php": "^8.1",
         "psr/log": "^2.0",
+        "psr/cache": "^3.0",
         "psr/container": "^2.0",
         "psr/http-message": "^1.0",
         "psr/http-server-middleware": "^1.0",
@@ -57,7 +58,6 @@
         "symfony/process": "^6.0",
         "nyholm/psr7": "^1.5",
         "guzzlehttp/guzzle": "^7.5",
-        "psr/cache": "^3.0",
         "workerman/workerman": "^4.1",
         "laravel/serializable-closure": "^1.3"
     },
@@ -65,7 +65,8 @@
         "middlewares/firewall": "^2.0",
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan": "^1.8",
-        "fakerphp/faker": "^1.20"
+        "fakerphp/faker": "^1.20",
+        "styleci/cli": "^1.5"
     },
     "extra": {
         "hooks": {

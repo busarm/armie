@@ -2,11 +2,12 @@
 
 namespace Armie\Handlers;
 
-use Armie\App;
 use Armie\Dto\ResponseDto;
 use Armie\Interfaces\ErrorHandlerInterface;
 use Armie\Interfaces\ResponseInterface;
 use Armie\Response;
+
+use function Armie\Helpers\app;
 
 /**
  * Armie Framework.
@@ -16,10 +17,7 @@ use Armie\Response;
  */
 class ErrorHandler implements ErrorHandlerInterface
 {
-    /**
-     * @param App $app
-     */
-    public function __construct(private App $app)
+    public function __construct()
     {
     }
 
@@ -30,8 +28,8 @@ class ErrorHandler implements ErrorHandlerInterface
      */
     public function handle(\Throwable $throwable): ResponseInterface
     {
-        $this->app->reporter->exception($throwable);
+        app()->reporter->exception($throwable);
 
-        return (new Response())->json(ResponseDto::fromError($throwable, $this->app->env, $this->app->config->version)->toArray(), 500);
+        return (new Response())->json(ResponseDto::fromError($throwable, app()->env, app()->config->version)->toArray(), 500);
     }
 }

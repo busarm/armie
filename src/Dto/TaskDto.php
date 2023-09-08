@@ -2,10 +2,8 @@
 
 namespace Armie\Dto;
 
-use Armie\Crypto;
 use Armie\Tasks\Task;
 
-use function Armie\Helpers\app;
 use function Armie\Helpers\serialize;
 use function Armie\Helpers\unserialize;
 
@@ -24,7 +22,7 @@ class TaskDto
 
     public function __construct()
     {
-        $this->name = Task::class.':'.microtime(true).':'.bin2hex(random_bytes(8));
+        $this->name = Task::class . ':' . microtime(true) . ':' . bin2hex(random_bytes(8));
         $this->async = true;
     }
 
@@ -83,15 +81,18 @@ class TaskDto
      */
     public function __toString()
     {
-        return Crypto::encrypt(app()->config->secret, serialize($this));
+        return base64_encode(serialize($this));
     }
 
     /**
      * Parse request.
+     *
+     * @param string $payload
+     * @return ?self
      */
     public static function parse(string $payload): ?self
     {
-        $dto = unserialize(Crypto::decrypt(app()->config->secret, $payload));
+        $dto = unserialize(base64_decode($payload) ?: null);
         if ($dto && $dto instanceof self) {
             return $dto;
         }

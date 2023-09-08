@@ -2,14 +2,16 @@
 
 namespace Armie\Dto;
 
+use Armie\Data\DataObject;
 use Armie\Helpers\Security;
 use Armie\Interfaces\Arrayable;
 use Armie\Traits\TypeResolver;
 use ArrayObject;
+use Generator;
 use InvalidArgumentException;
+use JsonSerializable;
 use OutOfRangeException;
 use Stringable;
-use Traversable;
 
 /**
  * Armie Framework.
@@ -21,59 +23,63 @@ use Traversable;
  *
  * @template T Item type template
  */
-class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
+class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, JsonSerializable
 {
     use TypeResolver;
 
     /**
-     * Constructor.
-     *
-     * Store the required array type prior to parental construction.
-     *
-     * @param array<T>|Traversable<int,T> $input     Any data to preset the array to.
-     * @param class-string<T>|null        $itemClass Define the class that will be used for all items in the array.
+     * @param iterable<T>           $list
+     * @param ?class-string<T>      $itemClass Define the class that will be used for all items in the array.
      *
      * @throws InvalidArgumentException
      */
-    protected function __construct($input = [], private $itemClass = null)
+    final private function __construct(iterable $list = [], private ?string $itemClass = null)
     {
-        // Create an empty array.
-        parent::__construct();
-
-        // Load data
-        $this->load($input);
+        parent::__construct(iterator_to_array($this->validate($list)));
     }
 
     /**
      * Load data.
      *
-     * @param array<T>|Traversable<int,T> $input
-     * @param bool                        $sanitize
+     * @param iterable<T> $list
+     * @param bool        $sanitize
      *
-     * @return self
+     * @return static
      */
-    public function load(array|Traversable $input, $sanitize = false): self
+    public function load(iterable $list, $sanitize = false): static
     {
-        // Validate that the input is an array or an object with an Traversable interface.
-        if (!(is_array($input) || (is_object($input) && in_array(Traversable::class, class_implements($input))))) {
-            throw new InvalidArgumentException('$input must be an array or an object that implements \Traversable.');
-        }
-
-        // Append each item so to validate it's type.
-        foreach ($input as $key => $value) {
-            // Validate Item type if available
-            if (!empty($this->itemClass)) {
-                if (is_subclass_of($this->itemClass, BaseDto::class) && !($value instanceof BaseDto) && is_array($value)) {
-                    $value = $this->itemClass::with($value);
-                }
-                if (!($value instanceof ($this->itemClass))) {
-                    throw new InvalidArgumentException(sprintf('Items of $input must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
-                }
-            }
-            $this[$key] = $sanitize ? Security::clean($value) : $value;
-        }
+        $this->exchangeArray(iterator_to_array($this->validate($list, $sanitize)));
 
         return $this;
+    }
+
+    /**
+     * Validata data.
+     *
+     * @param iterable<T> $list
+     * @param bool        $sanitize
+     *
+     * @return Generator
+     */
+    protected function validate(iterable $list, $sanitize = false): Generator
+    {
+        foreach ($list as $value) {
+            if ($value !== null) {
+                // Validate Item type if available
+                if (!empty($this->itemClass)) {
+                    if (is_subclass_of($this->itemClass, BaseDto::class) && !($value instanceof BaseDto) && is_array($value)) {
+                        $value = $this->itemClass::with($value);
+                    }
+                    if (!($value instanceof ($this->itemClass))) {
+                        throw new InvalidArgumentException(sprintf('Items of $list must be an instance of "%s", "%s" given.', $this->itemClass, get_class($value) ?: gettype($value)));
+                    }
+                }
+            }
+
+            yield $sanitize && $value !== null ? Security::clean($value) : $value;
+        }
+
+        return null;
     }
 
     /**
@@ -112,7 +118,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      * @param int|null $length
      * @param mixed    $replacement
      *
-     * @return self
+     * @return static
      */
     public function splice(int $offset, int $length = null, $replacement = null)
     {
@@ -126,7 +132,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         }
         $this->exchangeArray($data);
 
-        return new self($result);
+        return new static($result);
     }
 
     /**
@@ -154,11 +160,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      * @param int|null $length
      * @param bool     $preserveKeys
      *
-     * @return self
+     * @return static
      */
     public function slice(int $offset, int $length = null, bool $preserveKeys = false)
     {
-        return new self(array_slice($this->getArrayCopy(), $offset, $length, $preserveKeys));
+        return new static(array_slice($this->getArrayCopy(), $offset, $length, $preserveKeys));
     }
 
     /**
@@ -184,7 +190,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @see array_walk
      *
-     * @param callable   $callback
+     * @param callable $callback
      * @param mixed|null $userData
      *
      * @return bool Returns true on success, otherwise false
@@ -234,14 +240,14 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * @param callable $mapper Will be called as $mapper(mixed $item)
      *
-     * @return self A collection of the results of $mapper(mixed $item)
+     * @return static A collection of the results of $mapper(mixed $item)
      */
     public function map(callable $mapper): ArrayObject
     {
         $data = $this->getArrayCopy();
         $result = array_map($mapper, $data);
 
-        return new self($result, $this->itemClass);
+        return new static($result, $this->itemClass);
     }
 
     /**
@@ -347,7 +353,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      * @param int      $flag     Use ARRAY_FILTER_USE_KEY to pass key as the only argument to $callback instead of value.
      *                           Use ARRAY_FILTER_USE_BOTH pass both value and key as arguments to $callback instead of value.
      *
-     * @return self
+     * @return static
      *
      * @see array_filter
      */
@@ -356,7 +362,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
         $data = $this->getArrayCopy();
         $result = array_filter($data, $callback, $flag);
 
-        return new self($result);
+        return new static($result);
     }
 
     /**
@@ -398,11 +404,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
      *
      * @param bool $preserveKeys
      *
-     * @return self
+     * @return static
      */
     public function reverse(bool $preserveKeys = false)
     {
-        return new self(array_reverse($this->getArrayCopy(), $preserveKeys));
+        return new static(array_reverse($this->getArrayCopy(), $preserveKeys));
     }
 
     /**
@@ -439,34 +445,36 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
-        foreach ($this as $key => $item) {
+        foreach ($this as $item) {
             if (!$trim || $item !== null) {
-                if ($item instanceof self) {
-                    $result[$key] = $item->toArray($trim);
-                } elseif ($item instanceof BaseDto) {
-                    $result[$key] = $item->toArray($trim);
-                } elseif (is_array($item)) {
+                if ($item instanceof static) {
+                    $result[] = $item->toArray($trim);
+                } else if ($item instanceof DataObject) {
+                    $result[] = $item->toArray($trim);
+                } else if ($item instanceof BaseDto) {
+                    $result[] = $item->toArray($trim);
+                } else if (is_array($item)) {
                     // Item class provided
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto
                         if (in_array(BaseDto::class, class_parents($this->itemClass) ?: [])) {
-                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : call_user_func([$this->itemClass, 'with'], $item)->toArray($trim);
+                            $result[] = array_is_list($item) ? (new static($item))->toArray($trim) : call_user_func([$this->itemClass, 'with'], $item)->toArray($trim);
                         }
                         // Item class is a custom class
                         else {
-                            $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
+                            $result[] = array_is_list($item) ? (new static($item))->toArray($trim) : $item;
                         }
                     }
                     // Item class not provided - load with custom data
                     else {
-                        $result[$key] = array_is_list($item) ? (new self($item))->toArray($trim) : $item;
+                        $result[] = array_is_list($item) ? (new static($item))->toArray($trim) : $item;
                     }
                 } else {
                     $value = $this->resolveType($this->findType($item), $item);
                     if ($value instanceof Stringable) {
-                        $result[$key] = strval($value);
+                        $result[] = strval($value);
                     } else {
-                        $result[$key] = $value;
+                        $result[] = $value;
                     }
                 }
             }
@@ -478,16 +486,12 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     /**
      * Load dto with array.
      *
-     * @param array<TValue>|Traversable<int,TValue> $data
-     * @param class-string<TValue>|null             $itemClass
-     *
-     * @return self<TValue>
-     *
-     * @template TValue Item type template
+     * @param iterable<T>      $data
+     * @param ?class-string<T> $itemClass
      */
-    public static function of(array|Traversable $data, string $itemClass = null): self
+    public static function of(iterable $data, ?string $itemClass = null): static
     {
-        return new self($data, $itemClass);
+        return new static($data, $itemClass);
     }
 
     /**
@@ -498,5 +502,16 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable
     public function __toString()
     {
         return json_encode($this->toArray(), true);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * Serializes the object to a value that can be serialized natively by json_encode().
+     *
+     * @return mixed Returns data which can be serialized by json_encode(), which is a value of any type other than a resource .
+     */
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 }

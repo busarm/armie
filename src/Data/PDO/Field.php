@@ -34,11 +34,11 @@ class Field implements FieldInterface
     /**
      * Get field type.
      *
-     * @return string*
+     * @return DataType
      */
-    public function getType(): string
+    public function getType(): DataType
     {
-        return $this->type->value;
+        return $this->type;
     }
 
     /**

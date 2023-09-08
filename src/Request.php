@@ -13,11 +13,11 @@ use Armie\Enums\HttpMethod;
 use Armie\Errors\SystemError;
 use Armie\Interfaces\RequestInterface;
 use Armie\Interfaces\Resolver\AuthResolver;
-use Armie\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Interfaces\Resolver\HttpConnectionResolver;
 use Armie\Interfaces\SessionStoreInterface;
 use Armie\Interfaces\StorageBagInterface;
 use Armie\Interfaces\UploadBagInterface;
-use Armie\Resolvers\ServerConnection;
+use Armie\Resolvers\HttpConnection;
 use Armie\Traits\Container;
 use LogicException;
 use Nyholm\Psr7\Uri;
@@ -70,7 +70,7 @@ class Request implements RequestInterface
     protected StorageBagInterface|null $_headers = null;
     protected UploadBagInterface|StorageBagInterface|null $_files = null;
     protected AuthResolver|null $_auth = null;
-    protected ServerConnectionResolver|null $_connection = null;
+    protected HttpConnectionResolver|null $_connection = null;
 
     /**
      * [RESTRICTED].
@@ -225,7 +225,7 @@ class Request implements RequestInterface
     public static function fromWorkerman(HttpRequest $http, Config|null $config = null): self
     {
         $request = new self();
-        $request->setConnection(new ServerConnection($http->connection));
+        $request->setConnection(new HttpConnection($http->connection));
         $request->initialize(
             new Query($http->get() ?? []),
             new Bag($http->post() ?? []),
@@ -730,9 +730,9 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return ServerConnectionResolver|null
+     * @return HttpConnectionResolver|null
      */
-    public function connection(): ServerConnectionResolver|null
+    public function connection(): HttpConnectionResolver|null
     {
         return $this->_connection;
     }
@@ -862,7 +862,7 @@ class Request implements RequestInterface
      *
      * @return self
      */
-    public function setConnection(ServerConnectionResolver $connection): self
+    public function setConnection(HttpConnectionResolver $connection): self
     {
         $this->_connection = $connection;
 

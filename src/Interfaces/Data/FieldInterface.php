@@ -2,6 +2,7 @@
 
 namespace Armie\Interfaces\Data;
 
+use Armie\Enums\DataType;
 use Stringable;
 
 /**
@@ -24,7 +25,7 @@ interface FieldInterface extends Stringable
     /**
      * Get field type.
      *
-     * @return string
+     * @return DataType
      */
-    public function getType(): string;
+    public function getType(): DataType;
 }

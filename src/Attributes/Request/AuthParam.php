@@ -25,7 +25,7 @@ class AuthParam implements ParameterAttributeInterface
 {
     use TypeResolver;
 
-    public function __construct(private string $name, private bool $sanitize = false)
+    public function __construct()
     {
     }
 

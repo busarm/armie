@@ -92,7 +92,7 @@ Run a single application
 
     $app->get('/product/{id}')->to(ProductController::class, 'get');
 
-    $app->run();
+    $app->run()->send();
 ```
 
 #### Multi Tenant Application
@@ -109,7 +109,7 @@ Host multiple applications or modules. Supports path and domain routing
         ->addRoutePath('v1', __DIR__ . '/myapp/public')
         // Use `mydevapp` for requests with domain name `dev.myapp.com`
         ->addDomainPath('dev.myapp.com', __DIR__ . '/mydevapp/public');
-    $server->run();
+    $server->run()->send();
 
 
     # ../myapp/public/index.php
@@ -179,7 +179,7 @@ Run command to start application
 # Windows
 php start.php
 
-# Linux (Recommended)
+# Unix (Linux or Mac) [Recommended]
 php start.php start
 ```
 
@@ -267,7 +267,7 @@ Add HTTP routes.
     $app->post('/user/{id}')->to(UserController::class, 'create');
     $app->put('/user/{id}')->to(UserController::class, 'update'),
     $app->delete('/user/{id}')->to(UserController::class, 'delete'),
-    $app->run();
+    $app->run()->send();
 ```
 
 ### Anonymous Route
@@ -278,7 +278,7 @@ Add HTTP routes.
     $app->get('/user/{id}')->call(function (RequestInterface $request, string $id) {
         // Perform action ...
     });
-    $app->run();
+    $app->run()->send();
 ```
 
 ### View Route
@@ -287,7 +287,7 @@ Add HTTP routes.
     ....
     $app = new App($config);
     $app->get('/user/{id}')->view(UserPage::class);
-    $app->run();
+    $app->run()->send();
 ```
 
 ### Custom Route Class
@@ -304,7 +304,7 @@ Add HTTP routes.
         MyRoute::put('/user/{id}')->to(UserController::class, 'update'),
         MyRoute::delete('/user/{id}')->to(UserController::class, 'delete'),
     ]);
-    $app->run();
+    $app->run()->send();
 ```
 
 ## Providers

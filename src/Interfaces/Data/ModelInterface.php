@@ -2,6 +2,8 @@
 
 namespace Armie\Interfaces\Data;
 
+use Generator;
+
 /**
  * Armie Framework.
  *
@@ -71,7 +73,8 @@ interface ModelInterface
     /**
      * Count total number of model items.
      *
-     * @param array $params Custom query params
+     * @param string|null $query  Custom query to count
+     * @param array $params       Custom query params
      *
      * @return int
      */
@@ -119,10 +122,11 @@ interface ModelInterface
      * @param array $params     Query Params. e.g SQL query params
      * @param array $columns    Select Colomn names.
      * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param int   $page       Query List Page.
      *
      * @return self[]
      */
-    public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array;
+    public function all($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array;
 
     /**
      * Get list of model. With trashed (deleted) models.
@@ -131,10 +135,24 @@ interface ModelInterface
      * @param array $params     Query Params. e.g SQL query params
      * @param array $columns    Select Colomn names.
      * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param int   $page       Query List Page.
      *
      * @return self[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array;
+    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array;
+
+    /**
+     * Itterate upon list of model. With trashed (deleted) models.
+     *
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
+     * @param array $params     Query Params. e.g SQL query params
+     * @param array $columns    Select Colomn names.
+     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param int   $page       Query List Page.
+     *
+     * @return Generator<int,static>
+     */
+    public function itterate($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): Generator;
 
     /**
      * Delete model.
@@ -161,4 +179,11 @@ interface ModelInterface
      * @return bool
      */
     public function save($trim = false, $relations = true): bool;
+
+    /**
+     * Clone model.
+     *
+     * @return static
+     */
+    public function clone();
 }

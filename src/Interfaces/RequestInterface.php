@@ -4,7 +4,7 @@ namespace Armie\Interfaces;
 
 use Armie\Enums\HttpMethod;
 use Armie\Interfaces\Resolver\AuthResolver;
-use Armie\Interfaces\Resolver\ServerConnectionResolver;
+use Armie\Interfaces\Resolver\HttpConnectionResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -16,7 +16,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @codeCoverageIgnore
  */
-interface RequestInterface extends ContainerInterface
+interface RequestInterface extends SingletonContainerInterface
 {
     /**
      * @return string
@@ -124,14 +124,14 @@ interface RequestInterface extends ContainerInterface
     public function header(): StorageBagInterface;
 
     /**
-     * @return AuthResolver|null
+     * @return ?AuthResolver
      */
-    public function auth(): AuthResolver|null;
+    public function auth(): ?AuthResolver;
 
     /**
-     * @return ServerConnectionResolver|null
+     * @return ?HttpConnectionResolver
      */
-    public function connection(): ServerConnectionResolver|null;
+    public function connection(): ?HttpConnectionResolver;
 
     /**
      * Set the value of session.
@@ -194,7 +194,7 @@ interface RequestInterface extends ContainerInterface
      *
      * @return self
      */
-    public function setConnection(ServerConnectionResolver $connection): self;
+    public function setConnection(HttpConnectionResolver $connection): self;
 
     /**
      * @param UriInterface $uri

@@ -15,6 +15,8 @@ use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionParameter;
 
+use function Armie\Helpers\app;
+
 /**
  * Dependency Injector.
  *
@@ -27,7 +29,7 @@ use ReflectionParameter;
  */
 class DI
 {
-    final public function __construct(protected App $app)
+    final public function __construct()
     {
     }
 
@@ -51,9 +53,9 @@ class DI
 
         // Resolve with custom resolver
         if (
-            !(($instance = $this->app->resolver->resolve($class->getName(), $request))
+            !(($instance = app()->resolver->resolve($class->getName(), $request))
                 || ($class->getParentClass()
-                    && ($instance = $this->app->resolver->resolve($class->getParentClass()->getName(), $request))))
+                    && ($instance = app()->resolver->resolve($class->getParentClass()->getName(), $request))))
             && $class->isInstantiable()
         ) {
             // Resolve constructor method if available
@@ -134,7 +136,7 @@ class DI
                 // Resolve with custom resolver
                 if (($type = $param->getType())
                     && ($name = strval($type))
-                    && is_null($instance = $this->app->resolver->resolve($name, $request))
+                    && is_null($instance = app()->resolver->resolve($name, $request))
                 ) {
                     // If type can be instantiated
                     if ($this->instatiatable($type)) {
@@ -143,20 +145,20 @@ class DI
                     }
                     // If type is an interface - Resolve with interface bindings
                     elseif (interface_exists($name)) {
-                        if ($className = $this->app->getBinding($name)) {
+                        if ($className = app()->getBinding($name)) {
                             // Instantiate class for name
                             $instance = $this->instantiate($className, $request);
                         }
                         ($param->isOptional() || $param->isDefaultValueAvailable()) or
-                            throw new DependencyError('No interface binding exists for '.$name);
+                            throw new DependencyError('No interface binding exists for ' . $name);
                     } else {
                         continue;
                     }
                 }
 
                 // Customize resolution
-                if (isset($instance) && $this->app->resolver) {
-                    $instance = $this->app->resolver->customize($instance, $request) ?: $instance;
+                if (isset($instance) && app()->resolver) {
+                    $instance = app()->resolver->customize($instance, $request) ?: $instance;
                 }
 
                 // Process attributes if available
@@ -198,7 +200,7 @@ class DI
         foreach ($class->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
             if ($instance instanceof ClassAttributeInterface) {
-                $instance->processClass($class, $this->app, $request);
+                $instance->processClass($class, app(), $request);
             }
         }
     }
@@ -217,7 +219,7 @@ class DI
         foreach ($method->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
             if ($instance instanceof MethodAttributeInterface) {
-                $result = $instance->processMethod($method, $this->app, $request);
+                $result = $instance->processMethod($method, app(), $request);
             }
         }
 
@@ -238,7 +240,7 @@ class DI
         foreach ($function->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
             if ($instance instanceof FunctionAttributeInterface) {
-                $result = $instance->processFunction($function, $this->app, $request);
+                $result = $instance->processFunction($function, app(), $request);
             }
         }
 
@@ -262,7 +264,7 @@ class DI
         foreach ($parameter->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
             if ($instance instanceof ParameterAttributeInterface) {
-                $result = $instance->processParameter($parameter, $value, $this->app, $request) ?? $result;
+                $result = $instance->processParameter($parameter, $value, app(), $request) ?? $result;
             }
         }
 

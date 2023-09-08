@@ -242,15 +242,15 @@ class Config implements ConfigurationInterface
      */
     public function __construct(?string $name = null, ?string $version = null)
     {
-        $this->name = $name ?: $this->name.'_'.uniqid();
+        $this->name = $name ?: $this->name . '_' . uniqid();
         $this->version = $version ?: $this->version;
 
-        $prefix = str_replace([' ', '-', '.'], ['_', '_', ''], strtolower($this->name.'-'.$this->version));
+        $prefix = str_replace([' ', '-', '.'], ['_', '_', ''], strtolower($this->name . '-' . $this->version));
 
-        $this->setTempPath(sys_get_temp_dir().DIRECTORY_SEPARATOR.$prefix);
-        $this->setCachePath($this->tempPath.'/cache');
-        $this->setSessionPath($this->tempPath.'/session');
-        $this->setUploadPath($this->tempPath.'/upload');
+        $this->setTempPath(sys_get_temp_dir() . DIRECTORY_SEPARATOR . $prefix);
+        $this->setCachePath($this->tempPath . DIRECTORY_SEPARATOR . 'cache');
+        $this->setSessionPath($this->tempPath . DIRECTORY_SEPARATOR . 'session');
+        $this->setUploadPath($this->tempPath . DIRECTORY_SEPARATOR . 'upload');
 
         $this->setHttp(new HttpConfig());
         $this->setDb(new PDOConfig());
@@ -272,7 +272,7 @@ class Config implements ConfigurationInterface
             'cookie_samesite' => $this->cookieSameSite->value,
             'cache_limiter'   => $this->cacheLimiter->value,
             'save_path'       => $this->sessionPath,
-            'name'            => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)).'_sess',
+            'name'            => $this->sessionName ?? str_replace(' ', '_', strtolower($this->name)) . '_sess',
         ];
     }
 

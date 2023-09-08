@@ -2,7 +2,7 @@
 
 namespace Armie\Interfaces\Resolver;
 
-use Workerman\Connection\ConnectionInterface;
+use Workerman\Connection\TcpConnection;
 
 /**
  * Armie Framework.
@@ -12,12 +12,12 @@ use Workerman\Connection\ConnectionInterface;
  *
  * @codeCoverageIgnore
  */
-interface ServerConnectionResolver
+interface HttpConnectionResolver
 {
     /**
      * Get server connection.
      *
-     * @return ?ConnectionInterface
+     * @return ?TcpConnection
      */
-    public function getConnection(): ?ConnectionInterface;
+    public function get(): ?TcpConnection;
 }

@@ -4,6 +4,7 @@ namespace Armie\Bags;
 
 use Armie\Helpers\Security;
 use Armie\Interfaces\StorageBagInterface;
+use Generator;
 
 /**
  * Memory (array) store.
@@ -116,7 +117,20 @@ class Bag implements StorageBagInterface
      */
     public function updates(): array
     {
-        return array_diff($this->attributes, $this->original);
+        return array_filter($this->attributes, fn ($k) => !isset($this->original[$k]) || $this->original[$k] != $this->attributes[$k], ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function itterate(bool $delete = false): Generator
+    {
+        foreach ($this->attributes as $key => $item) {
+            if ($delete) $this->remove($key);
+            yield $key => $item;
+        }
+
+        return null;
     }
 
     /**

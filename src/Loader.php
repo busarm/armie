@@ -6,6 +6,8 @@ use Armie\Errors\LoaderError;
 use Armie\Interfaces\LoaderInterface;
 use Throwable;
 
+use function Armie\Helpers\app;
+
 /**
  * File or Class Loader.
  *
@@ -16,7 +18,7 @@ use Throwable;
  */
 class Loader implements LoaderInterface
 {
-    public function __construct(protected Config $config)
+    public function __construct()
     {
     }
 
@@ -60,13 +62,13 @@ class Loader implements LoaderInterface
      */
     public function view($path, $vars = [], $return = false): ?string
     {
-        if (empty($this->config->viewPath)) {
+        if (empty(app()->config->viewPath)) {
             throw new LoaderError('`viewPath` config should not be empty');
         }
 
-        $path = (str_starts_with($this->config->viewPath, $this->config->appPath) ?
-            $this->config->viewPath :
-            $this->config->appPath.DIRECTORY_SEPARATOR.$this->config->viewPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
+        $path = (str_starts_with(app()->config->viewPath, app()->config->appPath) ?
+            app()->config->viewPath :
+            app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
 
         if (file_exists($path)) {
             $content = self::load($path, $vars);
@@ -95,13 +97,13 @@ class Loader implements LoaderInterface
      */
     public function config($path): mixed
     {
-        if (empty($this->config->configPath)) {
+        if (empty(app()->config->configPath)) {
             throw new LoaderError('`configPath` config should not be empty');
         }
 
-        $path = (str_starts_with($this->config->configPath, $this->config->appPath) ?
-            $this->config->configPath :
-            $this->config->appPath.DIRECTORY_SEPARATOR.$this->config->configPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
+        $path = (str_starts_with(app()->config->configPath, app()->config->appPath) ?
+            app()->config->configPath :
+            app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             return require_once $path;
         } else {

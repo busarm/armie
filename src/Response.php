@@ -9,6 +9,8 @@ use Armie\Interfaces\ResponseInterface;
 use InvalidArgumentException;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Stringable;
 use Throwable;
 use Workerman\Protocols\Http\Response as HttpResponse;
 
@@ -245,7 +247,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param \Psr\Http\Message\StreamInterface|\Stringable|resource|string|null $body
+     * @param StreamInterface|Stringable|resource|string|null $body
      *
      * @return self
      */

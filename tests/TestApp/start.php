@@ -36,9 +36,9 @@ use function Armie\Helpers\env;
 use function Armie\Helpers\listen;
 use function Armie\Helpers\log_debug;
 
-require __DIR__.'/../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-$config = (new Config())
+$config = (new Config('TestApp', '1'))
     ->setAppPath(__DIR__)
     ->setViewPath('Views')
     ->setSecret('ds3d5Posdf@nZods!mfo')
@@ -66,12 +66,12 @@ $config = (new Config())
 
 $app = new App($config, Env::parse(env('ENV')));
 $app->addBinding(ProviderInterface::class, ServiceRegistryProvider::class);
-$app->addProvider(new ServiceRegistryProvider(new FileStore($config->tempPath.'/store')));
+$app->addProvider(new ServiceRegistryProvider(new FileStore($config->tempPath . '/store')));
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-'.$app->env->value;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test/view-old/{name}')->call(function (RequestInterface $req, string $name) {
@@ -114,23 +114,23 @@ $app->get('test/queue')->call(function () {
 $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
     $count = ConnectionInterface::$statistics['total_request'];
     $promise = (new Promise(function () use ($count) {
-        log_debug('Processing promise db - count: '.$count);
+        log_debug('Processing promise db - count: ' . $count);
 
         return ProductTestModel::update(2, [
             'name' => md5(uniqid()),
         ]);
     }));
     $promise->then(function (ProductTestModel $data) {
-        log_debug('1 - Result of promise db - '.$data?->get('name'));
+        log_debug('1 - Result of promise db - ' . $data?->get('name'));
         $data->set('name', 'hhahahahah');
 
         return $data;
     });
     $promise->then(function (ProductTestModel $data) {
-        log_debug('2 - Result of promise db - '.$data?->get('name'));
+        log_debug('2 - Result of promise db - ' . $data?->get('name'));
     });
     $waited = await($promise);
-    log_debug('Promise completed - '.$promise->done().' - '.$waited?->get('name'));
+    log_debug('Promise completed - ' . $promise->done() . ' - ' . $waited?->get('name'));
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -206,16 +206,16 @@ $app->get('test/async-class')->to(ProductTestController::class, 'task');
 $app->get('test/async-list')->call(function () {
     $res = concurrent([
         function () {
-            ProductTestModel::update(2, [
+            ProductTestModel::update(1, [
                 'name' => md5(uniqid()),
             ]);
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
-            log_debug('1 Non-wait async success');
+            $data = ProductTestModel::findById(1);
+            log_debug('1 Non-wait async success ');
 
-            return $data->at(0);
+            return $data;
         },
         function () {
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('2 Non-wait async success');
 
             return $data->at(1);
@@ -224,13 +224,13 @@ $app->get('test/async-list')->call(function () {
             ProductTestModel::update(2, [
                 'name' => md5(uniqid()),
             ]);
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('3 Non-wait async success');
 
             return $data->at(2);
         },
         function () {
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('4 Non-wait async success');
 
             return $data->at(3);
@@ -239,13 +239,13 @@ $app->get('test/async-list')->call(function () {
             ProductTestModel::update(2, [
                 'name' => md5(uniqid()),
             ]);
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('5 Non-wait async success');
 
             return $data->at(4);
         },
         function () {
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('6 Non-wait async success');
 
             return $data->at(5);
@@ -254,13 +254,13 @@ $app->get('test/async-list')->call(function () {
             ProductTestModel::update(2, [
                 'name' => md5(uniqid()),
             ]);
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('7 Non-wait async success');
 
             return $data->at(6);
         },
         function () {
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('8 Non-wait async success');
 
             return $data->at(7);
@@ -269,59 +269,62 @@ $app->get('test/async-list')->call(function () {
             ProductTestModel::update(2, [
                 'name' => md5(uniqid()),
             ]);
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('9 Non-wait async success');
 
             return $data->at(8);
         },
         function () {
-            $data = CollectionBaseDto::of(ProductTestModel::getAll(), ProductTestModel::class);
+            $data = CollectionBaseDto::of(ProductTestModel::itterateAll(), ProductTestModel::class);
             log_debug('10 Non-wait async success');
 
             return $data->at(9);
         },
-    ], false);
+    ], true);
     log_debug('Completed');
+    // foreach($res as $item) {
+    //     log_debug('Item completed', $item);
+    // }
 
     return $res;
 });
 $app->get('test/async')->call(function () {
-    print_r(PHP_EOL.'0 Test async started');
+    print_r(PHP_EOL . '0 Test async started');
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('1 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('1 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('2 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('2 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('3 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('3 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('5 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('5 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('6 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('6 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('7 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('7 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('8 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('8 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('9 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('9 Non-wait async success' . PHP_EOL);
     });
     async(function () {
-        CollectionBaseDto::of(ProductTestModel::getAll());
-        print_r('10 Non-wait async success'.PHP_EOL);
+        CollectionBaseDto::of(ProductTestModel::itterateAll());
+        print_r('10 Non-wait async success' . PHP_EOL);
     });
 });
 
@@ -336,7 +339,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
             RequestOptions::VERIFY => false,
         ]
     )->then(function () {
-        print_r('Test Http Success'.PHP_EOL);
+        print_r('Test Http Success' . PHP_EOL);
     });
 
     return 'Test success';
@@ -344,7 +347,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
     $req->session()?->set('TestSession', 'test');
-    $store = new FileStore($app->config->tempPath.'/files');
+    $store = new FileStore($app->config->tempPath . '/files');
     $store->set('TestSession-File', ['test', $app->env]);
 
     return [
@@ -357,7 +360,7 @@ $app->get('test/session')->call(function (RequestInterface $req, App $app) {
 });
 
 $app->get('test/download')->call(function (Response $response) {
-    return $response->downloadFile(__DIR__.'../../../README.md', 'README.md', true);
+    return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
 $app->start(
@@ -365,8 +368,8 @@ $app->start(
     8181,
     (new ServerConfig())
         ->setLooper(Looper::EV)
-        ->setHttpWorkers(2)
-        ->setTaskWorkers(1)
+        ->setHttpWorkers(4)
+        ->setTaskWorkers(2)
         ->addJob(function () {
             log_debug('Testing EVERY_MINUTE Cron Job');
         }, Cron::EVERY_MINUTE)

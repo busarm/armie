@@ -2,6 +2,8 @@
 
 namespace Armie\Handlers;
 
+use Armie\Data\DataObject;
+use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\ResponseFormat;
 use Armie\Interfaces\Arrayable;
 use Armie\Interfaces\ResponseHandlerInterface;
@@ -11,7 +13,7 @@ use Armie\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface as MessageResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Traversable;
+use Stringable;
 
 use function Armie\Helpers\await;
 
@@ -32,24 +34,39 @@ final class ResponseHandler implements ResponseHandlerInterface
         if ($this->data !== false) {
             if ($this->data instanceof ResponseInterface) {
                 $response = $this->data;
-            } elseif ($this->data instanceof MessageResponseInterface) {
+            } else if ($this->data instanceof MessageResponseInterface) {
                 $response = Response::fromPsr($this->data);
-            } elseif ($this->data instanceof ResponseHandlerInterface) {
+            } else if ($this->data instanceof ResponseHandlerInterface) {
                 $response = $this->data->handle();
             } else {
                 $response = new Response(statusCode: 200, version: $this->version, format: $this->format);
                 if ($this->data !== null) {
-                    if ($this->data instanceof StreamInterface) {
+                    // Stream, Stringable or Resource
+                    if ($this->data instanceof StreamInterface || $this->data instanceof Stringable || is_resource($this->data)) {
                         $response->setBody($this->data);
-                    } elseif ($this->data instanceof Promise) {
+                    }
+                    // Promise
+                    else if ($this->data instanceof Promise) {
                         $response->setBody(json_encode(await($this->data)));
-                    } elseif ($this->data instanceof Traversable) {
-                        $response->setBody(json_encode(iterator_to_array($this->data)));
-                    } elseif ($this->data instanceof Arrayable) {
+                    }
+                    // Data object
+                    else if ($this->data instanceof DataObject) {
+                        $response->setBody(strval($this->data));
+                    }
+                    // Arrayable
+                    else if ($this->data instanceof Arrayable) {
                         $response->setParameters($this->data->toArray());
-                    } elseif (is_array($this->data) || is_object($this->data)) {
+                    }
+                    // Iterable
+                    else if (is_iterable($this->data)) {
+                        $response->setBody(json_encode(CollectionBaseDto::of($this->data)));
+                    }
+                    // Array or Object
+                    else if (is_array($this->data) || is_object($this->data)) {
                         $response->setBody(Stream::create(json_encode($this->data)));
-                    } elseif ($this->data !== true) {
+                    }
+                    // String or Number
+                    else if (is_string($this->data) || is_numeric($this->data)) {
                         $response->html(Stream::create(strval($this->data)), 200);
                     }
                 }

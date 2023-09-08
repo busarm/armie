@@ -27,7 +27,7 @@ use function Armie\Helpers\enqueue;
 use function Armie\Helpers\listen;
 use function Armie\Helpers\log_debug;
 
-require __DIR__.'/../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 $config = (new Config())
     ->setAppPath(__DIR__)
@@ -56,7 +56,7 @@ $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-'.$app->env->value;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
@@ -100,27 +100,27 @@ $app->get('test/async')->call(function () {
     async(function () {
         sleep(5);
         $data = CollectionBaseDto::of(ProductTestModel::getAll());
-        log_debug('1 Async success'.PHP_EOL);
+        log_debug('1 Async success' . PHP_EOL);
 
         return $data->at(1);
     });
     async(function () {
         sleep(5);
         $data = CollectionBaseDto::of(ProductTestModel::getAll());
-        log_debug('2 Async success'.PHP_EOL);
+        log_debug('2 Async success' . PHP_EOL);
 
         return $data->at(2);
     });
     async(function () {
         sleep(5);
         $data = CollectionBaseDto::of(ProductTestModel::getAll());
-        log_debug('3 Async success'.PHP_EOL);
+        log_debug('3 Async success' . PHP_EOL);
 
         return $data->at(3);
     });
     async(function () {
         $data = CollectionBaseDto::of(ProductTestModel::getAll());
-        log_debug('4 Async success'.PHP_EOL);
+        log_debug('4 Async success' . PHP_EOL);
 
         return $data->at(4);
     });
@@ -182,7 +182,7 @@ $app->get('test/queue')->call(function () {
 });
 
 $app->get('download')->call(function (Response $response) {
-    return $response->downloadFile(__DIR__.'../../../README.md', 'README.md', true);
+    return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
 
 return $app->run(Request::capture($request ?? null, $config))->send($config->http->sendAndContinue);

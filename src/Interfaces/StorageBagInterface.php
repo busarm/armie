@@ -2,6 +2,8 @@
 
 namespace Armie\Interfaces;
 
+use Countable;
+use Iterator;
 use Stringable;
 
 /**
@@ -14,7 +16,7 @@ use Stringable;
  *
  * @template T
  */
-interface StorageBagInterface extends Stringable
+interface StorageBagInterface extends Stringable, Countable
 {
     /**
      * Load attributes from external source.
@@ -112,4 +114,12 @@ interface StorageBagInterface extends Stringable
      * @return int
      */
     public function count(): int;
+
+    /**
+     * Itterate store
+     *
+     * @param bool $delete Delete item upon itteration
+     * @return Iterator<T>
+     */
+    public function itterate(bool $delete = false): Iterator;
 }

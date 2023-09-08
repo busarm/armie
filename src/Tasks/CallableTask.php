@@ -24,10 +24,11 @@ final class CallableTask extends Task
     {
         if ($this->callable && is_callable($this->callable)) {
             if (array_is_list($this->data)) {
-                return call_user_func($this->callable, ...$this->data);
+                $result = call_user_func($this->callable, ...$this->data);
             } else {
-                return call_user_func($this->callable, $this->data);
+                $result = call_user_func($this->callable, $this->data);
             }
+            return $result !== false ? $result : null;
         }
 
         return null;

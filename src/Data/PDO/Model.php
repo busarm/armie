@@ -2,11 +2,10 @@
 
 namespace Armie\Data\PDO;
 
+use Armie\Data\DataObject;
 use Armie\Helpers\StringableDateTime;
 use Armie\Interfaces\Data\ModelInterface;
-use Armie\Interfaces\Data\PropertyResolverInterface;
-use Armie\Traits\PropertyResolver;
-use Armie\Traits\TypeResolver;
+use Generator;
 
 use function Armie\Helpers\dispatch;
 
@@ -15,113 +14,108 @@ use function Armie\Helpers\dispatch;
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * 
+ * // TODO: Load relations concurrently
+ * // TODO: Use Attributes for Model Table and Fields and Relations
  */
-abstract class Model implements ModelInterface, PropertyResolverInterface
+abstract class Model extends DataObject implements ModelInterface
 {
-    use TypeResolver;
-
-    use PropertyResolver {
-        fields as defaultFields;
-        __excluded as __defaultExcluded;
-    }
-
-    const EVENT_BEFORE_QUERY = self::class.':BeforeQuery';
-    const EVENT_AFTER_QUERY = self::class.':AfterQuery';
-    const EVENT_BEFORE_CREATE = self::class.':BeforeCreate';
-    const EVENT_AFTER_CREATE = self::class.':AfterCreate';
-    const EVENT_BEFORE_UPDATE = self::class.':BeforeUpdate';
-    const EVENT_AFTER_UPDATE = self::class.':AfterUpdate';
-    const EVENT_BEFORE_DELETE = self::class.':BeforeDelete';
-    const EVENT_AFTER_DELETE = self::class.':AfterDelete';
-
-    /**
-     * Database connection instance.
-     *
-     * @var Connection|null
-     */
-    protected Connection|null $db;
-
-    /**
-     * Max number of items to return in list.
-     *
-     * @var int
-     */
-    protected int $perPage = 20;
+    const EVENT_BEFORE_QUERY = self::class . ':BeforeQuery';
+    const EVENT_AFTER_QUERY = self::class . ':AfterQuery';
+    const EVENT_BEFORE_CREATE = self::class . ':BeforeCreate';
+    const EVENT_AFTER_CREATE = self::class . ':AfterCreate';
+    const EVENT_BEFORE_UPDATE = self::class . ':BeforeUpdate';
+    const EVENT_AFTER_UPDATE = self::class . ':AfterUpdate';
+    const EVENT_BEFORE_DELETE = self::class . ':BeforeDelete';
+    const EVENT_AFTER_DELETE = self::class . ':AfterDelete';
 
     /**
      * Model is new - not saved yet.
      *
      * @var bool
      */
-    protected bool $new = true;
+    protected bool $_new = true;
+
+    /**
+     * Max number of items to return in list.
+     *
+     * @var int
+     */
+    protected int $_perPage = 20;
+
 
     /**
      * Auto populate relations.
      *
      * @var bool
      */
-    protected bool $autoLoadRelations = true;
+    protected bool $_autoLoadRelations = true;
 
     /**
      * Loaded relations names.
      *
      * @var array<string>
      */
-    protected array $loadedRelations = [];
+    protected array $_loadedRelations = [];
 
     /**
      * Requested relations. Only these relation names will loaded if auto load relations not enabled.
      *
      * @var array<string>|array<string,callable>
      */
-    protected array $requestedRelations = [];
+    protected array $_requestedRelations = [];
+
+    /**
+     * Database connection instance.
+     *
+     * @var Connection|null
+     */
+    private Connection|null $_db;
 
     final public function __construct(Connection|null $db = null)
     {
-        $this->db = $db ?? Connection::make();
-        $this->setUp();
+        $this->_db = $db ?? Connection::make();
+        $this->boot();
     }
 
-    public function __sleep()
+    /**
+     * Get properties to be excluded from model's entity fields.
+     */
+    protected function __excluded(): array
     {
         return array_merge(
-            array_keys($this->defaultFields()),
-            $this->__defaultExcluded(),
+            parent::__excluded(),
             [
-                'requestedRelations', 'loadedRelations', 'autoLoadRelations',
-                'new', 'perPage',
+                '_db', '_autoLoadRelations', '_requestedRelations', '_loadedRelations',
+                '_new', '_perPage'
+            ]
+        );
+    }
+
+
+    public function __sleep(): array
+    {
+        return array_merge(
+            parent::__sleep(),
+            [
+                '_autoLoadRelations', '_requestedRelations', '_loadedRelations',
+                '_new', '_perPage'
             ]
         );
     }
 
     public function __wakeup(): void
     {
-        $this->db = Connection::make();
+        $this->_db = Connection::make();
     }
 
     /**
-     * Get properties to be excluded from model's entity fields.
-     */
-    public function __excluded(): array
-    {
-        return  array_merge(
-            $this->__defaultExcluded(),
-            [
-                'requestedRelations', 'loadedRelations', 'autoLoadRelations',
-                'db', 'new', 'perPage',
-            ]
-        );
-    }
-
-    /**
-     * Set up model.
+     * Boot up model.
      * Override to add customizations when model is initialized.
-     *
-     * @return static
      */
-    public function setUp(): static
+    public function boot()
     {
-        return $this;
+        // Override
     }
 
     /**
@@ -129,7 +123,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function getDatabase(): Connection
     {
-        return $this->db;
+        return $this->_db;
     }
 
     /**
@@ -139,7 +133,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function setPerPage(int $perPage)
     {
-        $this->perPage = $perPage;
+        $this->_perPage = $perPage;
 
         return $this;
     }
@@ -149,7 +143,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function getPerPage()
     {
-        return $this->perPage;
+        return $this->_perPage;
     }
 
     /**
@@ -160,7 +154,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     protected function setNew(bool $new)
     {
-        $this->new = $new;
+        $this->_new = $new;
 
         return $this;
     }
@@ -171,25 +165,25 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function isNew()
     {
-        return $this->new;
+        return $this->_new;
     }
 
     /**
-     * Get the value of autoLoadRelations.
+     * Get the value of _autoLoadRelations.
      */
     public function getAutoLoadRelations()
     {
-        return $this->autoLoadRelations;
+        return $this->_autoLoadRelations;
     }
 
     /**
-     * Set the value of autoLoadRelations.
+     * Set the value of _autoLoadRelations.
      *
      * @return static
      */
     public function setAutoLoadRelations(bool $autoLoadRelations)
     {
-        $this->autoLoadRelations = $autoLoadRelations;
+        $this->_autoLoadRelations = $autoLoadRelations;
 
         return $this;
     }
@@ -204,7 +198,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function setRequestedRelations(array $requestedRelations)
     {
-        $this->requestedRelations = $requestedRelations;
+        $this->_requestedRelations = $requestedRelations;
 
         return $this;
     }
@@ -218,7 +212,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function setLoadedRelations(array $loadedRelations)
     {
-        $this->loadedRelations = $loadedRelations;
+        $this->_loadedRelations = $loadedRelations;
 
         return $this;
     }
@@ -232,7 +226,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function addLoadedRelation(string $loadedRelation)
     {
-        $this->loadedRelations[] = $loadedRelation;
+        $this->_loadedRelations[] = $loadedRelation;
 
         return $this;
     }
@@ -283,7 +277,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
     public function getFieldNames(): array
     {
         $fields = $this->getFields();
-        $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys($this->fields());
+        $fieldNames = !empty($fields) ? array_map(fn ($field) => strval($field), $fields) : array_keys(parent::fields(false));
         $relationNames = $this->getRelationNames();
 
         return array_diff($fieldNames, $relationNames);
@@ -396,26 +390,29 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
 
-        $stmt = $this->db->prepare(sprintf(
+        $stmt = $this->_db->prepare(sprintf(
             'SELECT %s FROM %s %s LIMIT 1',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         ));
 
         // Dispatch event
         dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
-        if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
+
+        if ($stmt && $stmt->execute($params)) {
+
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
-            return (new static($this->db))
-                ->fastLoad($result)
-                ->setNew(false)
-                ->setPerPage($this->getPerPage())
-                ->setAutoLoadRelations($this->getAutoLoadRelations())
-                ->processAutoLoadRelations()
-                ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns));
+            if (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+
+                return $this->clone()
+                    ->fastLoad($result)
+                    ->setNew(false)
+                    ->processAutoLoadRelations()
+                    ->select($this->mergeColumnsAndRelations($columns));
+            }
         }
 
         return null;
@@ -426,14 +423,14 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      *
      * @return static[]
      */
-    public function all($conditions = [], $params = [], $columns = [], int $limit = 0): array
+    public function all($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array
     {
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->allTrashed(array_merge($conditions, [
                 sprintf('ISNULL(%s)', $this->getSoftDeleteDateName()),
             ]), $params, $columns, $limit);
         } else {
-            return $this->allTrashed($conditions, $params, $columns, $limit);
+            return $this->allTrashed($conditions, $params, $columns, $limit, $page);
         }
     }
 
@@ -442,7 +439,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      *
      * @return static[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0): array
+    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array
     {
         if (empty($columns)) {
             $columns = ['*'];
@@ -451,34 +448,83 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
         $limit = $limit > 0 ? $limit : $this->getPerPage();
+        $offset = $this->_db->getOffset($page, $limit);
 
-        $stmt = $this->db->prepare(sprintf(
+        $stmt = $this->_db->prepare(sprintf(
             'SELECT %s FROM %s %s %s',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : '',
-            $limit >= 0 ? 'LIMIT '.intval($limit) : ''
+            !empty($condPlaceHolders) ? "WHERE $condPlaceHolders" : '',
+            $limit >= 0 ? "LIMIT $offset, $limit" : ''
         ));
 
         // Dispatch event
         dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
-        if ($stmt && $stmt->execute($params) && ($results = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
+
+        if ($stmt && $stmt->execute($params)) {
+
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
-            return $this->processEagerLoadRelations(array_map(
-                fn ($result) => (new static($this->db))
+            $results = [];
+
+            while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+
+                $results[] = $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
-                    ->setPerPage($this->getPerPage())
-                    ->setAutoLoadRelations($this->getAutoLoadRelations())
-                    ->processAutoLoadRelations()
-                    ->select($this->mergeColumnsRelations(!empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns)),
-                $results
-            ));
+                    ->select($this->mergeColumnsAndRelations($columns));
+            }
+
+            return $this->processEagerLoadRelations($results);
         }
 
         return [];
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @return Generator<int,static>
+     */
+    public function itterate($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): Generator
+    {
+        if (empty($columns)) {
+            $columns = ['*'];
+        }
+
+        $colsPlaceHolders = $this->parseColumns($columns);
+        $condPlaceHolders = $this->parseConditions($conditions);
+        $limit = $limit > 0 ? $limit : $this->getPerPage();
+        $offset = $this->_db->getOffset($page, $limit);
+
+        $stmt = $this->_db->prepare(sprintf(
+            'SELECT %s FROM %s %s %s',
+            $colsPlaceHolders,
+            $this->getTableName(),
+            !empty($condPlaceHolders) ? "WHERE $condPlaceHolders" : '',
+            $limit >= 0 ? "LIMIT $offset, $limit" : ''
+        ));
+
+        // Dispatch event
+        dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+        if ($stmt && $stmt->execute($params)) {
+
+            // Dispatch event
+            dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+            while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+
+                yield $this->clone()
+                    ->fastLoad($result)
+                    ->setNew(false)
+                    ->processAutoLoadRelations()
+                    ->select($this->mergeColumnsAndRelations($columns));
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -498,11 +544,12 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             // Dispatch event
             dispatch(static::EVENT_BEFORE_DELETE, $this->toArray());
 
-            $stmt = $this->db->prepare(sprintf(
-                'DELETE FROM %s WHERE %s = ?',
+            $stmt = $this->_db->prepare(sprintf(
+                'DELETE FROM %s WHERE `%s` = ?',
                 $this->getTableName(),
                 $this->getKeyName()
             ));
+
             if ($stmt) {
                 $stmt->execute([$this->{$this->getKeyName()}]);
                 if ($stmt->rowCount() > 0) {
@@ -537,7 +584,8 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
     public function save($trim = false, $relations = true): bool
     {
         // Create
-        if ($this->new && !isset($this->{$this->getKeyName()})) {
+        if ($this->_new || !isset($this->{$this->getKeyName()})) {
+
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
                 $this->{$this->getCreatedDateName()} = strval(new StringableDateTime());
@@ -554,29 +602,29 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             // Dispatch event
             dispatch(static::EVENT_BEFORE_CREATE, $params);
 
+            // Process query
             $placeHolderKeys = implode(',', array_map(fn ($key) => "`$key`", array_keys($params)));
             $placeHolderValues = implode(',', array_fill(0, count($params), '?'));
-            $stmt = $this->db->prepare(sprintf(
+            $stmt = $this->_db->prepare(sprintf(
                 'INSERT INTO %s (%s) VALUES (%s)',
                 $this->getTableName(),
                 $placeHolderKeys,
                 $placeHolderValues
             ));
-
             if (!$stmt || !$stmt->execute(array_values($params))) {
                 return false;
             }
 
-            // Update id for Auto Increment
-            if (!isset($this->{$this->getKeyName()}) && !empty($id = $this->db->lastInsertId())) {
+            // Update key for Auto Increment
+            if (!isset($this->{$this->getKeyName()}) && !empty($id = $this->_db->lastInsertId())) {
                 $this->{$this->getKeyName()} = $id;
             }
 
             // Dispatch event
-            dispatch(static::EVENT_AFTER_CREATE, $this->toArray());
+            dispatch(static::EVENT_AFTER_CREATE, $params);
 
             // Notify record exists
-            $this->setNew(false);
+            $this->_new = false;
 
             // Save relations if available
             if ($relations) {
@@ -586,6 +634,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
 
         // Update
         elseif ($this->isDirty()) {
+
             // Add updated date if not available
             if (!empty($this->getUpdatedDateName())) {
                 $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
@@ -599,23 +648,23 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             // Dispatch event
             dispatch(static::EVENT_BEFORE_UPDATE, $params);
 
+            // Process query
             $placeHolder = implode(',', array_map(fn ($key) => "`$key` = ?", array_keys($params)));
-            $stmt = $this->db->prepare(sprintf(
-                'UPDATE %s SET %s WHERE %s = ?',
+            $stmt = $this->_db->prepare(sprintf(
+                'UPDATE %s SET %s WHERE `%s` = ?',
                 $this->getTableName(),
                 $placeHolder,
                 $this->getKeyName()
             ));
-
             if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) {
                 return false;
             }
 
             // Dispatch event
-            dispatch(static::EVENT_AFTER_UPDATE, $this->toArray());
+            dispatch(static::EVENT_AFTER_UPDATE, $params);
 
             // Notify record exists
-            $this->setNew(false);
+            $this->_new = false;
 
             // Save relations if available
             if ($relations) {
@@ -638,14 +687,38 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             $data = $this->{$relation->getName()} ?? null;
             if (isset($data)) {
                 if ($data instanceof static) {
-                    $success = !$data->save() ? false : $success;
-                } else {
-                    $success = !$relation->save((array) $data) ? false : $success;
+                    $success = !$data->isDirty() || !$data->save() ? false : $success;
+                } else if (is_array($data)) {
+                    $success = !$relation->save($data) ? false : $success;
                 }
             }
         }
 
         return $success;
+    }
+
+    /**
+     * Start database transaction
+     * 
+     * @return void
+     */
+    public function startTransaction(): void
+    {
+        $this->_db->beginTransaction();
+    }
+
+    /**
+     * End database transaction
+     *
+     * @param boolean $rollback
+     * @return void
+     */
+    public function endTransaction(bool $rollback = false): void
+    {
+        if ($rollback) {
+            $this->_db->rollBack();
+        }
+        $this->_db->commit();
     }
 
     /**
@@ -657,12 +730,15 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function transaction(callable $callable)
     {
-        $this->db->beginTransaction();
-        $result = $callable();
-        if ($result === false) {
-            $this->db->rollBack();
+        $this->startTransaction();
+        $result = null;
+        try {
+            $result = $callable();
+        } catch (\Throwable $th) {
+            throw $th;
+        } finally {
+            $this->endTransaction($result === false);
         }
-        $this->db->commit();
 
         return $result;
     }
@@ -676,7 +752,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function processEagerLoadRelations(array $items): array
     {
-        return $this->autoLoadRelations || !empty($this->requestedRelations) ? $this->eagerLoadRelations($items) : $items;
+        return $this->_autoLoadRelations || !empty($this->_requestedRelations) ? $this->eagerLoadRelations($items) : $items;
     }
 
     /**
@@ -686,7 +762,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function processAutoLoadRelations(): static
     {
-        return $this->autoLoadRelations || !empty($this->requestedRelations) ? $this->loadRelations() : $this;
+        return $this->_autoLoadRelations || !empty($this->_requestedRelations) ? $this->loadRelations() : $this;
     }
 
     /**
@@ -698,12 +774,12 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function eagerLoadRelations(array $items): array
     {
-        $relsIsList = array_is_list($this->requestedRelations);
+        $requestedRelations = array_is_list($this->_requestedRelations) ? $this->_requestedRelations : array_keys($this->_requestedRelations);
         foreach ($this->getRelations() as &$relation) {
-            if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
+            if (empty($this->_requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
                 // Trigger callback if available
-                $callback = $this->requestedRelations[$relation->getName()] ?? null;
-                if (!$relsIsList && $callback && is_callable($callback)) {
+                $callback = $this->_requestedRelations[$relation->getName()] ?? null;
+                if ($callback && is_callable($callback)) {
                     $callback($relation);
                 }
                 $items = $relation->load($items);
@@ -720,16 +796,16 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function loadRelations(): static
     {
-        $relsIsList = array_is_list($this->requestedRelations);
+        $requestedRelations = array_is_list($this->_requestedRelations) ? $this->_requestedRelations : array_keys($this->_requestedRelations);
         foreach ($this->getRelations() as &$relation) {
-            if (empty($this->requestedRelations) || in_array($relation->getName(), $relsIsList ? $this->requestedRelations : array_keys($this->requestedRelations))) {
+            if (empty($this->_requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
                 // Trigger callback if available
-                $callback = $this->requestedRelations[$relation->getName()] ?? null;
-                if (!$relsIsList && $callback && is_callable($callback)) {
+                $callback = $this->_requestedRelations[$relation->getName()] ?? null;
+                if ($callback && is_callable($callback)) {
                     $callback($relation);
                 }
                 $this->{$relation->getName()} = $relation->get();
-                $this->loadedRelations[] = $relation->getName();
+                $this->_loadedRelations[] = $relation->getName();
             }
         }
 
@@ -754,7 +830,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
                 }
 
                 $this->{$relation->getName()} = $relation->get();
-                $this->loadedRelations[] = $relation->getName();
+                $this->_loadedRelations[] = $relation->getName();
 
                 return $this;
             }
@@ -770,12 +846,14 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      *
      * @return array
      */
-    public function mergeColumnsRelations(array $columns): array
+    public function mergeColumnsAndRelations(array $columns): array
     {
-        if ($this->autoLoadRelations) {
+        $columns = !empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns;
+
+        if ($this->_autoLoadRelations) {
             return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->getRelationNames()]);
-        } elseif (!empty($this->loadedRelations)) {
-            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->loadedRelations]);
+        } elseif (!empty($this->_loadedRelations)) {
+            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->_loadedRelations]);
         }
 
         return array_is_list($columns) ? $columns : array_keys($columns);
@@ -792,17 +870,17 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
     {
         $cols = [];
         $relationCols = [];
-        $validCols = array_keys($this->fields(false));
+        $validCols = array_keys($this->fields());
 
-        // If all cols not selected:
-        // Always include relation cols
-        // Always exclude relation names from valid cols
+        // If all columns not selected:
+        // Always include relation columns
+        // Always exclude relation names from valid columns
         if (!in_array('*', $columns)) {
             foreach ($this->getRelations() as $relation) {
                 $validCols = array_diff($validCols, [$relation->getName()]);
                 $relationCols = array_keys($relation->getReferences());
-                $columns = array_merge($columns, $relationCols); // Add relationship cols
-                $columns = array_intersect($columns, $validCols); // Remove cols not in valid cols
+                $columns = array_merge($columns, $relationCols); // Add relationship columns
+                $columns = array_intersect($columns, $validCols); // Remove columns not in valid columns
             }
         }
 
@@ -837,41 +915,41 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             $key = strtoupper($key);
 
             return  $result ?
-                $result.sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
+                $result . sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
                 sprintf('%s %s', $key == 'NOT' ? $key : '', $this->parseConditions($cond));
         };
         $parseArrayList = function ($result, $key, $cond) {
             return $result ?
-                $result.' AND '.sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                $result . ' AND ' . sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
                 sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
         };
         $parseArray = function ($result, $cond) {
             return  $result ?
-                $result.' AND '.sprintf('%s', $this->parseConditions($cond)) :
+                $result . ' AND ' . sprintf('%s', $this->parseConditions($cond)) :
                 sprintf('%s', $this->parseConditions($cond));
         };
         $parseString = function ($result, $cond) {
             return $result ?
-                $result.' AND '.sprintf('(%s)', $this->cleanCond($cond)) :
+                $result . ' AND ' . sprintf('(%s)', $this->cleanCond($cond)) :
                 sprintf('(%s)', $this->cleanCond($cond));
         };
         $parseKeyedString = function ($result, $key, $cond) {
             // Key is a conditional operator
             if (in_array(strtoupper($key), ['AND', 'OR'])) {
                 return $result ?
-                    $result.sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
+                    $result . sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
                     sprintf('(%s)', $this->cleanCond($cond));
             }
             // Key is a conditional (NOT) operator
             elseif (strtoupper($key) == 'NOT') {
                 return $result ?
-                    $result.sprintf('(%s)', $this->cleanCond($cond)) :
+                    $result . sprintf('(%s)', $this->cleanCond($cond)) :
                     sprintf('%s (%s)', $key, $this->cleanCond($cond));
             }
             // Key is a parameter
             else {
                 return $result ?
-                    $result.' AND '.sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
+                    $result . ' AND ' . sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
                     sprintf('`%s` = %s', $key, $this->escapeCond($cond));
             }
         };
@@ -913,7 +991,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
             }
         }
 
-        return $result ? '('.$result.')' : '';
+        return $result ? '(' . $result . ')' : '';
     }
 
     /**
@@ -940,7 +1018,53 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
         return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '', $cond));
     }
 
-    //#### Statics #####
+
+    #### Statics #####
+
+
+    /**
+     * Create model instance with custom pagination limit
+     *
+     * @param int $limit
+     *
+     * @return static
+     */
+    public static function withLimit(int $limit): static
+    {
+        return (new static())->setPerPage($limit);
+    }
+
+    /**
+     * Create model instance with relations to be loaded.
+     *
+     * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
+     *
+     * @return static
+     */
+    public static function withRelations(array $relations): static
+    {
+        return (new static())->setRequestedRelations($relations);
+    }
+
+    /**
+     * Create model instance with support for auto loaded relations.
+     *
+     * @return static
+     */
+    public static function withAutoRelations(): static
+    {
+        return (new static())->setAutoLoadRelations(true);
+    }
+
+    /**
+     * Create model instance without support for auto loaded relations.
+     *
+     * @return static
+     */
+    public static function withoutAutoRelations(): static
+    {
+        return (new static())->setAutoLoadRelations(false);
+    }
 
     /**
      * Create record.
@@ -1042,7 +1166,25 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
         return $model->setAutoLoadRelations(false)->allTrashed($conditions, $params, $columns, $limit ?? 0);
     }
 
-    //#### Clones #####
+    /**
+     * Itterate upon list of model. With trashed (deleted) models.
+     *
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
+     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $columns    Select Colomn names.
+     * @param int|null $limit      Query limit
+     *
+     * @return Generator<int,static>
+     */
+    public static function itterateAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): Generator
+    {
+        $model = (new static());
+
+        return $model->setAutoLoadRelations(false)->itterate($conditions, $params, $columns, $limit ?? 0);
+    }
+
+
+    #### Clones #####
 
     /**
      * Clone model.
@@ -1056,31 +1198,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
         return $model;
     }
 
-    /**
-     * Set limit to be loaded with model.
-     *
-     * @param int $limit
-     *
-     * @return static
-     */
-    public function withLimit(int $limit): static
-    {
-        return $this->clone()->setPerPage($limit);
-    }
-
-    /**
-     * Set relations to be loaded with model.
-     *
-     * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
-     *
-     * @return static
-     */
-    public function withRelations(array $relations): static
-    {
-        return $this->clone()->setRequestedRelations($relations);
-    }
-
-    //#### Override #####
+    #### Override #####
 
     /**
      * Is Dirty - Update has been made.
@@ -1089,7 +1207,7 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
      */
     public function isDirty(): bool
     {
-        return !$this->new && $this->_isDirty;
+        return !$this->_new && parent::isDirty();
     }
 
     /**
@@ -1099,18 +1217,18 @@ abstract class Model implements ModelInterface, PropertyResolverInterface
     {
         if (!empty($fields = $this->getFields())) {
             $attrs = [];
-            if ($this->autoLoadRelations) {
+            if ($this->_autoLoadRelations) {
                 $fields = array_merge($fields, $this->getRelations());
-            } elseif (!empty($this->loadedRelations)) {
-                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->loadedRelations)));
+            } else if (!empty($this->_loadedRelations)) {
+                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->_loadedRelations)));
             }
             foreach ($fields as $field) {
-                $attrs[$field->getName()] = $field->getType();
+                $attrs[$field->getName()] = $field->getType()->value;
             }
 
             return $attrs;
         }
 
-        return $this->defaultFields($all, $trim);
+        return parent::fields($all, $trim);
     }
 }

@@ -2,13 +2,15 @@
 
 namespace Armie\Bags;
 
+use Armie\Async;
 use Armie\Crypto;
 use Armie\Helpers\Security;
 use Armie\Interfaces\StorageBagInterface;
 use Generator;
 
-use function Armie\Helpers\async;
 use function Armie\Helpers\serialize;
+use function Armie\Helpers\stream_read;
+use function Armie\Helpers\stream_write;
 use function Armie\Helpers\unserialize;
 
 /**
@@ -24,14 +26,20 @@ use function Armie\Helpers\unserialize;
 class FileStore implements StorageBagInterface
 {
     const STORAGE_EXT = '.astore';
-    protected array $original = [];
 
     /**
-     * @param string $basePath Storage root folder
-     * @param string $key      Secret key for encryption. Ignore to disable encryption
-     * @param bool   $async    Use async file store. Default: true
+     * Last time store was loaded
+     *
+     * @var integer
      */
-    public function __construct(private string $basePath, private $key = null, private bool $async = true)
+    protected int $loadTime = 0;
+
+    /**
+     * @param string  $basePath  Storage root folder
+     * @param ?string $key       Secret key for encryption. Ignore to disable encryption
+     * @param bool    $async     Save file asynchronously. Default: false
+     */
+    public function __construct(protected string $basePath, protected ?string $key = null, protected bool $async = false)
     {
     }
 
@@ -42,7 +50,7 @@ class FileStore implements StorageBagInterface
     {
         foreach ($data as $path => $item) {
             if ($this->set($path, $item)) {
-                $this->original[$path] = md5(json_encode($item));
+                $this->loadTime = time();
             }
         }
 
@@ -62,40 +70,38 @@ class FileStore implements StorageBagInterface
      */
     public function set(string $path, mixed $data, $sanitize = true): bool
     {
-        if (is_string($data) || is_array($data) || is_object($data)) {
-            $path = $this->fullPath($path);
-            $key = $this->key;
+        $path = $this->fullPath($path);
+        $key = $this->key;
 
-            $fn = function () use ($key, $path, $data, $sanitize) {
-                $dir = \dirname($path);
+        $dir = \dirname($path);
 
-                // Directory not available
-                if (!\is_dir($dir)) {
-                    mkdir($dir, 0755, true);
-                }
-
-                // 1. Sanitize
-                $data = $sanitize ? Security::clean($data) : $data;
-                // 2. Serialize
-                if ($data && !is_null($serialized = serialize($data))) {
-                    $data = $serialized;
-                }
-                // 3. Encrypt
-                $data = !empty($key) ? Crypto::encrypt($data, $key) : $data;
-
-                return \file_put_contents($path, $data);
-            };
-
-            if ($this->async) {
-                async($fn);
-            } else {
-                return $fn();
-            }
-
-            return true;
+        // Directory not available
+        if (!\is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
 
-        return false;
+        // 1. Sanitize
+        $data = $sanitize ? Security::clean($data) : $data;
+        // 2. Serialize
+        if ($data && !is_null($serialized = serialize($data))) {
+            $data = $serialized;
+        }
+        // 3. Encrypt
+        $data = !empty($key) ? Crypto::encrypt($key, $data) : $data;
+
+        // 4. Save
+        $file = fopen($path, 'xb');
+
+        if ($this->async) {
+            return $file ? Async::streamEventLoop($file, false, function ($stream, $body) {
+                stream_write($stream, $body);
+                fflush($stream) && fclose($stream) && $stream = null;
+            }, [$file, $data]) : false;
+        } else {
+            $done = $file ? stream_write($file, $data) : false;
+            $file && fflush($file) && fclose($file) && $file = null;
+            return $done;
+        }
     }
 
     /**
@@ -106,18 +112,21 @@ class FileStore implements StorageBagInterface
         if ($this->has($path)) {
             $path = $this->fullPath($path);
 
-            $data = \file_get_contents($path);
-
-            // 1. Decrypt
-            $data = !empty($this->key) ? Crypto::decrypt($data, $this->key) : $data;
-            // 2. Unserialize
-            if ($data && !is_null($parsed = unserialize($data))) {
-                $data = $parsed;
+            // 1. Read
+            $file = fopen($path, 'rb');
+            $data = $file ? stream_read($file) : null;
+            $file && fclose($file);
+            if (!is_null($data)) {
+                // 2. Decrypt
+                $data = !empty($this->key) ? Crypto::decrypt($this->key, $data) : $data;
+                // 3. Unserialize
+                if ($data && !is_null($parsed = unserialize($data))) {
+                    $data = $parsed;
+                }
+                // 4. Sanitize
+                $data = $sanitize ? Security::clean($data) : $data;
             }
-            // 3. Sanitize
-            $data = $sanitize ? Security::clean($data) : $data;
-
-            return $data;
+            return $data ?? $default;
         }
 
         return $default;
@@ -153,16 +162,27 @@ class FileStore implements StorageBagInterface
     public function updates(): array
     {
         $list = [];
-        foreach ($this->all() as $path => $item) {
-            if (
-                !isset($this->original[$path])
-                || $this->original[$path] != md5(json_encode($item))
-            ) {
-                $list[$path] = $item;
+        foreach ($this->getFiles($this->basePath) as $path) {
+            $fullPath = $this->fullPath($path);
+            clearstatcache(true, $fullPath);
+            if ((filemtime($fullPath) ?: filectime($fullPath)) > $this->loadTime) {
+                $list[$path] = $this->get($path);
             }
         }
 
         return $list;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function itterate(bool $delete = false): Generator
+    {
+        foreach ($this->getFiles($this->basePath) as $path) {
+            yield $path => $delete ? $this->pull($path) : $this->get($path);
+        }
+
+        return null;
     }
 
     /**
@@ -180,17 +200,12 @@ class FileStore implements StorageBagInterface
     public function remove(string $path)
     {
         $path = $this->fullPath($path);
-
-        $fn = function () use ($path) {
-            \unlink($path);
-        };
-
-        if ($this->has($path)) {
-            if ($this->async) {
-                async($fn);
-            } else {
-                $fn();
-            }
+        if ($this->async) {
+            Async::withEventLoop(function () use ($path) {
+                \file_exists($path) && \unlink($path);
+            });
+        } else {
+            \file_exists($path) && \unlink($path);
         }
     }
 
@@ -200,7 +215,7 @@ class FileStore implements StorageBagInterface
     public function clear()
     {
         foreach ($this->getFiles($this->basePath) as $path) {
-            \unlink($path);
+            $this->remove($path);
         }
     }
 
@@ -221,9 +236,9 @@ class FileStore implements StorageBagInterface
      */
     private function fullPath(string $path): string
     {
-        $path = $this->isStorePath($path) ? $path : sha1($path).self::STORAGE_EXT;
+        $path = $this->isStorePath($path) ? $path : sha1($path) . self::STORAGE_EXT;
 
-        return str_starts_with($path, $this->basePath) ? $path : $this->basePath.DIRECTORY_SEPARATOR.$path;
+        return str_starts_with($path, $this->basePath) ? $path : $this->basePath . DIRECTORY_SEPARATOR . $path;
     }
 
     /**
@@ -249,8 +264,8 @@ class FileStore implements StorageBagInterface
     {
         if (is_dir($dir)) {
             foreach (new \DirectoryIterator($dir) as $path) {
-                if (!$path->isDot() && !$path->isDir()) {
-                    yield $dir.DIRECTORY_SEPARATOR.$path->getFilename();
+                if (!$path->isDot() && !$path->isDir() && $this->isStorePath($path->getFilename())) {
+                    yield $path->getFilename();
                 }
             }
         }

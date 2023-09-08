@@ -2,12 +2,13 @@
 
 namespace Armie\Handlers;
 
-use Armie\App;
 use Armie\Async;
 use Armie\Enums\AppStatus;
 use Armie\Errors\SystemError;
 use Armie\Interfaces\EventHandlerInterface;
 use Armie\Interfaces\Runnable;
+
+use function Armie\Helpers\app;
 
 /**
  * Handle event operations.
@@ -34,10 +35,9 @@ final class EventHandler implements EventHandlerInterface
     private $listners = [];
 
     /**
-     * @param App $app
      * @param int $maxEventListners Maximum listners allowed per event. **IMPORTANT**: To prevent memory leak
      */
-    public function __construct(private App $app, private $maxEventListners = 10)
+    public function __construct(private $maxEventListners = 10)
     {
     }
 
@@ -46,12 +46,12 @@ final class EventHandler implements EventHandlerInterface
      */
     public function listen(string $event, callable|string $listner): void
     {
-        if (is_string($listner) && !in_array(Runnable::class, class_implements($listner))) {
-            throw new SystemError("`$listner` does not implement ".Runnable::class);
+        if (is_string($listner) && !is_subclass_of($listner, Runnable::class)) {
+            throw new SystemError("`$listner` does not implement " . Runnable::class);
         }
 
         // App running in async mode - register as single-use
-        if ($this->app->status === AppStatus::RUNNNIG && $this->app->async) {
+        if (app()->status === AppStatus::RUNNNIG && app()->async) {
             // Empty - initialize
             if (!isset(self::$singleUseListeners[$event])) {
                 self::$singleUseListeners[$event] = [];
@@ -108,7 +108,7 @@ final class EventHandler implements EventHandlerInterface
     {
         if (is_callable($listner)) {
             // Use event loop
-            if ($this->app->async && $this->app->getHttpWorkerAddress()) {
+            if (app()->async && app()->getHttpWorkerAddress()) {
                 Async::withEventLoop(fn () => call_user_func($listner, $data));
             }
             // Use default
@@ -116,10 +116,10 @@ final class EventHandler implements EventHandlerInterface
                 Async::withChildProcess(fn () => call_user_func($listner, $data)) or call_user_func($listner, $data);
             }
         } else {
-            $task = $this->app->di->instantiate($listner, null, $data);
+            $task = app()->di->instantiate($listner, null, $data);
             if ($task instanceof Runnable) {
                 // Use event loop
-                if ($this->app->async && $this->app->getHttpWorkerAddress()) {
+                if (app()->async && app()->getHttpWorkerAddress()) {
                     Async::withEventLoop($task);
                 }
                 // Use default

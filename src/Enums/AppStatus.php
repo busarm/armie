@@ -13,6 +13,8 @@ namespace Armie\Enums;
 enum AppStatus
 {
     case INITIALIZING;
+    case STARTED;
     case RUNNNIG;
+    case COMPLETED;
     case STOPPED;
 }

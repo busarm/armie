@@ -39,7 +39,7 @@ function unit_convert($size)
     $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
     $index = floor(log($size, 1024));
 
-    return (round($size / pow(1024, $index), 2) ?? 0).' '.$unit[$index] ?? '~';
+    return (round($size / pow(1024, $index), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
 }
 
 /**
@@ -152,10 +152,10 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? exit(PHP_EOL.$data.PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? exit(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
 
-    return is_cli() ? exit(PHP_EOL.var_export($data, true).PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
+    return is_cli() ? exit(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
 }
 
 //######### APPLICATION HELPERS ############
@@ -238,10 +238,17 @@ function &router()
  */
 function log_message($level, $message, array $context = [])
 {
-    $message = is_array($message) || is_object($message) ? var_export($message, true) : (string) $message;
-    $message = date('Y-m-d H:i:s.', time()).substr(gettimeofday()['usec'] ?? '0000', 0, 4).' - '.$message;
+    $message = print_r($message, true);
+    $message = sprintf(
+        "%s.%s - %s",
+        date('Y-m-d H:i:s', time()),
+        substr(gettimeofday()['usec'] ?? '0000', 0, 4),
+        $message
+    );
 
     try {
+        $prefix = app()->getWorker() ? sprintf("%s (#%s)", app()->getWorker()->name, app()->getWorker()->id) : app()->config->name;
+        $message = $prefix . ' - ' . $message;
         app()->logger->log($level, $message, $context);
     } catch (\Throwable) {
         (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
@@ -441,19 +448,19 @@ function create_cookie_header(
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    $date = date('D, d-M-Y H:i:s', $expires).' GMT';
+    $date = date('D, d-M-Y H:i:s', $expires) . ' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
-        $header .= "; Expires={$date}; Max-Age=".($expires - time());
+        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
     }
     if ($path != '') {
-        $header .= '; Path='.$path;
+        $header .= '; Path=' . $path;
     }
     if ($domain != '') {
-        $header .= '; Domain='.$domain;
+        $header .= '; Domain=' . $domain;
     }
     if ($samesite != '') {
-        $header .= '; SameSite='.$samesite;
+        $header .= '; SameSite=' . $samesite;
     }
     if ($secure) {
         $header .= '; Secure';
@@ -542,11 +549,12 @@ function await(Promise|PromiseThen|PromiseFinal $promise): mixed
 /**
  * Run task asynchronously.
  *
- * @param Task|callable $task
+ * @param Task|callable $task       Task to process
+ * @param bool $useEventLoopOnly    Force to process using event loop only
  */
-function async(Task|callable $task): void
+function async(Task|callable $task, bool $useEventLoopOnly = false): void
 {
-    Async::runTask($task);
+    $useEventLoopOnly ? Async::runTask($task) : Async::withEventLoop($task);
 }
 
 /**
@@ -586,15 +594,16 @@ function dispatch(string $event, array $data = [])
  * Queue task.
  *
  * @param Task|callable $task
+ * @param callable|class-string<Runnable>|null $listner
  */
-function enqueue(Task|callable $task)
+function enqueue(Task|callable $task, callable|string|null $listner = null)
 {
     if (!app()->queueHandler) {
         throw new SystemError('Queue handler is not set. @see App::setQueueHandler');
     }
 
     $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-    app()->queueHandler->enqueue($task);
+    app()->queueHandler->enqueue($task, $listner);
 }
 
 /**
@@ -712,7 +721,7 @@ function unserialize($data, array $options = [])
  *
  * @return string
  */
-function stream_read(mixed $resource, int $length): string
+function stream_read(mixed $resource, int $length = 8192): string
 {
     $response = '';
     while (!feof($resource)) {
@@ -732,16 +741,20 @@ function stream_read(mixed $resource, int $length): string
  * @param resource $resource
  * @param string   $data
  * @param int      $length
+ *
+ * @return bool
  */
-function stream_write(mixed $resource, string $data, int $length)
+function stream_write(mixed $resource, string $data, int $length = 8192): bool
 {
     $fwrite = $length;
     for ($written = 0; $written < strlen($data); $written += $fwrite) {
         $fwrite = fwrite($resource, substr($data, $written));
         if ($fwrite === false) {
-            return;
+            return false;
         }
     }
+
+    return true;
 }
 
 /**

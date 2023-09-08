@@ -13,8 +13,8 @@ namespace Armie\Interfaces;
 interface RouterInterface
 {
     /**
-     * @param string $method
-     * @param string $path
+     * @param string $method Http Method
+     * @param string $path   Http request path
      *
      * @return RouteInterface
      */
@@ -50,8 +50,10 @@ interface RouterInterface
 
     /**
      * @return RouteInterface[]
+     * 
+     * @param string $method Http Method
      */
-    public function getRoutes(): array;
+    public function getRoutes(string $method): array;
 
     /**
      * Process routing.
@@ -61,16 +63,4 @@ interface RouterInterface
      * @return MiddlewareInterface[]
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array;
-
-    /**
-     * Check if path matches.
-     *
-     * @param string $path       Request path
-     * @param string $route      Route to compare to
-     * @param bool   $startsWith path starts with route
-     * @param bool   $startsWith path ends with route
-     *
-     * @return bool|array
-     */
-    public function isMatch($path, $route, $startsWith = true, $endsWith = true);
 }

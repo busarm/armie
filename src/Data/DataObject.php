@@ -1,26 +1,28 @@
 <?php
 
-namespace Armie\Traits;
+namespace Armie\Data;
 
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Helpers\Security;
 use Armie\Interfaces\Arrayable;
 use Armie\Interfaces\Attribute\PropertyAttributeInterface;
-use ReflectionObject;
+use Armie\Traits\TypeResolver;
+use JsonSerializable;
+use ReflectionClass;
 use ReflectionProperty;
 use Stringable;
 
 /**
- * Manage Singletons.
- *
  * Armie Framework
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-trait PropertyResolver
+abstract class DataObject implements Arrayable, Stringable, JsonSerializable
 {
+    use TypeResolver;
+
     /**
      * Explicitly selected fields.
      *
@@ -46,11 +48,43 @@ trait PropertyResolver
     /**
      * Get excluded fields from properties.
      */
-    public function __excluded(): array
+    protected function __excluded(): array
     {
         return [
             '_selected', '_isDirty', '_loadAttr', '_loadTypes',
         ];
+    }
+
+    public function __sleep(): array
+    {
+        return array_merge(
+            array_keys($this->fields()),
+            $this->__excluded()
+        );
+    }
+
+    public function __wakeup(): void
+    {
+    }
+
+    public function __serialize(): array
+    {
+        $list = [];
+
+        foreach ($this->__sleep() as $key) {
+            $list[$key] = $this->__get($key);
+        }
+
+        return $list;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->__set($key, $value);
+        }
+
+        $this->__wakeup();
     }
 
     /**
@@ -101,16 +135,16 @@ trait PropertyResolver
     /**
      * Get properties.
      *
-     * @param bool $all
+     * @param bool $all  Get all or only public field
      *
      * @return ReflectionProperty[]
      */
     public function properties($all = false): array
     {
-        return (new ReflectionObject($this))->getProperties(
+        return (new ReflectionClass($this))->getProperties(
             $all ?
                 ReflectionProperty::IS_PRIVATE | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_READONLY | ReflectionProperty::IS_PUBLIC :
-                ReflectionProperty::IS_PRIVATE | ReflectionProperty::IS_PUBLIC
+                ReflectionProperty::IS_PUBLIC
         );
     }
 
@@ -126,11 +160,12 @@ trait PropertyResolver
     {
         $fields = [];
         $excluded = $this->__excluded();
-        foreach ($this->properties() as $property) {
-            if (($all || $property->isPublic())
-                && !$property->isStatic()
+        foreach ($this->properties($all) as $property) {
+            if (
+                !$property->isStatic()
                 && (!$trim || $property->isInitialized($this))
                 && !in_array($property->getName(), $excluded)
+                && !str_starts_with($property->getName(), '_')
             ) {
                 $type = $property->getType();
                 if ($type) {
@@ -236,7 +271,7 @@ trait PropertyResolver
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return isset($this->{$key}) ? $this->{$key} : $default;
+        return $this->__get($key) ?? $default;
     }
 
     /**
@@ -245,11 +280,11 @@ trait PropertyResolver
      * @param string $key
      * @param mixed  $value
      *
-     * @return mixed
+     * @return void
      */
-    public function set(string $key, mixed $value = null): mixed
+    public function set(string $key, mixed $value = null): void
     {
-        return $this->{$key} = $value;
+        $this->__set($key, $value);
     }
 
     /**
@@ -271,13 +306,15 @@ trait PropertyResolver
             ) {
                 $value = $this->{$attr} ?? null;
                 if ($value !== null) {
-                    if ($value instanceof CollectionBaseDto) {
+                    if ($value instanceof self) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } elseif ($value instanceof BaseDto) {
+                    } else if ($value instanceof CollectionBaseDto) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } elseif ($value instanceof Arrayable) {
+                    } else if ($value instanceof BaseDto) {
+                        $result[$attr] = $value->toArray($trim, $sanitize);
+                    } else if ($value instanceof Arrayable) {
                         $result[$attr] = $value->toArray($trim);
-                    } elseif (is_array($value)) {
+                    } else if (is_array($value)) {
                         $result[$attr] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
                     } else {
                         $value = $this->resolveType($type ?

@@ -13,7 +13,7 @@ use Closure;
  *
  * @codeCoverageIgnore
  */
-interface RouteInterface extends ContainerInterface
+interface RouteInterface extends SingletonContainerInterface
 {
     /**  @return Closure|null */
     public function getCallable(): ?Closure;

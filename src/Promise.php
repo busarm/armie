@@ -7,7 +7,7 @@ use Armie\Interfaces\Promise\PromiseThen;
 use Armie\Tasks\Task;
 use Closure;
 use Fiber;
-use Generator;
+use FiberError;
 use Throwable;
 
 use function Armie\Helpers\report;
@@ -59,7 +59,6 @@ class Promise implements PromiseThen
 {
     private Fiber $_fiber;
 
-    private bool $_resolving = false;
     private bool $_done = false;
     private mixed $_result = null;
 
@@ -67,11 +66,19 @@ class Promise implements PromiseThen
     private ?Closure $_finallyFn = null;
 
     /**
-     * @param Task<T>|callable():T $task
+     * @param Fiber|Task<T>|callable():T $task
+     * 
+     * @throws FiberError
      */
-    public function __construct(Task|callable $task)
+    public function __construct(Fiber|Task|callable $task)
     {
-        $this->_fiber = Async::withFiberWorker($task, true);
+        if ($task instanceof Fiber) {
+            if (!$task->isStarted()) $task->start();
+            if ($task->isTerminated()) throw new FiberError;
+            $this->_fiber = $task;
+        } else {
+            $this->_fiber = Async::withFiberWorker($task, true);
+        }
     }
 
     /**
@@ -145,13 +152,22 @@ class Promise implements PromiseThen
      *
      * @param self<T>[] $promises List of Promises
      *
-     * @return Generator<string,T>
+     * @return self<array<T|bool>>
      */
-    public static function all(array $promises): Generator
+    public static function all(array $promises): self
     {
-        foreach ($promises as $key => $promise) {
-            yield $key => $promise->wait();
-        }
+        $fiber = new Fiber(
+            function (array $promises) {
+                Fiber::suspend();
+                return array_map(
+                    fn (self $promise) => $promise->wait(),
+                    $promises
+                );
+            }
+        );
+        $fiber->start($promises);
+
+        return new self($fiber);
     }
 
     /**

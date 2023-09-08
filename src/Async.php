@@ -9,7 +9,6 @@ use Armie\Tasks\Task;
 use Closure;
 use Fiber;
 use Generator;
-use Traversable;
 use Workerman\Events\Event;
 use Workerman\Timer;
 use Workerman\Worker;
@@ -19,6 +18,7 @@ use function Armie\Helpers\log_warning;
 use function Armie\Helpers\report;
 use function Armie\Helpers\stream_read;
 use function Armie\Helpers\stream_write;
+use function Armie\Helpers\unserialize;
 
 /**
  * Handle async operations.
@@ -30,9 +30,9 @@ use function Armie\Helpers\stream_write;
  */
 class Async
 {
-    const STREAM_TIMEOUT = 30;
-    const STREAM_READ_WRITE_TIMEOUT = 30;
-    const STREAM_BUFFER_LENGTH = 8192;
+    const STREAM_TIMEOUT = 30; // Seconds
+    const STREAM_READ_WRITE_TIMEOUT = 30; // Seconds
+    const STREAM_BUFFER_LENGTH = 8192; // Bytes
     const MAX_CHILD_PROCESSES = 10;
 
     /**
@@ -47,7 +47,7 @@ class Async
             return self::withWorker($task, false);
         }
         // Use event loop
-        elseif (app()->async && app()->getHttpWorkerAddress()) {
+        else if (app()->async && app()->getHttpWorkerAddress()) {
             return self::withEventLoop($task);
         }
         // Use default
@@ -60,20 +60,22 @@ class Async
     }
 
     /**
-     * Run tasks asynchronously.
+     * Run tasks asynchronously. If failed, run synchronously
      *
-     * @param Task[]|callable[]|Traversable<Task|callable> $tasks List of Task instance to run
-     * @param bool                                         $wait  Wait for result
+     * @param iterable<Task|callable> $tasks List of Task instance to run
+     * @param bool                    $wait  Wait for result
      *
      * @return Generator
      */
-    public static function runTasks(Traversable|array $tasks, bool $wait = false): Generator
+    public static function runTasks(iterable $tasks, bool $wait = false): Generator
     {
         // Use Task Worker
         if (app()->async && app()->getTaskWorkerAddress()) {
-            $fibers = array_map(function (Task|callable $task) use ($wait) {
-                return self::withFiberWorker($task, $wait);
-            }, $tasks);
+            /** @var Fiber[] */
+            $fibers = [];
+            foreach ($tasks as $key => $task) {
+                $fibers[$key] = self::withFiberWorker($task, $wait);
+            }
             foreach ($fibers as $key => $fiber) {
                 $fiber->resume();
                 yield $key => $fiber->getReturn();
@@ -82,23 +84,16 @@ class Async
             return null;
         }
         // Use event loop
-        elseif (app()->async && app()->getHttpWorkerAddress() && !$wait) {
-            $results = array_map(function (Task|callable $task) {
-                return self::withEventLoop($task);
-            }, $tasks);
-            foreach ($results as $key => $result) {
-                yield $key => $result;
+        else if (app()->async && app()->getHttpWorkerAddress() && !$wait) {
+            foreach ($tasks as $key => $task) {
+                yield $key => self::withEventLoop($task);
             }
         }
         // Use process forking
-        elseif (!$wait) {
-            $results = array_map(function (Task|callable $task) {
+        else if (!$wait) {
+            foreach ($tasks as $key => $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
-
-                return self::withChildProcess($task) ?: $task->run();
-            }, $tasks);
-            foreach ($results as $key => $result) {
-                yield $key => $result;
+                yield $key => self::withChildProcess($task) ?: $task->run();
             }
         }
         // Use default
@@ -117,11 +112,10 @@ class Async
      *
      * @param Task|callable $task   Task to run
      * @param bool          $wait   Wait for response
-     * @param int           $length Max stream length in bytes
      *
      * @return Fiber
      */
-    public static function withFiberWorker(Task|callable $task, bool $wait = false, int $length = self::STREAM_BUFFER_LENGTH): Fiber
+    public static function withFiberWorker(Task|callable $task, bool $wait = false): Fiber
     {
         app()->throwIfNoTaskWorker();
 
@@ -129,7 +123,7 @@ class Async
         $id = $task->getName();
         $body = strval($task->getRequest(!$wait));
 
-        $fiber = new Fiber(function (string $id, string $body, bool $wait, int $length) {
+        $fiber = new Fiber(function (string $id, string $body, int $length, bool $wait) {
             try {
                 $socket = self::connect($id, true, false);
 
@@ -148,7 +142,7 @@ class Async
                     return !empty($result) ? unserialize($result) : true;
                 } else {
                     // Close socket
-                    $socket && fclose($socket) && $socket = null;
+                    $socket && fflush($socket) && fclose($socket) && $socket = null;
 
                     return true;
                 }
@@ -160,7 +154,7 @@ class Async
         });
 
         // Start running fiber
-        $fiber->start($id, $body, $wait, $length);
+        $fiber->start($id, $body, self::STREAM_BUFFER_LENGTH, $wait);
 
         return $fiber;
     }
@@ -170,11 +164,10 @@ class Async
      *
      * @param Task|callable $task   Task to run
      * @param bool          $wait   Wait for response
-     * @param int           $length Max stream length in bytes
      *
      * @return mixed `false` if failed or `true` if success with no response
      */
-    public static function withWorker(Task|callable $task, bool $wait = true, int $length = self::STREAM_BUFFER_LENGTH): mixed
+    public static function withWorker(Task|callable $task, bool $wait = true): mixed
     {
         app()->throwIfNoTaskWorker();
 
@@ -187,18 +180,18 @@ class Async
             if ($socket) {
                 if ($wait) {
                     // Send the data
-                    stream_write($socket, $body, $length);
+                    stream_write($socket, $body, self::STREAM_BUFFER_LENGTH);
                     // Receive the response.
-                    $result = stream_read($socket, $length);
+                    $result = stream_read($socket, self::STREAM_BUFFER_LENGTH);
                     // Return response.
                     return !empty($result) ? unserialize($result) : true;
                 } else {
-                    return self::streamEventLoop($socket, false, function ($socket, $length, $body) {
+                    return self::streamEventLoop($socket, false, function ($socket, $body, $length) {
                         // Send the data
                         stream_write($socket, $body, $length);
                         // Close socket - for non-persistent connection
-                        $socket && fclose($socket) && $socket = null;
-                    }, [$socket, $length, $body]);
+                        $socket && fflush($socket) && fclose($socket) && $socket = null;
+                    }, [$socket, $body, self::STREAM_BUFFER_LENGTH]);
                 }
             }
 
@@ -221,12 +214,12 @@ class Async
     public static function withChildProcess(Runnable|callable $task, ?callable $callback = null): int|bool
     {
         if (!extension_loaded('pcntl')) {
-            log_warning('Please install `pcntl` extension. '.__FILE__.':'.__LINE__);
+            log_warning('Please install `pcntl` extension. ' . __FILE__ . ':' . __LINE__);
 
             return false;
         }
         if (!extension_loaded('posix')) {
-            log_warning('Please install `posix` extension. '.__FILE__.':'.__LINE__);
+            log_warning('Please install `posix` extension. ' . __FILE__ . ':' . __LINE__);
 
             return false;
         }
@@ -276,7 +269,7 @@ class Async
      * @param Runnable|callable $task     Task to run
      * @param ?callable         $callback Event Loop Callback
      *
-     * @return int|bool Timer Id of `fale` if failed
+     * @return int|bool Timer Id of `false` if failed
      */
     public static function withEventLoop(Runnable|callable $task, ?callable $callback = null): int|bool
     {
@@ -300,7 +293,7 @@ class Async
      * @param resource $fd       Stream File Descriptor
      * @param bool     $readonly Read only stream. `false` if Read / Write
      * @param callable $callback Event Loop Callback
-     * @param array    $params   Event Loop Params
+     * @param array    $params   Event Loop Callback Params
      *
      * @return bool
      */

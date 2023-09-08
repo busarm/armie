@@ -10,7 +10,7 @@ namespace Armie\Interfaces;
  *
  * @codeCoverageIgnore
  */
-interface ContainerInterface
+interface SingletonContainerInterface
 {
     /**
      * Add singleton.

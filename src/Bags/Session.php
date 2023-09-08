@@ -6,6 +6,7 @@ use Armie\Errors\SessionError;
 use Armie\Handlers\EncryptedSessionHandler;
 use Armie\Helpers\Security;
 use Armie\Interfaces\SessionStoreInterface;
+use Generator;
 use SessionHandler;
 use SessionHandlerInterface;
 
@@ -253,7 +254,20 @@ final class Session implements SessionStoreInterface
      */
     public function updates(): array
     {
-        return array_diff($_SESSION, $this->original);
+        return array_filter($_SESSION, fn ($k) => !isset($this->original[$k]) || $this->original[$k] != $_SESSION[$k], ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function itterate(bool $delete = false): Generator
+    {
+        foreach ($_SESSION as $key => $item) {
+            if ($delete) $this->remove($key);
+            yield $key => $item;
+        }
+
+        return null;
     }
 
     /**

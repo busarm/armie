@@ -7,6 +7,8 @@ use SessionHandlerInterface;
 use Workerman\Protocols\Http\Session\SessionHandlerInterface as WorkerSessionHandlerInterface;
 
 /**
+ * Convert Workerman Session Handler to PHP Session Handler
+ * 
  * Armie Framework.
  *
  * @copyright busarm.com
@@ -14,7 +16,11 @@ use Workerman\Protocols\Http\Session\SessionHandlerInterface as WorkerSessionHan
  */
 final class WorkerSessionHandler implements SessionHandlerInterface
 {
-    public function __construct(private WorkerSessionHandlerInterface $handler, private string|null $key = null)
+    /**
+     * @param WorkerSessionHandlerInterface $handler    Workerman Session handler
+     * @param ?string $key                              Secret key: Auto encrypt session if available
+     */
+    public function __construct(private WorkerSessionHandlerInterface $handler, private ?string $key = null)
     {
     }
 

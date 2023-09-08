@@ -85,8 +85,8 @@ class ManyToMany extends Relation
 
         $itemRelationName = $this->getItemRelationName();
         if (count($referenceConditions) && count($referenceParams)) {
-            $results = $this->getReferenceModel()
-                ->withRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
+            $results = $this->getReferenceModel()->clone()
+                ->setRequestedRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
                     $itemRelationName => function (Relation $relation) {
                         $relation->setConditions($this->conditions)
                             ->setParams($this->params)
@@ -157,8 +157,8 @@ class ManyToMany extends Relation
                 $itemRelationName = $this->getItemRelationName();
 
                 // Eager Load item relation for result data
-                $data = $this->getReferenceModel()
-                    ->withRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
+                $data = $this->getReferenceModel()->clone()
+                    ->setRequestedRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
                         $itemRelationName => function (Relation $relation) {
                             $relation->setConditions($this->conditions)
                                 ->setParams($this->params)

@@ -2,19 +2,22 @@
 
 namespace Armie\Handlers;
 
-use Armie\App;
-use Armie\Async;
+use Armie\Bags\Bag;
 use Armie\Errors\QueueError;
 use Armie\Interfaces\QueueHandlerInterface;
-use Armie\Tasks\CallableTask;
+use Armie\Interfaces\StorageBagInterface;
+use Armie\Tasks\BatchTask;
 use Armie\Tasks\Task;
-use Closure;
 use LimitIterator;
-use SplQueue;
 use Workerman\Timer;
 
+use function Armie\Helpers\app;
+use function Armie\Helpers\dispatch;
+use function Armie\Helpers\listen;
+use function Armie\Helpers\report;
+
 /**
- * Handle event operations.
+ * Handle queue operations. Only available if app is running in async mode.
  *
  * Armie Framework
  *
@@ -23,13 +26,6 @@ use Workerman\Timer;
  */
 final class WorkerQueueHandler implements QueueHandlerInterface
 {
-    /**
-     * Queue store.
-     *
-     * @var SplQueue<Task>
-     */
-    public static ?SplQueue $queue;
-
     /**
      * Queue timer instance.
      */
@@ -41,69 +37,107 @@ final class WorkerQueueHandler implements QueueHandlerInterface
     public static bool $queueIdle = true;
 
     /**
-     * @param App $app
-     * @param int $queueRateLimit Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 1000. Must be less than `queueLimit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
-     * @param int $queueLimit     Queue limit: Allowed number of tasks in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * Queue try count
      */
-    public function __construct(private App $app, private int $queueRateLimit = 100, private int $queueLimit = 10000)
-    {
-        $this->queueRateLimit = min($this->queueRateLimit ?: 1, min($this->queueLimit, 1000));
+    public static array $queueCounts = [];
 
-        self::$queue = self::$queue ?? new SplQueue();
-        self::$queue->setIteratorMode(SplQueue::IT_MODE_FIFO | SplQueue::IT_MODE_DELETE);
+    /**
+     * @param int $rate                             Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 100. Must be less than `limit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int $limit                            Queue limit: Max number of tasks allowed in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int $maxRetry                         Queue max retry count: Max number of times to retry task if failed. Default: 5
+     * @param ?StorageBagInterface<string> $store   Queue store: Used to persist queue. Default @see Bag
+     */
+    public function __construct(private int $rate = 10, private int $limit = 10000, private int $maxRetry = 5, private ?StorageBagInterface $store = null)
+    {
+        $this->rate = min($this->rate ?: 1, min($this->limit, 100));
+
+        $this->store = $this->store ?? new Bag();
+    }
+
+    /**
+     * Run queue
+     */
+    public function run(): void
+    {
+        if (self::$queueTimer || $this->store->count() == 0) return;
+
+        self::$queueTimer = Timer::add(1, function () {
+
+            // Queue busy
+            if (!self::$queueIdle) return;
+
+            // Queue completed
+            if ($this->store->count() == 0) {
+                Timer::del(self::$queueTimer);
+                self::$queueTimer = null;
+                return;
+            }
+
+            try {
+                // --- Start Batch ---- //
+
+                self::$queueIdle = false;
+
+                $results = (new BatchTask(new LimitIterator($this->store->itterate(), 0, $this->rate)))->run();
+                if ($results && is_iterable($results)) {
+                    foreach ($results as $key => $result) {
+                        $count = (self::$queueCounts[$key] ?? 0);
+                        // Success
+                        if ($result !== false) {
+                            // Dispatch event
+                            dispatch($key, ['result' => $result]);
+                            unset(self::$queueCounts[$key]);
+                            $this->store->remove($key);
+                        }
+                        // Max retries
+                        else if ($count >= $this->maxRetry) {
+                            unset(self::$queueCounts[$key]);
+                            $this->store->remove($key);
+                        }
+                        // Increase queue counter
+                        else {
+                            self::$queueCounts[$key] = $count + 1;
+                        }
+                    }
+                }
+
+                self::$queueIdle = true;
+                // --- End Batch ---- //
+
+            } catch (\Throwable $th) {
+                report()->exception($th);
+            }
+        }, [], true);
     }
 
     /**
      * @inheritDoc
+     * 
+     * Note: If task returns `false` queue will fail and retry
      */
-    public function enqueue(Task $task): void
+    public function enqueue(Task $task, callable|string|null $listner = null): void
     {
-        $this->app->throwIfNoEventLoop();
+        app()->throwIfNoEventLoop();
 
-        if (count(self::$queue) >= $this->queueLimit) {
+        if ($this->store->count() >= $this->limit) {
             throw new QueueError('Queue limit exceeded. Please try again later');
         }
 
-        $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
+        // Listen to task event
+        $listner && listen($task->getName(), $listner);
 
         // Add to queue
-        self::$queue->enqueue($task);
+        $this->store->set($task->getName(), strval($task->getRequest(false))) or throw new QueueError('Failed to queue ' . $task->getName());
 
         // Run queue
-        self::$queueTimer = self::$queueTimer ?: Timer::add(1, function ($limit) {
-            if (self::$queueIdle) {
-                try {
-                    // --- Start Batch ---- //
-                    self::$queueIdle = false;
-                    $batch = [];
-                    foreach ((new LimitIterator(self::$queue, 0, $limit)) as $task) {
-                        $batch[] = $task;
-                    }
-                    foreach (Async::runTasks($batch) as $key => $result) {
-                        if ($result === false) {
-                            self::$queue->enqueue($batch[$key]); // Failed queue again
-                        }
-                    }
-                    self::$queueIdle = true;
-                    // --- End Batch ---- //
-
-                    // Queue completed
-                    if (self::$queue->count() == 0) {
-                        Timer::del(self::$queueTimer);
-                        self::$queueTimer = null;
-                    }
-                } catch (\Throwable $th) {
-                    $this->app->reporter->exception($th);
-                }
-            }
-        }, [$this->queueRateLimit], true);
+        $this->run();
     }
 
     /**
      * @inheritDoc
      */
-    public function dequeue(string|int $id = null): void
+    public function dequeue(string|int $id): void
     {
-        self::$queue->offsetUnset($id ?? self::$queue->key());
+        $this->store->remove($id);
     }
 }

@@ -7,18 +7,21 @@ use Armie\Dto\CollectionBaseDto;
 use Armie\Dto\PaginatedCollectionDto;
 use Armie\Interfaces\Data\QueryRepositoryInterface;
 
+use function Armie\Helpers\dispatch;
+
 /**
  * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  *
- * @template T
+ * @template ModelType
+ * @template DtoType
  */
 class Repository implements QueryRepositoryInterface
 {
     /**
-     * @param Model&T $model
+     * @param Model&ModelType $model
      */
     public function __construct(private Model $model)
     {
@@ -56,9 +59,20 @@ class Repository implements QueryRepositoryInterface
     public function querySingle(string $query, $params = []): ?BaseDto
     {
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+
             $stmt = $this->model->getDatabase()->prepare($query);
-            if ($stmt && $stmt->execute($params) && ($result = $stmt->fetch(Connection::FETCH_ASSOC))) {
-                return BaseDto::with($result);
+
+            // Dispatch event
+            dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+            if ($stmt && $stmt->execute($params)) {
+
+                // Dispatch event
+                dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+                if (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+                    return BaseDto::with($result);
+                }
             }
         }
 
@@ -74,9 +88,24 @@ class Repository implements QueryRepositoryInterface
         $query = $this->model->getDatabase()->applyLimit($query, 1, $limit);
 
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+
             $stmt = $this->model->getDatabase()->prepare($query);
-            if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
-                return CollectionBaseDto::of($result);
+
+            // Dispatch event
+            dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+            if ($stmt && $stmt->execute($params)) {
+
+                // Dispatch event
+                dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+                $generator = function () use ($stmt) {
+                    while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+                        yield $result;
+                    }
+                };
+
+                return CollectionBaseDto::of($generator());
             }
         }
 
@@ -93,9 +122,24 @@ class Repository implements QueryRepositoryInterface
         $query = $this->model->getDatabase()->applyLimit($query, $page, $limit);
 
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+
             $stmt = $this->model->getDatabase()->prepare($query);
-            if ($stmt && $stmt->execute($params) && ($result = $stmt->fetchAll(Connection::FETCH_ASSOC))) {
-                return new PaginatedCollectionDto(CollectionBaseDto::of($result), $page, $limit, $total);
+
+            // Dispatch event
+            dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+            if ($stmt && $stmt->execute($params)) {
+
+                // Dispatch event
+                dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
+
+                $generator = function () use ($stmt) {
+                    while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
+                        yield $result;
+                    }
+                };
+
+                return new PaginatedCollectionDto(CollectionBaseDto::of($generator()), $page, $limit, $total);
             }
         }
 
@@ -107,7 +151,13 @@ class Repository implements QueryRepositoryInterface
      */
     public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto
     {
-        return CollectionBaseDto::of($this->model->all($conditions, $params, $columns, $limit));
+        if (!empty($this->model->getSoftDeleteDateName())) {
+            return CollectionBaseDto::of($this->model->itterate(array_merge($conditions, [
+                sprintf('ISNULL(%s)', $this->model->getSoftDeleteDateName()),
+            ]), $params, $columns, $limit));
+        } else {
+            return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $limit));
+        }
     }
 
     /**
@@ -115,11 +165,7 @@ class Repository implements QueryRepositoryInterface
      */
     public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto
     {
-        if (!empty($this->model->getSoftDeleteDateName())) {
-            return CollectionBaseDto::of($this->model->allTrashed($conditions, $params, $columns, $limit));
-        }
-
-        return $this->all($conditions, $params, $columns, $limit);
+        return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $limit));
     }
 
     /**
@@ -138,7 +184,7 @@ class Repository implements QueryRepositoryInterface
             'SELECT %s FROM %s %s',
             $colsPlaceHolders,
             $this->model->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         );
 
         return $this->queryPaginate($query, $params, $page, $limit);
@@ -151,7 +197,7 @@ class Repository implements QueryRepositoryInterface
     {
         $data = $this->model->find($id, $conditions, $params, $columns);
 
-        return $data ? BaseDto::with($data->toArray()) : $data;
+        return $data ? BaseDto::with($data) : $data;
     }
 
     /**
@@ -162,7 +208,7 @@ class Repository implements QueryRepositoryInterface
         if (!empty($this->model->getSoftDeleteDateName())) {
             $data = $this->model->findTrashed($id, $conditions, $params, $columns);
 
-            return $data ? BaseDto::with($data->toArray()) : $data;
+            return $data ? BaseDto::with($data) : $data;
         }
 
         return $this->findById($id, $conditions, $params, $columns);

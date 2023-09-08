@@ -4,6 +4,7 @@ namespace Armie\Bags;
 
 use Armie\Crypto;
 use Armie\Interfaces\StorageBagInterface;
+use Generator;
 
 /**
  * Armie Framework.
@@ -46,7 +47,7 @@ final class Cookie implements StorageBagInterface
      */
     public function key(string $name): string
     {
-        return str_starts_with($name, $this->prefix) ? $name : $this->prefix.'_'.$name;
+        return str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
     }
 
     /**
@@ -140,6 +141,19 @@ final class Cookie implements StorageBagInterface
     public function updates(): array
     {
         return array_filter($_COOKIE, fn ($k) => !isset($this->original[$k]) || $this->original[$k] != $_COOKIE[$k], ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function itterate(bool $delete = false): Generator
+    {
+        foreach ($_COOKIE as $key => $item) {
+            if ($delete) $this->remove($key);
+            yield $key => $item;
+        }
+
+        return null;
     }
 
     /**

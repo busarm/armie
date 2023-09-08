@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.6]
+
+### Added
+
+- Support for persistent queue storage. file, database or BYO storage
+- Support for queue listners: Listen to result of queue process
+- Add Database key/value store for basic storage. E.g cache, queue etc.
+- Bug fixes, performance and feature update
+
 ## [2.0.3]
 
 ### Added

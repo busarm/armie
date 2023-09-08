@@ -31,11 +31,11 @@ class Router implements RouterInterface
         '.' => "\.",
     ];
     const MATCHER_REGX = [
-        "/\(".RouteMatcher::ALPHA."\)/"          => '([a-zA-Z]+)',
-        "/\(".RouteMatcher::ALPHA_NUM."\)/"      => '([a-zA-Z-_]+)',
-        "/\(".RouteMatcher::ALPHA_NUM_DASH."\)/" => '([a-zA-Z0-9-_]+)',
-        "/\(".RouteMatcher::NUM."\)/"            => '([0-9]+)',
-        "/\(".RouteMatcher::ANY."\)/"            => '(.+)',
+        "/\(" . RouteMatcher::ALPHA . "\)/"          => '([a-zA-Z]+)',
+        "/\(" . RouteMatcher::ALPHA_NUM . "\)/"      => '([a-zA-Z-_]+)',
+        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => '([a-zA-Z0-9-_]+)',
+        "/\(" . RouteMatcher::NUM . "\)/"            => '([0-9]+)',
+        "/\(" . RouteMatcher::ANY . "\)/"            => '(.+)',
     ];
 
     /**
@@ -45,7 +45,7 @@ class Router implements RouterInterface
         "/\{\w*\}/" => '([a-zA-Z0-9-_]+)',
     ];
 
-    /** @var RouteInterface[] HTTP routes */
+    /** @var array<string,RouteInterface[]> HTTP routes */
     protected array $routes = [];
 
     /**
@@ -57,10 +57,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * @param string $method
-     * @param string $path
-     *
-     * @return RouteInterface
+     * @inheritDoc
      */
     public function createRoute(string $method, string $path): RouteInterface
     {
@@ -73,52 +70,44 @@ class Router implements RouterInterface
             HttpMethod::HEAD->value    => Route::head($path),
         };
 
-        return $this->routes[] = &$route;
+        if (!isset($this->routes[$route->getMethod()->value]))
+            $this->routes[$route->getMethod()->value] = [];
+
+        return $this->routes[$route->getMethod()->value][] = &$route;
     }
 
     /**
-     * Add single route.
-     *
-     * @param RouteInterface $route
-     *
-     * @return RouterInterface
+     * @inheritDoc
      */
     public function addRoute(RouteInterface $route): RouterInterface
     {
-        $this->routes[] = $route;
+        if (!isset($this->routes[$route->getMethod()->value]))
+            $this->routes[$route->getMethod()->value] = [];
+
+        $this->routes[$route->getMethod()->value][] = $route;
 
         return $this;
     }
 
     /**
-     * Add list of routes.
-     *
-     * @param RouteInterface[] $routes
-     *
-     * @return RouterInterface
+     * @inheritDoc
      */
     public function addRoutes(array $routes): RouterInterface
     {
-        $this->routes = array_merge($this->routes, $routes);
+        foreach ($routes as $route) {
+            $this->addRoute($route);
+        }
 
         return $this;
     }
 
     /**
-     * Add Resource (CREATE/READ/UPDATE/DELETE) routes for controller.
-     * Controller must implement ResourceControllerInterface.
-     *
-     * @see ResourceControllerInterface
-     *
-     * @param string                                    $path       HTTP path. e.g /home. @see RouteMatcher for list of parameters matching keywords
-     * @param class-string<ResourceControllerInterface> $controller Application Controller class name e.g Home
-     *
-     * @return RouterInterface
+     * @inheritDoc
      */
     public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
@@ -135,19 +124,15 @@ class Router implements RouterInterface
     }
 
     /**
-     * @return RouteInterface[]
+     * @inheritDoc
      */
-    public function getRoutes(): array
+    public function getRoutes(string $method): array
     {
-        return $this->routes;
+        return $this->routes[strtoupper($method)] ?? [];
     }
 
     /**
-     * Process routing.
-     *
-     * @param RequestInterface|RouteInterface|null $request
-     *
-     * @return \Armie\Interfaces\MiddlewareInterface[]
+     * @inheritDoc
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array
     {
@@ -178,12 +163,9 @@ class Router implements RouterInterface
 
         // If http request
         elseif ($request instanceof RequestInterface) {
-            foreach ($this->routes as $route) {
+            foreach ($this->getRoutes($request->method()->value) as $route) {
                 // Find route
-                if (
-                    $route->getMethod() === $request->method() &&
-                    ($params = $this->isMatch($request->path(), $route->getPath())) !== false
-                ) {
+                if (($params = $this->isMatch($request->path(), $route->getPath())) !== false) {
                     // Set route params
                     $route->params(array_merge($route->getParams(), $params ?: []));
 
@@ -216,16 +198,16 @@ class Router implements RouterInterface
     }
 
     /**
-     * Check if path matches.
+     * Match request path against route
      *
-     * @param string $path       Request path
-     * @param string $route      Route to compare to
-     * @param bool   $startsWith path starts with route
-     * @param bool   $startsWith path ends with route
+     * @param string  $path       Request path
+     * @param string  $route      Route to compare to
+     * @param bool    $startsWith Path starts with route
+     * @param bool    $endsWith   Path ends with route
      *
-     * @return array|false Return list of path match or `false` if failed
+     * @return array|false Return list of path param matches or `false` if failed
      */
-    public function isMatch($path, $route, $startsWith = true, $endsWith = true)
+    protected function isMatch(string $path, string $route, bool $startsWith = true, bool $endsWith = true)
     {
         // Trim leading & trailing slash and spaces
         $route = trim($route, " /\t\n\r");

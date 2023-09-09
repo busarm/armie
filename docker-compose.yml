@@ -8,7 +8,7 @@ services:
       - 9000
     volumes:
       - .:/var/www:rw
-      - ./tests/php/php.ini:/opt/docker/etc/php/php.ini:ro
+      - ./tests/app/php/php.ini:/opt/docker/etc/php/php.ini:ro
     environment:
       # PHP
       PHP_MEMORY_LIMIT: 512M
@@ -24,11 +24,11 @@ services:
       - 80:80
     volumes:
       - .:/var/www:ro
-      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
-      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
+      - ./tests/app/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/app/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
-      WEB_DOCUMENT_ROOT: '/var/www/tests/TestServer'
+      WEB_DOCUMENT_ROOT: '/var/www/tests/app/server'
       WEB_DOCUMENT_INDEX: index.php
       # `php` service name + exposed port
       WEB_PHP_SOCKET: 'php:9000'
@@ -42,12 +42,12 @@ services:
       - 81:80
     volumes:
       - .:/var/www:ro
-      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
-      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
+      - ./tests/app/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/app/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
 
     environment:
       # NGINX
-      WEB_DOCUMENT_ROOT: '/var/www/tests/TestApp'
+      WEB_DOCUMENT_ROOT: '/var/www/tests/app/v1'
       WEB_DOCUMENT_INDEX: index.php
       # `php` service name + exposed port
       WEB_PHP_SOCKET: 'php:9000'
@@ -61,11 +61,11 @@ services:
       - 82:80
     volumes:
       - .:/var/www:ro
-      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
-      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
+      - ./tests/app/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/app/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
-      WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV2'
+      WEB_DOCUMENT_ROOT: '/var/www/tests/app/v2'
       WEB_DOCUMENT_INDEX: index.php
       # `php` service name + exposed port
       WEB_PHP_SOCKET: 'php:9000'
@@ -79,11 +79,11 @@ services:
       - 83:80
     volumes:
       - .:/var/www:ro
-      - ./tests/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
-      - ./tests/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
+      - ./tests/app/nginx/nginx.conf:/opt/docker/etc/nginx/nginx.conf:ro
+      - ./tests/app/nginx/app.conf:/opt/docker/etc/nginx/conf.d/app.conf:ro
     environment:
       # NGINX
-      WEB_DOCUMENT_ROOT: '/var/www/tests/TestAppV3'
+      WEB_DOCUMENT_ROOT: '/var/www/tests/app/v3'
       WEB_DOCUMENT_INDEX: index.php
       # `php` service name + exposed port
       WEB_PHP_SOCKET: 'php:9000'
@@ -95,10 +95,10 @@ services:
       - 3310:3306
     volumes:
       - mysql-volume:/var/lib/mysql:rw
-      - ./tests/mysql/mysql.conf:/etc/mysql/conf.d/mysql.conf:ro
+      - ./tests/app/mysql/mysql.conf:/etc/mysql/conf.d/mysql.conf:ro
       # Deploy database ddl scripts on fresh init 
       # NOTE: If ddl has any error, docker will fail to start
-      - ./tests/database:/docker-entrypoint-initdb.d/:ro
+      - ./tests/app/database:/docker-entrypoint-initdb.d/:ro
     environment:
       - MYSQL_DATABASE=default
       - MYSQL_PASSWORD=root

@@ -16,7 +16,11 @@
         ],
         "psr-4": {
             "Armie\\": "src/",
-            "Armie\\Test\\": "tests/"
+            "Armie\\Tests\\": "tests/",
+            "Armie\\Tests\\App\\Server\\": "tests/app/server",
+            "Armie\\Tests\\App\\V1\\": "tests/app/v1",
+            "Armie\\Tests\\App\\V2\\": "tests/app/v2",
+            "Armie\\Tests\\App\\V3\\": "tests/app/v3"
         }
     },
     "config": {
@@ -25,7 +29,7 @@
     },
     "scripts": {
         "analyze": "./vendor/bin/phpstan analyse --level 3 src tests",
-        "phpunit": "./vendor/bin/phpunit tests -v",
+        "phpunit": "./vendor/bin/phpunit --coverage-text tests -v",
         "test": "composer run analyze && composer run phpunit -- --exclude skip",
         "test-local": "composer run analyze && composer run phpunit",
         "test-skip": "composer run phpunit -- --group skip",

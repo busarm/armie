@@ -7,9 +7,9 @@ use Armie\Config;
 use Armie\Configs\PDOConfig;
 use Armie\Data\PDO\Relation;
 use Armie\Dto\CollectionBaseDto;
-use Armie\Test\TestApp\Models\CategoryTestModel;
-use Armie\Test\TestApp\Models\ProductTestModel;
-use Armie\Test\TestApp\Repositories\ProductTestRepository;
+use Armie\Tests\App\V1\Models\CategoryTestModel;
+use Armie\Tests\App\V1\Models\ProductTestModel;
+use Armie\Tests\App\V1\Repositories\ProductTestRepository;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
@@ -23,8 +23,8 @@ use PHPUnit\Framework\TestCase;
  * @covers \Armie\Data\PDO\Connection
  * @covers \Armie\Data\PDO\Model
  * @covers \Armie\Data\PDO\Repository
- * @covers \Armie\Test\TestApp\Models
- * @covers \Armie\Test\TestApp\Repositories
+ * @covers \Armie\Tests\App\V1\Models
+ * @covers \Armie\Tests\App\V1\Repositories
  *
  * @group skip
  * @group pdo
@@ -47,7 +47,7 @@ final class PDOTest extends TestCase
     {
         if (!isset(self::$app)) {
             $config = (new Config())
-                ->setAppPath(__DIR__.'/TestApp')
+                ->setAppPath(__DIR__.'/app/v1')
                 ->setConfigPath('Configs')
                 ->setViewPath('Views')
                 ->setLogRequest(false)

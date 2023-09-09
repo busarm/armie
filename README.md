@@ -595,7 +595,7 @@ $ composer test
 You can use PHP server built-in server to test:
 
 ```bash
-$ php -S localhost:8181 -t tests/TestApp
+$ php -S localhost:8181 -t tests/app/v1
 ```
 
 ## License

@@ -13,12 +13,12 @@ use Armie\Interfaces\RouterInterface;
 use Armie\Middlewares\CorsMiddleware;
 use Armie\Request;
 use Armie\Route;
-use Armie\Test\TestApp\Controllers\AuthTestController;
-use Armie\Test\TestApp\Controllers\HomeTestController;
-use Armie\Test\TestApp\Controllers\ProductTestController;
-use Armie\Test\TestApp\Services\MockService;
-use Armie\Test\TestApp\Services\MockStatelessService;
-use Armie\Test\TestApp\Views\TestViewPage;
+use Armie\Tests\App\V1\Controllers\AuthTestController;
+use Armie\Tests\App\V1\Controllers\HomeTestController;
+use Armie\Tests\App\V1\Controllers\ProductTestController;
+use Armie\Tests\App\V1\Services\MockService;
+use Armie\Tests\App\V1\Services\MockStatelessService;
+use Armie\Tests\App\V1\Views\TestViewPage;
 use Middlewares\Firewall;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,7 @@ final class AppTest extends TestCase
     protected function setUp(): void
     {
         $config = (new Config())
-            ->setAppPath(__DIR__.'/TestApp')
+            ->setAppPath(__DIR__ . '/app/v1')
             ->setConfigPath('Configs')
             ->setViewPath('Views')
             ->setLogRequest(false);
@@ -80,7 +80,7 @@ final class AppTest extends TestCase
     /**
      * Test app run CLI.
      *
-     * @covers \Armie\Test\TestApp\Controllers\HomeTestController
+     * @covers \Armie\Tests\App\V1\Controllers\HomeTestController
      *
      * @return void
      */
@@ -88,7 +88,7 @@ final class AppTest extends TestCase
     {
         $response = $this->app->run(Route::init()->to(HomeTestController::class, 'ping'));
         $this->assertNotNull($response);
-        $this->assertEquals('success-'.$this->app->env->value, strval($response->getBody()));
+        $this->assertEquals('success-' . $this->app->env->value, strval($response->getBody()));
     }
 
     /**
@@ -99,10 +99,10 @@ final class AppTest extends TestCase
     public function testAppRunMockHttp()
     {
         $this->app->get('pingHtml')->to(HomeTestController::class, 'pingHtml');
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml', HttpMethod::GET, $this->app->config));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('success-'.$this->app->env->value, $response->getBody());
+        $this->assertEquals('success-' . $this->app->env->value, $response->getBody());
     }
 
     /**
@@ -113,7 +113,7 @@ final class AppTest extends TestCase
     public function testAppRunMockHttpView()
     {
         $this->app->get('pingHtml/{name}')->view(TestViewPage::class);
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml/sam', HttpMethod::GET, $this->app->config));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml/sam', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString('Test View Component', strval($response->getBody()));
@@ -133,7 +133,7 @@ final class AppTest extends TestCase
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml'),
         ]);
         $response = $this->app->run(Request::fromUrl(
-            self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
             HttpMethod::OPTIONS,
             $this->app->config
         ));
@@ -157,7 +157,7 @@ final class AppTest extends TestCase
         ]);
         $response = $this->app->run(
             Request::fromUrl(
-                self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
             )->setServer(new Bag([
@@ -189,7 +189,7 @@ final class AppTest extends TestCase
         ]);
         $response = $this->app->run(
             Request::fromUrl(
-                self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
             )->setServer(new Bag([
@@ -220,7 +220,7 @@ final class AppTest extends TestCase
         ]);
         $response = $this->app->run(
             Request::fromUrl(
-                self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::OPTIONS,
                 $this->app->config
             )->setServer(new Bag([
@@ -246,7 +246,7 @@ final class AppTest extends TestCase
             Route::get('pingHtml')->to(HomeTestController::class, 'pingHtml'),
         ]);
         $response = $this->app->run(Request::fromUrl(
-            self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+            self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
             HttpMethod::OPTIONS,
             $this->app->config
         ));
@@ -259,8 +259,7 @@ final class AppTest extends TestCase
     /**
      * Test app singletons.
      *
-     * @covers \Armie\Test\TestApp\Services\MockService
-     * @covers \Armie\Interfaces\SingletonInterface
+     * @covers \Armie\Tests\App\V1\Services\MockService
      * @covers \Armie\Traits\Singleton
      *
      * @return void
@@ -277,8 +276,7 @@ final class AppTest extends TestCase
     /**
      * Test app singletons for async class on async mode - should not be supported.
      *
-     * @covers \Armie\Test\TestApp\Services\MockService
-     * @covers \Armie\Interfaces\SingletonInterface
+     * @covers \Armie\Tests\App\V1\Services\MockService
      * @covers \Armie\Traits\Singleton
      *
      * @return void
@@ -296,15 +294,14 @@ final class AppTest extends TestCase
                 $this->assertNotEquals($mockService->id, $newMockService->id);
             }),
         ]);
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/ping', HttpMethod::GET, $this->app->config));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping', HttpMethod::GET, $this->app->config));
     }
 
     /**
      * Test stateless singletons.
      *
      *
-     * @covers \Armie\Test\TestApp\Services\MockStatelessService
-     * @covers \Armie\Interfaces\SingletonStatelessInterface
+     * @covers \Armie\Tests\App\V1\Services\MockStatelessService
      * @covers \Armie\Traits\SingletonStateless
      *
      * @return void
@@ -322,7 +319,7 @@ final class AppTest extends TestCase
                 $this->assertEquals($mockService->id, $newMockService->id);
             }),
         ]);
-        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/ping', HttpMethod::GET, $this->app->config));
+        $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping', HttpMethod::GET, $this->app->config));
     }
 
     /**
@@ -338,7 +335,7 @@ final class AppTest extends TestCase
         ]);
         $response = $this->app->run(
             Request::fromUrl(
-                self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/pingHtml',
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/pingHtml',
                 HttpMethod::GET,
                 $this->app->config
             )->setServer(new Bag([
@@ -359,7 +356,7 @@ final class AppTest extends TestCase
     public function testAppRunMockHttpResourceController()
     {
         $this->app->config
-            ->setAppPath(__DIR__.'/TestApp')
+            ->setAppPath(__DIR__ . '/app/v1')
             ->setConfigPath('Configs')
             ->setViewPath('Views')
             ->setDb((new PDOConfig())
@@ -375,7 +372,7 @@ final class AppTest extends TestCase
         $this->app->router->addResourceRoutes('product', ProductTestController::class);
         $response = $this->app->run(
             Request::fromUrl(
-                self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/product/paginate?limit=2&page=10',
+                self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/product/paginate?limit=2&page=10',
                 HttpMethod::GET,
                 $this->app->config
             )
@@ -388,16 +385,14 @@ final class AppTest extends TestCase
     /**
      * Test attribute auth Ok.
      *
-     * @covers \Armie\Interfaces\Attributes
-     * @covers \Armie\Interfaces\Attributes
-     * @covers \Armie\Test\TestApp\Attributes
+     * @covers \Armie\Tests\App\V1\Controllers\AuthTestController
      *
      * @return void
      */
     public function testAttributeAuthOk()
     {
         $this->app->get('auth/test')->to(AuthTestController::class, 'test');
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/auth/test', HttpMethod::GET, $this->app->config)
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/auth/test', HttpMethod::GET, $this->app->config)
             ->setServer(new Bag([
                 'HTTP_AUTHORIZATION' => 'php112233445566',
             ]))->initialize());
@@ -409,16 +404,14 @@ final class AppTest extends TestCase
     /**
      * Test attribute auth failed.
      *
-     * @covers \Armie\Interfaces\Attributes
-     * @covers \Armie\Interfaces\Attributes
-     * @covers \Armie\Test\TestApp\Attributes
+     * @covers \Armie\Tests\App\V1\Controllers\AuthTestController
      *
      * @return void
      */
     public function testAttributeAuthFailed()
     {
         $this->app->get('auth/test')->to(AuthTestController::class, 'test');
-        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/auth/test', HttpMethod::GET, $this->app->config));
+        $response = $this->app->run(Request::fromUrl(self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/auth/test', HttpMethod::GET, $this->app->config));
         $this->assertNotNull($response);
         $this->assertEquals(401, $response->getStatusCode());
     }

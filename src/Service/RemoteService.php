@@ -40,18 +40,18 @@ class RemoteService extends BaseService
         $url = $this->location ?? $this->getLocation($this->name);
 
         if (empty($url)) {
-            throw new SystemError(self::class.": Location for client `$this->name` not found");
+            throw new SystemError(self::class . ": Location for client `$this->name` not found");
         }
 
         if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
-            throw new SystemError(self::class.": Location for client `$this->name` is not a valid remote url");
+            throw new SystemError(self::class . ": Location for client `$this->name` is not a valid remote url");
         }
 
-        $uri = (new Uri(rtrim($url, '/').'/'.ltrim($dto->route, '/')));
+        $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
-        $dto->headers['x-trace-id'] = $request->correlationId();
+        $dto->headers['x-trace-id'] = $dto->headers['x-correlation-id'] = $request->correlationId();
 
         // Call remote service
         $client = new Client([
@@ -97,21 +97,21 @@ class RemoteService extends BaseService
         $url = $this->location ?? $this->getLocation($this->name);
 
         if (empty($url)) {
-            throw new SystemError(self::class.": Location for client `$this->name` not found");
+            throw new SystemError(self::class . ": Location for client `$this->name` not found");
         }
 
         if (!($url = filter_var($url, FILTER_VALIDATE_URL))) {
-            throw new SystemError(self::class.": Location for client `$this->name` is not a valid remote url");
+            throw new SystemError(self::class . ": Location for client `$this->name` is not a valid remote url");
         }
 
         $dto->headers = $dto->headers ?? [];
-        $dto->headers['x-trace-id'] = $request->correlationId();
+        $dto->headers['x-trace-id'] = $dto->headers['x-correlation-id'] = $request->correlationId();
 
         $timeout = $this->timeout;
 
         // Call async
         async(static function () use ($url, $dto, $timeout) {
-            $uri = (new Uri(rtrim($url, '/').'/'.ltrim($dto->route, '/')));
+            $uri = (new Uri(rtrim($url, '/') . '/' . ltrim($dto->route, '/')));
             $query = http_parse_query($uri->getQuery());
 
             // Call remote service

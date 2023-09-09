@@ -58,6 +58,7 @@ $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
     return 'success-' . $app->env->value;
 });
+$app->get('/')->to(HomeTestController::class, 'ping');
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->session()?->set('Name', 'Samuel');

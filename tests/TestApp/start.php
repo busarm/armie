@@ -204,6 +204,7 @@ $app->get('test/db-async')->call(function () {
 });
 $app->get('test/async-class')->to(ProductTestController::class, 'task');
 $app->get('test/async-list')->call(function () {
+    log_debug("Script cached - ", opcache_is_script_cached(__FILE__));
     $res = concurrent([
         function () {
             ProductTestModel::update(1, [

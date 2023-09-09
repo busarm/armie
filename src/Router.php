@@ -73,7 +73,7 @@ class Router implements RouterInterface
         if (!isset($this->routes[$route->getMethod()->value]))
             $this->routes[$route->getMethod()->value] = [];
 
-        return $this->routes[$route->getMethod()->value][] = &$route;
+        return $this->routes[$route->getMethod()->value][strtolower($route->getPath())] = &$route;
     }
 
     /**
@@ -84,7 +84,7 @@ class Router implements RouterInterface
         if (!isset($this->routes[$route->getMethod()->value]))
             $this->routes[$route->getMethod()->value] = [];
 
-        $this->routes[$route->getMethod()->value][] = $route;
+        $this->routes[$route->getMethod()->value][strtolower($route->getPath())] = $route;
 
         return $this;
     }
@@ -126,6 +126,28 @@ class Router implements RouterInterface
     /**
      * @inheritDoc
      */
+    public function getRoute(string $method, string $path): ?RouteInterface
+    {
+        $path = strtolower($path);
+        $routes = $this->getRoutes($method);
+
+        if (isset($routes[$path])) {
+            return $routes[$path];
+        }
+
+        foreach ($routes as $route) {
+            if (($params = $this->isMatch($path, strtolower($route->getPath()))) !== false) {
+                $route->params(array_merge($route->getParams(), $params ?: []));
+                return $route;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getRoutes(string $method): array
     {
         return $this->routes[strtoupper($method)] ?? [];
@@ -136,65 +158,49 @@ class Router implements RouterInterface
      */
     public function process(RequestInterface|RouteInterface|null $request = null): array
     {
-        // If custom routes
+        // If route request
         if ($request instanceof RouteInterface) {
-            // View
-            if ($view = $request->getView()) {
-                $routeMiddleware = $request->getMiddlewares() ?? [];
-                $routeMiddleware[] = new ViewRouteMiddleware($view, $request->getParams());
-
-                return $routeMiddleware;
-            }
-            // Callable
-            elseif ($callable = $request->getCallable()) {
-                $routeMiddleware = $request->getMiddlewares() ?? [];
-                $routeMiddleware[] = new CallableRouteMiddleware($callable, $request->getParams());
-
-                return $routeMiddleware;
-            }
-            // Controller
-            else {
-                $routeMiddleware = $request->getMiddlewares() ?? [];
-                $routeMiddleware[] = new ControllerRouteMiddleware($request->getController(), $request->getFunction(), $request->getParams());
-
-                return $routeMiddleware;
-            }
+            return $this->getMiddlewares($request);
         }
-
         // If http request
-        elseif ($request instanceof RequestInterface) {
-            foreach ($this->getRoutes($request->method()->value) as $route) {
-                // Find route
-                if (($params = $this->isMatch($request->path(), $route->getPath())) !== false) {
-                    // Set route params
-                    $route->params(array_merge($route->getParams(), $params ?: []));
-
-                    // View
-                    if ($view = $route->getView()) {
-                        $routeMiddleware = $route->getMiddlewares() ?? [];
-                        $routeMiddleware[] = new ViewRouteMiddleware($view, $route->getParams());
-
-                        return $routeMiddleware;
-                    }
-                    // Callable
-                    if ($callable = $route->getCallable()) {
-                        $routeMiddleware = $route->getMiddlewares() ?? [];
-                        $routeMiddleware[] = new CallableRouteMiddleware($callable, $route->getParams());
-
-                        return $routeMiddleware;
-                    }
-                    // Controller
-                    else {
-                        $routeMiddleware = $route->getMiddlewares() ?? [];
-                        $routeMiddleware[] = new ControllerRouteMiddleware($route->getController(), $route->getFunction(), $route->getParams());
-
-                        return $routeMiddleware;
-                    }
-                }
+        else if ($request instanceof RequestInterface) {
+            if ($route = $this->getRoute($request->method()->value, $request->path())) {
+                return $this->getMiddlewares($route);
             }
         }
 
         return [];
+    }
+
+    /**
+     * Get route middlewares
+     *
+     * @param RouteInterface $route
+     * @return array
+     */
+    public function getMiddlewares(RouteInterface $route): array
+    {
+        // View
+        if ($view = $route->getView()) {
+            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware[] = new ViewRouteMiddleware($view, $route->getParams());
+
+            return $routeMiddleware;
+        }
+        // Callable
+        if ($callable = $route->getCallable()) {
+            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware[] = new CallableRouteMiddleware($callable, $route->getParams());
+
+            return $routeMiddleware;
+        }
+        // Controller
+        else {
+            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware[] = new ControllerRouteMiddleware($route->getController(), $route->getFunction(), $route->getParams());
+
+            return $routeMiddleware;
+        }
     }
 
     /**
@@ -211,14 +217,20 @@ class Router implements RouterInterface
     {
         // Trim leading & trailing slash and spaces
         $route = trim($route, " /\t\n\r");
-        $path = trim($path, " /\t\n\r");
-        // Decode url
-        $path = urldecode($path);
+        $path = trim(urldecode($path), " /\t\n\r");
+
+        if ($route === $path) return [];
+        if (empty($path)) return false;
+
         // Remove unwanted characters from path
         $path = str_replace(self::PATH_EXCLUDE_LIST, '', $path, $excludeCount);
-        if ($excludeCount > 0) {
-            throw new BadRequestException(sprintf('The following charaters are not allowed in the url: %s', implode(',', array_values(self::PATH_EXCLUDE_LIST))));
-        }
+        if ($excludeCount > 0) throw new BadRequestException(
+            sprintf(
+                'The following charaters are not allowed in the url: %s',
+                implode(',', array_values(self::PATH_EXCLUDE_LIST))
+            )
+        );
+
         // Escape charaters to be a safe Regexp
         $route = str_replace(array_keys(self::ESCAPE_LIST), array_values(self::ESCAPE_LIST), $route);
         // Replace matching keywords with regexp

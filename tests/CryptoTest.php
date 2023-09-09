@@ -1,6 +1,6 @@
 <?php
 
-namespace Armie\Test;
+namespace Armie\Tests;
 
 use Armie\Crypto;
 use PHPUnit\Framework\TestCase;

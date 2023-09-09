@@ -53,6 +53,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface as ServerMiddlewareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use SessionHandlerInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -156,6 +157,11 @@ class App implements HttpServerInterface, SingletonContainerInterface
      * @var EventHandlerInterface
      */
     public EventHandlerInterface $eventHandler;
+
+    /**
+     * @var ?SessionHandlerInterface
+     */
+    public ?SessionHandlerInterface $sessionHandler = null;
 
     /**
      * @var ?QueueHandlerInterface
@@ -646,6 +652,21 @@ class App implements HttpServerInterface, SingletonContainerInterface
         return $this;
     }
 
+
+    /**
+     * Set session Handler.
+     *
+     * @param SessionHandlerInterface $sessionHandler Session Handler
+     *
+     * @return self
+     */
+    public function setSessionHandler(SessionHandlerInterface $sessionHandler)
+    {
+        $this->sessionHandler = $sessionHandler;
+
+        return $this;
+    }
+
     /**
      * Set the value of queueHandler.
      *
@@ -892,7 +913,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
             // Add Custom Middlewares
             $this->addMiddleware(new StatelessCookieMiddleware($this->config));
-            $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->config->sessionHandler ?? new WorkerSessionHandler(
+            $this->addMiddleware(new StatelessSessionMiddleware($this->config, $this->sessionHandler ?? new WorkerSessionHandler(
                 new FileSessionHandler($this->config->getSessionConfigs()),
                 $this->config->secret
             )));

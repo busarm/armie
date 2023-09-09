@@ -9,7 +9,6 @@ use Armie\Enums\SameSite;
 use Armie\Enums\Verbose;
 use Armie\Interfaces\ConfigurationInterface;
 use Armie\Traits\CustomConfig;
-use SessionHandlerInterface;
 
 /**
  * Application Configuration.
@@ -185,13 +184,7 @@ class Config implements ConfigurationInterface
      * @var int
      */
     public int|null $sessionLifetime = null;
-
-    /**
-     * Session Handler.
-     *
-     * @var SessionHandlerInterface
-     */
-    public SessionHandlerInterface|null $sessionHandler = null;
+    
 
     // ------------- CACHE -----------------//
 
@@ -583,20 +576,6 @@ class Config implements ConfigurationInterface
     public function setCookieSameSite(SameSite $cookieSameSite)
     {
         $this->cookieSameSite = $cookieSameSite;
-
-        return $this;
-    }
-
-    /**
-     * Set session Handler.
-     *
-     * @param SessionHandlerInterface $sessionHandler Session Handler
-     *
-     * @return self
-     */
-    public function setSessionHandler(SessionHandlerInterface $sessionHandler)
-    {
-        $this->sessionHandler = $sessionHandler;
 
         return $this;
     }

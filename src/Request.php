@@ -121,8 +121,7 @@ class Request implements RequestInterface
                 ),
                 $config?->sessionEnabled ? (new Session(
                     $config ? $config->getSessionConfigs() : [],
-                    $config?->cookieEncrypt ? $config?->secret : null,
-                    $config?->sessionHandler
+                    $config?->cookieEncrypt ? $config?->secret : null
                 )) : null,
                 new Bag(),
                 new Bag()
@@ -130,11 +129,11 @@ class Request implements RequestInterface
 
             $request->_method = $method;
             $request->_scheme = $uri->getScheme();
-            $request->_domain = $uri->getPort() ? $uri->getHost().':'.$uri->getPort() : $uri->getHost();
-            $request->_host = $request->_scheme.'://'.$request->_domain;
-            $request->_path = '/'.ltrim($uri->getPath(), '/');
+            $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
+            $request->_host = $request->_scheme . '://' . $request->_domain;
+            $request->_path = '/' . ltrim($uri->getPath(), '/');
             $request->_baseUrl = $request->_host;
-            $request->_currentUrl = $request->_baseUrl.$request->_path;
+            $request->_currentUrl = $request->_baseUrl . $request->_path;
             $request->_psr = null;
 
             return $request;
@@ -154,20 +153,19 @@ class Request implements RequestInterface
     {
         $request = new self();
         $request->initialize(
-            new Query($_GET),
-            new Bag($_POST),
-            new Cookie(
+            query: new Query($_GET),
+            request: new Bag($_POST),
+            cookies: new Cookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
                 $config?->cookieEncrypt ? $config?->secret : null
             ),
-            $config?->sessionEnabled ? (new Session(
+            session: $config?->sessionEnabled ? (new Session(
                 $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->secret : null,
-                $config?->sessionHandler
+                $config?->cookieEncrypt ? $config?->secret : null
             )) : null,
-            new Bag($_FILES),
-            new Bag($_SERVER)
+            files: new Bag($_FILES),
+            server: new Bag($_SERVER)
         );
         $request->_psr = null;
 
@@ -186,29 +184,28 @@ class Request implements RequestInterface
     {
         $request = new self();
         $request->initialize(
-            (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
-            new Bag((array) ($psr->getParsedBody() ?? [])),
-            (new Cookie(
+            query: (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
+            request: new Bag((array) ($psr->getParsedBody() ?? [])),
+            cookies: (new Cookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name || '')),
                 $config?->cookieEncrypt ? $config?->secret : null
             ))->load($psr->getCookieParams() ?? []),
-            $config?->sessionEnabled ? (new Session(
+            session: $config?->sessionEnabled ? (new Session(
                 $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->secret : null,
-                $config?->sessionHandler
+                $config?->cookieEncrypt ? $config?->secret : null
             )) : null,
-            new Upload($psr->getUploadedFiles()),
-            new Bag($psr->getServerParams()),
-            new Bag(array_map(fn ($header) => $header[0] ?? null, $psr->getHeaders()))
+            files: new Upload($psr->getUploadedFiles()),
+            server: new Bag($psr->getServerParams()),
+            headers: new Bag(array_map(fn ($header) => $header[0] ?? null, $psr->getHeaders()))
         );
 
         $request->_scheme = $psr->getUri()->getScheme();
-        $request->_domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost().':'.$psr->getUri()->getPort() : $psr->getUri()->getHost();
-        $request->_host = $request->_scheme.'://'.$request->_domain;
-        $request->_path = '/'.ltrim($psr->getUri()->getPath(), '/');
+        $request->_domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost() . ':' . $psr->getUri()->getPort() : $psr->getUri()->getHost();
+        $request->_host = $request->_scheme . '://' . $request->_domain;
+        $request->_path = '/' . ltrim($psr->getUri()->getPath(), '/');
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl.$request->_path;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
         $request->_psr = $psr;
 
         return $request;
@@ -227,28 +224,27 @@ class Request implements RequestInterface
         $request = new self();
         $request->setConnection(new HttpConnection($http->connection));
         $request->initialize(
-            new Query($http->get() ?? []),
-            new Bag($http->post() ?? []),
-            (new StatelessCookie(
+            query: new Query($http->get() ?? []),
+            request: new Bag($http->post() ?? []),
+            cookies: (new StatelessCookie(
                 $config ? $config->getCookieConfigs() : [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
                 $config?->cookieEncrypt ? $config?->secret : null
             ))->load($http->cookie() ?? []),
-            $config?->sessionEnabled ? (new StatelessSession(
+            session: $config?->sessionEnabled ? (new StatelessSession(
                 $config?->getSessionConfigs()['name'] ?? 'PHPSESS',
-                $config?->cookieEncrypt ? $config?->secret : null,
-                $config?->sessionHandler
+                $config?->cookieEncrypt ? $config?->secret : null
             )) : null,
-            new Upload($http->file()),
-            new Bag($_SERVER),
-            new Bag($http->header())
+            files: new Upload($http->file()),
+            server: new Bag($_SERVER),
+            headers: new Bag($http->header())
         );
 
         $request->_protocol = $http->protocolVersion();
         $request->_host = $http->host();
         $request->_path = $http->path();
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl.$request->_path;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
         $request->_ip = $http->connection?->getRemoteIp() ?? $request->_ip;
         $request->_workerman = $http;
 
@@ -266,11 +262,11 @@ class Request implements RequestInterface
     {
         $request = clone $this;
         $request->_scheme = $uri->getScheme();
-        $request->_domain = $uri->getPort() ? $uri->getHost().':'.$uri->getPort() : $uri->getHost();
-        $request->_host = $request->_scheme.'://'.$request->_domain;
-        $request->_path = '/'.ltrim($uri->getPath(), '/');
+        $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
+        $request->_host = $request->_scheme . '://' . $request->_domain;
+        $request->_path = '/' . ltrim($uri->getPath(), '/');
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl.$request->_path;
+        $request->_currentUrl = $request->_baseUrl . $request->_path;
         $request->_psr = null;
 
         return $request;
@@ -340,13 +336,13 @@ class Request implements RequestInterface
             $this->_scheme = $this->_scheme ?: ($this->isHttps() ? 'https' : 'http');
             $this->_ip = $this->_ip ?: $this->getIpAddress();
             $this->_domain = $this->_domain ?: $this->_server->get(VAR_HTTP_HOST);
-            $this->_host = $this->_host ?: $this->_scheme.'://'.$this->_domain;
+            $this->_host = $this->_host ?: $this->_scheme . '://' . $this->_domain;
             if (!$this->_path) {
-                $this->_path = '/'.ltrim($this->_server->get(VAR_REQUEST_URI) ?: ($this->_server->get(VAR_PATH_INFO) ?: $this->_server->get(VAR_ORIG_PATH_INFO) ?: ''), '/');
+                $this->_path = '/' . ltrim($this->_server->get(VAR_REQUEST_URI) ?: ($this->_server->get(VAR_PATH_INFO) ?: $this->_server->get(VAR_ORIG_PATH_INFO) ?: ''), '/');
                 $this->_path = rawurldecode(explode('?', $this->_path ?? '', 2)[0]);
             }
             $this->_baseUrl = $this->_baseUrl ?: $this->_host;
-            $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl.$this->_path;
+            $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
 
             $this->_correlationId = ($this->_headers->get('x-trace-id') ??
                 $this->_headers->get('x-correlation-id'))
@@ -354,7 +350,7 @@ class Request implements RequestInterface
 
             $this->_requestId = ($this->_headers->get('x-request-id') ??
                 $this->_headers->get('request-id'))
-                ?: floor(microtime(true) * 1000).'.'.md5(uniqid());
+                ?: floor(microtime(true) * 1000) . '.' . bin2hex(random_bytes(16));
         }
 
         return $this;
@@ -565,7 +561,7 @@ class Request implements RequestInterface
 
         // PHP_AUTH_USER/PHP_AUTH_PW
         if (isset($headers['PHP_AUTH_USER'])) {
-            $headers['AUTHORIZATION'] = 'Basic '.base64_encode($headers['PHP_AUTH_USER'].':'.$headers['PHP_AUTH_PW']);
+            $headers['AUTHORIZATION'] = 'Basic ' . base64_encode($headers['PHP_AUTH_USER'] . ':' . $headers['PHP_AUTH_PW']);
         }
 
         return $headers;

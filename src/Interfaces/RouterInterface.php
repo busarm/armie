@@ -51,14 +51,14 @@ interface RouterInterface
     /**
      * @param string $method Http Method
      * @param string $path   Http Request Path
-     * 
+     *
      * @return ?RouteInterface
      */
     public function getRoute(string $method, string $path): ?RouteInterface;
 
     /**
      * @param string $method Http Method
-     * 
+     *
      * @return RouteInterface[]
      */
     public function getRoutes(string $method): array;

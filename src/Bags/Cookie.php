@@ -47,7 +47,7 @@ final class Cookie implements StorageBagInterface
      */
     public function key(string $name): string
     {
-        return str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
+        return str_starts_with($name, $this->prefix) ? $name : $this->prefix.'_'.$name;
     }
 
     /**
@@ -149,7 +149,9 @@ final class Cookie implements StorageBagInterface
     public function itterate(bool $delete = false): Generator
     {
         foreach ($_COOKIE as $key => $item) {
-            if ($delete) $this->remove($key);
+            if ($delete) {
+                $this->remove($key);
+            }
             yield $key => $item;
         }
 

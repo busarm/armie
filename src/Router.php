@@ -31,11 +31,11 @@ class Router implements RouterInterface
         '.' => "\.",
     ];
     const MATCHER_REGX = [
-        "/\(" . RouteMatcher::ALPHA . "\)/"          => '([a-zA-Z]+)',
-        "/\(" . RouteMatcher::ALPHA_NUM . "\)/"      => '([a-zA-Z-_]+)',
-        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => '([a-zA-Z0-9-_]+)',
-        "/\(" . RouteMatcher::NUM . "\)/"            => '([0-9]+)',
-        "/\(" . RouteMatcher::ANY . "\)/"            => '(.+)',
+        "/\(".RouteMatcher::ALPHA."\)/"          => '([a-zA-Z]+)',
+        "/\(".RouteMatcher::ALPHA_NUM."\)/"      => '([a-zA-Z-_]+)',
+        "/\(".RouteMatcher::ALPHA_NUM_DASH."\)/" => '([a-zA-Z0-9-_]+)',
+        "/\(".RouteMatcher::NUM."\)/"            => '([0-9]+)',
+        "/\(".RouteMatcher::ANY."\)/"            => '(.+)',
     ];
 
     /**
@@ -70,8 +70,9 @@ class Router implements RouterInterface
             HttpMethod::HEAD->value    => Route::head($path),
         };
 
-        if (!isset($this->routes[$route->getMethod()->value]))
+        if (!isset($this->routes[$route->getMethod()->value])) {
             $this->routes[$route->getMethod()->value] = [];
+        }
 
         return $this->routes[$route->getMethod()->value][strtolower($route->getPath())] = &$route;
     }
@@ -81,8 +82,9 @@ class Router implements RouterInterface
      */
     public function addRoute(RouteInterface $route): RouterInterface
     {
-        if (!isset($this->routes[$route->getMethod()->value]))
+        if (!isset($this->routes[$route->getMethod()->value])) {
             $this->routes[$route->getMethod()->value] = [];
+        }
 
         $this->routes[$route->getMethod()->value][strtolower($route->getPath())] = $route;
 
@@ -107,7 +109,7 @@ class Router implements RouterInterface
     public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
@@ -138,6 +140,7 @@ class Router implements RouterInterface
         foreach ($routes as $route) {
             if (($params = $this->isMatch($path, strtolower($route->getPath()))) !== false) {
                 $route->params(array_merge($route->getParams(), $params ?: []));
+
                 return $route;
             }
         }
@@ -163,7 +166,7 @@ class Router implements RouterInterface
             return $this->getMiddlewares($request);
         }
         // If http request
-        else if ($request instanceof RequestInterface) {
+        elseif ($request instanceof RequestInterface) {
             if ($route = $this->getRoute($request->method()->value, $request->path())) {
                 return $this->getMiddlewares($route);
             }
@@ -173,9 +176,10 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get route middlewares
+     * Get route middlewares.
      *
      * @param RouteInterface $route
+     *
      * @return array
      */
     public function getMiddlewares(RouteInterface $route): array
@@ -204,12 +208,12 @@ class Router implements RouterInterface
     }
 
     /**
-     * Match request path against route
+     * Match request path against route.
      *
-     * @param string  $path       Request path
-     * @param string  $route      Route to compare to
-     * @param bool    $startsWith Path starts with route
-     * @param bool    $endsWith   Path ends with route
+     * @param string $path       Request path
+     * @param string $route      Route to compare to
+     * @param bool   $startsWith Path starts with route
+     * @param bool   $endsWith   Path ends with route
      *
      * @return array|false Return list of path param matches or `false` if failed
      */
@@ -219,17 +223,23 @@ class Router implements RouterInterface
         $route = trim($route, " /\t\n\r");
         $path = trim(urldecode($path), " /\t\n\r");
 
-        if ($route === $path) return [];
-        if (empty($path)) return false;
+        if ($route === $path) {
+            return [];
+        }
+        if (empty($path)) {
+            return false;
+        }
 
         // Remove unwanted characters from path
         $path = str_replace(self::PATH_EXCLUDE_LIST, '', $path, $excludeCount);
-        if ($excludeCount > 0) throw new BadRequestException(
-            sprintf(
-                'The following charaters are not allowed in the url: %s',
-                implode(',', array_values(self::PATH_EXCLUDE_LIST))
-            )
-        );
+        if ($excludeCount > 0) {
+            throw new BadRequestException(
+                sprintf(
+                    'The following charaters are not allowed in the url: %s',
+                    implode(',', array_values(self::PATH_EXCLUDE_LIST))
+                )
+            );
+        }
 
         // Escape charaters to be a safe Regexp
         $route = str_replace(array_keys(self::ESCAPE_LIST), array_values(self::ESCAPE_LIST), $route);

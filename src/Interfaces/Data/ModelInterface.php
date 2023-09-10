@@ -74,7 +74,7 @@ interface ModelInterface
      * Count total number of model items.
      *
      * @param string|null $query  Custom query to count
-     * @param array $params       Custom query params
+     * @param array       $params Custom query params
      *
      * @return int
      */

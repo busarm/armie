@@ -21,10 +21,10 @@ class ErrorTraceDto extends BaseDto
 
     /**
      * @param array $trace Instance of Error Trace
-     * - file
-     * - line
-     * - class
-     * - function
+     *                     - file
+     *                     - line
+     *                     - class
+     *                     - function
      */
     public function __construct($trace = [])
     {

@@ -116,9 +116,10 @@ interface StorageBagInterface extends Stringable, Countable
     public function count(): int;
 
     /**
-     * Itterate store
+     * Itterate store.
      *
      * @param bool $delete Delete item upon itteration
+     *
      * @return Iterator<T>
      */
     public function itterate(bool $delete = false): Iterator;

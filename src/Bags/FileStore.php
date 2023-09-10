@@ -28,16 +28,16 @@ class FileStore implements StorageBagInterface
     const STORAGE_EXT = '.astore';
 
     /**
-     * Last time store was loaded
+     * Last time store was loaded.
      *
-     * @var integer
+     * @var int
      */
     protected int $loadTime = 0;
 
     /**
-     * @param string  $basePath  Storage root folder
-     * @param ?string $key       Secret key for encryption. Ignore to disable encryption
-     * @param bool    $async     Save file asynchronously. Default: false
+     * @param string  $basePath Storage root folder
+     * @param ?string $key      Secret key for encryption. Ignore to disable encryption
+     * @param bool    $async    Save file asynchronously. Default: false
      */
     public function __construct(protected string $basePath, protected ?string $key = null, protected bool $async = false)
     {
@@ -100,6 +100,7 @@ class FileStore implements StorageBagInterface
         } else {
             $done = $file ? stream_write($file, $data) : false;
             $file && fflush($file) && fclose($file) && $file = null;
+
             return $done;
         }
     }
@@ -126,6 +127,7 @@ class FileStore implements StorageBagInterface
                 // 4. Sanitize
                 $data = $sanitize ? Security::clean($data) : $data;
             }
+
             return $data ?? $default;
         }
 
@@ -236,9 +238,9 @@ class FileStore implements StorageBagInterface
      */
     private function fullPath(string $path): string
     {
-        $path = $this->isStorePath($path) ? $path : sha1($path) . self::STORAGE_EXT;
+        $path = $this->isStorePath($path) ? $path : sha1($path).self::STORAGE_EXT;
 
-        return str_starts_with($path, $this->basePath) ? $path : $this->basePath . DIRECTORY_SEPARATOR . $path;
+        return str_starts_with($path, $this->basePath) ? $path : $this->basePath.DIRECTORY_SEPARATOR.$path;
     }
 
     /**

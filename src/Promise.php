@@ -67,14 +67,18 @@ class Promise implements PromiseThen
 
     /**
      * @param Fiber|Task<T>|callable():T $task
-     * 
+     *
      * @throws FiberError
      */
     public function __construct(Fiber|Task|callable $task)
     {
         if ($task instanceof Fiber) {
-            if (!$task->isStarted()) $task->start();
-            if ($task->isTerminated()) throw new FiberError;
+            if (!$task->isStarted()) {
+                $task->start();
+            }
+            if ($task->isTerminated()) {
+                throw new FiberError();
+            }
             $this->_fiber = $task;
         } else {
             $this->_fiber = Async::withFiberWorker($task, true);
@@ -159,6 +163,7 @@ class Promise implements PromiseThen
         $fiber = new Fiber(
             function (array $promises) {
                 Fiber::suspend();
+
                 return array_map(
                     fn (self $promise) => $promise->wait(),
                     $promises

@@ -263,7 +263,9 @@ final class Session implements SessionStoreInterface
     public function itterate(bool $delete = false): Generator
     {
         foreach ($_SESSION as $key => $item) {
-            if ($delete) $this->remove($key);
+            if ($delete) {
+                $this->remove($key);
+            }
             yield $key => $item;
         }
 

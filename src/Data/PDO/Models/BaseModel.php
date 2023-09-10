@@ -15,14 +15,14 @@ use Armie\Data\PDO\Model;
 class BaseModel extends Model
 {
     protected string $_table = '';
-    protected string $_key   = '';
+    protected string $_key = '';
     protected ?string $_createdAt = null;
     protected ?string $_updatedAt = null;
     protected ?string $_deletedAt = null;
-    /** @var \Armie\Data\PDO\Field[] $fields */
-    protected array $_fields      = [];
+    /** @var \Armie\Data\PDO\Field[] */
+    protected array $_fields = [];
     /** @var \Armie\Data\PDO\Relation<static,parent>[] */
-    protected array $_relations   = [];
+    protected array $_relations = [];
 
     public function __sleep(): array
     {
@@ -30,7 +30,7 @@ class BaseModel extends Model
             parent::__sleep(),
             [
                 '_table', '_key', '_createdAt', '_updatedAt',
-                '_fields', '_relations'
+                '_fields', '_relations',
             ]
         );
     }
@@ -44,18 +44,20 @@ class BaseModel extends Model
             parent::__excluded(),
             [
                 '_table', '_key', '_createdAt', '_updatedAt',
-                '_fields', '_relations'
+                '_fields', '_relations',
             ]
         );
     }
+
     /**
-     * @param string $tableName
-     * @param string $keyName
-     * @param string $createdDateName
-     * @param string $updatedDateName
-     * @param string $deletedDateName
-     * @param \Armie\Data\PDO\Field[] $fields
+     * @param string                                    $tableName
+     * @param string                                    $keyName
+     * @param string                                    $createdDateName
+     * @param string                                    $updatedDateName
+     * @param string                                    $deletedDateName
+     * @param \Armie\Data\PDO\Field[]                   $fields
      * @param \Armie\Data\PDO\Relation<static,parent>[] $relations
+     *
      * @return static
      */
     public static function init(
@@ -75,12 +77,11 @@ class BaseModel extends Model
         $model->_deletedAt = $deletedDateName;
         $model->_fields = $fields;
         $model->_relations = $relations;
+
         return $model;
     }
 
-
-    ########### Getters ###########
-
+    //########## Getters ###########
 
     /**
      * @inheritDoc
@@ -89,6 +90,7 @@ class BaseModel extends Model
     {
         return $this->_table;
     }
+
     /**
      * @inheritDoc
      */
@@ -96,6 +98,7 @@ class BaseModel extends Model
     {
         return $this->_key;
     }
+
     /**
      * @inheritDoc
      */
@@ -103,6 +106,7 @@ class BaseModel extends Model
     {
         return $this->_createdAt;
     }
+
     /**
      * @inheritDoc
      */
@@ -110,6 +114,7 @@ class BaseModel extends Model
     {
         return $this->_updatedAt;
     }
+
     /**
      * @inheritDoc
      */
@@ -117,6 +122,7 @@ class BaseModel extends Model
     {
         return $this->_deletedAt;
     }
+
     /**
      * @inheritDoc
      */
@@ -124,6 +130,7 @@ class BaseModel extends Model
     {
         return $this->_fields;
     }
+
     /**
      * @inheritDoc
      */

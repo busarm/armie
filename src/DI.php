@@ -150,7 +150,7 @@ class DI
                             $instance = $this->instantiate($className, $request);
                         }
                         ($param->isOptional() || $param->isDefaultValueAvailable()) or
-                            throw new DependencyError('No interface binding exists for ' . $name);
+                            throw new DependencyError('No interface binding exists for '.$name);
                     } else {
                         continue;
                     }

@@ -129,11 +129,11 @@ class Request implements RequestInterface
 
             $request->_method = $method;
             $request->_scheme = $uri->getScheme();
-            $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
-            $request->_host = $request->_scheme . '://' . $request->_domain;
-            $request->_path = '/' . ltrim($uri->getPath(), '/');
+            $request->_domain = $uri->getPort() ? $uri->getHost().':'.$uri->getPort() : $uri->getHost();
+            $request->_host = $request->_scheme.'://'.$request->_domain;
+            $request->_path = '/'.ltrim($uri->getPath(), '/');
             $request->_baseUrl = $request->_host;
-            $request->_currentUrl = $request->_baseUrl . $request->_path;
+            $request->_currentUrl = $request->_baseUrl.$request->_path;
             $request->_psr = null;
 
             return $request;
@@ -201,11 +201,11 @@ class Request implements RequestInterface
         );
 
         $request->_scheme = $psr->getUri()->getScheme();
-        $request->_domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost() . ':' . $psr->getUri()->getPort() : $psr->getUri()->getHost();
-        $request->_host = $request->_scheme . '://' . $request->_domain;
-        $request->_path = '/' . ltrim($psr->getUri()->getPath(), '/');
+        $request->_domain = $psr->getUri()->getPort() ? $psr->getUri()->getHost().':'.$psr->getUri()->getPort() : $psr->getUri()->getHost();
+        $request->_host = $request->_scheme.'://'.$request->_domain;
+        $request->_path = '/'.ltrim($psr->getUri()->getPath(), '/');
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_currentUrl = $request->_baseUrl.$request->_path;
         $request->_psr = $psr;
 
         return $request;
@@ -244,7 +244,7 @@ class Request implements RequestInterface
         $request->_host = $http->host();
         $request->_path = $http->path();
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_currentUrl = $request->_baseUrl.$request->_path;
         $request->_ip = $http->connection?->getRemoteIp() ?? $request->_ip;
         $request->_workerman = $http;
 
@@ -262,11 +262,11 @@ class Request implements RequestInterface
     {
         $request = clone $this;
         $request->_scheme = $uri->getScheme();
-        $request->_domain = $uri->getPort() ? $uri->getHost() . ':' . $uri->getPort() : $uri->getHost();
-        $request->_host = $request->_scheme . '://' . $request->_domain;
-        $request->_path = '/' . ltrim($uri->getPath(), '/');
+        $request->_domain = $uri->getPort() ? $uri->getHost().':'.$uri->getPort() : $uri->getHost();
+        $request->_host = $request->_scheme.'://'.$request->_domain;
+        $request->_path = '/'.ltrim($uri->getPath(), '/');
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_currentUrl = $request->_baseUrl.$request->_path;
         $request->_psr = null;
 
         return $request;
@@ -336,13 +336,13 @@ class Request implements RequestInterface
             $this->_scheme = $this->_scheme ?: ($this->isHttps() ? 'https' : 'http');
             $this->_ip = $this->_ip ?: $this->getIpAddress();
             $this->_domain = $this->_domain ?: $this->_server->get(VAR_HTTP_HOST);
-            $this->_host = $this->_host ?: $this->_scheme . '://' . $this->_domain;
+            $this->_host = $this->_host ?: $this->_scheme.'://'.$this->_domain;
             if (!$this->_path) {
-                $this->_path = '/' . ltrim($this->_server->get(VAR_REQUEST_URI) ?: ($this->_server->get(VAR_PATH_INFO) ?: $this->_server->get(VAR_ORIG_PATH_INFO) ?: ''), '/');
+                $this->_path = '/'.ltrim($this->_server->get(VAR_REQUEST_URI) ?: ($this->_server->get(VAR_PATH_INFO) ?: $this->_server->get(VAR_ORIG_PATH_INFO) ?: ''), '/');
                 $this->_path = rawurldecode(explode('?', $this->_path ?? '', 2)[0]);
             }
             $this->_baseUrl = $this->_baseUrl ?: $this->_host;
-            $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl . $this->_path;
+            $this->_currentUrl = $this->_currentUrl ?: $this->_baseUrl.$this->_path;
 
             $this->_correlationId = ($this->_headers->get('x-trace-id') ??
                 $this->_headers->get('x-correlation-id'))
@@ -350,7 +350,7 @@ class Request implements RequestInterface
 
             $this->_requestId = ($this->_headers->get('x-request-id') ??
                 $this->_headers->get('request-id'))
-                ?: floor(microtime(true) * 1000) . '.' . bin2hex(random_bytes(16));
+                ?: floor(microtime(true) * 1000).'.'.bin2hex(random_bytes(16));
         }
 
         return $this;
@@ -561,7 +561,7 @@ class Request implements RequestInterface
 
         // PHP_AUTH_USER/PHP_AUTH_PW
         if (isset($headers['PHP_AUTH_USER'])) {
-            $headers['AUTHORIZATION'] = 'Basic ' . base64_encode($headers['PHP_AUTH_USER'] . ':' . $headers['PHP_AUTH_PW']);
+            $headers['AUTHORIZATION'] = 'Basic '.base64_encode($headers['PHP_AUTH_USER'].':'.$headers['PHP_AUTH_PW']);
         }
 
         return $headers;

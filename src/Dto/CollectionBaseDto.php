@@ -28,8 +28,8 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
     use TypeResolver;
 
     /**
-     * @param iterable<T>           $list
-     * @param ?class-string<T>      $itemClass Define the class that will be used for all items in the array.
+     * @param iterable<T>      $list
+     * @param ?class-string<T> $itemClass Define the class that will be used for all items in the array.
      *
      * @throws InvalidArgumentException
      */
@@ -190,7 +190,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
      *
      * @see array_walk
      *
-     * @param callable $callback
+     * @param callable   $callback
      * @param mixed|null $userData
      *
      * @return bool Returns true on success, otherwise false
@@ -449,11 +449,11 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
             if (!$trim || $item !== null) {
                 if ($item instanceof static) {
                     $result[] = $item->toArray($trim);
-                } else if ($item instanceof DataObject) {
+                } elseif ($item instanceof DataObject) {
                     $result[] = $item->toArray($trim);
-                } else if ($item instanceof BaseDto) {
+                } elseif ($item instanceof BaseDto) {
                     $result[] = $item->toArray($trim);
-                } else if (is_array($item)) {
+                } elseif (is_array($item)) {
                     // Item class provided
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto

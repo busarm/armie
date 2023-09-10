@@ -5,8 +5,8 @@ namespace Armie\Handlers;
 use Workerman\Connection\TcpConnection;
 
 /**
- * Reload worker when max request reached
- * 
+ * Reload worker when max request reached.
+ *
  * Armie Framework.
  *
  * @copyright busarm.com
@@ -17,7 +17,7 @@ final class WorkerMaxRequestHandler
     /**
      * @var array<int,int>
      */
-    static $requests = [];
+    public static $requests = [];
 
     public function __construct(protected int $maxRequests)
     {

@@ -80,7 +80,7 @@ class Resolver implements ContainerInterface, DependencyResolverInterface
             MessageResponseInterface::class  => $request && $request instanceof RequestInterface ? (new Response(version: $request->version(), format: app()->config->http->responseFormat))->toPsr() : (new Response())->toPsr(),
             AuthResolver::class              => $request && $request instanceof RequestInterface ? $request->auth() : null,
             AuthUserResolver::class          => $request && $request instanceof RequestInterface ? $request->auth()?->getUser() : null,
-            HttpConnectionResolver::class  => $request && $request instanceof RequestInterface ? $request->connection() : null,
+            HttpConnectionResolver::class    => $request && $request instanceof RequestInterface ? $request->connection() : null,
             ConnectionInterface::class       => $request && $request instanceof RequestInterface ? $request->connection()?->get() : null,
             ServiceDiscoveryInterface::class, DistributedServiceDiscoveryInterface::class  => app()->serviceDiscovery,
             default => ($request ? $request->getSingleton($className) : null) ?: app()->getSingleton($className)

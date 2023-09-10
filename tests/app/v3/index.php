@@ -12,7 +12,7 @@ use Armie\Interfaces\RequestInterface;
 use Armie\Request;
 use Armie\Service\RemoteServiceDiscovery;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__.'/../../../vendor/autoload.php';
 
 $config = (new Config())
     ->setAppPath(__DIR__)

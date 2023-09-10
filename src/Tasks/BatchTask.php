@@ -26,7 +26,7 @@ final class BatchTask extends Task
 
     /**
      * @inheritdoc
-     * 
+     *
      * @return iterable|bool|null
      */
     public function run()

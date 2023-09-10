@@ -39,7 +39,7 @@ function unit_convert($size)
     $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
     $index = floor(log($size, 1024));
 
-    return (round($size / pow(1024, $index), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
+    return (round($size / pow(1024, $index), 2) ?? 0).' '.$unit[$index] ?? '~';
 }
 
 /**
@@ -152,10 +152,10 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? exit(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? exit(PHP_EOL.$data.PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
 
-    return is_cli() ? exit(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
+    return is_cli() ? exit(PHP_EOL.var_export($data, true).PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
 }
 
 //######### APPLICATION HELPERS ############
@@ -240,15 +240,15 @@ function log_message($level, $message, array $context = [])
 {
     $message = print_r($message, true);
     $message = sprintf(
-        "%s.%s - %s",
+        '%s.%s - %s',
         date('Y-m-d H:i:s', time()),
         substr(gettimeofday()['usec'] ?? '0000', 0, 4),
         $message
     );
 
     try {
-        $prefix = app()->getWorker() ? sprintf("%s (#%s)", app()->getWorker()->name, app()->getWorker()->id) : app()->config->name;
-        $message = $prefix . ' - ' . $message;
+        $prefix = app()->getWorker() ? sprintf('%s (#%s)', app()->getWorker()->name, app()->getWorker()->id) : app()->config->name;
+        $message = $prefix.' - '.$message;
         app()->logger->log($level, $message, $context);
     } catch (\Throwable) {
         (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
@@ -448,19 +448,19 @@ function create_cookie_header(
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    $date = date('D, d-M-Y H:i:s', $expires) . ' GMT';
+    $date = date('D, d-M-Y H:i:s', $expires).' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
-        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
+        $header .= "; Expires={$date}; Max-Age=".($expires - time());
     }
     if ($path != '') {
-        $header .= '; Path=' . $path;
+        $header .= '; Path='.$path;
     }
     if ($domain != '') {
-        $header .= '; Domain=' . $domain;
+        $header .= '; Domain='.$domain;
     }
     if ($samesite != '') {
-        $header .= '; SameSite=' . $samesite;
+        $header .= '; SameSite='.$samesite;
     }
     if ($secure) {
         $header .= '; Secure';
@@ -549,8 +549,8 @@ function await(Promise|PromiseThen|PromiseFinal $promise): mixed
 /**
  * Run task asynchronously.
  *
- * @param Task|callable $task       Task to process
- * @param bool $useEventLoopOnly    Force to process using event loop only
+ * @param Task|callable $task             Task to process
+ * @param bool          $useEventLoopOnly Force to process using event loop only
  */
 function async(Task|callable $task, bool $useEventLoopOnly = false): void
 {
@@ -593,7 +593,7 @@ function dispatch(string $event, array $data = [])
 /**
  * Queue task.
  *
- * @param Task|callable $task
+ * @param Task|callable                        $task
  * @param callable|class-string<Runnable>|null $listner
  */
 function enqueue(Task|callable $task, callable|string|null $listner = null)

@@ -17,7 +17,7 @@ class BaseDto extends DataObject
      * Load dto with array of class attibutes.
      *
      * @param Arrayable|self|array|null $data
-     * @param bool              $sanitize
+     * @param bool                      $sanitize
      *
      * @return self
      */

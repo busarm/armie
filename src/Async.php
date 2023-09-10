@@ -47,7 +47,7 @@ class Async
             return self::withWorker($task, false);
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress()) {
+        elseif (app()->async && app()->getHttpWorkerAddress()) {
             return self::withEventLoop($task);
         }
         // Use default
@@ -60,7 +60,7 @@ class Async
     }
 
     /**
-     * Run tasks asynchronously. If failed, run synchronously
+     * Run tasks asynchronously. If failed, run synchronously.
      *
      * @param iterable<Task|callable> $tasks List of Task instance to run
      * @param bool                    $wait  Wait for result
@@ -84,13 +84,13 @@ class Async
             return null;
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress() && !$wait) {
+        elseif (app()->async && app()->getHttpWorkerAddress() && !$wait) {
             foreach ($tasks as $key => $task) {
                 yield $key => self::withEventLoop($task);
             }
         }
         // Use process forking
-        else if (!$wait) {
+        elseif (!$wait) {
             foreach ($tasks as $key => $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
                 yield $key => self::withChildProcess($task) ?: $task->run();
@@ -110,8 +110,8 @@ class Async
     /**
      * Run task using task worker with fibers.
      *
-     * @param Task|callable $task   Task to run
-     * @param bool          $wait   Wait for response
+     * @param Task|callable $task Task to run
+     * @param bool          $wait Wait for response
      *
      * @return Fiber
      */
@@ -162,8 +162,8 @@ class Async
     /**
      * Run task using task worker.
      *
-     * @param Task|callable $task   Task to run
-     * @param bool          $wait   Wait for response
+     * @param Task|callable $task Task to run
+     * @param bool          $wait Wait for response
      *
      * @return mixed `false` if failed or `true` if success with no response
      */
@@ -214,12 +214,12 @@ class Async
     public static function withChildProcess(Runnable|callable $task, ?callable $callback = null): int|bool
     {
         if (!extension_loaded('pcntl')) {
-            log_warning('Please install `pcntl` extension. ' . __FILE__ . ':' . __LINE__);
+            log_warning('Please install `pcntl` extension. '.__FILE__.':'.__LINE__);
 
             return false;
         }
         if (!extension_loaded('posix')) {
-            log_warning('Please install `posix` extension. ' . __FILE__ . ':' . __LINE__);
+            log_warning('Please install `posix` extension. '.__FILE__.':'.__LINE__);
 
             return false;
         }

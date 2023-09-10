@@ -23,7 +23,7 @@ abstract class Task implements Runnable
 
     public function __construct(string $name = null)
     {
-        $this->name = ($name ?: static::class) . ':' . microtime(true) . ':' . bin2hex(random_bytes(8));
+        $this->name = ($name ?: static::class).':'.microtime(true).':'.bin2hex(random_bytes(8));
     }
 
     /**
@@ -69,9 +69,10 @@ abstract class Task implements Runnable
     abstract public function run();
 
     /**
-     * Parse request
+     * Parse request.
      *
      * @param TaskDto $dto
+     *
      * @return ?static
      */
     public static function parse(TaskDto $dto): ?static
@@ -84,6 +85,7 @@ abstract class Task implements Runnable
             $task = app()->di->instantiate($dto->class, null, $dto->params);
             if ($task instanceof static) {
                 $task->name = $dto->name;
+
                 return $task;
             }
         }

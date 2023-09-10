@@ -34,9 +34,9 @@ final class ResponseHandler implements ResponseHandlerInterface
         if ($this->data !== false) {
             if ($this->data instanceof ResponseInterface) {
                 $response = $this->data;
-            } else if ($this->data instanceof MessageResponseInterface) {
+            } elseif ($this->data instanceof MessageResponseInterface) {
                 $response = Response::fromPsr($this->data);
-            } else if ($this->data instanceof ResponseHandlerInterface) {
+            } elseif ($this->data instanceof ResponseHandlerInterface) {
                 $response = $this->data->handle();
             } else {
                 $response = new Response(statusCode: 200, version: $this->version, format: $this->format);
@@ -46,27 +46,27 @@ final class ResponseHandler implements ResponseHandlerInterface
                         $response->setBody($this->data);
                     }
                     // Promise
-                    else if ($this->data instanceof Promise) {
+                    elseif ($this->data instanceof Promise) {
                         $response->setBody(json_encode(await($this->data)));
                     }
                     // Data object
-                    else if ($this->data instanceof DataObject) {
+                    elseif ($this->data instanceof DataObject) {
                         $response->setBody(strval($this->data));
                     }
                     // Arrayable
-                    else if ($this->data instanceof Arrayable) {
+                    elseif ($this->data instanceof Arrayable) {
                         $response->setParameters($this->data->toArray());
                     }
                     // Iterable
-                    else if (is_iterable($this->data)) {
+                    elseif (is_iterable($this->data)) {
                         $response->setBody(json_encode(CollectionBaseDto::of($this->data)));
                     }
                     // Array or Object
-                    else if (is_array($this->data) || is_object($this->data)) {
+                    elseif (is_array($this->data) || is_object($this->data)) {
                         $response->setBody(Stream::create(json_encode($this->data)));
                     }
                     // String or Number
-                    else if (is_string($this->data) || is_numeric($this->data)) {
+                    elseif (is_string($this->data) || is_numeric($this->data)) {
                         $response->html(Stream::create(strval($this->data)), 200);
                     }
                 }

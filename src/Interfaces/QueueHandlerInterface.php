@@ -17,7 +17,7 @@ interface QueueHandlerInterface
     /**
      * Queue task.
      *
-     * @param Task $task
+     * @param Task                                 $task
      * @param callable|class-string<Runnable>|null $listner
      */
     public function enqueue(Task $task, callable|string|null $listner = null): void;
@@ -25,7 +25,7 @@ interface QueueHandlerInterface
     /**
      * Remove from queue.
      *
-     * @param string|int $id 
+     * @param string|int $id
      */
     public function dequeue(string|int $id): void;
 }

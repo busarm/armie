@@ -40,11 +40,11 @@ class DI
      * @param RequestInterface|RouteInterface|null $request Request
      * @param array<string,mixed>                  $params  List of Custom params. (name => value) E.g [ 'request' => $request ]
      *
-     * @return T
+     * @return ?T
      *
      * @template T Item type template
      */
-    public function instantiate(ReflectionClass|string $class, RequestInterface|RouteInterface|null $request = null, array $params = [])
+    public function instantiate(ReflectionClass|string $class, RequestInterface|RouteInterface|null $request = null, array $params = []): mixed
     {
         if (!($class instanceof ReflectionClass)) {
             $class = new ReflectionClass($class);
@@ -134,7 +134,8 @@ class DI
                 $instance = null;
 
                 // Resolve with custom resolver
-                if (($type = $param->getType())
+                if (
+                    ($type = $param->getType())
                     && ($name = strval($type))
                     && is_null($instance = app()->resolver->resolve($name, $request))
                 ) {
@@ -157,7 +158,7 @@ class DI
                 }
 
                 // Customize resolution
-                if (isset($instance) && app()->resolver) {
+                if (isset($instance)) {
                     $instance = app()->resolver->customize($instance, $request) ?: $instance;
                 }
 

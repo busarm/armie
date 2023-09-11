@@ -51,13 +51,13 @@ class DatabaseStore implements StorageBagInterface
      * @param bool    $async    Save asynchronously. Default: false
      */
     public function __construct(
-        string  $tableName,
-        string  $keyColumn    = 'key',
-        protected string  $valueColumn  = 'value',
-        protected string  $typeColumn   = 'type',
-        string  $createdAtColumn  = 'createdAt',
-        protected string  $type     = 'store',
-        protected bool    $async    = false
+        string $tableName,
+        string $keyColumn = 'key',
+        protected string $valueColumn = 'value',
+        protected string $typeColumn = 'type',
+        string $createdAtColumn = 'createdAt',
+        protected string $type = 'store',
+        protected bool $async = false
     ) {
         $this->model = BaseModel::init(
             tableName: $tableName,
@@ -106,12 +106,12 @@ class DatabaseStore implements StorageBagInterface
         // 1. Sanitize
         $data = $sanitize ? Security::clean($data) : $data;
         // 2. Serialize
-        if ($data && !is_null($serialized = serialize($data))) {
+        if ($data && !empty($serialized = serialize($data))) {
             $data = $serialized;
         }
         // 3. Save
         if ($this->async) {
-            return !!Async::runTask(function ()  use ($key, $data) {
+            return !!Async::runTask(function () use ($key, $data) {
                 $model = $this->model->clone();
                 $model->load([
                     $this->model->getKeyName() => $this->fullKey($key),
@@ -140,9 +140,8 @@ class DatabaseStore implements StorageBagInterface
         $item = $this->model->find($this->fullKey($key), [$this->typeColumn => $this->type]);
 
         if ($item && !empty($data = $item->get($this->valueColumn))) {
-
             // 2. Unserialize
-            if ($data && !is_null($parsed = unserialize($data))) {
+            if (!is_null($parsed = unserialize($data))) {
                 $data = $parsed;
             }
             // 3. Sanitize
@@ -163,17 +162,19 @@ class DatabaseStore implements StorageBagInterface
         $item = $this->model->find($this->fullKey($key), [$this->typeColumn => $this->type]);
 
         if ($item && !empty($data = $item->get($this->valueColumn))) {
-
             // 2. Unserialize
-            if ($data && !is_null($parsed = unserialize($data))) {
+            if (!is_null($parsed = unserialize($data))) {
                 $data = $parsed;
             }
             // 3. Sanitize
             $data = $sanitize ? Security::clean($data) : $data;
 
             // 4. Delete
-            if ($this->async) Async::runTask(fn ()  => $item->delete(true));
-            else $item->delete(true);
+            if ($this->async) {
+                Async::runTask(fn ()  => $item->delete(true));
+            } else {
+                $item->delete(true);
+            }
 
             return $data;
         }
@@ -188,7 +189,6 @@ class DatabaseStore implements StorageBagInterface
     {
         $list = [];
         foreach ($this->model->all([$this->typeColumn => $this->type]) as $item) {
-
             // 1. Fetch
             $key = $item->get($this->model->getKeyName());
             $data = $item->get($this->valueColumn);
@@ -211,9 +211,7 @@ class DatabaseStore implements StorageBagInterface
     {
         $list = [];
         foreach ($this->model->all([$this->typeColumn => $this->type]) as $item) {
-
             if (strtotime($item->get($this->model->getCreatedDateName())) > $this->loadTime) {
-
                 // 1. Fetch
                 $key = $item->get($this->model->getKeyName());
                 $data = $item->get($this->valueColumn);
@@ -236,7 +234,6 @@ class DatabaseStore implements StorageBagInterface
     public function itterate(bool $delete = false): Generator
     {
         foreach ($this->model->itterate([$this->typeColumn => $this->type]) as $item) {
-
             // 1. Fetch
             $key = $item->get($this->model->getKeyName());
             $data = $item->get($this->valueColumn);
@@ -248,8 +245,11 @@ class DatabaseStore implements StorageBagInterface
 
             // 3. Delete (if required)
             if ($delete) {
-                if ($this->async) Async::runTask(fn ()  => $item->delete(true));
-                else $item->delete(true);
+                if ($this->async) {
+                    Async::runTask(fn ()  => $item->delete(true));
+                } else {
+                    $item->delete(true);
+                }
             }
 
             yield $key => $data;
@@ -271,7 +271,7 @@ class DatabaseStore implements StorageBagInterface
     public function remove(string $key)
     {
         if ($this->async) {
-            Async::runTask(function ()  use ($key) {
+            Async::runTask(function () use ($key) {
                 $item = $this->model->find($this->fullKey($key), [$this->typeColumn => $this->type]);
                 if ($item) {
                     $item->delete(true);
@@ -292,7 +292,7 @@ class DatabaseStore implements StorageBagInterface
     {
         foreach ($this->model->all() as $item) {
             if ($this->async) {
-                Async::runTask(function ()  use ($item) {
+                Async::runTask(function () use ($item) {
                     $item->delete(true);
                 });
             } else {

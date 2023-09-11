@@ -35,7 +35,7 @@ class AuthParam implements ParameterAttributeInterface
     public function processParameter(ReflectionParameter $parameter, mixed $value = null, App $app, null|RequestInterface|RouteInterface $request = null): mixed
     {
         if (
-            $request instanceof RequestInterface && $parameter
+            $request instanceof RequestInterface
             && ($parameter->getType() == AuthResolver::class || $parameter->getType() == Auth::class)
         ) {
             return $request->auth();

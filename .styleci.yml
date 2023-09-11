@@ -1,6 +1,6 @@
 risky: false
 version: 8.1
-preset: recommended
+preset: psr12
 finder:
   exclude:
     - "vendor"

@@ -27,7 +27,7 @@ class Connection extends PDO implements SingletonInterface
      *
      * @inheritDoc
      */
-    public function __construct(private PDOConfig $config, public $id = 0)
+    public function __construct(PDOConfig $config, public $id = 0)
     {
         $dns = $config->connectionDNS ?? sprintf(
             '%s:dbname=%s;host=%s;port=%s',
@@ -56,8 +56,7 @@ class Connection extends PDO implements SingletonInterface
         if (app()->async && app()->config->db->connectionPoolSize > 0) {
             /** @var static */
             return ConnectionPool::make([
-                'config' => app()->config->db,
-                'size'   => app()->config->db->connectionPoolSize ?: app()->config->db->connectionPoolSize,
+                'config' => app()->config->db
             ])->get();
         }
 
@@ -72,11 +71,8 @@ class Connection extends PDO implements SingletonInterface
      *
      * @return int
      */
-    public function getOffset($page, $limit)
+    public function getOffset(int $page, int $limit)
     {
-        $page = intval(strip_tags(stripslashes($page)));
-        $limit = intval(strip_tags(stripslashes($limit)));
-
         return ($page >= 1 ? $page - 1 : 0) * $limit;
     }
 
@@ -89,11 +85,9 @@ class Connection extends PDO implements SingletonInterface
      *
      * @return string
      */
-    public function applyLimit($query, $page, $limit)
+    public function applyLimit(string $query, int $page, int $limit)
     {
         $regexp = $this->matchLimitQuery($query);
-        $page = intval(strip_tags(stripslashes($page)));
-        $limit = intval(strip_tags(stripslashes($limit)));
 
         // Remove limit
         if ($page == 0 && $limit == 0) {
@@ -129,7 +123,7 @@ class Connection extends PDO implements SingletonInterface
      *
      * @return string|false
      */
-    public function applyCount($query)
+    public function applyCount(string $query)
     {
         // Check if select statement is present in query
         if ($regexp = $this->matchSelectQuery($query)) {

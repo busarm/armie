@@ -8,7 +8,7 @@ use Workerman\Protocols\Http\Session\SessionHandlerInterface as WorkerSessionHan
 
 /**
  * Convert Workerman Session Handler to PHP Session Handler
- * 
+ *
  * Armie Framework.
  *
  * @copyright busarm.com

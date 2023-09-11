@@ -115,13 +115,13 @@ class Request implements RequestInterface
                 (new Query())->setQuery($uri->getQuery()),
                 new Bag(),
                 new Cookie(
-                    $config ? $config->getCookieConfigs() : [],
+                    $config?->getCookieConfigs() ?? [],
                     $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                    $config?->cookieEncrypt ? $config?->secret : null
+                    $config?->cookieEncrypt ? $config->secret : null
                 ),
                 $config?->sessionEnabled ? (new Session(
-                    $config ? $config->getSessionConfigs() : [],
-                    $config?->cookieEncrypt ? $config?->secret : null
+                    $config->getSessionConfigs(),
+                    $config->cookieEncrypt ? $config->secret : null
                 )) : null,
                 new Bag(),
                 new Bag()
@@ -156,13 +156,13 @@ class Request implements RequestInterface
             query: new Query($_GET),
             request: new Bag($_POST),
             cookies: new Cookie(
-                $config ? $config->getCookieConfigs() : [],
+                $config?->getCookieConfigs() ?? [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config?->cookieEncrypt ? $config->secret : null
             ),
             session: $config?->sessionEnabled ? (new Session(
-                $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config->getSessionConfigs(),
+                $config->cookieEncrypt ? $config->secret : null
             )) : null,
             files: new Bag($_FILES),
             server: new Bag($_SERVER)
@@ -187,13 +187,13 @@ class Request implements RequestInterface
             query: (new Query($psr->getQueryParams()))->setQuery($psr->getUri()->getQuery()),
             request: new Bag((array) ($psr->getParsedBody() ?? [])),
             cookies: (new Cookie(
-                $config ? $config->getCookieConfigs() : [],
-                $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name || '')),
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config?->getCookieConfigs() ?? [],
+                $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name ?? '')),
+                $config?->cookieEncrypt ? $config->secret : null
             ))->load($psr->getCookieParams() ?? []),
             session: $config?->sessionEnabled ? (new Session(
-                $config ? $config->getSessionConfigs() : [],
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config->getSessionConfigs(),
+                $config->cookieEncrypt ? $config->secret : null
             )) : null,
             files: new Upload($psr->getUploadedFiles()),
             server: new Bag($psr->getServerParams()),
@@ -227,13 +227,13 @@ class Request implements RequestInterface
             query: new Query($http->get() ?? []),
             request: new Bag($http->post() ?? []),
             cookies: (new StatelessCookie(
-                $config ? $config->getCookieConfigs() : [],
+                $config?->getCookieConfigs() ?? [],
                 $config?->cookiePrefix ?? str_replace(' ', '_', strtolower($config?->name)),
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config?->cookieEncrypt ? $config->secret : null
             ))->load($http->cookie() ?? []),
             session: $config?->sessionEnabled ? (new StatelessSession(
-                $config?->getSessionConfigs()['name'] ?? 'PHPSESS',
-                $config?->cookieEncrypt ? $config?->secret : null
+                $config->getSessionConfigs()['name'] ?? 'PHPSESS',
+                $config->cookieEncrypt ? $config->secret : null
             )) : null,
             files: new Upload($http->file()),
             server: new Bag($_SERVER),
@@ -245,7 +245,7 @@ class Request implements RequestInterface
         $request->_path = $http->path();
         $request->_baseUrl = $request->_host;
         $request->_currentUrl = $request->_baseUrl . $request->_path;
-        $request->_ip = $http->connection?->getRemoteIp() ?? $request->_ip;
+        $request->_ip = $http->connection->getRemoteIp() ?? $request->_ip;
         $request->_workerman = $http;
 
         return $request;
@@ -421,39 +421,37 @@ class Request implements RequestInterface
     protected function getIpAddress()
     {
         // check for IPs passing through proxies
-        if (!empty($this->_server->get('HTTP_X_FORWARDED_FOR'))) {
+        if (!empty($xForwardFor = $this->_server->get('HTTP_X_FORWARDED_FOR'))) {
             // check if multiple ips exist in var
-            if (strpos($this->_server->get('HTTP_X_FORWARDED_FOR'), ',') !== false) {
-                $iplist = explode(',', $this->_server->get('HTTP_X_FORWARDED_FOR') ?? '', 20);
+            if (strpos($xForwardFor, ',') !== false) {
+                $iplist = explode(',', $xForwardFor, 20);
                 foreach ($iplist as $ip) {
                     if ($this->validateIpAddress($ip)) {
                         return $ip;
                     }
                 }
-            } else {
-                if ($this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED_FOR'))) {
-                    return $this->_server->get('HTTP_X_FORWARDED_FOR');
-                }
+            } else if ($this->validateIpAddress($xForwardFor)) {
+                return $xForwardFor;
             }
         }
         // check for shared internet/ISP IP
-        if (!empty($this->_server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_CLIENT_IP'))) {
-            return $this->_server->get('HTTP_CLIENT_IP');
+        if (!empty($xClient = $this->_server->get('HTTP_CLIENT_IP')) && $this->validateIpAddress($xClient)) {
+            return $xClient;
         }
-        if (!empty($this->_server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($this->_server->get('HTTP_X_FORWARDED'))) {
-            return $this->_server->get('HTTP_X_FORWARDED');
-        }
-
-        if (!empty($this->_server->get('HTTP_X_CLUSTER_CLIENT_IP')) && $this->validateIpAddress($this->_server->get('HTTP_X_CLUSTER_CLIENT_IP'))) {
-            return $this->_server->get('HTTP_X_CLUSTER_CLIENT_IP');
+        if (!empty($xForward = $this->_server->get('HTTP_X_FORWARDED')) && $this->validateIpAddress($xForward)) {
+            return $xForward;
         }
 
-        if (!empty($this->_server->get('HTTP_FORWARDED_FOR')) && $this->validateIpAddress($this->_server->get('HTTP_FORWARDED_FOR'))) {
-            return $this->_server->get('HTTP_FORWARDED_FOR');
+        if (!empty($xCluster = $this->_server->get('HTTP_X_CLUSTER_CLIENT_IP')) && $this->validateIpAddress($xCluster)) {
+            return $xCluster;
         }
 
-        if (!empty($this->_server->get('HTTP_FORWARDED')) && $this->validateIpAddress($this->_server->get('HTTP_FORWARDED'))) {
-            return $this->_server->get('HTTP_FORWARDED');
+        if (!empty($forwardFor = $this->_server->get('HTTP_FORWARDED_FOR')) && $this->validateIpAddress($forwardFor)) {
+            return $forwardFor;
+        }
+
+        if (!empty($client = $this->_server->get('HTTP_FORWARDED')) && $this->validateIpAddress($client)) {
+            return $client;
         }
 
         // return unreliable ip since all else failed
@@ -551,7 +549,7 @@ class Request implements RequestInterface
                 $headers['AUTHORIZATION'] = $authorizationHeader;
                 // Decode AUTHORIZATION header into PHP_AUTH_USER and PHP_AUTH_PW when authorization header is basic
                 if (0 === stripos($authorizationHeader, 'basic')) {
-                    $exploded = explode(':', base64_decode(substr($authorizationHeader, 6) ?? '', 3));
+                    $exploded = explode(':', base64_decode(substr($authorizationHeader, 6)), 2);
                     if (count($exploded) == 2) {
                         list($headers['PHP_AUTH_USER'], $headers['PHP_AUTH_PW']) = $exploded;
                     }
@@ -568,7 +566,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function correlationId()
     {
@@ -576,7 +574,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function requestId()
     {
@@ -584,7 +582,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function ip()
     {
@@ -592,7 +590,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function scheme()
     {
@@ -600,7 +598,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function domain()
     {
@@ -608,7 +606,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function host()
     {
@@ -616,7 +614,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function baseUrl()
     {
@@ -624,7 +622,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function path()
     {
@@ -632,7 +630,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function currentUrl()
     {
@@ -648,7 +646,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function contentType()
     {

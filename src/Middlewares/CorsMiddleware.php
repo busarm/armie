@@ -108,7 +108,7 @@ class CorsMiddleware implements MiddlewareInterface
             $response->setHttpHeader('Access-Control-Allow-Max-Age', $maxAge);
 
             if ($request->method() === HttpMethod::OPTIONS) {
-                $response->setHttpHeader('Cache-Control', 'max-age='.$maxAge);
+                $response->setHttpHeader('Cache-Control', 'max-age=' . $maxAge);
                 $response->html('Preflight Ok');
             }
         } elseif ($request->method() === HttpMethod::OPTIONS) {

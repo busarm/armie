@@ -25,7 +25,7 @@ interface QueueHandlerInterface
     /**
      * Remove from queue.
      *
-     * @param string|int $id 
+     * @param string|int $id
      */
     public function dequeue(string|int $id): void;
 }

@@ -59,12 +59,16 @@ final class WorkerQueueHandler implements QueueHandlerInterface
      */
     public function run(): void
     {
-        if (self::$queueTimer || $this->store->count() == 0) return;
+        if (self::$queueTimer || $this->store->count() == 0) {
+            return;
+        }
 
         self::$queueTimer = Timer::add(1, function () {
 
             // Queue busy
-            if (!self::$queueIdle) return;
+            if (!self::$queueIdle) {
+                return;
+            }
 
             // Queue completed
             if ($this->store->count() == 0) {
@@ -90,7 +94,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
                             $this->store->remove($key);
                         }
                         // Max retries
-                        else if ($count >= $this->maxRetry) {
+                        elseif ($count >= $this->maxRetry) {
                             unset(self::$queueCounts[$key]);
                             $this->store->remove($key);
                         }
@@ -103,7 +107,6 @@ final class WorkerQueueHandler implements QueueHandlerInterface
 
                 self::$queueIdle = true;
                 // --- End Batch ---- //
-
             } catch (\Throwable $th) {
                 report()->exception($th);
             }
@@ -112,7 +115,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
 
     /**
      * @inheritDoc
-     * 
+     *
      * Note: If task returns `false` queue will fail and retry
      */
     public function enqueue(Task $task, callable|string|null $listner = null): void

@@ -179,11 +179,11 @@ class ResponseDto extends BaseDto
         $response->version = $version;
 
         // Show more info if not production
-        if (!$response->success && $env !== Env::PROD) {
+        if ($env !== Env::PROD) {
             $response->errorCode = strval($e->getCode());
             $response->errorLine = $e->getLine();
             $response->errorFile = $e->getFile();
-            $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), 1) : null;
+            $response->errorTrace = !empty($trace) ? json_decode(json_encode($trace), true) : null;
         }
 
         return $response;

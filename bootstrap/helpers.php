@@ -276,9 +276,9 @@ function log_error(...$message)
 }
 
 /**
- * @param \Exception $exception
+ * @param \Throwable $exception
  */
-function log_exception($exception)
+function log_exception(\Throwable $exception)
 {
     log_message(
         \Psr\Log\LogLevel::ERROR,

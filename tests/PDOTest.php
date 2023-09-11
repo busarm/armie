@@ -47,7 +47,7 @@ final class PDOTest extends TestCase
     {
         if (!isset(self::$app)) {
             $config = (new Config())
-                ->setAppPath(__DIR__.'/app/v1')
+                ->setAppPath(__DIR__ . '/app/v1')
                 ->setConfigPath('Configs')
                 ->setViewPath('Views')
                 ->setLogRequest(false)

@@ -14,7 +14,7 @@ use function Armie\Helpers\dispatch;
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
- * 
+ *
  * // TODO: Load relations concurrently
  * // TODO: Use Attributes for Model Table and Fields and Relations
  */
@@ -401,12 +401,10 @@ abstract class Model extends DataObject implements ModelInterface
         dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
         if ($stmt && $stmt->execute($params)) {
-
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             if (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
-
                 return $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
@@ -462,14 +460,12 @@ abstract class Model extends DataObject implements ModelInterface
         dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
         if ($stmt && $stmt->execute($params)) {
-
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             $results = [];
 
             while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
-
                 $results[] = $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
@@ -510,12 +506,10 @@ abstract class Model extends DataObject implements ModelInterface
         dispatch(static::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
         if ($stmt && $stmt->execute($params)) {
-
             // Dispatch event
             dispatch(static::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             while (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
-
                 yield $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
@@ -585,7 +579,6 @@ abstract class Model extends DataObject implements ModelInterface
     {
         // Create
         if ($this->_new || !isset($this->{$this->getKeyName()})) {
-
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
                 $this->{$this->getCreatedDateName()} = strval(new StringableDateTime());
@@ -634,7 +627,6 @@ abstract class Model extends DataObject implements ModelInterface
 
         // Update
         elseif ($this->isDirty()) {
-
             // Add updated date if not available
             if (!empty($this->getUpdatedDateName())) {
                 $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
@@ -688,7 +680,7 @@ abstract class Model extends DataObject implements ModelInterface
             if (isset($data)) {
                 if ($data instanceof static) {
                     $success = !$data->isDirty() || !$data->save() ? false : $success;
-                } else if (is_array($data)) {
+                } elseif (is_array($data)) {
                     $success = !$relation->save($data) ? false : $success;
                 }
             }
@@ -699,7 +691,7 @@ abstract class Model extends DataObject implements ModelInterface
 
     /**
      * Start database transaction
-     * 
+     *
      * @return void
      */
     public function startTransaction(): void
@@ -1219,7 +1211,7 @@ abstract class Model extends DataObject implements ModelInterface
             $attrs = [];
             if ($this->_autoLoadRelations) {
                 $fields = array_merge($fields, $this->getRelations());
-            } else if (!empty($this->_loadedRelations)) {
+            } elseif (!empty($this->_loadedRelations)) {
                 $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->_loadedRelations)));
             }
             foreach ($fields as $field) {

@@ -20,7 +20,7 @@ interface DependencyResolverInterface
      * @param class-string<T>                 $className
      * @param RequestInterface|RouteInterface $request
      *
-     * @return T
+     * @return ?T
      *
      * @template T Item type template
      */

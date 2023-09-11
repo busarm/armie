@@ -47,7 +47,7 @@ class Async
             return self::withWorker($task, false);
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress()) {
+        elseif (app()->async && app()->getHttpWorkerAddress()) {
             return self::withEventLoop($task);
         }
         // Use default
@@ -84,13 +84,13 @@ class Async
             return null;
         }
         // Use event loop
-        else if (app()->async && app()->getHttpWorkerAddress() && !$wait) {
+        elseif (app()->async && app()->getHttpWorkerAddress() && !$wait) {
             foreach ($tasks as $key => $task) {
                 yield $key => self::withEventLoop($task);
             }
         }
         // Use process forking
-        else if (!$wait) {
+        elseif (!$wait) {
             foreach ($tasks as $key => $task) {
                 $task = $task instanceof Task ? $task : new CallableTask(Closure::fromCallable($task));
                 yield $key => self::withChildProcess($task) ?: $task->run();

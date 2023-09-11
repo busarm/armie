@@ -74,12 +74,11 @@ trait TypeResolver
                 DataType::INT->value, DataType::INTEGER->value => intval($data),
                 DataType::BOOL->value, DataType::BOOLEAN->value => boolval($data),
                 DataType::FLOAT->value  => floatval($data),
-                DataType::DOUBLE->value => doubleval($data),
                 DataType::ARRAY->value  => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : ((array) $data),
                 DataType::OBJECT->value, DataType::JSON->value => is_string($data) ? json_decode($data) : (object) $data,
                 DataType::STRING->value => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
                 DataType::DATETIME->value, StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
-                    strval(StringableDateTime::createFromInterface($data)) :
+                    $data->format(DateTime::W3C) :
                     strval(new StringableDateTime($data, new DateTimeZone(date_default_timezone_get()))),
                 ArrayObject::class => new ArrayObject(is_string($data) ? json_decode($data, true) : (array) $data),
                 default            => $data
@@ -102,16 +101,18 @@ trait TypeResolver
         $types = array_map(fn ($type) => strval($type), $types);
         if ($data !== null) {
             return match (true) {
-                is_numeric($data) && is_bool($data) && (in_array(DataType::BOOL->value, $types) || in_array(DataType::BOOLEAN->value, $types)) => DataType::BOOL,
-                is_numeric($data) && is_double($data) && in_array(DataType::DOUBLE->value, $types)                                             => DataType::DOUBLE->value,
-                is_numeric($data) && is_double($data) && in_array(DataType::FLOAT->value, $types)                                              => DataType::FLOAT->value,
-                is_numeric($data) && (is_integer($data) || is_int($data))                                                                      => DataType::INT->value,
-                is_bool($data) || $data === 'true' || $data === 'false'                                                                        => DataType::BOOL->value,
-                is_double($data)                                                                                                               => DataType::DOUBLE->value,
-                is_float($data)                                                                                                                => DataType::FLOAT->value,
-                is_array($data)                                                                                                                => DataType::ARRAY->value,
-                is_object($data)                                                                                                               => DataType::OBJECT->value,
-                is_string($data)                                                                                                               => $this->isDate($data) ? DataType::DATETIME->value : DataType::STRING->value,
+                is_numeric($data)
+                    && (in_array(DataType::BOOL->value, $types) || in_array(DataType::BOOLEAN->value, $types)) => DataType::BOOL,
+                is_numeric($data)
+                    && is_float($data)
+                    && in_array(DataType::FLOAT->value, $types)    => DataType::FLOAT->value,
+                is_bool($data) || $data === 'true' || $data === 'false' => DataType::BOOL->value,
+                is_float($data)     => DataType::FLOAT->value,
+                is_int($data)       => DataType::INT->value,
+                is_array($data)     => DataType::ARRAY->value,
+                is_object($data)    => DataType::OBJECT->value,
+                is_string($data)    => $this->isDate($data) ? DataType::DATETIME->value : DataType::STRING->value,
+                default             => false
             };
         }
 

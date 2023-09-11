@@ -21,7 +21,6 @@ enum DataType: string
     case OBJECT = 'object';
     case JSON = 'json';
     case FLOAT = 'float';
-    case DOUBLE = 'double';
     case DATETIME = 'datetime';
     case MIXED = 'mixed';
 }

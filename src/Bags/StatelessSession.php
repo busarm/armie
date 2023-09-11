@@ -23,12 +23,12 @@ final class StatelessSession extends Bag implements SessionStoreInterface
 
     /**
      * @param string                                      $name    Session Name
-     * @param string                                      $secret  Encryption key
+     * @param string|null                                 $secret  Encryption key
      * @param SessionHandler|SessionHandlerInterface|null $handler Session handler
      *
      * @throws SessionError
      */
-    public function __construct(private string $name, private string|null $secret = null, SessionHandler|SessionHandlerInterface|null $handler = null)
+    public function __construct(private string $name, string|null $secret = null, SessionHandler|SessionHandlerInterface|null $handler = null)
     {
         parent::__construct();
         $this->setHandler($handler ?? new EncryptedSessionHandler($secret));

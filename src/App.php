@@ -219,7 +219,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
     private ?string $taskWorkerAddress = null;
 
     /**
-     * Current application worker. Only available if app is running in async mode 
+     * Current application worker. Only available if app is running in async mode
      *
      * @var ?Worker
      */
@@ -261,7 +261,6 @@ class App implements HttpServerInterface, SingletonContainerInterface
                     Verbose::VERBOSE      => OutputInterface::VERBOSITY_VERBOSE,
                     Verbose::VERY_VERBOSE => OutputInterface::VERBOSITY_VERY_VERBOSE,
                     Verbose::DEBUG        => OutputInterface::VERBOSITY_DEBUG,
-                    default               => OutputInterface::VERBOSITY_NORMAL
                 },
                 true
             ),
@@ -919,7 +918,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
             )));
 
             // Dispatch event
-            if ($worker->id == 0) dispatch(self::EVENT_STARTED);
+            if ($worker->id == 0) {
+                dispatch(self::EVENT_STARTED);
+            }
 
             // ----- Add Connection Handlers ----- //
             $worker->onMessage = function (TcpConnection $connection, HttpRequest $request) use ($config) {
@@ -1006,7 +1007,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
             }
 
             // Dispatch event
-            if ($worker->id == 0) dispatch(self::EVENT_STOPPED);
+            if ($worker->id == 0) {
+                dispatch(self::EVENT_STOPPED);
+            }
         };
         $worker->onWorkerReload = function (Worker $worker) {
             $this->logger->info(sprintf('%s (#%s) reloading', $worker->name, $worker->id));
@@ -1467,7 +1470,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
      */
     public function throwIfNoEventLoop(string|null $message = null)
     {
-        if (!$this->async && empty($this->httpWorkerAddress) || empty(Worker::getEventLoop())) {
+        if (!$this->async && (empty($this->httpWorkerAddress) || is_null(Worker::getEventLoop()))) {
             throw new SystemError($message ?: 'Event Loop is required for this action. Please run app in async mode. See App::start()');
         }
     }

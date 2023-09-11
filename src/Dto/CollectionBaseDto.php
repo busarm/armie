@@ -449,11 +449,9 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
             if (!$trim || $item !== null) {
                 if ($item instanceof static) {
                     $result[] = $item->toArray($trim);
-                } else if ($item instanceof DataObject) {
+                } elseif ($item instanceof DataObject) {
                     $result[] = $item->toArray($trim);
-                } else if ($item instanceof BaseDto) {
-                    $result[] = $item->toArray($trim);
-                } else if (is_array($item)) {
+                } elseif (is_array($item)) {
                     // Item class provided
                     if ($this->itemClass) {
                         // Item class is subclass of BaseDto
@@ -501,7 +499,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
      */
     public function __toString()
     {
-        return json_encode($this->toArray(), true);
+        return json_encode($this->toArray());
     }
 
     /**

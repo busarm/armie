@@ -42,8 +42,7 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
             if ($object) {
                 // Load method
                 if (
-                    $object
-                    && method_exists($object, $this->function)
+                    method_exists($object, $this->function)
                     && is_callable([$object, $this->function])
                 ) {
                     $method = new ReflectionMethod($object, $this->function);
@@ -61,7 +60,7 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                     if ($request instanceof RequestInterface) {
                         return $result !== false ?
                             (new ResponseHandler(data: $result, version: $request->version(), format: app()->config->http->responseFormat))->handle() :
-                            throw new NotFoundException('Not found - '.($request->method()->value.' '.$request->path()));
+                            throw new NotFoundException('Not found - ' . ($request->method()->value . ' ' . $request->path()));
                     }
 
                     return $result !== false ?
@@ -69,12 +68,12 @@ final class ControllerRouteMiddleware implements MiddlewareInterface
                         throw new NotFoundException('Resource not found');
                 }
 
-                throw new SystemError("Function not found or can't be executed: ".$this->controller.'::'.$this->function);
+                throw new SystemError("Function not found or can't be executed: " . $this->controller . '::' . $this->function);
             }
 
-            throw new SystemError('Failed to instantiate controller: '.$this->controller);
+            throw new SystemError('Failed to instantiate controller: ' . $this->controller);
         }
 
-        throw new SystemError('Class does not exist: '.$this->controller);
+        throw new SystemError('Class does not exist: ' . $this->controller);
     }
 }

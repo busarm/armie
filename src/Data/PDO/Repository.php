@@ -59,14 +59,12 @@ class Repository implements QueryRepositoryInterface
     public function querySingle(string $query, $params = []): ?BaseDto
     {
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
-
             $stmt = $this->model->getDatabase()->prepare($query);
 
             // Dispatch event
             dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             if ($stmt && $stmt->execute($params)) {
-
                 // Dispatch event
                 dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
@@ -88,14 +86,12 @@ class Repository implements QueryRepositoryInterface
         $query = $this->model->getDatabase()->applyLimit($query, 1, $limit);
 
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
-
             $stmt = $this->model->getDatabase()->prepare($query);
 
             // Dispatch event
             dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             if ($stmt && $stmt->execute($params)) {
-
                 // Dispatch event
                 dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
@@ -122,14 +118,12 @@ class Repository implements QueryRepositoryInterface
         $query = $this->model->getDatabase()->applyLimit($query, $page, $limit);
 
         if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
-
             $stmt = $this->model->getDatabase()->prepare($query);
 
             // Dispatch event
             dispatch(Model::EVENT_BEFORE_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
             if ($stmt && $stmt->execute($params)) {
-
                 // Dispatch event
                 dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 

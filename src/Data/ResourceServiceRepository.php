@@ -40,7 +40,7 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
                 ->setParams($dto->toArray()),
             $this->request
         );
-        if ($response->status && $response->data && !empty($result = $response->data)) {
+        if ($response->status && !empty($result = $response->data)) {
             return BaseDto::with($result, true);
         }
 
@@ -59,8 +59,8 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
                 ->setParams($dto->toArray()),
             $this->request
         );
-        if ($response->status && $response->data && !empty($result = $response->data)) {
-            return CollectionBaseDto::of($result, true);
+        if ($response->status && !empty($result = $response->data)) {
+            return CollectionBaseDto::of($result);
         }
 
         return CollectionBaseDto::of([]);
@@ -78,7 +78,7 @@ class ResourceServiceRepository implements ResourceServiceRepositoryInterface
                 ->setParams($dto->toArray()),
             $this->request
         );
-        if ($response->status && $response->data && !empty($result = $response->data)) {
+        if ($response->status && !empty($result = $response->data)) {
             return (new PaginatedCollectionDto())->load($result, true);
         }
 

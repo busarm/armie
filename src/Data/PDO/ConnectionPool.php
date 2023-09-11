@@ -32,12 +32,7 @@ class ConnectionPool implements SingletonInterface
      */
     private static $pool = [];
 
-    /**
-     * @param int $size - Pool size
-     *
-     * @inheritDoc
-     */
-    public function __construct(private PDOConfig $config, private int $size, private $pattern = self::PATTERN_RR)
+    public function __construct(private PDOConfig $config, private int $pattern = self::PATTERN_RR)
     {
     }
 
@@ -61,7 +56,7 @@ class ConnectionPool implements SingletonInterface
      */
     public function get(): Connection
     {
-        if (count(self::$pool) < $this->size) {
+        if (count(self::$pool) < $this->config->connectionPoolSize) {
             $connection = self::$pool[] = new Connection($this->config, count(self::$pool));
         } else {
             // Using round-robin pattern
@@ -70,7 +65,7 @@ class ConnectionPool implements SingletonInterface
             }
             // Using random pattern
             else {
-                $connection = self::$pool[rand(0, $this->size - 1)];
+                $connection = self::$pool[rand(0, $this->config->connectionPoolSize - 1)];
             }
         }
 

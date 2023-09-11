@@ -16,13 +16,13 @@ class Security
      * @see https://www.php.net/manual/en/function.password-hash.php
      *
      * @param string|int $password
-     * @param string     $hmacKey  Default: md5($password)
+     * @param ?string    $hmacKey  Default: md5($password)
      *
      * @return string
      */
-    public static function hashPassword(string|int $password, $hmacKey = null)
+    public static function hashPassword(string|int $password, ?string $hmacKey = null)
     {
-        $pwd = hash_hmac('sha256', $password, $hmacKey || md5($password));
+        $pwd = hash_hmac('sha256', $password, $hmacKey ?? md5($password));
 
         return password_hash($pwd, PASSWORD_BCRYPT);
     }
@@ -32,13 +32,13 @@ class Security
      *
      * @param string|int $password
      * @param string     $passwordHash
-     * @param string     $hmacKey      Default: md5($password)
+     * @param ?string    $hmacKey      Default: md5($password)
      *
      * @return bool
      */
-    public static function verifyPassword(string|int $password, string $passwordHash, $hmacKey = null)
+    public static function verifyPassword(string|int $password, string $passwordHash, ?string $hmacKey = null)
     {
-        $pwd = hash_hmac('sha256', $password, $hmacKey || md5($password));
+        $pwd = hash_hmac('sha256', $password, $hmacKey ?? md5($password));
 
         return password_verify($pwd, $passwordHash);
     }
@@ -46,11 +46,11 @@ class Security
     /**
      * Clean params.
      *
-     * @param mixed $input
+     * @param array|object|string|null $input
      *
-     * @return mixed
+     * @return array|object|string|null
      */
-    public static function clean($input): mixed
+    public static function clean(array|object|string|null $input): mixed
     {
         if (is_array($input) || is_object($input)) {
             return self::cleanParams((array) $input);
@@ -121,7 +121,7 @@ class Security
      *
      * @author https://gist.github.com/mbijon
      */
-    public static function cleanInput($input)
+    public static function cleanInput(string $input)
     {
         // Remove unwanted tags
         $output = self::stripTags($input);
@@ -141,7 +141,7 @@ class Security
      *
      * @author https://gist.github.com/mbijon
      */
-    public static function cleanBase64($input)
+    public static function cleanBase64(string $input)
     {
         $decoded = base64_decode($input);
 
@@ -165,7 +165,7 @@ class Security
      *
      * @author https://gist.github.com/mbijon
      */
-    public static function stripEncodedEntities($input)
+    public static function stripEncodedEntities(string $input)
     {
         // Fix &entity\n;
         $input = str_replace(['&amp;', '&lt;', '&gt;'], ['&amp;amp;', '&amp;lt;', '&amp;gt;'], $input);
@@ -200,7 +200,7 @@ class Security
      *
      * @author https://gist.github.com/mbijon
      */
-    public static function stripTags($input)
+    public static function stripTags(string $input)
     {
         // Remove tags
         $input = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $input);

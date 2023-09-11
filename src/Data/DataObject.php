@@ -308,13 +308,11 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
                 if ($value !== null) {
                     if ($value instanceof self) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } else if ($value instanceof CollectionBaseDto) {
+                    } elseif ($value instanceof CollectionBaseDto) {
                         $result[$attr] = $value->toArray($trim, $sanitize);
-                    } else if ($value instanceof BaseDto) {
-                        $result[$attr] = $value->toArray($trim, $sanitize);
-                    } else if ($value instanceof Arrayable) {
+                    } elseif ($value instanceof Arrayable) {
                         $result[$attr] = $value->toArray($trim);
-                    } else if (is_array($value)) {
+                    } elseif (is_array($value)) {
                         $result[$attr] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
                     } else {
                         $value = $this->resolveType($type ?

@@ -52,7 +52,7 @@ final class StatelessCookie implements StorageBagInterface
      */
     public function key(string $name): string
     {
-        return str_starts_with($name, $this->prefix) ? $name : $this->prefix . '_' . $name;
+        return str_starts_with($name, $this->prefix) ? $name : $this->prefix.'_'.$name;
     }
 
     /**

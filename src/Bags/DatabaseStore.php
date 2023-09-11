@@ -16,7 +16,7 @@ use function Armie\Helpers\serialize;
 use function Armie\Helpers\unserialize;
 
 /**
- * Store key-value data in database table
+ * Store key-value data in database table.
  *
  * Armie Framework
  *
@@ -30,9 +30,9 @@ class DatabaseStore implements StorageBagInterface
     const STORAGE_SUFFIX = '.astore';
 
     /**
-     * Last time store was loaded
+     * Last time store was loaded.
      *
-     * @var integer
+     * @var int
      */
     protected int $loadTime = 0;
 
@@ -42,13 +42,13 @@ class DatabaseStore implements StorageBagInterface
     protected Model $model;
 
     /**
-     * @param string  $tableName        Model table name
-     * @param string  $keyColumn        Model `key` column name. Must be a `VAR_CHAR`(80 to 100) column and PRIMARY KEY
-     * @param string  $valueColumn      Model `value` column name. Must be a `MEDIUMTEXT` or `LONGTEXT` column
-     * @param string  $typeColumn       Model `type` column name. Must be a `VAR_CHAR`(32) column. Suggestion: INDEX this column
-     * @param string  $createdAtColumn  Model `createdAt` column name. Must be a `DATETIME` column
-     * @param string  $type     Store type. E.g queue, cache, session. Default: `store`
-     * @param bool    $async    Save asynchronously. Default: false
+     * @param string $tableName       Model table name
+     * @param string $keyColumn       Model `key` column name. Must be a `VAR_CHAR`(80 to 100) column and PRIMARY KEY
+     * @param string $valueColumn     Model `value` column name. Must be a `MEDIUMTEXT` or `LONGTEXT` column
+     * @param string $typeColumn      Model `type` column name. Must be a `VAR_CHAR`(32) column. Suggestion: INDEX this column
+     * @param string $createdAtColumn Model `createdAt` column name. Must be a `DATETIME` column
+     * @param string $type            Store type. E.g queue, cache, session. Default: `store`
+     * @param bool   $async           Save asynchronously. Default: false
      */
     public function __construct(
         string $tableName,
@@ -67,7 +67,7 @@ class DatabaseStore implements StorageBagInterface
                 new Field($keyColumn, DataType::STRING),
                 new Field($this->valueColumn, DataType::STRING),
                 new Field($this->typeColumn, DataType::STRING),
-                new Field($createdAtColumn, DataType::DATETIME)
+                new Field($createdAtColumn, DataType::DATETIME),
             ]
         );
     }
@@ -100,7 +100,7 @@ class DatabaseStore implements StorageBagInterface
     public function set(string $key, mixed $data, $sanitize = true): bool
     {
         if (strlen($key) > 100) {
-            throw new BadMethodCallException("Length of `key` must be less than or equals to 100");
+            throw new BadMethodCallException('Length of `key` must be less than or equals to 100');
         }
 
         // 1. Sanitize
@@ -115,18 +115,20 @@ class DatabaseStore implements StorageBagInterface
                 $model = $this->model->clone();
                 $model->load([
                     $this->model->getKeyName() => $this->fullKey($key),
-                    $this->valueColumn => $data,
-                    $this->typeColumn => $this->type
+                    $this->valueColumn         => $data,
+                    $this->typeColumn          => $this->type,
                 ]);
+
                 return $model->save(true, false);
             });
         } else {
             $model = $this->model->clone();
             $model->load([
                 $this->model->getKeyName() => $this->fullKey($key),
-                $this->valueColumn => $data,
-                $this->typeColumn => $this->type
+                $this->valueColumn         => $data,
+                $this->typeColumn          => $this->type,
             ]);
+
             return $model->save(true, false);
         }
     }
@@ -318,7 +320,7 @@ class DatabaseStore implements StorageBagInterface
      */
     private function fullKey(string $key): string
     {
-        return $this->isStoreKey($key) ? $key : sha1($key) . self::STORAGE_SUFFIX;
+        return $this->isStoreKey($key) ? $key : sha1($key).self::STORAGE_SUFFIX;
     }
 
     /**

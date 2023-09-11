@@ -137,7 +137,7 @@ class ServerConfig
     }
 
     /**
-     * Set max number of http requests to handle per worker before reloading worker. This is to prevent memory leak. Default: 10,000
+     * Set max number of http requests to handle per worker before reloading worker. This is to prevent memory leak. Default: 10,000.
      *
      * @return self
      */
@@ -149,7 +149,7 @@ class ServerConfig
     }
 
     /**
-     * Set number of taks workers to spawn. Set to 0 or false to disable. Default: 100,000
+     * Set number of taks workers to spawn. Set to 0 or false to disable. Default: 100,000.
      *
      * @return self
      */
@@ -324,7 +324,7 @@ class ServerConfig
     public function addSocket(int $port, string $controller): self
     {
         if (!is_subclass_of($controller, SocketControllerInterface::class)) {
-            throw new SystemError("`$controller` does not implement " . SocketControllerInterface::class);
+            throw new SystemError("`$controller` does not implement ".SocketControllerInterface::class);
         }
 
         $port = (string) $port;

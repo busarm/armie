@@ -17,7 +17,7 @@ final class WorkerMaxRequestHandler
     /**
      * @var array<int,int>
      */
-    static $requests = [];
+    public static $requests = [];
 
     public function __construct(protected int $maxRequests)
     {

@@ -163,6 +163,7 @@ class Promise implements PromiseThen
         $fiber = new Fiber(
             function (array $promises) {
                 Fiber::suspend();
+
                 return array_map(
                     fn (self $promise) => $promise->wait(),
                     $promises

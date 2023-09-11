@@ -17,8 +17,8 @@ use Workerman\Protocols\Http\Session\SessionHandlerInterface as WorkerSessionHan
 final class WorkerSessionHandler implements SessionHandlerInterface
 {
     /**
-     * @param WorkerSessionHandlerInterface $handler    Workerman Session handler
-     * @param ?string $key                              Secret key: Auto encrypt session if available
+     * @param WorkerSessionHandlerInterface $handler Workerman Session handler
+     * @param ?string                       $key     Secret key: Auto encrypt session if available
      */
     public function __construct(private WorkerSessionHandlerInterface $handler, private ?string $key = null)
     {

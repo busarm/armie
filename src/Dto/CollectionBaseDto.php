@@ -28,8 +28,8 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
     use TypeResolver;
 
     /**
-     * @param iterable<T>           $list
-     * @param ?class-string<T>      $itemClass Define the class that will be used for all items in the array.
+     * @param iterable<T>      $list
+     * @param ?class-string<T> $itemClass Define the class that will be used for all items in the array.
      *
      * @throws InvalidArgumentException
      */
@@ -190,7 +190,7 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
      *
      * @see array_walk
      *
-     * @param callable $callback
+     * @param callable   $callback
      * @param mixed|null $userData
      *
      * @return bool Returns true on success, otherwise false

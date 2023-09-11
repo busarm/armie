@@ -31,11 +31,11 @@ class Router implements RouterInterface
         '.' => "\.",
     ];
     const MATCHER_REGX = [
-        "/\(" . RouteMatcher::ALPHA . "\)/"          => '([a-zA-Z]+)',
-        "/\(" . RouteMatcher::ALPHA_NUM . "\)/"      => '([a-zA-Z-_]+)',
-        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => '([a-zA-Z0-9-_]+)',
-        "/\(" . RouteMatcher::NUM . "\)/"            => '([0-9]+)',
-        "/\(" . RouteMatcher::ANY . "\)/"            => '(.+)',
+        "/\(".RouteMatcher::ALPHA."\)/"          => '([a-zA-Z]+)',
+        "/\(".RouteMatcher::ALPHA_NUM."\)/"      => '([a-zA-Z-_]+)',
+        "/\(".RouteMatcher::ALPHA_NUM_DASH."\)/" => '([a-zA-Z0-9-_]+)',
+        "/\(".RouteMatcher::NUM."\)/"            => '([0-9]+)',
+        "/\(".RouteMatcher::ANY."\)/"            => '(.+)',
     ];
 
     /**
@@ -112,7 +112,7 @@ class Router implements RouterInterface
     public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
@@ -143,6 +143,7 @@ class Router implements RouterInterface
         foreach ($routes as $route) {
             if (($params = $this->isMatch($path, strtolower($route->getPath()))) !== false) {
                 $route->params(array_merge($route->getParams(), $params ?: []));
+
                 return $route;
             }
         }
@@ -178,9 +179,10 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get route middlewares
+     * Get route middlewares.
      *
      * @param RouteInterface $route
+     *
      * @return array
      */
     public function getMiddlewares(RouteInterface $route): array
@@ -209,12 +211,12 @@ class Router implements RouterInterface
     }
 
     /**
-     * Match request path against route
+     * Match request path against route.
      *
-     * @param string  $path       Request path
-     * @param string  $route      Route to compare to
-     * @param bool    $startsWith Path starts with route
-     * @param bool    $endsWith   Path ends with route
+     * @param string $path       Request path
+     * @param string $route      Route to compare to
+     * @param bool   $startsWith Path starts with route
+     * @param bool   $endsWith   Path ends with route
      *
      * @return array|false Return list of path param matches or `false` if failed
      */

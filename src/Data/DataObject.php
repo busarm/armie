@@ -14,7 +14,7 @@ use ReflectionProperty;
 use Stringable;
 
 /**
- * Armie Framework
+ * Armie Framework.
  *
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
@@ -135,7 +135,7 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
     /**
      * Get properties.
      *
-     * @param bool $all  Get all or only public field
+     * @param bool $all Get all or only public field
      *
      * @return ReflectionProperty[]
      */

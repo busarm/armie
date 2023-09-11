@@ -20,14 +20,14 @@ use function Armie\Helpers\dispatch;
  */
 abstract class Model extends DataObject implements ModelInterface
 {
-    const EVENT_BEFORE_QUERY = self::class . ':BeforeQuery';
-    const EVENT_AFTER_QUERY = self::class . ':AfterQuery';
-    const EVENT_BEFORE_CREATE = self::class . ':BeforeCreate';
-    const EVENT_AFTER_CREATE = self::class . ':AfterCreate';
-    const EVENT_BEFORE_UPDATE = self::class . ':BeforeUpdate';
-    const EVENT_AFTER_UPDATE = self::class . ':AfterUpdate';
-    const EVENT_BEFORE_DELETE = self::class . ':BeforeDelete';
-    const EVENT_AFTER_DELETE = self::class . ':AfterDelete';
+    const EVENT_BEFORE_QUERY = self::class.':BeforeQuery';
+    const EVENT_AFTER_QUERY = self::class.':AfterQuery';
+    const EVENT_BEFORE_CREATE = self::class.':BeforeCreate';
+    const EVENT_AFTER_CREATE = self::class.':AfterCreate';
+    const EVENT_BEFORE_UPDATE = self::class.':BeforeUpdate';
+    const EVENT_AFTER_UPDATE = self::class.':AfterUpdate';
+    const EVENT_BEFORE_DELETE = self::class.':BeforeDelete';
+    const EVENT_AFTER_DELETE = self::class.':AfterDelete';
 
     /**
      * Model is new - not saved yet.
@@ -42,7 +42,6 @@ abstract class Model extends DataObject implements ModelInterface
      * @var int
      */
     protected int $_perPage = 20;
-
 
     /**
      * Auto populate relations.
@@ -87,11 +86,10 @@ abstract class Model extends DataObject implements ModelInterface
             parent::__excluded(),
             [
                 '_db', '_autoLoadRelations', '_requestedRelations', '_loadedRelations',
-                '_new', '_perPage'
+                '_new', '_perPage',
             ]
         );
     }
-
 
     public function __sleep(): array
     {
@@ -99,7 +97,7 @@ abstract class Model extends DataObject implements ModelInterface
             parent::__sleep(),
             [
                 '_autoLoadRelations', '_requestedRelations', '_loadedRelations',
-                '_new', '_perPage'
+                '_new', '_perPage',
             ]
         );
     }
@@ -394,7 +392,7 @@ abstract class Model extends DataObject implements ModelInterface
             'SELECT %s FROM %s %s LIMIT 1',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
         ));
 
         // Dispatch event
@@ -700,9 +698,10 @@ abstract class Model extends DataObject implements ModelInterface
     }
 
     /**
-     * End database transaction
+     * End database transaction.
      *
-     * @param boolean $rollback
+     * @param bool $rollback
+     *
      * @return void
      */
     public function endTransaction(bool $rollback = false): void
@@ -724,6 +723,7 @@ abstract class Model extends DataObject implements ModelInterface
     {
         $this->startTransaction();
         $result = null;
+
         try {
             $result = $callable();
         } catch (\Throwable $th) {
@@ -907,41 +907,41 @@ abstract class Model extends DataObject implements ModelInterface
             $key = strtoupper($key);
 
             return  $result ?
-                $result . sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
+                $result.sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
                 sprintf('%s %s', $key == 'NOT' ? $key : '', $this->parseConditions($cond));
         };
         $parseArrayList = function ($result, $key, $cond) {
             return $result ?
-                $result . ' AND ' . sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                $result.' AND '.sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
                 sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
         };
         $parseArray = function ($result, $cond) {
             return  $result ?
-                $result . ' AND ' . sprintf('%s', $this->parseConditions($cond)) :
+                $result.' AND '.sprintf('%s', $this->parseConditions($cond)) :
                 sprintf('%s', $this->parseConditions($cond));
         };
         $parseString = function ($result, $cond) {
             return $result ?
-                $result . ' AND ' . sprintf('(%s)', $this->cleanCond($cond)) :
+                $result.' AND '.sprintf('(%s)', $this->cleanCond($cond)) :
                 sprintf('(%s)', $this->cleanCond($cond));
         };
         $parseKeyedString = function ($result, $key, $cond) {
             // Key is a conditional operator
             if (in_array(strtoupper($key), ['AND', 'OR'])) {
                 return $result ?
-                    $result . sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
+                    $result.sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
                     sprintf('(%s)', $this->cleanCond($cond));
             }
             // Key is a conditional (NOT) operator
             elseif (strtoupper($key) == 'NOT') {
                 return $result ?
-                    $result . sprintf('(%s)', $this->cleanCond($cond)) :
+                    $result.sprintf('(%s)', $this->cleanCond($cond)) :
                     sprintf('%s (%s)', $key, $this->cleanCond($cond));
             }
             // Key is a parameter
             else {
                 return $result ?
-                    $result . ' AND ' . sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
+                    $result.' AND '.sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
                     sprintf('`%s` = %s', $key, $this->escapeCond($cond));
             }
         };
@@ -983,7 +983,7 @@ abstract class Model extends DataObject implements ModelInterface
             }
         }
 
-        return $result ? '(' . $result . ')' : '';
+        return $result ? '('.$result.')' : '';
     }
 
     /**
@@ -1010,12 +1010,10 @@ abstract class Model extends DataObject implements ModelInterface
         return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '', $cond));
     }
 
-
-    #### Statics #####
-
+    //### Statics #####
 
     /**
-     * Create model instance with custom pagination limit
+     * Create model instance with custom pagination limit.
      *
      * @param int $limit
      *
@@ -1175,8 +1173,7 @@ abstract class Model extends DataObject implements ModelInterface
         return $model->setAutoLoadRelations(false)->itterate($conditions, $params, $columns, $limit ?? 0);
     }
 
-
-    #### Clones #####
+    //### Clones #####
 
     /**
      * Clone model.
@@ -1190,7 +1187,7 @@ abstract class Model extends DataObject implements ModelInterface
         return $model;
     }
 
-    #### Override #####
+    //### Override #####
 
     /**
      * Is Dirty - Update has been made.

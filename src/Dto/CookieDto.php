@@ -33,12 +33,12 @@ class CookieDto extends BaseDto
      * @param string            $name
      * @param string|array|null $value
      * @param array             $options
-     * - domain: ""
-     * - httponly: "0"
-     * - expires: "0" (seconds)
-     * - path: "/"
-     * - samesite: ""
-     * - secure: "0"
+     *                                   - domain: ""
+     *                                   - httponly: "0"
+     *                                   - expires: "0" (seconds)
+     *                                   - path: "/"
+     *                                   - samesite: ""
+     *                                   - secure: "0"
      */
     public function __construct($name, $value = null, $options = [])
     {

@@ -178,7 +178,7 @@ class Repository implements QueryRepositoryInterface
             'SELECT %s FROM %s %s',
             $colsPlaceHolders,
             $this->model->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
         );
 
         return $this->queryPaginate($query, $params, $page, $limit);

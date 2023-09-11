@@ -28,6 +28,7 @@ final class CallableTask extends Task
             } else {
                 $result = call_user_func($this->callable, $this->data);
             }
+
             return $result !== false ? $result : null;
         }
 

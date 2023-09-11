@@ -37,15 +37,15 @@ final class WorkerQueueHandler implements QueueHandlerInterface
     public static bool $queueIdle = true;
 
     /**
-     * Queue try count
+     * Queue try count.
      */
     public static array $queueCounts = [];
 
     /**
-     * @param int $rate                             Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 100. Must be less than `limit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
-     * @param int $limit                            Queue limit: Max number of tasks allowed in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
-     * @param int $maxRetry                         Queue max retry count: Max number of times to retry task if failed. Default: 5
-     * @param ?StorageBagInterface<string> $store   Queue store: Used to persist queue. Default @see Bag
+     * @param int                          $rate     Queue rate limit: Allowed number of request processed per second per worker. Between 1 to 100. Must be less than `limit`. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int                          $limit    Queue limit: Max number of tasks allowed in queue. **IMPORTANT**: To prevent denial-of-service due to queue spamming
+     * @param int                          $maxRetry Queue max retry count: Max number of times to retry task if failed. Default: 5
+     * @param ?StorageBagInterface<string> $store    Queue store: Used to persist queue. Default @see Bag
      */
     public function __construct(private int $rate = 10, private int $limit = 10000, private int $maxRetry = 5, private ?StorageBagInterface $store = null)
     {
@@ -55,7 +55,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
     }
 
     /**
-     * Run queue
+     * Run queue.
      */
     public function run(): void
     {
@@ -64,7 +64,6 @@ final class WorkerQueueHandler implements QueueHandlerInterface
         }
 
         self::$queueTimer = Timer::add(1, function () {
-
             // Queue busy
             if (!self::$queueIdle) {
                 return;
@@ -74,6 +73,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
             if ($this->store->count() == 0) {
                 Timer::del(self::$queueTimer);
                 self::$queueTimer = null;
+
                 return;
             }
 
@@ -130,7 +130,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
         $listner && listen($task->getName(), $listner);
 
         // Add to queue
-        $this->store->set($task->getName(), strval($task->getRequest(false))) or throw new QueueError('Failed to queue ' . $task->getName());
+        $this->store->set($task->getName(), strval($task->getRequest(false))) or throw new QueueError('Failed to queue '.$task->getName());
 
         // Run queue
         $this->run();

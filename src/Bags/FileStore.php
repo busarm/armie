@@ -25,7 +25,7 @@ use function Armie\Helpers\unserialize;
  */
 class FileStore implements StorageBagInterface
 {
-    const STORAGE_EXT = '.astore';
+    public const STORAGE_EXT = '.astore';
 
     /**
      * Last time store was loaded.
@@ -238,9 +238,9 @@ class FileStore implements StorageBagInterface
      */
     private function fullPath(string $path): string
     {
-        $path = $this->isStorePath($path) ? $path : sha1($path).self::STORAGE_EXT;
+        $path = $this->isStorePath($path) ? $path : sha1($path) . self::STORAGE_EXT;
 
-        return str_starts_with($path, $this->basePath) ? $path : $this->basePath.DIRECTORY_SEPARATOR.$path;
+        return str_starts_with($path, $this->basePath) ? $path : $this->basePath . DIRECTORY_SEPARATOR . $path;
     }
 
     /**

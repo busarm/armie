@@ -25,23 +25,23 @@ use Armie\Middlewares\ViewRouteMiddleware;
  */
 class Router implements RouterInterface
 {
-    const PATH_EXCLUDE_LIST = ['$', '<', '>', '[', ']', '{', '}', '^', '\\', '|', '%'];
-    const ESCAPE_LIST = [
+    public const PATH_EXCLUDE_LIST = ['$', '<', '>', '[', ']', '{', '}', '^', '\\', '|', '%'];
+    public const ESCAPE_LIST = [
         '/' => "\/",
         '.' => "\.",
     ];
-    const MATCHER_REGX = [
-        "/\(".RouteMatcher::ALPHA."\)/"          => '([a-zA-Z]+)',
-        "/\(".RouteMatcher::ALPHA_NUM."\)/"      => '([a-zA-Z-_]+)',
-        "/\(".RouteMatcher::ALPHA_NUM_DASH."\)/" => '([a-zA-Z0-9-_]+)',
-        "/\(".RouteMatcher::NUM."\)/"            => '([0-9]+)',
-        "/\(".RouteMatcher::ANY."\)/"            => '(.+)',
+    public const MATCHER_REGX = [
+        "/\(" . RouteMatcher::ALPHA . "\)/"          => '([a-zA-Z]+)',
+        "/\(" . RouteMatcher::ALPHA_NUM . "\)/"      => '([a-zA-Z-_]+)',
+        "/\(" . RouteMatcher::ALPHA_NUM_DASH . "\)/" => '([a-zA-Z0-9-_]+)',
+        "/\(" . RouteMatcher::NUM . "\)/"            => '([0-9]+)',
+        "/\(" . RouteMatcher::ANY . "\)/"            => '(.+)',
     ];
 
     /**
      * Use to match route path to an exact variable name. e.g $uid = /user/{uid}.
      */
-    const PARAM_NAME_REGX = [
+    public const PARAM_NAME_REGX = [
         "/\{\w*\}/" => '([a-zA-Z0-9-_]+)',
     ];
 
@@ -112,7 +112,7 @@ class Router implements RouterInterface
     public function addResourceRoutes(string $path, string $controller): RouterInterface
     {
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
         $this->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');

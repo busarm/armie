@@ -12,9 +12,9 @@ namespace Armie\Enums;
  */
 class RouteMatcher
 {
-    const ALPHA = 'alpha';
-    const ALPHA_NUM = 'alpha-dash';
-    const ALPHA_NUM_DASH = 'alpha-num-dash';
-    const NUM = 'num';
-    const ANY = 'any';
+    public const ALPHA = 'alpha';
+    public const ALPHA_NUM = 'alpha-dash';
+    public const ALPHA_NUM_DASH = 'alpha-num-dash';
+    public const NUM = 'num';
+    public const ANY = 'any';
 }

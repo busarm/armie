@@ -30,10 +30,10 @@ use function Armie\Helpers\unserialize;
  */
 class Async
 {
-    const STREAM_TIMEOUT = 30; // Seconds
-    const STREAM_READ_WRITE_TIMEOUT = 30; // Seconds
-    const STREAM_BUFFER_LENGTH = 8192; // Bytes
-    const MAX_CHILD_PROCESSES = 10;
+    public const STREAM_TIMEOUT = 30; // Seconds
+    public const STREAM_READ_WRITE_TIMEOUT = 30; // Seconds
+    public const STREAM_BUFFER_LENGTH = 8192; // Bytes
+    public const MAX_CHILD_PROCESSES = 10;
 
     /**
      * Run task asynchronously.
@@ -214,12 +214,12 @@ class Async
     public static function withChildProcess(Runnable|callable $task, ?callable $callback = null): int|bool
     {
         if (!extension_loaded('pcntl')) {
-            log_warning('Please install `pcntl` extension. '.__FILE__.':'.__LINE__);
+            log_warning('Please install `pcntl` extension. ' . __FILE__ . ':' . __LINE__);
 
             return false;
         }
         if (!extension_loaded('posix')) {
-            log_warning('Please install `posix` extension. '.__FILE__.':'.__LINE__);
+            log_warning('Please install `posix` extension. ' . __FILE__ . ':' . __LINE__);
 
             return false;
         }

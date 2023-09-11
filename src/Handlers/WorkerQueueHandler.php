@@ -130,7 +130,7 @@ final class WorkerQueueHandler implements QueueHandlerInterface
         $listner && listen($task->getName(), $listner);
 
         // Add to queue
-        $this->store->set($task->getName(), strval($task->getRequest(false))) or throw new QueueError('Failed to queue '.$task->getName());
+        $this->store->set($task->getName(), strval($task->getRequest(false))) or throw new QueueError('Failed to queue ' . $task->getName());
 
         // Run queue
         $this->run();

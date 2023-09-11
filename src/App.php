@@ -97,19 +97,19 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * App started event. Only available if app is running in async mode. @see self::start.
      */
-    const EVENT_STARTED = self::class.':Started';
+    public const EVENT_STARTED = self::class . ':Started';
     /**
      * App stopped event. Only available if app is running in async mode. @see self::start.
      */
-    const EVENT_STOPPED = self::class.':Stopped';
+    public const EVENT_STOPPED = self::class . ':Stopped';
     /**
      * App request running.
      */
-    const EVENT_RUNNING = self::class.':Running';
+    public const EVENT_RUNNING = self::class . ':Running';
     /**
      * App request completed.
      */
-    const EVENT_COMPLETE = self::class.':Completed';
+    public const EVENT_COMPLETE = self::class . ':Completed';
 
     /**
      * List of classes that must be handled as stateless when running in async mode.
@@ -319,22 +319,22 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     public function __sleep(): array
     {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
     }
 
     public function __wakeup()
     {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
     }
 
     public function __set($key, $val)
     {
-        throw new \BadMethodCallException('Cannot set dynamic value for '.__CLASS__);
+        throw new \BadMethodCallException('Cannot set dynamic value for ' . __CLASS__);
     }
 
     public function __get($key)
     {
-        throw new \BadMethodCallException('Cannot get dynamic value for '.__CLASS__);
+        throw new \BadMethodCallException('Cannot get dynamic value for ' . __CLASS__);
     }
 
     /**
@@ -850,9 +850,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
         // Set up workerman
         Worker::$stopTimeout = 5;
-        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath.DIRECTORY_SEPARATOR.'workerman.log';
-        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath.DIRECTORY_SEPARATOR.'workerman.status';
-        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath.DIRECTORY_SEPARATOR.'workerman.pid';
+        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
+        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
         Worker::$eventLoopClass = $this->getEventLooper($config->looper);
 
         //------- Add Main HTTP Worker -------//
@@ -893,10 +893,10 @@ class App implements HttpServerInterface, SingletonContainerInterface
         ] : [];
 
         // Init Worker
-        $this->httpWorkerAddress = ($ssl ? 'https://' : 'http://').$host.':'.$port;
+        $this->httpWorkerAddress = ($ssl ? 'https://' : 'http://') . $host . ':' . $port;
 
         $worker = new Worker($this->httpWorkerAddress, $context);
-        $worker->name = '[HTTP] '.$this->config->name.' v'.$this->config->version;
+        $worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
         $worker->count = $count;
         $worker->transport = $ssl ? 'ssl' : 'tcp';
 
@@ -980,7 +980,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
                     $this->queueHandler = new WorkerQueueHandler(
                         rate: 50,
                         store: new FileStore(
-                            basePath: $this->config->tempPath.DIRECTORY_SEPARATOR.'queue'.DIRECTORY_SEPARATOR.'worker-'.$worker->id,
+                            basePath: $this->config->tempPath . DIRECTORY_SEPARATOR . 'queue' . DIRECTORY_SEPARATOR . 'worker-' . $worker->id,
                             key: $this->config->secret,
                             async: false
                         )
@@ -1033,10 +1033,10 @@ class App implements HttpServerInterface, SingletonContainerInterface
             return;
         }
 
-        $this->taskWorkerAddress = 'unix:///'.$this->config->tempPath.DIRECTORY_SEPARATOR.'task_worker.sock';
+        $this->taskWorkerAddress = 'unix:///' . $this->config->tempPath . DIRECTORY_SEPARATOR . 'task_worker.sock';
 
         $worker = new Worker($this->taskWorkerAddress);
-        $worker->name = '[Task] '.$this->config->name.' v'.$this->config->version;
+        $worker->name = '[Task] ' . $this->config->name . ' v' . $this->config->version;
         $worker->transport = 'unix';
         $worker->count = max($config->taskWorkers, 1);
 
@@ -1238,8 +1238,8 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
         // Create workers
         foreach ($config->sockets as $port => $class) {
-            $worker = new Worker('websocket://'.$host.':'.$port, $context);
-            $worker->name = '[Socket] '.$this->config->name.' v'.$this->config->version." ($port)";
+            $worker = new Worker('websocket://' . $host . ':' . $port, $context);
+            $worker->name = '[Socket] ' . $this->config->name . ' v' . $this->config->version . " ($port)";
             $worker->transport = $ssl ? 'ssl' : 'tcp';
 
             $worker->onWorkerStart = function (Worker $worker) use ($class) {
@@ -1298,7 +1298,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
                         $this->logger->error(sprintf('Connection to %s (#%s) failed: [%s] %s', $connection->worker->name, $connection->worker->id, $id, $error));
                     };
                 } else {
-                    throw new SystemError("Failed to instantiate `$class`. Ensure it is a valid class that implements ".SocketControllerInterface::class);
+                    throw new SystemError("Failed to instantiate `$class`. Ensure it is a valid class that implements " . SocketControllerInterface::class);
                 }
             };
             $worker->onWorkerStop = function (Worker $worker) {
@@ -1380,7 +1380,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
         $this->throwIfRunning();
 
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
         $this->router->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');

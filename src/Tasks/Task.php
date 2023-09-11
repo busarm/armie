@@ -23,7 +23,7 @@ abstract class Task implements Runnable
 
     public function __construct(string $name = null)
     {
-        $this->name = ($name ?: static::class).':'.microtime(true).':'.bin2hex(random_bytes(8));
+        $this->name = ($name ?: static::class) . ':' . microtime(true) . ':' . bin2hex(random_bytes(8));
     }
 
     /**

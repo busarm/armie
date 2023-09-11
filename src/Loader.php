@@ -68,7 +68,7 @@ class Loader implements LoaderInterface
 
         $path = (str_starts_with(app()->config->viewPath, app()->config->appPath) ?
             app()->config->viewPath :
-            app()->config->appPath.DIRECTORY_SEPARATOR.app()->config->viewPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
+            app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->viewPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
 
         if (file_exists($path)) {
             $content = self::load($path, $vars);
@@ -103,7 +103,7 @@ class Loader implements LoaderInterface
 
         $path = (str_starts_with(app()->config->configPath, app()->config->appPath) ?
             app()->config->configPath :
-            app()->config->appPath.DIRECTORY_SEPARATOR.app()->config->configPath).DIRECTORY_SEPARATOR.(is_file($path) ? $path : $path.'.php');
+            app()->config->appPath . DIRECTORY_SEPARATOR . app()->config->configPath) . DIRECTORY_SEPARATOR . (is_file($path) ? $path : $path . '.php');
         if (file_exists($path)) {
             return require_once $path;
         } else {

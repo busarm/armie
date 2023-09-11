@@ -19,7 +19,7 @@ use Armie\Interfaces\StorageBagInterface;
  */
 class ServiceRegistryProvider implements ProviderInterface
 {
-    const ROUTE = 'discovery';
+    public const ROUTE = 'discovery';
 
     /**
      * @param StorageBagInterface<array> $storage

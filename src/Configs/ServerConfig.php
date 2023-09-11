@@ -324,7 +324,7 @@ class ServerConfig
     public function addSocket(int $port, string $controller): self
     {
         if (!is_subclass_of($controller, SocketControllerInterface::class)) {
-            throw new SystemError("`$controller` does not implement ".SocketControllerInterface::class);
+            throw new SystemError("`$controller` does not implement " . SocketControllerInterface::class);
         }
 
         $port = (string) $port;

@@ -47,7 +47,7 @@ final class EventHandler implements EventHandlerInterface
     public function listen(string $event, callable|string $listner): void
     {
         if (is_string($listner) && !is_subclass_of($listner, Runnable::class)) {
-            throw new SystemError("`$listner` does not implement ".Runnable::class);
+            throw new SystemError("`$listner` does not implement " . Runnable::class);
         }
 
         // App running in async mode - register as single-use

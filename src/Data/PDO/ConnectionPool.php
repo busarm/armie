@@ -21,11 +21,11 @@ class ConnectionPool implements SingletonInterface
     /**
      * @var int - Round robin
      */
-    const PATTERN_RR = 1;
+    public const PATTERN_RR = 1;
     /**
      * @var int - Random
      */
-    const PATTERN_RAND = 2;
+    public const PATTERN_RAND = 2;
 
     /**
      * @var Connection[]

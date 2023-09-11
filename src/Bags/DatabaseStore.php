@@ -27,7 +27,7 @@ use function Armie\Helpers\unserialize;
  */
 class DatabaseStore implements StorageBagInterface
 {
-    const STORAGE_SUFFIX = '.astore';
+    public const STORAGE_SUFFIX = '.astore';
 
     /**
      * Last time store was loaded.
@@ -173,7 +173,7 @@ class DatabaseStore implements StorageBagInterface
 
             // 4. Delete
             if ($this->async) {
-                Async::runTask(fn ()  => $item->delete(true));
+                Async::runTask(fn () => $item->delete(true));
             } else {
                 $item->delete(true);
             }
@@ -248,7 +248,7 @@ class DatabaseStore implements StorageBagInterface
             // 3. Delete (if required)
             if ($delete) {
                 if ($this->async) {
-                    Async::runTask(fn ()  => $item->delete(true));
+                    Async::runTask(fn () => $item->delete(true));
                 } else {
                     $item->delete(true);
                 }
@@ -320,7 +320,7 @@ class DatabaseStore implements StorageBagInterface
      */
     private function fullKey(string $key): string
     {
-        return $this->isStoreKey($key) ? $key : sha1($key).self::STORAGE_SUFFIX;
+        return $this->isStoreKey($key) ? $key : sha1($key) . self::STORAGE_SUFFIX;
     }
 
     /**

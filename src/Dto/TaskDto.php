@@ -22,7 +22,7 @@ class TaskDto
 
     public function __construct()
     {
-        $this->name = Task::class.':'.microtime(true).':'.bin2hex(random_bytes(8));
+        $this->name = Task::class . ':' . microtime(true) . ':' . bin2hex(random_bytes(8));
         $this->async = true;
     }
 

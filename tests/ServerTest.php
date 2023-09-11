@@ -22,8 +22,8 @@ use Psr\Log\LoggerInterface;
  */
 final class ServerTest extends TestCase
 {
-    const HTTP_TEST_URL = 'http://localhost';
-    const HTTP_TEST_PORT = 8181;
+    public const HTTP_TEST_URL = 'http://localhost';
+    public const HTTP_TEST_PORT = 8181;
 
     private Server|null $server = null;
     private App|null $app = null;
@@ -41,7 +41,7 @@ final class ServerTest extends TestCase
     {
         $this->server = new Server('Test Server');
         $config = (new Config())
-            ->setAppPath(__DIR__.'/app/v1')
+            ->setAppPath(__DIR__ . '/app/v1')
             ->setConfigPath('Configs')
             ->setViewPath('Views')
             ->setLogRequest(false);
@@ -72,8 +72,8 @@ final class ServerTest extends TestCase
      */
     public function testServerRunHttpForRoute()
     {
-        $this->server->addRoutePath('v1', __DIR__.'/app/v1');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/v1/ping'));
+        $this->server->addRoutePath('v1', __DIR__ . '/app/v1');
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/v1/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -85,8 +85,8 @@ final class ServerTest extends TestCase
      */
     public function testServerRunHttpForDomain()
     {
-        $this->server->addDomainPath('localhost:'.ServerTest::HTTP_TEST_PORT, __DIR__.'/app/v1');
-        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL.':'.self::HTTP_TEST_PORT.'/ping'));
+        $this->server->addDomainPath('localhost:' . ServerTest::HTTP_TEST_PORT, __DIR__ . '/app/v1');
+        $response = $this->server->run(new ServerRequest(HttpMethod::GET->value, self::HTTP_TEST_URL . ':' . self::HTTP_TEST_PORT . '/ping'));
         $this->assertNotNull($response);
         $this->assertEquals(200, $response->getStatusCode());
     }

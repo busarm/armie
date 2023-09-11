@@ -39,7 +39,7 @@ function unit_convert($size)
     $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
     $index = floor(log($size, 1024));
 
-    return (round($size / pow(1024, $index), 2) ?? 0).' '.$unit[$index] ?? '~';
+    return (round($size / pow(1024, $index), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
 }
 
 /**
@@ -152,10 +152,10 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? exit(PHP_EOL.$data.PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? exit(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
 
-    return is_cli() ? exit(PHP_EOL.var_export($data, true).PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
+    return is_cli() ? exit(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
 }
 
 //######### APPLICATION HELPERS ############
@@ -248,7 +248,7 @@ function log_message($level, $message, array $context = [])
 
     try {
         $prefix = app()->getWorker() ? sprintf('%s (#%s)', app()->getWorker()->name, app()->getWorker()->id) : app()->config->name;
-        $message = $prefix.' - '.$message;
+        $message = $prefix . ' - ' . $message;
         app()->logger->log($level, $message, $context);
     } catch (\Throwable) {
         (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
@@ -448,19 +448,19 @@ function create_cookie_header(
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    $date = date('D, d-M-Y H:i:s', $expires).' GMT';
+    $date = date('D, d-M-Y H:i:s', $expires) . ' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
-        $header .= "; Expires={$date}; Max-Age=".($expires - time());
+        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
     }
     if ($path != '') {
-        $header .= '; Path='.$path;
+        $header .= '; Path=' . $path;
     }
     if ($domain != '') {
-        $header .= '; Domain='.$domain;
+        $header .= '; Domain=' . $domain;
     }
     if ($samesite != '') {
-        $header .= '; SameSite='.$samesite;
+        $header .= '; SameSite=' . $samesite;
     }
     if ($secure) {
         $header .= '; Secure';
@@ -515,15 +515,19 @@ function parse_php_size($sSize)
         case 'P':
             $iValue *= 1024;
             // Fallthrough intended
+            // no break
         case 'T':
             $iValue *= 1024;
             // Fallthrough intended
+            // no break
         case 'G':
             $iValue *= 1024;
             // Fallthrough intended
+            // no break
         case 'M':
             $iValue *= 1024;
             // Fallthrough intended
+            // no break
         case 'K':
             $iValue *= 1024;
             break;

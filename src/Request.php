@@ -244,7 +244,7 @@ class Request implements RequestInterface
         $request->_host = $http->host();
         $request->_path = $http->path();
         $request->_baseUrl = $request->_host;
-        $request->_currentUrl = $request->_baseUrl . $request->_path;
+        $request->_currentUrl = $request->_baseUrl.$request->_path;
         $request->_ip = $http->connection->getRemoteIp() ?? $request->_ip;
         $request->_workerman = $http;
 
@@ -430,7 +430,7 @@ class Request implements RequestInterface
                         return $ip;
                     }
                 }
-            } else if ($this->validateIpAddress($xForwardFor)) {
+            } elseif ($this->validateIpAddress($xForwardFor)) {
                 return $xForwardFor;
             }
         }

@@ -23,7 +23,7 @@ final class CryptoTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->key = md5(uniqid() . time());
+        $this->key = md5(uniqid().time());
         $this->plainText = 'Samuel Gabriel Test';
     }
 

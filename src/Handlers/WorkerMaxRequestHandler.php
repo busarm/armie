@@ -5,7 +5,7 @@ namespace Armie\Handlers;
 use Workerman\Connection\TcpConnection;
 
 /**
- * Reload worker when max request reached
+ * Reload worker when max request reached.
  *
  * Armie Framework.
  *

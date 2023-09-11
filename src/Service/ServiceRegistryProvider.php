@@ -47,7 +47,7 @@ class ServiceRegistryProvider implements ProviderInterface
         });
 
         // Unregister service endpoint
-        $app->delete(self::ROUTE . '/{name}/{url}')->call(function (
+        $app->delete(self::ROUTE.'/{name}/{url}')->call(function (
             string $name,
             string $url
         ) {
@@ -65,7 +65,7 @@ class ServiceRegistryProvider implements ProviderInterface
         });
 
         // Get service endpoint
-        $app->get(self::ROUTE . '/{name}')->call(function (string $name) {
+        $app->get(self::ROUTE.'/{name}')->call(function (string $name) {
             $list = $this->storage->get($name);
             if (!empty($list) && is_array($list)) {
                 return $this->leastUsed($list);

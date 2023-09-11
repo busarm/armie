@@ -70,7 +70,7 @@ class Router implements RouterInterface
             HttpMethod::PATCH->value   => Route::patch($path),
             HttpMethod::DELETE->value  => Route::delete($path),
             HttpMethod::HEAD->value    => Route::head($path),
-            default  => Route::get($path)
+            default                    => Route::get($path)
         };
 
         if (!isset($this->routes[$method])) {

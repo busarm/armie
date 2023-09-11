@@ -20,7 +20,7 @@ class Reference implements Stringable
     public function __construct(private Model|string $model, private array $keys)
     {
         if (!($model instanceof Model) && !is_subclass_of($model, Model::class)) {
-            throw new Exception('Reference `model` must be a subclass of ' . Model::class);
+            throw new Exception('Reference `model` must be a subclass of '.Model::class);
         }
     }
 

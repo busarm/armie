@@ -105,14 +105,14 @@ trait TypeResolver
                     && (in_array(DataType::BOOL->value, $types) || in_array(DataType::BOOLEAN->value, $types)) => DataType::BOOL,
                 is_numeric($data)
                     && is_float($data)
-                    && in_array(DataType::FLOAT->value, $types)    => DataType::FLOAT->value,
+                    && in_array(DataType::FLOAT->value, $types)         => DataType::FLOAT->value,
                 is_bool($data) || $data === 'true' || $data === 'false' => DataType::BOOL->value,
-                is_float($data)     => DataType::FLOAT->value,
-                is_int($data)       => DataType::INT->value,
-                is_array($data)     => DataType::ARRAY->value,
-                is_object($data)    => DataType::OBJECT->value,
-                is_string($data)    => $this->isDate($data) ? DataType::DATETIME->value : DataType::STRING->value,
-                default             => false
+                is_float($data)                                         => DataType::FLOAT->value,
+                is_int($data)                                           => DataType::INT->value,
+                is_array($data)                                         => DataType::ARRAY->value,
+                is_object($data)                                        => DataType::OBJECT->value,
+                is_string($data)                                        => $this->isDate($data) ? DataType::DATETIME->value : DataType::STRING->value,
+                default                                                 => false
             };
         }
 

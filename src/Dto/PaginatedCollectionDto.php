@@ -41,7 +41,7 @@ class PaginatedCollectionDto extends BaseDto
         if ($limit !== null && $this->count > 0 && $this->total > 0) {
             $limit = $limit ?: 1;
             $this->setFirst(1);
-            $this->setLast((int)ceil($this->total / $limit));
+            $this->setLast((int) ceil($this->total / $limit));
             if ($page !== null) {
                 $page = $page ?: 1;
                 $this->setCurrent(min($page, $this->last));

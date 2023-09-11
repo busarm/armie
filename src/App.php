@@ -219,7 +219,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
     private ?string $taskWorkerAddress = null;
 
     /**
-     * Current application worker. Only available if app is running in async mode
+     * Current application worker. Only available if app is running in async mode.
      *
      * @var ?Worker
      */

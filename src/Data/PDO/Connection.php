@@ -56,7 +56,7 @@ class Connection extends PDO implements SingletonInterface
         if (app()->async && app()->config->db->connectionPoolSize > 0) {
             /** @var static */
             return ConnectionPool::make([
-                'config' => app()->config->db
+                'config' => app()->config->db,
             ])->get();
         }
 

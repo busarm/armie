@@ -185,7 +185,6 @@ class Config implements ConfigurationInterface
      */
     public int|null $sessionLifetime = null;
 
-
     // ------------- CACHE -----------------//
 
     /**

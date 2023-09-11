@@ -688,7 +688,7 @@ abstract class Model extends DataObject implements ModelInterface
     }
 
     /**
-     * Start database transaction
+     * Start database transaction.
      *
      * @return void
      */

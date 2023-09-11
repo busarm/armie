@@ -111,7 +111,7 @@ class DatabaseStore implements StorageBagInterface
         }
         // 3. Save
         if ($this->async) {
-            return !!Async::runTask(function () use ($key, $data) {
+            return (bool) Async::runTask(function () use ($key, $data) {
                 $model = $this->model->clone();
                 $model->load([
                     $this->model->getKeyName() => $this->fullKey($key),
@@ -173,7 +173,7 @@ class DatabaseStore implements StorageBagInterface
 
             // 4. Delete
             if ($this->async) {
-                Async::runTask(fn ()  => $item->delete(true));
+                Async::runTask(fn () => $item->delete(true));
             } else {
                 $item->delete(true);
             }
@@ -248,7 +248,7 @@ class DatabaseStore implements StorageBagInterface
             // 3. Delete (if required)
             if ($delete) {
                 if ($this->async) {
-                    Async::runTask(fn ()  => $item->delete(true));
+                    Async::runTask(fn () => $item->delete(true));
                 } else {
                     $item->delete(true);
                 }

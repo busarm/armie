@@ -25,9 +25,9 @@ class UpdateProduct extends Task
     {
         $repository = new ProductTestRepository();
 
-        print_r('Async product 2 update start' . PHP_EOL);
+        print_r('Async product 2 update start'.PHP_EOL);
         $repository->updateById(2, $this->data);
-        print_r('Async product 2 update finish' . PHP_EOL);
+        print_r('Async product 2 update finish'.PHP_EOL);
 
         return $repository->findById(2);
     }

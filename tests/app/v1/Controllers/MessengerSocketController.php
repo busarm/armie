@@ -24,7 +24,7 @@ class MessengerSocketController implements SocketControllerInterface
      */
     public function onConnect(ConnectionInterface $connection): void
     {
-        log_warning('User connected ' . $connection->getRemoteAddress());
+        log_warning('User connected '.$connection->getRemoteAddress());
     }
 
     /**
@@ -35,9 +35,9 @@ class MessengerSocketController implements SocketControllerInterface
      */
     public function onMessage(ConnectionInterface $connection, mixed $data): void
     {
-        log_debug('Message received from ' . $connection->getRemoteAddress(), $data);
+        log_debug('Message received from '.$connection->getRemoteAddress(), $data);
         Timer::add(1, function () use ($connection) {
-            $connection->send('Pong ' . time());
+            $connection->send('Pong '.time());
         }, [], false);
     }
 
@@ -48,6 +48,6 @@ class MessengerSocketController implements SocketControllerInterface
      */
     public function onClose(ConnectionInterface $connection): void
     {
-        log_warning('User disconnected ' . $connection->getRemoteAddress());
+        log_warning('User disconnected '.$connection->getRemoteAddress());
     }
 }

@@ -3,7 +3,6 @@
 namespace Armie;
 
 use Armie\Data\DataObject;
-use Armie\Dto\CollectionBaseDto;
 use Armie\Interfaces\ResponseHandlerInterface;
 use Armie\Interfaces\ResponseInterface;
 use Stringable;
@@ -21,8 +20,8 @@ use function Armie\Helpers\view;
 abstract class View implements ResponseHandlerInterface, Stringable
 {
     /**
-     * @param DataObject|array|null $data       View Data
-     * @param array                 $headers    Http headers
+     * @param DataObject|array|null $data    View Data
+     * @param array                 $headers Http headers
      */
     public function __construct(protected DataObject|array|null $data = null, protected $headers = [])
     {

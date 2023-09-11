@@ -52,7 +52,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
                 ]);
                 $response = $http->request(
                     HttpMethod::GET->value,
-                    $this->endpoint . "/$name",
+                    $this->endpoint."/$name",
                     [
                         RequestOptions::VERIFY => false,
                     ]
@@ -105,7 +105,7 @@ class DistributedServiceDiscovery implements DistributedServiceDiscoveryInterfac
         ]);
         $response = $http->request(
             HttpMethod::DELETE->value,
-            $this->endpoint . '/' . $client->getName() . '/' . urlencode($client->getLocation()),
+            $this->endpoint.'/'.$client->getName().'/'.urlencode($client->getLocation()),
             [
                 RequestOptions::VERIFY => false,
             ]

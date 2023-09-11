@@ -172,8 +172,8 @@ class Response implements ResponseInterface
         }
 
         return
-            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText) . "\r\n" .
-            $this->getHttpHeadersAsString($headers) . "\r\n" .
+            sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
+            $this->getHttpHeadersAsString($headers)."\r\n".
             strval($this->getResponseBody());
     }
 
@@ -592,9 +592,9 @@ class Response implements ResponseInterface
         $this->setParameters([]);
         $this->setBody($data);
         if ($name) {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . "filename=\"$name\"");
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ')."filename=\"$name\"");
         } else {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . 'filename="download-' . time() . '"');
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ').'filename="download-'.time().'"');
         }
         if ($contentType) {
             $this->setHttpHeader('Content-Type', $contentType);
@@ -617,9 +617,9 @@ class Response implements ResponseInterface
         $this->setParameters([]);
         $this->setBody(file_exists($path) ? fopen($path, 'rb') : null);
         if ($name) {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . "filename=\"$name\"");
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ')."filename=\"$name\"");
         } else {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . 'filename="download-' . time() . '"');
+            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ').'filename="download-'.time().'"');
         }
         if ($contentType) {
             $this->setHttpHeader('Content-Type', $contentType);
@@ -709,7 +709,7 @@ class Response implements ResponseInterface
         ksort($headers);
         foreach ($headers as $name => $values) {
             foreach ($values as $value) {
-                $content .= sprintf("%-{$max}s %s\r\n", $this->beautifyHeaderName($name) . ':', $value);
+                $content .= sprintf("%-{$max}s %s\r\n", $this->beautifyHeaderName($name).':', $value);
             }
         }
 
@@ -737,7 +737,7 @@ class Response implements ResponseInterface
      */
     private function beautifyCallback($match)
     {
-        return '-' . strtoupper($match[1]);
+        return '-'.strtoupper($match[1]);
     }
 
     /**

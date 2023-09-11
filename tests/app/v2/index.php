@@ -27,7 +27,7 @@ $app = new App($config);
 $app->setServiceDiscovery($discovery ?? new RemoteServiceDiscovery('https://server/discover'));
 
 $app->get('ping')->call(function (App $app) {
-    return 'success-v2-' . $app->env->value;
+    return 'success-v2-'.$app->env->value;
 });
 
 $app->get('test')->call(function (RequestInterface $req, App $app) {

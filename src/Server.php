@@ -78,12 +78,13 @@ class Server
                 ->setParameters(
                     (new ResponseDto())
                         ->setSuccess(false)
-                        ->setErrorCode($errno)
+                        ->setErrorCode(strval($errno))
                         ->setErrorLine($errline)
                         ->setErrorFile($errfile)
                         ->setMessage(sprintf('Error: %s', $errstr))
                         ->toArray()
                 )->send();
+            return $errno;
         });
         set_exception_handler(function (Throwable $e) {
             $this->reporter->exception($e);
@@ -317,7 +318,7 @@ class Server
             if (array_key_exists($route, $this->routeApps)) {
                 return $this->routeApps[$route]
                     ->setServiceDiscovery($this->serviceDiscovery)
-                    ->run($request->withUri(new Uri($request->baseUrl().'/'.$uri)));
+                    ->run($request->withUri(new Uri($request->baseUrl() . '/' . $uri)));
             }
 
             // Check route static
@@ -328,13 +329,13 @@ class Server
             // Check route paths
             if (array_key_exists($route, $this->routePaths)) {
                 $path = $this->routePaths[$route];
-                $path = is_dir($path) ? $path.'/index.php' : $path;
+                $path = is_dir($path) ? $path . '/index.php' : $path;
                 if (!file_exists($path)) {
                     throw new SystemError("App file not found: $path");
                 }
 
                 return Loader::require($path, [
-                    'request'   => $request->withUri(new Uri($request->baseUrl().'/'.$uri))->toPsr(),
+                    'request'   => $request->withUri(new Uri($request->baseUrl() . '/' . $uri))->toPsr(),
                     'discovery' => $this->serviceDiscovery,
                 ]);
             }
@@ -374,7 +375,7 @@ class Server
         // Check domain paths
         if (array_key_exists($domain, $this->domainPaths)) {
             $path = $this->domainPaths[$domain];
-            $path = is_dir($path) ? $path.'/index.php' : $path;
+            $path = is_dir($path) ? $path . '/index.php' : $path;
             if (!file_exists($path)) {
                 throw new SystemError("App file not found: $path");
             }

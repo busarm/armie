@@ -34,7 +34,7 @@ class ServiceRegistryProvider implements ProviderInterface
     public function process(App $app): void
     {
         // Register service endpoint
-        $app->post(self::ROUTE)->call(function (ServiceRegistryDto $dto) {
+        $app->post(self::ROUTE)->call(function (?ServiceRegistryDto $dto) {
             if ($dto && $dto->name && filter_var($dto->url, FILTER_VALIDATE_URL)) {
                 $list = $this->storage->get($dto->name, []);
                 $list[] = $dto->toArray();
@@ -47,7 +47,7 @@ class ServiceRegistryProvider implements ProviderInterface
         });
 
         // Unregister service endpoint
-        $app->delete(self::ROUTE.'/{name}/{url}')->call(function (
+        $app->delete(self::ROUTE . '/{name}/{url}')->call(function (
             string $name,
             string $url
         ) {
@@ -65,7 +65,7 @@ class ServiceRegistryProvider implements ProviderInterface
         });
 
         // Get service endpoint
-        $app->get(self::ROUTE.'/{name}')->call(function (string $name) {
+        $app->get(self::ROUTE . '/{name}')->call(function (string $name) {
             $list = $this->storage->get($name);
             if (!empty($list) && is_array($list)) {
                 return $this->leastUsed($list);

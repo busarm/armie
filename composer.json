@@ -15,7 +15,11 @@
             "bootstrap/helpers.php"
         ],
         "psr-4": {
-            "Armie\\": "src/",
+            "Armie\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Armie\\Tests\\": "tests/",
             "Armie\\Tests\\App\\Server\\": "tests/app/server",
             "Armie\\Tests\\App\\V1\\": "tests/app/v1",
@@ -28,9 +32,11 @@
         "classmap-authoritative": true
     },
     "scripts": {
-        "analyze": "./vendor/bin/phpstan analyse --level 3 src tests",
+        "analyze": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "lint": "phpcs --severity=8 --standard=psr12 ./src ./tests",
+        "lint-fix": "phpcbf --severity=8 --standard=psr12 ./src ./tests",
         "phpunit": "./vendor/bin/phpunit --coverage-text tests -v",
-        "test": "composer run analyze && composer run phpunit -- --exclude skip",
+        "test": "composer run analyze && composer run lint && composer run phpunit -- --exclude skip",
         "test-local": "composer run analyze && composer run phpunit",
         "test-skip": "composer run phpunit -- --group skip",
         "test-pdo": "composer run phpunit -- --group pdo",
@@ -70,7 +76,7 @@
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan": "^1.8",
         "fakerphp/faker": "^1.20",
-        "styleci/cli": "^1.5"
+        "squizlabs/php_codesniffer": "3.*"
     },
     "extra": {
         "hooks": {

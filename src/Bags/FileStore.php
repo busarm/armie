@@ -83,7 +83,7 @@ class FileStore implements StorageBagInterface
         // 1. Sanitize
         $data = $sanitize ? Security::clean($data) : $data;
         // 2. Serialize
-        if ($data && !is_null($serialized = serialize($data))) {
+        if ($data && !empty($serialized = serialize($data))) {
             $data = $serialized;
         }
         // 3. Encrypt

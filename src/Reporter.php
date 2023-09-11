@@ -78,7 +78,7 @@ class Reporter implements ReportingInterface
     {
         $contexts = array_map(
             function ($instance) {
-                return ($instance['file'] ?? $instance['class'] ?? '').':'.($instance['line'] ?? '1');
+                return $instance['file'] . ':' . ($instance['line'] ?? '1');
             },
             array_values(array_filter(debug_backtrace(), fn ($trace) => isset($trace['file'])))
         );
@@ -100,7 +100,7 @@ class Reporter implements ReportingInterface
     {
         $contexts = array_map(
             function ($instance) {
-                return ($instance['file'] ?? $instance['class'] ?? '').':'.($instance['line'] ?? '1');
+                return $instance['file'] . ':' . ($instance['line'] ?? '1');
             },
             array_values(array_filter($exception->getTrace(), fn ($trace) => isset($trace['file'])))
         );

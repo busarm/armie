@@ -106,12 +106,12 @@ class DatabaseStore implements StorageBagInterface
         // 1. Sanitize
         $data = $sanitize ? Security::clean($data) : $data;
         // 2. Serialize
-        if ($data && !is_null($serialized = serialize($data))) {
+        if ($data && !empty($serialized = serialize($data))) {
             $data = $serialized;
         }
         // 3. Save
         if ($this->async) {
-            return (bool) Async::runTask(function () use ($key, $data) {
+            return !!Async::runTask(function () use ($key, $data) {
                 $model = $this->model->clone();
                 $model->load([
                     $this->model->getKeyName() => $this->fullKey($key),
@@ -143,7 +143,7 @@ class DatabaseStore implements StorageBagInterface
 
         if ($item && !empty($data = $item->get($this->valueColumn))) {
             // 2. Unserialize
-            if ($data && !is_null($parsed = unserialize($data))) {
+            if (!is_null($parsed = unserialize($data))) {
                 $data = $parsed;
             }
             // 3. Sanitize
@@ -165,7 +165,7 @@ class DatabaseStore implements StorageBagInterface
 
         if ($item && !empty($data = $item->get($this->valueColumn))) {
             // 2. Unserialize
-            if ($data && !is_null($parsed = unserialize($data))) {
+            if (!is_null($parsed = unserialize($data))) {
                 $data = $parsed;
             }
             // 3. Sanitize
@@ -173,7 +173,7 @@ class DatabaseStore implements StorageBagInterface
 
             // 4. Delete
             if ($this->async) {
-                Async::runTask(fn () => $item->delete(true));
+                Async::runTask(fn ()  => $item->delete(true));
             } else {
                 $item->delete(true);
             }
@@ -248,7 +248,7 @@ class DatabaseStore implements StorageBagInterface
             // 3. Delete (if required)
             if ($delete) {
                 if ($this->async) {
-                    Async::runTask(fn () => $item->delete(true));
+                    Async::runTask(fn ()  => $item->delete(true));
                 } else {
                     $item->delete(true);
                 }

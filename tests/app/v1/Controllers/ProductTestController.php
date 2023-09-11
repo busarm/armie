@@ -20,8 +20,8 @@ class ProductTestController extends ResourceController
 {
     public function __construct(
         private ProductTestRepository $repository,
-        private RequestInterface $request,
-        private ResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
     ) {
         parent::__construct($repository, $request, $response);
     }

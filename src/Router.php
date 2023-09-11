@@ -61,20 +61,23 @@ class Router implements RouterInterface
      */
     public function createRoute(string $method, string $path): RouteInterface
     {
-        $route = match (strtoupper($method)) {
+        $method = strtoupper($method);
+
+        $route = match ($method) {
             HttpMethod::GET->value     => Route::get($path),
             HttpMethod::POST->value    => Route::post($path),
             HttpMethod::PUT->value     => Route::put($path),
             HttpMethod::PATCH->value   => Route::patch($path),
             HttpMethod::DELETE->value  => Route::delete($path),
             HttpMethod::HEAD->value    => Route::head($path),
+            default  => Route::get($path)
         };
 
-        if (!isset($this->routes[$route->getMethod()->value])) {
-            $this->routes[$route->getMethod()->value] = [];
+        if (!isset($this->routes[$method])) {
+            $this->routes[$method] = [];
         }
 
-        return $this->routes[$route->getMethod()->value][strtolower($route->getPath())] = &$route;
+        return $this->routes[$method][strtolower($route->getPath())] = &$route;
     }
 
     /**
@@ -186,21 +189,21 @@ class Router implements RouterInterface
     {
         // View
         if ($view = $route->getView()) {
-            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware = $route->getMiddlewares();
             $routeMiddleware[] = new ViewRouteMiddleware($view, $route->getParams());
 
             return $routeMiddleware;
         }
         // Callable
         if ($callable = $route->getCallable()) {
-            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware = $route->getMiddlewares();
             $routeMiddleware[] = new CallableRouteMiddleware($callable, $route->getParams());
 
             return $routeMiddleware;
         }
         // Controller
         else {
-            $routeMiddleware = $route->getMiddlewares() ?? [];
+            $routeMiddleware = $route->getMiddlewares();
             $routeMiddleware[] = new ControllerRouteMiddleware($route->getController(), $route->getFunction(), $route->getParams());
 
             return $routeMiddleware;

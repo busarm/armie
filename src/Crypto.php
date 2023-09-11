@@ -93,7 +93,7 @@ class Crypto
                 $hash = self::digest($crypt, md5($passphrase), $hmacHashAlgo);
                 $separator = bin2hex(openssl_random_pseudo_bytes(4));
 
-                return implode($separator, [bin2hex($crypt), bin2hex($salt), bin2hex($iv), $hash]).'/'.$separator;
+                return implode($separator, [bin2hex($crypt), bin2hex($salt), bin2hex($iv), $hash]) . '/' . $separator;
             } catch (\Throwable $th) {
                 log_exception($th);
             }

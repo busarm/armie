@@ -22,7 +22,7 @@ final class CallableTask extends Task
      */
     public function run()
     {
-        if ($this->callable && is_callable($this->callable)) {
+        if (is_callable($this->callable)) {
             if (array_is_list($this->data)) {
                 $result = call_user_func($this->callable, ...$this->data);
             } else {

@@ -39,12 +39,14 @@ class PaginatedCollectionDto extends BaseDto
             $this->setTotal($total);
         }
         if ($limit !== null && $this->count > 0 && $this->total > 0) {
+            $limit = $limit ?: 1;
             $this->setFirst(1);
-            $this->setLast($this->count > 0 ? ceil($this->total / $limit) : 1);
+            $this->setLast((int)ceil($this->total / $limit));
             if ($page !== null) {
+                $page = $page ?: 1;
                 $this->setCurrent(min($page, $this->last));
-                $this->setNext($this->count > 0 ? min($page + 1, ceil($this->total / $limit)) : 1);
-                $this->setPrevious($this->count > 0 ? max($page - 1, 1) : 1);
+                $this->setNext(min($page + 1, ceil($this->total / $limit)));
+                $this->setPrevious(max($page - 1, 1));
             }
         }
     }

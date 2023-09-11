@@ -101,7 +101,7 @@ class ServerConfig
     /**
      * Timer Jobs.
      *
-     * @var array<string,Task[]>
+     * @var array<int|string,Task[]>
      */
     public array $jobs = [];
 

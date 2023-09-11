@@ -121,13 +121,13 @@ $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
         ]);
     }));
     $promise->then(function (ProductTestModel $data) {
-        log_debug('1 - Result of promise db - '.$data?->get('name'));
+        log_debug('1 - Result of promise db - ' . $data->get('name'));
         $data->set('name', 'hhahahahah');
 
         return $data;
     });
     $promise->then(function (ProductTestModel $data) {
-        log_debug('2 - Result of promise db - '.$data?->get('name'));
+        log_debug('2 - Result of promise db - ' . $data->get('name'));
     });
     $waited = await($promise);
     log_debug('Promise completed - '.$promise->done().' - '.$waited?->get('name'));

@@ -2,7 +2,7 @@
 
 namespace Armie;
 
-use Armie\Dto\BaseDto;
+use Armie\Data\DataObject;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Interfaces\ResponseHandlerInterface;
 use Armie\Interfaces\ResponseInterface;
@@ -21,10 +21,10 @@ use function Armie\Helpers\view;
 abstract class View implements ResponseHandlerInterface, Stringable
 {
     /**
-     * @param BaseDto|array|null $data    View Data
-     * @param array              $headers Http headers
+     * @param DataObject|array|null $data       View Data
+     * @param array                 $headers    Http headers
      */
-    public function __construct(protected BaseDto|array|null $data = null, protected $headers = [])
+    public function __construct(protected DataObject|array|null $data = null, protected $headers = [])
     {
     }
 
@@ -39,7 +39,7 @@ abstract class View implements ResponseHandlerInterface, Stringable
     final protected function get(string $name, mixed $default = null): mixed
     {
         if ($this->data) {
-            if ($this->data instanceof BaseDto) {
+            if ($this->data instanceof DataObject) {
                 return $this->data->get($name, $default);
             } elseif (is_array($this->data)) {
                 return $this->data[$name] ?? $default;
@@ -93,9 +93,7 @@ abstract class View implements ResponseHandlerInterface, Stringable
     {
         $params = [];
 
-        if ($this->data instanceof CollectionBaseDto) {
-            $params = $this->data->toArray();
-        } elseif ($this->data instanceof BaseDto) {
+        if ($this->data instanceof DataObject) {
             $params = $this->data->toArray();
         } elseif (is_array($this->data) || is_object($this->data)) {
             $params = (array) $this->data;

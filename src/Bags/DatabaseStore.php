@@ -70,6 +70,8 @@ class DatabaseStore implements StorageBagInterface
                 new Field($createdAtColumn, DataType::DATETIME),
             ]
         );
+
+        $this->loadTime = time();
     }
 
     /**
@@ -320,7 +322,7 @@ class DatabaseStore implements StorageBagInterface
      */
     private function fullKey(string $key): string
     {
-        return $this->isStoreKey($key) ? $key : sha1($key).self::STORAGE_SUFFIX;
+        return $this->isStoreKey($key) ? $key : sha1($key) . self::STORAGE_SUFFIX;
     }
 
     /**

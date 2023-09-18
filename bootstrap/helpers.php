@@ -39,7 +39,7 @@ function unit_convert($size)
     $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
     $index = floor(log($size, 1024));
 
-    return (round($size / pow(1024, $index), 2) ?? 0).' '.$unit[$index] ?? '~';
+    return (round($size / pow(1024, $index), 2) ?? 0) . ' ' . $unit[$index] ?? '~';
 }
 
 /**
@@ -152,10 +152,10 @@ function is_cli()
 function out($data = null, $responseCode = 500)
 {
     if (!is_array($data) && !is_object($data)) {
-        return is_cli() ? exit(PHP_EOL.$data.PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
+        return is_cli() ? exit(PHP_EOL . $data . PHP_EOL) : (new \Armie\Response())->html($data, $responseCode)->send(false);
     }
 
-    return is_cli() ? exit(PHP_EOL.var_export($data, true).PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
+    return is_cli() ? exit(PHP_EOL . var_export($data, true) . PHP_EOL) : (new \Armie\Response())->json((array) $data, $responseCode)->send(false);
 }
 
 //######### APPLICATION HELPERS ############
@@ -248,7 +248,7 @@ function log_message($level, $message, array $context = [])
 
     try {
         $prefix = app()->getWorker() ? sprintf('%s (#%s)', app()->getWorker()->name, app()->getWorker()->id) : app()->config->name;
-        $message = $prefix.' - '.$message;
+        $message = $prefix . ' - ' . $message;
         app()->logger->log($level, $message, $context);
     } catch (\Throwable) {
         (new ConsoleLogger(new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG)))->log($level, $message, $context);
@@ -282,7 +282,7 @@ function log_exception(\Throwable $exception)
 {
     log_message(
         \Psr\Log\LogLevel::ERROR,
-        sprintf('%s (%s:%s)', $exception->getMessage(), $exception->getFile(), $exception->getLine() ?? 1),
+        sprintf('%s in %s:%s', $exception->getMessage() ?: 'Exception', $exception->getFile(), $exception->getLine() ?? 1)
     );
 }
 
@@ -448,19 +448,19 @@ function create_cookie_header(
     bool $httponly = false
 ): string {
     $value = rawurlencode($value);
-    $date = date('D, d-M-Y H:i:s', $expires).' GMT';
+    $date = date('D, d-M-Y H:i:s', $expires) . ' GMT';
     $header = "{$name}={$value}";
     if ($expires != 0) {
-        $header .= "; Expires={$date}; Max-Age=".($expires - time());
+        $header .= "; Expires={$date}; Max-Age=" . ($expires - time());
     }
     if ($path != '') {
-        $header .= '; Path='.$path;
+        $header .= '; Path=' . $path;
     }
     if ($domain != '') {
-        $header .= '; Domain='.$domain;
+        $header .= '; Domain=' . $domain;
     }
     if ($samesite != '') {
-        $header .= '; SameSite='.$samesite;
+        $header .= '; SameSite=' . $samesite;
     }
     if ($secure) {
         $header .= '; Secure';
@@ -560,12 +560,15 @@ function async(Task|callable $task, bool $useEventLoopOnly = false): void
 /**
  * Run task list concurrently.
  *
- * @param Task[]|callable[] $task
- * @param bool              $wait
+ * @param array<Task<T>|callable():T> $task
+ * @param bool                      $wait
+ * 
+ * @return array<T>
+ * @template T
  */
-function concurrent(array $tasks, $wait = false): Generator
+function concurrent(array $tasks): array
 {
-    return Async::runTasks($tasks, $wait);
+    return Async::runTasks($tasks, true);
 }
 
 /**
@@ -714,6 +717,49 @@ function unserialize($data, array $options = [])
 }
 
 /**
+ * Open Internet or Unix domain socket connection to a client
+ *
+ * @param string    $address Client address. Unix socket file path (`unix://<path>`) or TCP endpoint (`tcp://<domain>:<port>`)
+ * @param bool      $block   Blocking or Non-Blocking connection
+ * @param bool      $persist Peristent connection
+ * @param int       $timeout Connection timeout in seconds. Default: 10secs
+ * @param resource  $context Stream context. @see stream_context_create.
+ *
+ * @throws SystemError If failed and $block = true
+ *
+ * @return resource|false Return connection or `false` if failed and $async = true
+ */
+function stream_connect(string $address, bool $block = true, bool $persist = false, int $timeout = 10, mixed $context = NULL): mixed
+{
+    static $connection = null;
+
+    $flag = $block
+        ? ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT : STREAM_CLIENT_CONNECT)
+        : ($persist ? STREAM_CLIENT_PERSISTENT | STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT : STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT);
+
+    if ($persist && $connection) {
+        $socket = $connection;
+    } elseif (!($socket = stream_socket_client($address, $errorCode, $errorMsg, $timeout, $flag, $context))) {
+        if ($block) {
+            throw new SystemError(sprintf('Failed to connect to %: [%s] %s.', $address, $errorCode, $errorMsg));
+        }
+        return false;
+    }
+
+    // Set blocking mode
+    stream_set_blocking($socket, $block);
+
+    // Set read/write timeout
+    stream_set_timeout($socket, $timeout);
+
+    if ($persist) {
+        $connection = $socket;
+    }
+
+    return $socket;
+}
+
+/**
  * Read from stream.
  *
  * @param resource $resource
@@ -810,4 +856,32 @@ function error_level(int $level): string
     }
 
     return '';
+}
+
+/**
+ * Itterate a range of elements.
+ *
+ * @param float|int|string $start First value of the sequence.
+ * @param float|int|string $end The sequence is ended upon reaching the `end` value.
+ * @param float|int $step If a `step` value is given, it will be used as the increment (or decrement) between elements in the sequence. `step` must not equal `0` and must not exceed the specified range. If not specified, `step` will default to 1.
+ * @return Generator Returns an itterator of elements from `start` to `end`, inclusive.
+ */
+function range_itterate(float|int|string $start, float|int|string $end, float|int $step = 1): Generator
+{
+    foreach (range($start, $end, $step) as $index) {
+        yield $index;
+    }
+}
+
+/**
+ * Itterate a list of elements.
+ *
+ * @param array $list
+ * @return Generator Returns an itterator of elements from `start` to `end`, inclusive.
+ */
+function array_itterate(array $list): Generator
+{
+    foreach ($list as $key => $value) {
+        yield $key => $value;
+    }
 }

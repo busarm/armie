@@ -30,6 +30,11 @@ use const Armie\Constants\VAR_REQUEST_URI;
  */
 class LocalService extends BaseService
 {
+    /**
+     * @param string                         $name      Name of service
+     * @param string|null                    $location  File Path location of service
+     * @param ServiceDiscoveryInterface|null $discovery Service discovery
+     */
     public function __construct(
         private string $name,
         private ?string $location = null,
@@ -44,23 +49,23 @@ class LocalService extends BaseService
     {
         $path = $this->location ?? $this->getLocation($this->name);
         if (empty($path)) {
-            throw new SystemError(self::class.": Location for client $this->name not found");
+            throw new SystemError(self::class . ": Location for client $this->name not found");
         }
 
-        $path = is_dir($path) ? $path.'/index.php' : $path;
+        $path = is_dir($path) ? $path . '/index.php' : $path;
         if (!file_exists($path)) {
-            throw new SystemError(self::class.": Client $this->name App file not found: $path");
+            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
         }
 
-        $uri = (new Uri(rtrim($request->baseUrl(), '/').'/'.ltrim($dto->route, '/')));
+        $uri = (new Uri(rtrim($request->baseUrl(), '/') . '/' . ltrim($dto->route, '/')));
         $query = http_parse_query($uri->getQuery());
 
         $dto->headers = $dto->headers ?? [];
         $dto->headers['x-trace-id'] = $dto->headers['x-correlation-id'] = $request->correlationId();
 
         $server = $request->server();
-        $server->set(VAR_REQUEST_URI, '/'.$dto->route);
-        $server->set(VAR_PATH_INFO, '/'.$dto->route);
+        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
+        $server->set(VAR_PATH_INFO, '/' . $dto->route);
 
         $response = Loader::require($path, [
             'request' => Request::fromUrl(
@@ -104,12 +109,12 @@ class LocalService extends BaseService
     {
         $path = $this->location ?? $this->getLocation($this->name);
         if (empty($path)) {
-            throw new SystemError(self::class.": Location for client $this->name not found");
+            throw new SystemError(self::class . ": Location for client $this->name not found");
         }
 
-        $path = is_dir($path) ? $path.'/index.php' : $path;
+        $path = is_dir($path) ? $path . '/index.php' : $path;
         if (!file_exists($path)) {
-            throw new SystemError(self::class.": Client $this->name App file not found: $path");
+            throw new SystemError(self::class . ": Client $this->name App file not found: $path");
         }
 
         $baseUrl = $request->baseUrl();
@@ -118,8 +123,8 @@ class LocalService extends BaseService
         $dto->headers['x-trace-id'] = $dto->headers['x-correlation-id'] = $request->correlationId();
 
         $server = $request->server();
-        $server->set(VAR_REQUEST_URI, '/'.$dto->route);
-        $server->set(VAR_PATH_INFO, '/'.$dto->route);
+        $server->set(VAR_REQUEST_URI, '/' . $dto->route);
+        $server->set(VAR_PATH_INFO, '/' . $dto->route);
         $serverList = $server->all();
 
         $cookieList = $request->cookie()->all();
@@ -128,7 +133,7 @@ class LocalService extends BaseService
 
         // Call async
         async(static function () use ($path, $baseUrl, $dto, $discovery, $cookieList, $serverList) {
-            $uri = (new Uri(rtrim($baseUrl, '/').'/'.ltrim($dto->route, '/')));
+            $uri = (new Uri(rtrim($baseUrl, '/') . '/' . ltrim($dto->route, '/')));
             $query = http_parse_query($uri->getQuery());
 
             // Load local service with path

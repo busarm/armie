@@ -14,56 +14,60 @@ use Armie\Dto\PaginatedCollectionDto;
  *
  * @codeCoverageIgnore
  *
- * @template T
+ * @template ModelType
+ * @template DtoType
  */
 interface RepositoryInterface
 {
     /**
      * Get all records.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names
-     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
+     * @param int   $limit      Query Limit. Default: 0 to use `perPage`
      *
-     * @return CollectionBaseDto<T>
+     * @return CollectionBaseDto<ModelType|DtoType>
      */
-    public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
+    public function all(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $limit = 0): CollectionBaseDto;
 
     /**
      * Get all records with trashed.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names
-     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
+     * @param int   $limit      Query Limit. Default: 0 to use `perPage`
      *
-     * @return CollectionBaseDto<T>
+     * @return CollectionBaseDto<ModelType|DtoType>
      */
-    public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto;
+    public function allTrashed(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $limit = 0): CollectionBaseDto;
 
     /**
      * Get paginated list of records.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
      * @param int   $page       Page Number Default: 1
      * @param int   $limit      Page Limit. Default: 0 to disable
      *
-     * @return PaginatedCollectionDto<T>
+     * @return PaginatedCollectionDto<ModelType|DtoType>
      */
-    public function paginate(array $conditions = [], array $params = [], array $columns = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
+    public function paginate(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 
     /**
      * Find record by id.
      *
      * @param int|string $id
-     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array      $params     Query Params. e.g SQL query params
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array      $params     Query Params. e.g SQL query bind params
      * @param array      $columns    Select Colomn names
      *
-     * @return BaseDto|null
+     * @return (BaseDto&DtoType)|null
      */
     public function findById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto;
 
@@ -71,11 +75,11 @@ interface RepositoryInterface
      * Find with trashed record by id.
      *
      * @param int|string $id
-     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array      $params     Query Params. e.g SQL query params
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array      $params     Query Params. e.g SQL query bind params
      * @param array      $columns    Select Colomn names
      *
-     * @return BaseDto|null
+     * @return (BaseDto&DtoType)|null
      */
     public function findTrashedById(int|string $id, array $conditions = [], array $params = [], array $columns = ['*']): ?BaseDto;
 
@@ -84,7 +88,7 @@ interface RepositoryInterface
      *
      * @param array $data
      *
-     * @return BaseDto|null
+     * @return (BaseDto&DtoType)|null
      */
     public function create(array $data): ?BaseDto;
 

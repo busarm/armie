@@ -95,7 +95,7 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of params.
+     * Set the value of params. e.g SQL query bind params
      *
      * @return self
      */
@@ -115,7 +115,7 @@ abstract class Relation extends Field implements RelationInterface
     }
 
     /**
-     * Set the value of columns.
+     * Set the value of columns. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
      *
      * @return self
      */

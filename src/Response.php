@@ -616,11 +616,7 @@ class Response implements ResponseInterface
     {
         $this->setParameters([]);
         $this->setBody(file_exists($path) ? fopen($path, 'rb') : null);
-        if ($name) {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . "filename=\"$name\"");
-        } else {
-            $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . 'filename="download-' . time() . '"');
-        }
+        $this->setHttpHeader('Content-Disposition', ($inline ? 'inline; ' : 'attachment; ') . ($name ? "filename=\"$name\"" : "filename=\"download-" . time() . "\""));
         if ($contentType) {
             $this->setHttpHeader('Content-Type', $contentType);
         }

@@ -24,6 +24,13 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
     use TypeResolver;
 
     /**
+     * Loaded properties.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $_props = [];
+
+    /**
      * Explicitly selected fields.
      *
      * @var array<string>
@@ -41,17 +48,14 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
     protected bool $_loadAttr = true;
 
     /**
-     * Load property types.
-     */
-    protected bool $_loadTypes = true;
-
-    /**
      * Get excluded fields from properties.
+     * 
+     * Override to exclude custom values
      */
     protected function __excluded(): array
     {
         return [
-            '_selected', '_isDirty', '_loadAttr', '_loadTypes',
+            '_props', '_selected', '_isDirty', '_loadAttr'
         ];
     }
 
@@ -93,35 +97,7 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
      */
     public function __set($key, $value)
     {
-        $key = strip_tags(stripslashes($key));
-
-        if (in_array($key, $this->__excluded())) {
-            $this->{$key} = $value;
-
-            return;
-        }
-
-        if ($this->__get($key) != $value) {
-            $this->_isDirty = true;
-        }
-
-        // If class property
-        if ($this->_loadTypes && property_exists($this, $key)) {
-            $property = new ReflectionProperty($this, $key);
-
-            // Resolve type of value
-            $value = $this->resolvePropertyType($property, $value);
-
-            if ($this->_loadAttr) {
-                // Process attributes if available
-                $value = $this->processFieldAttributes($property, $value);
-                $this->{$key} = $value;
-            }
-        }
-        // If custom property
-        else {
-            $this->{$key} = $this->resolveType($this->findType($value), $value);
-        }
+        $this->set($key, $value);
     }
 
     /**
@@ -129,7 +105,30 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
      */
     public function __get($key)
     {
-        return $this->{strip_tags(stripslashes($key))} ?? null;
+        return $this->get($key);
+    }
+
+    /**
+     * Set Is Dirty - Update has been made.
+     *
+     * @param boolean $isDirty
+     * @return static
+     */
+    protected function setIsDirty(bool $isDirty): static
+    {
+        $this->_isDirty = $isDirty;
+
+        return $this;
+    }
+
+    /**
+     * Is Dirty - Update has been made.
+     *
+     * @return bool
+     */
+    public function isDirty(): bool
+    {
+        return $this->_isDirty || !empty(array_intersect(array_keys($this->fields()), array_keys($this->_props)));
     }
 
     /**
@@ -165,7 +164,6 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
                 !$property->isStatic()
                 && (!$trim || $property->isInitialized($this))
                 && !in_array($property->getName(), $excluded)
-                && !str_starts_with($property->getName(), '_')
             ) {
                 $type = $property->getType();
                 if ($type) {
@@ -176,11 +174,11 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
             }
         }
 
-        return $fields;
+        return [...$fields, ...array_map(fn ($item) => $this->findType($item), $this->_props)];
     }
 
     /**
-     * Quickly load data from array to class properties - Without processing property types and attributes.
+     * Quickly load data from array to class properties - Without processing attributes.
      *
      * @param array $data
      * @param bool  $sanitize
@@ -195,9 +193,8 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
 
         if ($data) {
             $this->_loadAttr = false;
-            $this->_loadTypes = false;
             foreach ($data as $name => $value) {
-                $this->{$name} = $value;
+                $this->set($name, $value);
             }
         }
 
@@ -220,21 +217,11 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
 
         if ($data) {
             foreach ($data as $name => $value) {
-                $this->{$name} = $value;
+                $this->set($name, $value);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * Is Dirty - Update has been made.
-     *
-     * @return bool
-     */
-    public function isDirty(): bool
-    {
-        return $this->_isDirty;
     }
 
     /**
@@ -271,7 +258,9 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return $this->__get($key) ?? $default;
+        return property_exists($this, $key)
+            ? ($this->{$key} ?? $default)
+            : ($this->_props[strip_tags(stripslashes($key))] ?? $default);
     }
 
     /**
@@ -284,7 +273,32 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
      */
     public function set(string $key, mixed $value = null): void
     {
-        $this->__set($key, $value);
+        $key = strip_tags(stripslashes($key));
+
+        if (in_array($key, $this->__excluded())) {
+            if (property_exists($this, $key)) $this->{$key} = $value;
+            else $this->_props[$key] = $value;
+
+            return;
+        }
+
+        if ($this->get($key) != $value) {
+            $this->setIsDirty(true);
+        }
+
+        if (property_exists($this, $key)) {
+            // Process types
+            $property = new ReflectionProperty($this, $key);
+            $value = $this->resolvePropertyType($property, $value);
+            // Process attributes 
+            if ($this->_loadAttr) {
+                $value = $this->processFieldAttributes($property, $value);
+            }
+            $this->{$key} = $value;
+        } else {
+            $value = $this->resolveType($this->findType($value), $value);
+            $this->_props[$key] = $value;
+        }
     }
 
     /**
@@ -298,34 +312,32 @@ abstract class DataObject implements Arrayable, Stringable, JsonSerializable
     public function toArray($trim = true, $sanitize = false): array
     {
         $result = [];
-        foreach ($this->fields() as $attr => $type) {
+        foreach ($this->fields() as $key => $type) {
             if (
-                (empty($this->_selected) || in_array('*', $this->_selected) || in_array($attr, $this->_selected))
-                && property_exists($this, $attr)
-                && (!$trim || isset($this->{$attr}))
+                (empty($this->_selected) || in_array('*', $this->_selected) || in_array($key, $this->_selected))
             ) {
-                $value = $this->{$attr} ?? null;
+                $value = $this->get($key);
                 if ($value !== null) {
                     if ($value instanceof self) {
-                        $result[$attr] = $value->toArray($trim, $sanitize);
+                        $result[$key] = $value->toArray($trim, $sanitize);
                     } elseif ($value instanceof CollectionBaseDto) {
-                        $result[$attr] = $value->toArray($trim, $sanitize);
+                        $result[$key] = $value->toArray($trim, $sanitize);
                     } elseif ($value instanceof Arrayable) {
-                        $result[$attr] = $value->toArray($trim);
+                        $result[$key] = $value->toArray($trim);
                     } elseif (is_array($value)) {
-                        $result[$attr] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
+                        $result[$key] = array_is_list($value) ? (CollectionBaseDto::of($value))->toArray($trim, $sanitize) : (BaseDto::with($value))->toArray($trim, $sanitize);
+                    } elseif (is_iterable($value)) {
+                        $result[$key] = (CollectionBaseDto::of($value))->toArray($trim, $sanitize);
                     } else {
-                        $value = $this->resolveType($type ?
-                            $this->getTypeName($type) :
-                            $this->findType($value), $value);
+                        $value = $this->resolveType(!empty($type) ? $this->getTypeName($type) : $this->findType($value), $value);
                         if ($value instanceof Stringable) {
-                            $result[$attr] = strval($value);
+                            $result[$key] = strval($value);
                         } else {
-                            $result[$attr] = $value;
+                            $result[$key] = $value;
                         }
                     }
-                } else {
-                    $result[$attr] = $value;
+                } else if (!$trim) {
+                    $result[$key] = $value;
                 }
             }
         }

@@ -51,7 +51,8 @@ abstract class ResourceController implements ResourceControllerInterface
         return $this->response->json($this->repository->all(
             Security::cleanQueryParamKeys($dto->query),
             Security::cleanQueryParamValues($dto->query),
-            Security::cleanParams($dto->columns)
+            Security::cleanParams($dto->columns),
+            Security::cleanParams($dto->sort)
         )->toArray(), 200);
     }
 
@@ -64,6 +65,7 @@ abstract class ResourceController implements ResourceControllerInterface
             Security::cleanQueryParamKeys($dto->query),
             Security::cleanQueryParamValues($dto->query),
             Security::cleanParams($dto->columns),
+            Security::cleanParams($dto->sort),
             $dto->page,
             $dto->limit
         )->toArray(), 200);

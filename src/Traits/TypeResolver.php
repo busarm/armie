@@ -67,20 +67,23 @@ trait TypeResolver
      */
     protected function resolveType($type, $data)
     {
-        $type = $this->getTypeName($type instanceof DataType ? DataType::INTEGER->value : $type, $data);
+        $type = $this->getTypeName($type instanceof DataType ? $type->value : $type, $data);
 
         if ($data !== null) {
             return match ($type) {
                 DataType::INT->value, DataType::INTEGER->value => intval($data),
                 DataType::BOOL->value, DataType::BOOLEAN->value => boolval($data),
                 DataType::FLOAT->value  => floatval($data),
-                DataType::ARRAY->value  => is_string($data) ? ($this->resolveArrayJson($data) || $this->resolveArrayCSV($data) || $this->resolveArraySSV($data)) : ((array) $data),
+                DataType::ARRAY->value  => is_string($data) ? ($this->resolveArrayJson($data) ?? $this->resolveArrayCSV($data) ?? $this->resolveArraySSV($data)) : ((array) $data),
                 DataType::OBJECT->value, DataType::JSON->value => is_string($data) ? json_decode($data) : (object) $data,
                 DataType::STRING->value => is_array($data) || is_object($data) ? json_encode($data) : strval($data),
-                DataType::DATETIME->value, StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
+                DataType::DATETIME->value => $data instanceof DateTimeInterface ?
                     $data->format(DateTime::W3C) :
-                    strval(new StringableDateTime($data, new DateTimeZone(date_default_timezone_get()))),
-                ArrayObject::class => new ArrayObject(is_string($data) ? json_decode($data, true) : (array) $data),
+                    strval(new StringableDateTime($data)),
+                StringableDateTime::class, DateTime::class, DateTimeImmutable::class, DateTimeInterface::class => $data instanceof DateTimeInterface ?
+                    $data :
+                    new StringableDateTime($data),
+                ArrayObject::class => new ArrayObject($this->resolveType(DataType::ARRAY, $data) ?? []),
                 default            => $data
             };
         }

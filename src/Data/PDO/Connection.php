@@ -19,6 +19,12 @@ class Connection extends PDO implements SingletonInterface
 {
     use Singleton;
 
+    const SELECT_QUERY_REGX = "/select\s*\n*.*\n*\s*from/im";
+    const INSERT_QUERY_REGX = "/insert\s*\n*\s*into/im";
+    const UPDATE_QUERY_REGX = "/update\s*\n*.*\n*\s*set/im";
+    const DELETE_QUERY_REGX = "/delete\s*\n*\s*from/im";
+    const LIMIT_QUERY_REGX = "/limit\s*([0-9]+(,\s*[0-9])*)/im";
+
     /**
      * @param PDOConfig $config
      * @param int       $id
@@ -148,7 +154,7 @@ class Connection extends PDO implements SingletonInterface
      */
     public function matchSelectQuery(string $query)
     {
-        $regexp = "/select\s*\n*.*\n*\s*from/im";
+        $regexp = self::SELECT_QUERY_REGX;
 
         return preg_match($regexp, $query) ? $regexp : false;
     }
@@ -162,7 +168,7 @@ class Connection extends PDO implements SingletonInterface
      */
     public function matchInsertQuery(string $query)
     {
-        $regexp = "/insert\s*\n*\s*into/im";
+        $regexp = self::INSERT_QUERY_REGX;
 
         return preg_match($regexp, $query) ? $regexp : false;
     }
@@ -176,7 +182,7 @@ class Connection extends PDO implements SingletonInterface
      */
     public function matchUpdateQuery(string $query)
     {
-        $regexp = "/update\s*\n*.*\n*\s*set/im";
+        $regexp = self::UPDATE_QUERY_REGX;
 
         return preg_match($regexp, $query) ? $regexp : false;
     }
@@ -190,7 +196,7 @@ class Connection extends PDO implements SingletonInterface
      */
     public function matchDeleteQuery(string $query)
     {
-        $regexp = "/delete\s*\n*\s*from/im";
+        $regexp = self::DELETE_QUERY_REGX;
 
         return preg_match($regexp, $query) ? $regexp : false;
     }
@@ -204,7 +210,7 @@ class Connection extends PDO implements SingletonInterface
      */
     public function matchLimitQuery(string $query)
     {
-        $regexp = "/limit\s*([0-9]+(,\s*[0-9])*)/im";
+        $regexp = self::LIMIT_QUERY_REGX;
 
         return preg_match($regexp, $query) ? $regexp : false;
     }
@@ -213,7 +219,7 @@ class Connection extends PDO implements SingletonInterface
      * Execute query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array  $params Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      *
      * @return int|bool Returns row count for modification query or boolean success status
      */

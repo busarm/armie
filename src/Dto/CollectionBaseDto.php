@@ -484,10 +484,12 @@ class CollectionBaseDto extends ArrayObject implements Arrayable, Stringable, Js
     /**
      * Load dto with array.
      *
-     * @param iterable<T>      $data
-     * @param ?class-string<T> $itemClass
+     * @param ArrayObject<T>|iterable<T>  $data
+     * @param ?class-string<T>                    $itemClass
+     * 
+     * @return static(static<T>)
      */
-    public static function of(iterable $data, ?string $itemClass = null): static
+    public static function of(ArrayObject|iterable $data, ?string $itemClass = null): static
     {
         return new static($data, $itemClass);
     }

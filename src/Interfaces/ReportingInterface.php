@@ -25,7 +25,7 @@ interface ReportingInterface
     /**
      * Get bread crumbs.
      */
-    public function getBreadCrumbs();
+    public function getBreadCrumbs(): array;
 
     /**
      * Report Info.
@@ -55,9 +55,9 @@ interface ReportingInterface
     public function exception(\Throwable $exception);
 
     /**
-     * Add list of params to be redacted from report.
+     * Add list of params to be redacted from report (LOWER CASED STRINGS).
      *
-     * @param array<string> $list
+     * @param array<string> $list Params to redact. Supports REGEXP
      *
      * @return void
      */
@@ -67,7 +67,7 @@ interface ReportingInterface
      * Redact params.
      *
      * @param array         $params
-     * @param array<string> $redactedParams
+     * @param array<string> $redactedParams Params to redact. Supports REGEXP
      *
      * @return array
      */

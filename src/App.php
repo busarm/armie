@@ -3,7 +3,9 @@
 namespace Armie;
 
 use Armie\Bags\FileStore;
+use Armie\Configs\HttpServerConfig;
 use Armie\Configs\ServerConfig;
+use Armie\Configs\TaskWorkerServerConfig;
 use Armie\Dto\TaskDto;
 use Armie\Enums\AppStatus;
 use Armie\Enums\Cron;
@@ -97,19 +99,19 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * App started event. Only available if app is running in async mode. @see self::start.
      */
-    const EVENT_STARTED = self::class.':Started';
+    const EVENT_STARTED = self::class . ':Started';
     /**
      * App stopped event. Only available if app is running in async mode. @see self::start.
      */
-    const EVENT_STOPPED = self::class.':Stopped';
+    const EVENT_STOPPED = self::class . ':Stopped';
     /**
      * App request running.
      */
-    const EVENT_RUNNING = self::class.':Running';
+    const EVENT_RUNNING = self::class . ':Running';
     /**
      * App request completed.
      */
-    const EVENT_COMPLETE = self::class.':Completed';
+    const EVENT_COMPLETE = self::class . ':Completed';
 
     /**
      * List of classes that must be handled as stateless when running in async mode.
@@ -232,7 +234,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
     public function __construct(public Config $config, public Env $env = Env::LOCAL)
     {
         if (empty($this->config->appPath)) {
-            throw new SystemError('`appPath` config should not be empty');
+            throw new SystemError('Please configure `appPath` in `config`');
         }
         if (\PHP_VERSION_ID < 80100) {
             throw new SystemError('Only PHP 8.1 and above is supported');
@@ -319,22 +321,22 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     public function __sleep(): array
     {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
     }
 
     public function __wakeup()
     {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
     }
 
     public function __set($key, $val)
     {
-        throw new \BadMethodCallException('Cannot set dynamic value for '.__CLASS__);
+        throw new \BadMethodCallException('Cannot set dynamic value for ' . __CLASS__);
     }
 
     public function __get($key)
     {
-        throw new \BadMethodCallException('Cannot get dynamic value for '.__CLASS__);
+        throw new \BadMethodCallException('Cannot get dynamic value for ' . __CLASS__);
     }
 
     /**
@@ -401,7 +403,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
     public function setUpErrorHandlers()
     {
         set_exception_handler(function (Throwable $e) {
-            $this->reporter->leaveCrumbs('meta', ['type' => 'exception', 'env' => $this->env->value]);
+            $this->reporter->leaveCrumbs('meta', ['type' => get_class($e), 'env' => $this->env->value]);
             if ($e instanceof HttpException) {
                 $response = $e->handle($this);
                 !$this->isCli && !$this->async && $response->send($this->config->http->sendAndContinue);
@@ -413,12 +415,13 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
         set_error_handler(function (int $severity, string $message, string $file, ?int $line = 0) {
             if (in_array($severity, [E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING])) {
-                return log_warning(sprintf('%s (%s:%s)', $message, $file, $line ?? 1));
+                return log_warning(sprintf('%s in %s:%s', $message ?: 'Warning', $file, $line ?? 1));
             } else {
                 $this->reporter->leaveCrumbs('meta', ['type' => 'error', 'severity' => error_level($severity), 'env' => $this->env->value]);
                 $this->reporter->exception(new \ErrorException($message, 0, $severity, $file, $line));
                 !$this->isCli && !$this->async && Response::error(500, $message, 0, $file, $line)->send($this->config->http->sendAndContinue);
             }
+            Worker::runAll();
         });
     }
 
@@ -454,6 +457,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     /**
      * Add singleton.
+     * Note: Adding the same class name singleton again will replace the previous.
      *
      * @inheritDoc
      */
@@ -476,6 +480,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     /**
      * Add interface binding. Binds interface to a specific class which implements it.
+     * Note: Adding the same interface binding again will replace the previous.
      *
      * @param string $interfaceName
      * @param string $className
@@ -496,6 +501,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     /**
      * Get interface binding.
+     * Note: Adding the same interface binding again will replace the previous.
      *
      * @param string $interfaceName
      * @param string $default
@@ -509,6 +515,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
     /**
      * Add provider.
+     * Note: Adding the same provider again will replace the previous.
      *
      * @param ProviderInterface $provider
      *
@@ -518,13 +525,14 @@ class App implements HttpServerInterface, SingletonContainerInterface
     {
         $this->throwIfRunning('Adding a provider while app is running is forbidden');
 
-        $this->providers[] = $provider;
+        $this->providers[get_class($provider)] = $provider;
 
         return $this;
     }
 
     /**
      * Add middleware.
+     * Note: Adding the same middleware again will replace the previous.
      *
      * @param MiddlewareInterface|ServerMiddlewareInterface $middleware
      *
@@ -535,9 +543,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
         $this->throwIfRunning('Adding application middleware while app is running is forbidden');
 
         if ($middleware instanceof ServerMiddlewareInterface) {
-            $this->middlewares[] = new PsrMiddleware($middleware, $this->config);
+            $this->middlewares[get_class($middleware)] = new PsrMiddleware($middleware, $this->config);
         } else {
-            $this->middlewares[] = $middleware;
+            $this->middlewares[get_class($middleware)] = $middleware;
         }
 
         return $this;
@@ -680,16 +688,6 @@ class App implements HttpServerInterface, SingletonContainerInterface
     }
 
     /**
-     * Get application http worker address - when using event loop (async) mode.
-     *
-     * @return ?string
-     */
-    public function getHttpWorkerAddress(): ?string
-    {
-        return $this->httpWorkerAddress;
-    }
-
-    /**
      * Get application task worker address.
      *
      * @return ?string
@@ -702,13 +700,13 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * Set application task worker address. Use to set external task worker address.
      *
-     * @param string $taskWorkerAddress Application task worker address.
+     * @param string $taskWorkerAddress Task worker address. Must begin with `tcp://`
      *
      * @return self
      */
     public function setTaskWorkerAddress(string $taskWorkerAddress)
     {
-        $this->taskWorkerAddress = $taskWorkerAddress;
+        $this->taskWorkerAddress = 'tcp://' . preg_replace('/(^\w*:\/\/)/im', '', $taskWorkerAddress);
 
         return $this;
     }
@@ -734,11 +732,11 @@ class App implements HttpServerInterface, SingletonContainerInterface
     {
         try {
             // Add default response handler
-            $action = fn (RequestInterface|RouteInterface & $request): ResponseInterface => $request instanceof RequestInterface ?
+            $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $request instanceof RequestInterface ?
                 (new Response(version: $request->version(), format: $this->config->http->responseFormat))->html(sprintf('Not found - %s %s', $request->method()->value, $request->path()), 404) : (new Response(format: $this->config->http->responseFormat))->html('Resource not found', 404);
 
             foreach (array_reverse(array_merge($this->middlewares, $this->router->process($request))) as $middleware) {
-                $action = fn (RequestInterface|RouteInterface & $request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
+                $action = fn (RequestInterface|RouteInterface &$request): ResponseInterface => $middleware->process($request, new RequestHandler($action));
             }
 
             return ($action)($request);
@@ -777,7 +775,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
 
         // Log Data
         $log = $request instanceof RequestInterface ? [
-            'time'          => $startTime,
+            'startTime'     => $startTime,
             'requestId'     => $request->requestId(),
             'correlationId' => $request->correlationId(),
             'ip'            => $request->ip(),
@@ -785,9 +783,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
             'method'        => $request->method()->value,
             'query'         => $request->query()->all(),
             'body'          => $request->request()->all(),
-            'headers'       => $request->request()->all(),
+            'headers'       => $request->request()->all()
         ] : [
-            'time'          => $startTime,
+            'startTime'     => $startTime,
         ];
 
         // Dispatch event
@@ -801,7 +799,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
             $this->logger->info(sprintf('Request started: id = %s, correlationId = %s, time = %s', $request->requestId(), $request->correlationId(), $startTime));
         }
 
-        // Process route request
+        // Process request
         $response = $this->processMiddleware($request);
 
         $endTime = microtime(true) * 1000;
@@ -812,15 +810,16 @@ class App implements HttpServerInterface, SingletonContainerInterface
             $this->logger->info(sprintf('Request completed: id = %s, correlationId = %s, time = %s, durationMs = %s', $request->requestId(), $request->correlationId(), $endTime, $duration));
         }
 
+        // Dispatch event
+        $log['endTime'] = $endTime;
+        $log['durationMs'] = $duration;
+        dispatch(self::EVENT_COMPLETE, $log);
+
         // Clean up request
         $request = null;
+        $log = null;
 
         $this->status = AppStatus::COMPLETED;
-
-        // Dispatch event
-        $log['time'] = $endTime;
-        $log['duration'] = $duration;
-        dispatch(self::EVENT_COMPLETE, $log);
 
         return $response;
     }
@@ -828,13 +827,13 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * Start asynchronous http workers. Auto start task and sockets workers.
      *
-     * @param string            $host   Domain or IP address. E.g `www.myapp.com` or `112.33.4.55`
-     * @param int               $port   Remote port. Default: `80`
-     * @param ServerConfig|null $config
+     * @param string                $host   Domain or IP address. E.g `www.myapp.com` or `112.33.4.55`
+     * @param int                   $port   Remote port. Default: `80`
+     * @param HttpServerConfig|null $config
      *
      * @return void
      */
-    public function start(string $host, int $port = 80, ServerConfig|null $config = null)
+    public function start(string $host, int $port = 80, HttpServerConfig|null $config = null)
     {
         if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('pcntl')) {
             exit("Please install pcntl extension. See http://doc3.workerman.net/install/install.html\n");
@@ -843,16 +842,16 @@ class App implements HttpServerInterface, SingletonContainerInterface
             exit("Please install posix extension. See http://doc3.workerman.net/install/install.html\n");
         }
 
-        $config = $config ?? new ServerConfig();
+        $config = $config ?? new HttpServerConfig();
 
         // App running in async mode
         $this->setAsync(true);
 
         // Set up workerman
         Worker::$stopTimeout = 5;
-        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath.DIRECTORY_SEPARATOR.'workerman.log';
-        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath.DIRECTORY_SEPARATOR.'workerman.status';
-        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath.DIRECTORY_SEPARATOR.'workerman.pid';
+        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
+        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
         Worker::$eventLoopClass = $this->getEventLooper($config->looper);
 
         //------- Add Main HTTP Worker -------//
@@ -862,7 +861,88 @@ class App implements HttpServerInterface, SingletonContainerInterface
         $config->taskWorkers > 0 && $this->setUpTaskWorker($config);
 
         //------- Add Socket Workers -------//
-        $this->setUpSocketWorkers($host, $config);
+        $this->setUpSocketWorkers($host, $config, $config->sockets);
+
+        //----- Start event loop ------//
+        Worker::$onMasterStop = function () {
+            $this->logger->debug('Worker master process stopped');
+        };
+        @Worker::runAll();
+    }
+
+    /**
+     * Start asynchronous task worker.
+     *
+     * @param TaskWorkerServerConfig|null $config
+     * @return void
+     */
+    public function startTaskWoker(TaskWorkerServerConfig|null $config = null)
+    {
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('pcntl')) {
+            exit("Please install pcntl extension. See http://doc3.workerman.net/install/install.html\n");
+        }
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('posix')) {
+            exit("Please install posix extension. See http://doc3.workerman.net/install/install.html\n");
+        }
+
+        $config = $config ?? new TaskWorkerServerConfig();
+
+        // App running in async mode
+        $this->setAsync(true);
+
+        // Set up workerman
+        Worker::$stopTimeout = 5;
+        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
+        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
+        Worker::$eventLoopClass = $this->getEventLooper($config->looper);
+
+        //------- Add Task Worker -------//
+        $this->setUpTaskWorker($config);
+
+        //----- Start event loop ------//
+        Worker::$onMasterStop = function () {
+            $this->logger->debug('Worker master process stopped');
+        };
+        Worker::runAll();
+    }
+
+    /**
+     * Start asynchronous web socket server.
+     *
+     * @param string                                  $host   Domain or IP address. E.g `www.myapp.com` or `112.33.4.55`
+     * @param int                                     $port   Socket port
+     * @param class-string<SocketControllerInterface> $controller Socket controller class
+     * @param ServerConfig|null $config
+     *
+     * @return void
+     */
+    public function startWebSocket(string $host, int $port, string $controller, ServerConfig|null $config = null)
+    {
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('pcntl')) {
+            exit("Please install pcntl extension. See http://doc3.workerman.net/install/install.html\n");
+        }
+        if (DIRECTORY_SEPARATOR == '/' && !extension_loaded('posix')) {
+            exit("Please install posix extension. See http://doc3.workerman.net/install/install.html\n");
+        }
+        if (!is_subclass_of($controller, SocketControllerInterface::class)) {
+            throw new SystemError("`$controller` does not implement " . SocketControllerInterface::class);
+        }
+
+        $config = $config ?? new ServerConfig();
+
+        // App running in async mode
+        $this->setAsync(true);
+
+        // Set up workerman
+        Worker::$stopTimeout = 5;
+        Worker::$logFile = $config->logFilePath ?: $this->config->tempPath . DIRECTORY_SEPARATOR . 'workerman.log';
+        Worker::$statusFile = $config->statusFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.status';
+        Worker::$pidFile = $config->pidFilePath ?: $this->config->appPath . DIRECTORY_SEPARATOR . 'workerman.pid';
+        Worker::$eventLoopClass = $this->getEventLooper($config->looper);
+
+        //------- Add Socket Workers -------//
+        $this->setUpSocketWorkers($host, $config, [strval($port) => $controller]);
 
         //----- Start event loop ------//
         Worker::$onMasterStop = function () {
@@ -874,11 +954,11 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * Setup application http worker.
      *
-     * @param string       $host
-     * @param int          $port
-     * @param ServerConfig $config
+     * @param string            $host
+     * @param int               $port
+     * @param HttpServerConfig  $config
      */
-    private function setUpHttpWorker(string $host, int $port, ServerConfig $config)
+    private function setUpHttpWorker(string $host, int $port, HttpServerConfig $config)
     {
         $count = max($config->httpWorkers, 1);
 
@@ -893,10 +973,10 @@ class App implements HttpServerInterface, SingletonContainerInterface
         ] : [];
 
         // Init Worker
-        $this->httpWorkerAddress = ($ssl ? 'https://' : 'http://').$host.':'.$port;
+        $this->httpWorkerAddress = ($ssl ? 'https://' : 'http://') . $host . ':' . $port;
 
         $worker = new Worker($this->httpWorkerAddress, $context);
-        $worker->name = '[HTTP] '.$this->config->name.' v'.$this->config->version;
+        $worker->name = '[HTTP] ' . $this->config->name . ' v' . $this->config->version;
         $worker->count = $count;
         $worker->transport = $ssl ? 'ssl' : 'tcp';
 
@@ -980,7 +1060,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
                     $this->queueHandler = new WorkerQueueHandler(
                         rate: 50,
                         store: new FileStore(
-                            basePath: $this->config->tempPath.DIRECTORY_SEPARATOR.'queue'.DIRECTORY_SEPARATOR.'worker-'.$worker->id,
+                            basePath: $this->config->tempPath . DIRECTORY_SEPARATOR . 'queue' . DIRECTORY_SEPARATOR . 'worker-' . $worker->id,
                             key: $this->config->secret,
                             async: false
                         )
@@ -1018,26 +1098,32 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * Setup Task worker.
      *
-     * @param ServerConfig $config
+     * @param TaskWorkerServerConfig $config
      */
-    private function setUpTaskWorker(ServerConfig $config)
+    private function setUpTaskWorker(TaskWorkerServerConfig $config)
     {
-        if ($this->taskWorkerAddress) {
-            return;
-        }
-
         // Only supported for unix
-        if (DIRECTORY_SEPARATOR !== '/') {
+        if ($this->httpWorkerAddress && DIRECTORY_SEPARATOR !== '/') {
             $this->logger->error('Failed to start task worker. Multiple workers is only available for unix systems. Alternatively, you can use separate start-up scripts.');
 
             return;
         }
 
-        $this->taskWorkerAddress = 'unix:///'.$this->config->tempPath.DIRECTORY_SEPARATOR.'task_worker.sock';
+        $name = $this->config->name . ' v' . $this->config->version;
+
+        if (!empty($config->workerHost)) {
+            if (preg_match('/^unix:\/\//im', $config->workerHost)) {
+                $this->taskWorkerAddress = 'unix://' . preg_replace('/^unix:\/\//im', '', $config->workerHost);
+            } else {
+                $this->taskWorkerAddress = 'tcp://' . preg_replace('/(^\w*:\/\/)/im', '', $config->workerHost);
+            }
+        } else {
+            $path = $this->config->tempPath . DIRECTORY_SEPARATOR . md5($name) . '.sock';
+            $this->taskWorkerAddress = 'unix://' . $path;
+        }
 
         $worker = new Worker($this->taskWorkerAddress);
-        $worker->name = '[Task] '.$this->config->name.' v'.$this->config->version;
-        $worker->transport = 'unix';
+        $worker->name = '[Task] ' . $name;
         $worker->count = max($config->taskWorkers, 1);
 
         $worker->onWorkerStart = function (Worker $worker) use ($config) {
@@ -1079,7 +1165,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
                 }
 
                 // Handle max requests
-                WorkerMaxRequestHandler::handle($connection, $config->httpMaxRequests);
+                WorkerMaxRequestHandler::handle($connection, $config->taskMaxRequests);
             };
             $worker->onConnect = function (TcpConnection $connection) {
                 $this->config->logRequest
@@ -1214,13 +1300,14 @@ class App implements HttpServerInterface, SingletonContainerInterface
     /**
      * Setup Socket workers.
      *
-     * @param string       $host
-     * @param ServerConfig $config
+     * @param string                                                    $host
+     * @param ServerConfig                                              $config
+     * @param array<string|int,class-string<SocketControllerInterface>> $sockets
      */
-    private function setUpSocketWorkers(string $host, ServerConfig $config)
+    private function setUpSocketWorkers(string $host, ServerConfig $config, array $sockets)
     {
         // Only supported for unix
-        if (DIRECTORY_SEPARATOR !== '/') {
+        if (($this->httpWorkerAddress || $this->taskWorkerAddress) && DIRECTORY_SEPARATOR !== '/') {
             $this->logger->error('Failed to start socket workers. Multiple workers is only available for unix systems. Alternatively, you can use separate start-up scripts.');
 
             return;
@@ -1237,9 +1324,9 @@ class App implements HttpServerInterface, SingletonContainerInterface
         ] : [];
 
         // Create workers
-        foreach ($config->sockets as $port => $class) {
-            $worker = new Worker('websocket://'.$host.':'.$port, $context);
-            $worker->name = '[Socket] '.$this->config->name.' v'.$this->config->version." ($port)";
+        foreach ($sockets as $port => $class) {
+            $worker = new Worker('websocket://' . $host . ':' . $port, $context);
+            $worker->name = '[Socket] ' . $this->config->name . ' v' . $this->config->version . " ($port)";
             $worker->transport = $ssl ? 'ssl' : 'tcp';
 
             $worker->onWorkerStart = function (Worker $worker) use ($class) {
@@ -1298,7 +1385,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
                         $this->logger->error(sprintf('Connection to %s (#%s) failed: [%s] %s', $connection->worker->name, $connection->worker->id, $id, $error));
                     };
                 } else {
-                    throw new SystemError("Failed to instantiate `$class`. Ensure it is a valid class that implements ".SocketControllerInterface::class);
+                    throw new SystemError("Failed to instantiate `$class`. Ensure it is a valid class that implements " . SocketControllerInterface::class);
                 }
             };
             $worker->onWorkerStop = function (Worker $worker) {
@@ -1380,7 +1467,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
         $this->throwIfRunning();
 
         if (!in_array(ResourceControllerInterface::class, class_implements($controller))) {
-            throw new SystemError("`$controller` does not implement ".ResourceControllerInterface::class);
+            throw new SystemError("`$controller` does not implement " . ResourceControllerInterface::class);
         }
 
         $this->router->createRoute(HttpMethod::GET->value, "$path/list")->to($controller, 'list');
@@ -1469,7 +1556,7 @@ class App implements HttpServerInterface, SingletonContainerInterface
      */
     public function throwIfNoEventLoop(string|null $message = null)
     {
-        if (!$this->async && (empty($this->httpWorkerAddress) || is_null(Worker::getEventLoop()))) {
+        if (!$this->async || is_null(Worker::getEventLoop())) {
             throw new SystemError($message ?: 'Event Loop is required for this action. Please run app in async mode. See App::start()');
         }
     }

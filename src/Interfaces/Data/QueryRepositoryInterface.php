@@ -14,7 +14,8 @@ use Armie\Dto\PaginatedCollectionDto;
  *
  * @codeCoverageIgnore
  *
- * @template T
+ * @template ModelType
+ * @template DtoType
  */
 interface QueryRepositoryInterface extends RepositoryInterface
 {
@@ -22,7 +23,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * Count number of rows or rows in query.
      *
      * @param string|null $query  Model Provider Query. e.g SQL query
-     * @param array       $params Query Params. e.g SQL query params
+     * @param array       $params Query Params. e.g SQL query bind params
      *
      * @return int
      */
@@ -32,7 +33,7 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * Execute query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params
+     * @param array  $params Query Params. e.g SQL query bind params
      *
      * @return int|bool Returns row count for modification query or boolean success status
      */
@@ -42,9 +43,9 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * Find single model with query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params
+     * @param array  $params Query Params. e.g SQL query bind params
      *
-     * @return BaseDto|null
+     * @return (BaseDto&DtoType)|null
      */
     public function querySingle(string $query, $params = []): ?BaseDto;
 
@@ -52,10 +53,10 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * Find list of models with query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params
-     * @param int    $limit  Query Limit. Default: 0 to disable
+     * @param array  $params Query Params. e.g SQL query bind params
+     * @param int    $limit  Query Limit. Default: 0 to use `perPage`
      *
-     * @return CollectionBaseDto<T>
+     * @return CollectionBaseDto<ModelType|DtoType>
      */
     public function queryList(string $query, $params = [], int $limit = 0): CollectionBaseDto;
 
@@ -63,11 +64,11 @@ interface QueryRepositoryInterface extends RepositoryInterface
      * Find list of models with paginated query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params
+     * @param array  $params Query Params. e.g SQL query bind params
      * @param int    $page   Page Number Default: 1
      * @param int    $limit  Page Limit. Default: 0 to disable
      *
-     * @return PaginatedCollectionDto<T>
+     * @return PaginatedCollectionDto<ModelType|DtoType>
      */
     public function queryPaginate(string $query, $params = [], int $page = 1, int $limit = 0): PaginatedCollectionDto;
 }

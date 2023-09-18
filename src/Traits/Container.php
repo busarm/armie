@@ -1,6 +1,7 @@
 <?php
 
 namespace Armie\Traits;
+use Armie\Interfaces\SingletonContainerInterface;
 
 /**
  * Manage Singletons.

@@ -16,4 +16,6 @@ class ResourceListRequestDto extends BaseDto
     public array $query = [];
     /** @var array<string> Reqested columns. E.g ['email', 'age'] */
     public array $columns = [];
+    /** @var array<string, string> Reqested columns. E.g ['name' => 'DESC'] */
+    public array $sort = [];
 }

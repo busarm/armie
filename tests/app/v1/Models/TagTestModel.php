@@ -5,6 +5,8 @@ namespace Armie\Tests\App\V1\Models;
 use Armie\Data\PDO\Model;
 use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relations\ManyToMany;
+use Armie\Helpers\StringableDateTime;
+use DateTime;
 
 /**
  * Armie Framework.
@@ -16,6 +18,7 @@ class TagTestModel extends Model
 {
     public int|null $id;
     public string|null $name;
+    public DateTime|null $createdAt;
 
     /**
      * @inheritDoc

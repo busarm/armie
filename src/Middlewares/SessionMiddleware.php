@@ -17,7 +17,7 @@ use SessionHandlerInterface;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
-final class SessionMiddleware implements MiddlewareInterface
+class SessionMiddleware implements MiddlewareInterface
 {
     public function __construct(private Config $config, private SessionStoreInterface|SessionHandlerInterface|null $session = null)
     {

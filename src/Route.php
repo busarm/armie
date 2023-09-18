@@ -187,7 +187,8 @@ class Route implements RouteInterface
     }
 
     /**
-     * Add route middleware.
+     * Add route middleware. 
+     * Note: Adding the same middleware again will replace the previous.
      *
      * @param MiddlewareInterface $middleware
      *
@@ -195,7 +196,7 @@ class Route implements RouteInterface
      */
     public function middleware(MiddlewareInterface $middleware): self
     {
-        $this->middlewares[] = $middleware;
+        $this->middlewares[get_class($middleware)] = $middleware;
 
         return $this;
     }

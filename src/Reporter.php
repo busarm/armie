@@ -19,28 +19,18 @@ use function Armie\Helpers\log_exception;
 class Reporter implements ReportingInterface
 {
     protected array $redactedParams = [
-        'secret',
-        'password',
         'authorization',
         'authentication',
-        'confirm_password',
-        'confirmpassword',
-        'accesstoken',
-        'access_token',
-        'apikey',
-        'api_key',
-        'privatekey',
-        'private_key',
+        '.*secret.*',
+        '.*password.*',
+        '.*token',
+        '.*key',
     ];
+
     protected array $breadCrumbs = [];
 
     /**
-     * Leave breadcrumbs for issue tracking.
-     *
-     * @param mixed $title
-     * @param array $metadata
-     *
-     * @return void
+     * @inheritDoc
      */
     public function leaveCrumbs($title, array $metadata = [])
     {
@@ -48,19 +38,15 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Get bread crumbs.
+     * @inheritDoc
      */
-    public function getBreadCrumbs()
+    public function getBreadCrumbs(): array
     {
         return $this->breadCrumbs;
     }
 
     /**
-     * Report Info.
-     *
-     * @param array $data
-     *
-     * @return void
+     * @inheritDoc
      */
     public function info(array $data)
     {
@@ -68,15 +54,11 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Report Error.
-     *
-     * @param string $message
-     *
-     * @return void
+     * @inheritDoc
      */
     public function error(string $message)
     {
-        $contexts = array_map(
+        $trace = array_map(
             function ($instance) {
                 return $instance['file'] . ':' . ($instance['line'] ?? '1');
             },
@@ -85,20 +67,16 @@ class Reporter implements ReportingInterface
         log_error($message);
         log_debug($this->toString([
             'crumbs'   => $this->redact($this->breadCrumbs),
-            'contexts' => $contexts,
+            'trace' => $trace,
         ]));
     }
 
     /**
-     * Report Exception.
-     *
-     * @param \Throwable $exception
-     *
-     * @return void
+     * @inheritDoc
      */
     public function exception(\Throwable $exception)
     {
-        $contexts = array_map(
+        $trace = array_map(
             function ($instance) {
                 return $instance['file'] . ':' . ($instance['line'] ?? '1');
             },
@@ -107,16 +85,12 @@ class Reporter implements ReportingInterface
         log_exception($exception);
         log_debug($this->toString([
             'crumbs'   => $this->redact($this->breadCrumbs),
-            'contexts' => $contexts,
+            'trace' => $trace,
         ]));
     }
 
     /**
-     * Add list of params to be redacted from report (LOWER CASED STRINGS).
-     *
-     * @param array<string> $list
-     *
-     * @return void
+     * @inheritDoc
      */
     public function addRedactedParams(array $list)
     {
@@ -124,25 +98,23 @@ class Reporter implements ReportingInterface
     }
 
     /**
-     * Redact params.
-     *
-     * @param array         $params
-     * @param array<string> $redactedParams
-     *
-     * @return array
+     * @inheritDoc
      */
     public function redact(array $params, $redactedParams = []): array
     {
+        $replace = "[REDACTED]";
         $redacted = [];
-        $excluded = array_merge($this->redactedParams, $redactedParams);
+
+        $excluded = array_map(function ($name) {
+            return str_starts_with($name, '/') ? $name : sprintf("/(%s)/im", $name);
+        }, array_merge($this->redactedParams, $redactedParams));
+
         foreach ($params as $key => $value) {
             if ($value) {
                 if (is_array($value) || is_object($value)) {
                     $redacted[$key] = $this->redact((array) $value, $redactedParams);
-                } elseif (in_array(strtolower($key), $excluded)) {
-                    $redacted[$key] = '[REDACTED]';
                 } else {
-                    $redacted[$key] = $value;
+                    $redacted[$key] = preg_replace($excluded, $replace, $key) == $replace ? $replace : $value;
                 }
             } else {
                 $redacted[$key] = $value;

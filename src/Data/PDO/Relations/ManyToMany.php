@@ -5,7 +5,6 @@ namespace Armie\Data\PDO\Relations;
 use Armie\Data\PDO\Model;
 use Armie\Data\PDO\Reference;
 use Armie\Data\PDO\Relation;
-use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\DataType;
 
 /**
@@ -18,33 +17,77 @@ use Armie\Enums\DataType;
  */
 class ManyToMany extends Relation
 {
+    const MODE_PIVOT = 1;
+    const MODE_ITEM  = 2;
+
+    protected array $sort = [];
+
     /**
      * @param string    $name           Relation attribute name in Current Model
      * @param Model     $model          Current Model
      * @param Reference $pivotReference Pivot Relation Reference
      * @param Reference $itemReference  Item Relation Reference
-     * @param bool      $fullMode       Defaut: `true`. Get or Load full relation data with pivot relation or only item relation
+     * @param self::MODE_PIVOT|self::MODE_ITEM $mode    Relation retrieval mode. 
+     * - `self::MODE_ITEM`  - Retrieve `item` content only. 
+     * - `self::MODE_PIVOT` - Retrieve `pivot` content only
      *
      * @return void
      */
     public function __construct(
-        private string $name,
+        string $name,
         private Model $model,
         private Reference $pivotReference,
         private Reference $itemReference,
-        private bool $fullMode = true
+        protected int $mode = self::MODE_PIVOT,
     ) {
         parent::__construct($name, DataType::ARRAY);
     }
 
     /**
-     * Set the value of fullMode.
-     *
-     * @return self
+     * Get the value of sort
      */
-    public function setFullMode(bool $fullMode)
+    public function getSort()
     {
-        $this->fullMode = $fullMode;
+        return $this->sort;
+    }
+
+    /**
+     * Set the value of sort - List of sorting columns or conditions. e.g `['name' => 'ASC']` or ['name ASC']
+     * 
+     * @param array $sort Columns SHOULD be part of `pivot` table
+     *
+     * @return  self
+     */
+    public function setSort(array $sort)
+    {
+        $this->sort = $sort;
+
+        return $this;
+    }
+
+    /**
+     * Get relation retrieval mode
+     *
+     * @return self::MODE_PIVOT|self::MODE_ITEM
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    /**
+     * Set relation retrieval mode
+     *
+     * @param self::MODE_PIVOT|self::MODE_ITEM  $mode
+     * 
+     * `MODE_ITEM`  - Retrieve `item` content only
+     * `MODE_PIVOT` - Retrieve `pivot` content only
+     *
+     * @return  self
+     */
+    public function setMode(int $mode)
+    {
+        $this->mode = $mode;
 
         return $this;
     }
@@ -77,33 +120,37 @@ class ManyToMany extends Relation
         $referenceConditions = [];
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $pivotModelRef) {
-            if (isset($this->model->{$modelRef})) {
+            if ($this->model->get($modelRef)) {
                 $referenceConditions[] = "`$pivotModelRef` = :$pivotModelRef";
-                $referenceParams[":$pivotModelRef"] = $this->model->{$modelRef};
+                $referenceParams[":$pivotModelRef"] = $this->model->get($modelRef);
             }
         }
 
         $itemRelationName = $this->getItemRelationName();
         if (count($referenceConditions) && count($referenceParams)) {
-            $results = $this->getReferenceModel()->clone()
-                ->setRequestedRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
+            $model = $this->getReferenceModel()->clone()->setAutoLoadRelations(false);
+            if ($itemRelationName && $this->mode == self::MODE_ITEM) {
+                $model->setRequestedRelations([
                     $itemRelationName => function (Relation $relation) {
                         $relation->setConditions($this->conditions)
                             ->setParams($this->params)
-                            ->setColumns($this->columns)
-                            ->setLimit($this->limit);
+                            ->setColumns($this->columns);
                     },
-                ]) : [])
-                ->setAutoLoadRelations(false)
-                ->setPerPage($this->fullMode ? $this->limit : -1)
-                ->all(
-                    array_merge($referenceConditions, $this->fullMode ? $this->conditions : []),
-                    array_merge($referenceParams, $this->fullMode ? $this->params : []),
-                    $this->fullMode ? $this->columns : []
-                );
+                ]);
+            }
+            $results = $model->all(
+                conditions: array_merge($referenceConditions, $this->mode == self::MODE_PIVOT ? $this->conditions : []),
+                params: array_merge($referenceParams, $this->mode == self::MODE_PIVOT ? $this->params : []),
+                columns: $this->mode == self::MODE_PIVOT ? $this->columns : [],
+                limit: $this->limit,
+                sort: $this->sort
+            );
 
-            if (!$this->fullMode && $itemRelationName) {
-                return CollectionBaseDto::of($results)->pluck($itemRelationName);
+            if ($this->mode == self::MODE_ITEM && $itemRelationName) {
+                $results = array_reduce($results, function ($carry, Model $current) use ($itemRelationName) {
+                    $carry[] = $current->get($itemRelationName);
+                    return $carry;
+                }, []);
             }
 
             return $results;
@@ -124,56 +171,62 @@ class ManyToMany extends Relation
         $referenceConditions = [];
         $referenceParams = [];
         foreach ($this->getReferences() as $modelRef => $pivotModelRef) {
-            $refs = array_map(fn ($item) => $item->{$modelRef}, $items);
+            $refs = array_map(fn ($item) => $item->get($modelRef), $items);
             $referenceConditions[] = sprintf("`$pivotModelRef` IN (%s)", implode(',', array_fill(0, count($refs), '?')));
             $referenceParams = array_merge($referenceParams, $refs);
         }
 
-        if (count($referenceConditions) && count($referenceConditions)) {
+        if (count($referenceConditions) && count($referenceParams)) {
             // Get relation results for all items
-            $results = $this->getReferenceModel()
-                ->clone()
+            $results = $this->getReferenceModel()->clone()
                 ->setAutoLoadRelations(false)
-                ->setPerPage($this->fullMode ? $this->limit * count($items) : -1)
-                ->all(
-                    array_merge($referenceConditions, $this->fullMode ? $this->conditions : []),
-                    array_merge($referenceParams, $this->fullMode ? $this->params : []),
-                    $this->fullMode ? $this->columns : []
+                ->itterate(
+                    conditions: array_merge($referenceConditions, $this->mode == self::MODE_PIVOT ? $this->conditions : []),
+                    params: array_merge($referenceParams, $this->mode == self::MODE_PIVOT ? $this->params : []),
+                    columns: $this->mode == self::MODE_PIVOT ? $this->columns : [],
+                    limit: $this->limit,
+                    sort: $this->sort,
                 );
+
+            $fromRefKeys = array_keys($this->getReferences());
+            $toRefKeys = array_values($this->getReferences());
 
             // Group result for references
             $resultsMap = [];
             foreach ($results as $result) {
-                $key = implode('-', array_map(fn ($ref) => $result->{$ref}, array_values($this->getReferences())));
+                $key = implode('-', array_map(fn ($ref) => $result->get($ref), $toRefKeys));
                 $resultsMap[$key][] = $result; // Multiple items (m:m)
             }
 
             // Map relation for each item
             foreach ($items as &$item) {
-                $key = implode('-', array_map(fn ($ref) => $item->{$ref}, array_keys($this->getReferences())));
+                $key = implode('-', array_map(fn ($ref) => $item->get($ref), $fromRefKeys));
                 $data = $resultsMap[$key] ?? [];
 
                 // Get item relation name
                 $itemRelationName = $this->getItemRelationName();
-
                 // Eager Load item relation for result data
-                $data = $this->getReferenceModel()->clone()
-                    ->setRequestedRelations($itemRelationName ? ($this->fullMode ? [$itemRelationName] : [
-                        $itemRelationName => function (Relation $relation) {
-                            $relation->setConditions($this->conditions)
-                                ->setParams($this->params)
-                                ->setColumns($this->columns)
-                                ->setLimit($this->limit);
-                        },
-                    ]) : [])->eagerLoadRelations($data);
+                if ($itemRelationName && $this->mode == self::MODE_ITEM) {
+                    $data = $this->getReferenceModel()->clone()
+                        ->setRequestedRelations([
+                            $itemRelationName => function (Relation $relation) {
+                                $relation->setConditions($this->conditions)
+                                    ->setParams($this->params)
+                                    ->setColumns($this->columns);
+                            },
+                        ])
+                        ->eagerLoadRelations($data);
 
-                // Get item relation if full mode not supported
-                if (!$this->fullMode && $itemRelationName) {
-                    $data = CollectionBaseDto::of($data)->pluck($itemRelationName);
+                    // Get item relation if item mode
+                    $data = array_reduce($data, function ($carry, Model $current) use ($itemRelationName) {
+                        $carry[] = $current->get($itemRelationName);
+                        return $carry;
+                    }, []);
                 }
 
-                $item->{$this->getName()} = $data;
+                $item->set($this->getName(), $data);
                 $item->addLoadedRelation($this->getName());
+                $item->select([...$item->selected(), $this->getName()]);
             }
 
             return $items;
@@ -219,15 +272,15 @@ class ManyToMany extends Relation
 
             // Load reference model keys for current model
             foreach ($this->getReferences() as $modelRef => $pivotModelRef) {
-                if (isset($this->getCurrentModel()->{$modelRef}) && in_array($pivotModelRef, $reFieldNames)) {
-                    $pivotData[$pivotModelRef] = $this->getCurrentModel()->{$modelRef};
+                if (($ref = $this->getCurrentModel()->get($modelRef)) && in_array($pivotModelRef, $reFieldNames)) {
+                    $pivotData[$pivotModelRef] = $ref;
                 }
             }
 
             // Load reference model keys for item model
             foreach ($this->getItemReferences() as $pivotModelRef => $itemModelRef) {
-                if (isset($itemModel->{$itemModelRef}) && in_array($pivotModelRef, $reFieldNames)) {
-                    $pivotData[$pivotModelRef] = $itemModel->{$itemModelRef};
+                if (($ref = $itemModel->get($itemModelRef)) && in_array($pivotModelRef, $reFieldNames)) {
+                    $pivotData[$pivotModelRef] = $ref;
                 }
             }
 

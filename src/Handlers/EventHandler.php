@@ -108,7 +108,7 @@ final class EventHandler implements EventHandlerInterface
     {
         if (is_callable($listner)) {
             // Use event loop
-            if (app()->async && app()->getHttpWorkerAddress()) {
+            if (app()->async) {
                 Async::withEventLoop(fn () => call_user_func($listner, $data));
             }
             // Use default
@@ -119,7 +119,7 @@ final class EventHandler implements EventHandlerInterface
             $task = app()->di->instantiate($listner, null, $data);
             if ($task instanceof Runnable) {
                 // Use event loop
-                if (app()->async && app()->getHttpWorkerAddress()) {
+                if (app()->async) {
                     Async::withEventLoop($task);
                 }
                 // Use default

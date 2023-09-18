@@ -17,6 +17,9 @@ use Armie\Enums\DataType;
  */
 class ProductTestModel extends Model
 {
+    protected string $constant;
+    protected CategoryTestModel $category;
+
     /**
      * @inheritDoc
      */
@@ -45,8 +48,7 @@ class ProductTestModel extends Model
                 'tags',
                 $this,
                 new Reference(ProductTagTestModel::class, ['id' => 'productId']),
-                new Reference(TagTestModel::class, ['tagId' => 'id']),
-                false
+                new Reference(TagTestModel::class, ['tagId' => 'id'])
             ),
         ];
     }

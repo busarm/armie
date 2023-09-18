@@ -4,6 +4,7 @@ namespace Armie\Bags;
 
 use Armie\Async;
 use Armie\Crypto;
+use Armie\Errors\SystemError;
 use Armie\Helpers\Security;
 use Armie\Interfaces\StorageBagInterface;
 use Generator;
@@ -41,6 +42,12 @@ class FileStore implements StorageBagInterface
      */
     public function __construct(protected string $basePath, protected ?string $key = null, protected bool $async = false)
     {
+        // Directory not available
+        if (!\is_dir($basePath)) {
+            mkdir($basePath, 0755, true) or throw new SystemError("Failed to create file store at `$basePath`");
+        }
+
+        $this->loadTime = time();
     }
 
     /**
@@ -72,13 +79,6 @@ class FileStore implements StorageBagInterface
     {
         $path = $this->fullPath($path);
         $key = $this->key;
-
-        $dir = \dirname($path);
-
-        // Directory not available
-        if (!\is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
 
         // 1. Sanitize
         $data = $sanitize ? Security::clean($data) : $data;
@@ -238,9 +238,9 @@ class FileStore implements StorageBagInterface
      */
     private function fullPath(string $path): string
     {
-        $path = $this->isStorePath($path) ? $path : sha1($path).self::STORAGE_EXT;
+        $path = $this->isStorePath($path) ? $path : sha1($path) . self::STORAGE_EXT;
 
-        return str_starts_with($path, $this->basePath) ? $path : $this->basePath.DIRECTORY_SEPARATOR.$path;
+        return str_starts_with($path, $this->basePath) ? $path : $this->basePath . DIRECTORY_SEPARATOR . $path;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Armie;
 
+use Armie\Errors\SystemError;
 use Armie\Interfaces\Promise\PromiseFinal;
 use Armie\Interfaces\Promise\PromiseThen;
 use Armie\Tasks\Task;
@@ -45,15 +46,9 @@ use function Armie\Helpers\report;
  * });
  * ```
  *
- * #### or DO this: ####
- * ```
- * new Promise(function ($secret) {
- *      // Use secret
- * }, $app->config->secret);
- *
- * ```
- *
  * @template T
+ * 
+ * // TODO Investigate using fiber child process if fiber worker not available
  */
 class Promise implements PromiseThen
 {
@@ -81,7 +76,7 @@ class Promise implements PromiseThen
             }
             $this->_fiber = $task;
         } else {
-            $this->_fiber = Async::withFiberWorker($task, true);
+            $this->_fiber = Async::withFiberWorker($task);
         }
     }
 
@@ -98,20 +93,24 @@ class Promise implements PromiseThen
      */
     public function then(callable $fn): PromiseThen
     {
-        Async::withEventLoop(
-            function () use ($fn) {
-                try {
-                    $this->wait();
-                    $this->_result = call_user_func($fn, $this->_result) ?? $this->_result;
-                } catch (Throwable $th) {
-                    $this->_catchFn ? call_user_func($this->_catchFn, $th) : report()->exception($th);
-                } finally {
-                    $this->_finallyFn && call_user_func($this->_finallyFn);
-                }
-
-                return $this->_result;
+        $thenfn = function () use ($fn) {
+            try {
+                $this->wait();
+                $this->_result = call_user_func($fn, $this->_result) ?? $this->_result;
+            } catch (Throwable $th) {
+                $this->_catchFn ? call_user_func($this->_catchFn, $th) : report()->exception($th);
+            } finally {
+                $this->_finallyFn && call_user_func($this->_finallyFn);
             }
-        );
+
+            return $this->_result;
+        };
+
+        try {
+            Async::withEventLoop($thenfn);
+        } catch (SystemError) {
+            Async::withChildProcess($thenfn) ?: $thenfn();
+        }
 
         return $this;
     }
@@ -154,7 +153,7 @@ class Promise implements PromiseThen
     /**
      * Resolve list of promises.
      *
-     * @param self<T>[] $promises List of Promises
+     * @param self[] $promises List of Promises
      *
      * @return self<array<T|bool>>
      */

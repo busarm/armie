@@ -8,6 +8,7 @@ use Armie\Interfaces\Data\ModelInterface;
 use Generator;
 
 use function Armie\Helpers\dispatch;
+use function Armie\Helpers\log_debug;
 
 /**
  * Armie Framework.
@@ -15,19 +16,18 @@ use function Armie\Helpers\dispatch;
  * @copyright busarm.com
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  *
- * // TODO: Load relations concurrently
  * // TODO: Use Attributes for Model Table and Fields and Relations
  */
 abstract class Model extends DataObject implements ModelInterface
 {
-    const EVENT_BEFORE_QUERY = self::class.':BeforeQuery';
-    const EVENT_AFTER_QUERY = self::class.':AfterQuery';
-    const EVENT_BEFORE_CREATE = self::class.':BeforeCreate';
-    const EVENT_AFTER_CREATE = self::class.':AfterCreate';
-    const EVENT_BEFORE_UPDATE = self::class.':BeforeUpdate';
-    const EVENT_AFTER_UPDATE = self::class.':AfterUpdate';
-    const EVENT_BEFORE_DELETE = self::class.':BeforeDelete';
-    const EVENT_AFTER_DELETE = self::class.':AfterDelete';
+    const EVENT_BEFORE_QUERY = self::class . ':BeforeQuery';
+    const EVENT_AFTER_QUERY = self::class . ':AfterQuery';
+    const EVENT_BEFORE_CREATE = self::class . ':BeforeCreate';
+    const EVENT_AFTER_CREATE = self::class . ':AfterCreate';
+    const EVENT_BEFORE_UPDATE = self::class . ':BeforeUpdate';
+    const EVENT_AFTER_UPDATE = self::class . ':AfterUpdate';
+    const EVENT_BEFORE_DELETE = self::class . ':BeforeDelete';
+    const EVENT_AFTER_DELETE = self::class . ':AfterDelete';
 
     /**
      * Model is new - not saved yet.
@@ -196,7 +196,7 @@ abstract class Model extends DataObject implements ModelInterface
      */
     public function setRequestedRelations(array $requestedRelations)
     {
-        $this->_requestedRelations = $requestedRelations;
+        $this->_requestedRelations = array_filter($requestedRelations, fn ($key) => in_array($key, $this->getRelationNames()), ARRAY_FILTER_USE_KEY);
 
         return $this;
     }
@@ -318,7 +318,7 @@ abstract class Model extends DataObject implements ModelInterface
      */
     public function isTrashed(): bool
     {
-        return !empty($this->getSoftDeleteDateName()) && isset($this->{$this->getSoftDeleteDateName()});
+        return !empty($this->getSoftDeleteDateName()) && !empty($this->get($this->getSoftDeleteDateName()));
     }
 
     /**
@@ -392,7 +392,7 @@ abstract class Model extends DataObject implements ModelInterface
             'SELECT %s FROM %s %s LIMIT 1',
             $colsPlaceHolders,
             $this->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : ''
         ));
 
         // Dispatch event
@@ -406,6 +406,7 @@ abstract class Model extends DataObject implements ModelInterface
                 return $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
+                    ->setIsDirty(false)
                     ->processAutoLoadRelations()
                     ->select($this->mergeColumnsAndRelations($columns));
             }
@@ -419,14 +420,14 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return static[]
      */
-    public function all($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array
+    public function all($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): array
     {
         if (!empty($this->getSoftDeleteDateName())) {
             return $this->allTrashed(array_merge($conditions, [
                 sprintf('ISNULL(%s)', $this->getSoftDeleteDateName()),
-            ]), $params, $columns, $limit);
+            ]), $params, $columns, $sort, $limit);
         } else {
-            return $this->allTrashed($conditions, $params, $columns, $limit, $page);
+            return $this->allTrashed($conditions, $params, $columns, $sort, $limit, $page);
         }
     }
 
@@ -435,7 +436,7 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return static[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array
+    public function allTrashed($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): array
     {
         if (empty($columns)) {
             $columns = ['*'];
@@ -443,14 +444,16 @@ abstract class Model extends DataObject implements ModelInterface
 
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
+        $sortPlaceHolders = $this->parseSort($sort);
         $limit = $limit > 0 ? $limit : $this->getPerPage();
         $offset = $this->_db->getOffset($page, $limit);
 
         $stmt = $this->_db->prepare(sprintf(
-            'SELECT %s FROM %s %s %s',
+            'SELECT %s FROM %s %s %s %s',
             $colsPlaceHolders,
             $this->getTableName(),
             !empty($condPlaceHolders) ? "WHERE $condPlaceHolders" : '',
+            !empty($sortPlaceHolders) ? "ORDER BY $sortPlaceHolders" : '',
             $limit >= 0 ? "LIMIT $offset, $limit" : ''
         ));
 
@@ -467,6 +470,7 @@ abstract class Model extends DataObject implements ModelInterface
                 $results[] = $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
+                    ->setIsDirty(false)
                     ->select($this->mergeColumnsAndRelations($columns));
             }
 
@@ -481,7 +485,7 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return Generator<int,static>
      */
-    public function itterate($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): Generator
+    public function itterate($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): Generator
     {
         if (empty($columns)) {
             $columns = ['*'];
@@ -489,14 +493,16 @@ abstract class Model extends DataObject implements ModelInterface
 
         $colsPlaceHolders = $this->parseColumns($columns);
         $condPlaceHolders = $this->parseConditions($conditions);
+        $sortPlaceHolders = $this->parseSort($sort);
         $limit = $limit > 0 ? $limit : $this->getPerPage();
         $offset = $this->_db->getOffset($page, $limit);
 
         $stmt = $this->_db->prepare(sprintf(
-            'SELECT %s FROM %s %s %s',
+            'SELECT %s FROM %s %s %s %s',
             $colsPlaceHolders,
             $this->getTableName(),
             !empty($condPlaceHolders) ? "WHERE $condPlaceHolders" : '',
+            !empty($sortPlaceHolders) ? "ORDER BY $sortPlaceHolders" : '',
             $limit >= 0 ? "LIMIT $offset, $limit" : ''
         ));
 
@@ -511,6 +517,7 @@ abstract class Model extends DataObject implements ModelInterface
                 yield $this->clone()
                     ->fastLoad($result)
                     ->setNew(false)
+                    ->setIsDirty(false)
                     ->processAutoLoadRelations()
                     ->select($this->mergeColumnsAndRelations($columns));
             }
@@ -526,7 +533,7 @@ abstract class Model extends DataObject implements ModelInterface
     {
         // Soft delele
         if (!$force && !empty($this->getSoftDeleteDateName())) {
-            $this->{$this->getSoftDeleteDateName()} = strval(new StringableDateTime());
+            $this->set($this->getSoftDeleteDateName(), strval(new StringableDateTime()));
 
             return $this->save() !== false;
         }
@@ -543,7 +550,7 @@ abstract class Model extends DataObject implements ModelInterface
             ));
 
             if ($stmt) {
-                $stmt->execute([$this->{$this->getKeyName()}]);
+                $stmt->execute([$this->get($this->getKeyName())]);
                 if ($stmt->rowCount() > 0) {
                     // Dispatch event
                     dispatch(static::EVENT_AFTER_DELETE);
@@ -561,8 +568,8 @@ abstract class Model extends DataObject implements ModelInterface
      */
     public function restore(): bool
     {
-        if ($this->getSoftDeleteDateName() && isset($this->{$this->getSoftDeleteDateName()})) {
-            $this->{$this->getSoftDeleteDateName()} = null;
+        if ($this->getSoftDeleteDateName() && empty($this->get($this->getSoftDeleteDateName()))) {
+            $this->set($this->getSoftDeleteDateName(), null);
 
             return $this->save() !== false;
         }
@@ -576,13 +583,13 @@ abstract class Model extends DataObject implements ModelInterface
     public function save($trim = false, $relations = true): bool
     {
         // Create
-        if ($this->_new || !isset($this->{$this->getKeyName()})) {
+        if ($this->_new || empty($this->get($this->getKeyName()))) {
             // Add created & updated dates if not available
             if (!empty($this->getCreatedDateName())) {
-                $this->{$this->getCreatedDateName()} = strval(new StringableDateTime());
+                $this->set($this->getCreatedDateName(), strval(new StringableDateTime()));
             }
             if (!empty($this->getUpdatedDateName())) {
-                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
+                $this->set($this->getUpdatedDateName(), strval(new StringableDateTime()));
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
@@ -607,8 +614,8 @@ abstract class Model extends DataObject implements ModelInterface
             }
 
             // Update key for Auto Increment
-            if (!isset($this->{$this->getKeyName()}) && !empty($id = $this->_db->lastInsertId())) {
-                $this->{$this->getKeyName()} = $id;
+            if (empty($this->get($this->getKeyName())) && !empty($id = $this->_db->lastInsertId())) {
+                $this->set($this->getKeyName(), $id);
             }
 
             // Dispatch event
@@ -627,7 +634,7 @@ abstract class Model extends DataObject implements ModelInterface
         elseif ($this->isDirty()) {
             // Add updated date if not available
             if (!empty($this->getUpdatedDateName())) {
-                $this->{$this->getUpdatedDateName()} = strval(new StringableDateTime());
+                $this->set($this->getUpdatedDateName(), strval(new StringableDateTime()));
             }
 
             $params = $this->select($this->getFieldNames())->toArray($trim);
@@ -646,7 +653,7 @@ abstract class Model extends DataObject implements ModelInterface
                 $placeHolder,
                 $this->getKeyName()
             ));
-            if (!$stmt || !$stmt->execute([...array_values($params), $this->{$this->getKeyName()}])) {
+            if (!$stmt || !$stmt->execute([...array_values($params), $this->get($this->getKeyName())])) {
                 return false;
             }
 
@@ -674,7 +681,7 @@ abstract class Model extends DataObject implements ModelInterface
     {
         $success = true;
         foreach ($this->getRelations() as $relation) {
-            $data = $this->{$relation->getName()} ?? null;
+            $data = $this->get($relation->getName()) ?? null;
             if (isset($data)) {
                 if ($data instanceof static) {
                     $success = !$data->isDirty() || !$data->save() ? false : $success;
@@ -715,9 +722,10 @@ abstract class Model extends DataObject implements ModelInterface
     /**
      * Perform database transaction. Auto rollback if unsuccessful.
      *
-     * @param callable $callable Return FALSE if unsuccessful
+     * @param callable():T $callable Return FALSE if unsuccessful
      *
-     * @return mixed result of $callable.
+     * @return T result of $callable.
+     * @template T
      */
     public function transaction(callable $callable)
     {
@@ -742,7 +750,7 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return static[]
      */
-    public function processEagerLoadRelations(array $items): array
+    protected function processEagerLoadRelations(array $items): array
     {
         return $this->_autoLoadRelations || !empty($this->_requestedRelations) ? $this->eagerLoadRelations($items) : $items;
     }
@@ -752,8 +760,12 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return static
      */
-    public function processAutoLoadRelations(): static
+    protected function processAutoLoadRelations(): static
     {
+        if ($this->isNew()) {
+            return $this;
+        }
+
         return $this->_autoLoadRelations || !empty($this->_requestedRelations) ? $this->loadRelations() : $this;
     }
 
@@ -768,7 +780,7 @@ abstract class Model extends DataObject implements ModelInterface
     {
         $requestedRelations = array_is_list($this->_requestedRelations) ? $this->_requestedRelations : array_keys($this->_requestedRelations);
         foreach ($this->getRelations() as &$relation) {
-            if (empty($this->_requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
+            if (empty($requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
                 // Trigger callback if available
                 $callback = $this->_requestedRelations[$relation->getName()] ?? null;
                 if ($callback && is_callable($callback)) {
@@ -788,16 +800,22 @@ abstract class Model extends DataObject implements ModelInterface
      */
     public function loadRelations(): static
     {
+        if ($this->isNew()) {
+            return $this->setAutoLoadRelations(true);
+        }
+
         $requestedRelations = array_is_list($this->_requestedRelations) ? $this->_requestedRelations : array_keys($this->_requestedRelations);
         foreach ($this->getRelations() as &$relation) {
-            if (empty($this->_requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
+            if (empty($requestedRelations) || in_array($relation->getName(), $requestedRelations)) {
                 // Trigger callback if available
                 $callback = $this->_requestedRelations[$relation->getName()] ?? null;
                 if ($callback && is_callable($callback)) {
                     $callback($relation);
                 }
-                $this->{$relation->getName()} = $relation->get();
+
+                $this->set($relation->getName(), $relation->get());
                 $this->_loadedRelations[] = $relation->getName();
+                $this->select([...$this->_selected, $relation->getName()]);
             }
         }
 
@@ -807,13 +825,17 @@ abstract class Model extends DataObject implements ModelInterface
     /**
      * Load single relation by name.
      *
-     * @param string   $name
-     * @param callable $callback Anonymous function with `Relation::class` as parameter
+     * @param string   $name     Relation name to load. @see self::getRelations
+     * @param callable $callback Use this to modify relation query. Anonymous function with instance of `Relation::class` as parameter
      *
      * @return static
      */
     public function loadRelation(string $name, callable $callback = null): static
     {
+        if ($this->isNew()) {
+            return $this->setAutoLoadRelations(true)->setRequestedRelations([...$this->_requestedRelations, $name => $callback]);
+        }
+
         foreach ($this->getRelations() as &$relation) {
             if (strtolower($name) === strtolower($relation->getName())) {
                 // Trigger callback if available
@@ -821,8 +843,9 @@ abstract class Model extends DataObject implements ModelInterface
                     $callback($relation);
                 }
 
-                $this->{$relation->getName()} = $relation->get();
+                $this->set($relation->getName(), $relation->get());
                 $this->_loadedRelations[] = $relation->getName();
+                $this->select([...$this->_selected, $relation->getName()]);
 
                 return $this;
             }
@@ -832,64 +855,51 @@ abstract class Model extends DataObject implements ModelInterface
     }
 
     /**
-     * Merge columns with relation names.
+     * Merge columns with loaded relation names.
      *
      * @param array $columns
      *
      * @return array
      */
-    public function mergeColumnsAndRelations(array $columns): array
+    protected function mergeColumnsAndRelations(array $columns): array
     {
         $columns = !empty($this->selected()) && !in_array('*', $this->selected()) ? $this->selected() : $columns;
 
-        if ($this->_autoLoadRelations) {
-            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->getRelationNames()]);
-        } elseif (!empty($this->_loadedRelations)) {
-            return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->_loadedRelations]);
-        }
-
-        return array_is_list($columns) ? $columns : array_keys($columns);
+        return array_unique([...(array_is_list($columns) ? $columns : array_keys($columns)), ...$this->_loadedRelations]);
     }
 
     /**
-     * Parse query colomns.
+     * Parse query columns.
      *
      * @param array $columns
      *
      * @return string
      */
-    public function parseColumns(array $columns): string
+    protected function parseColumns(array $columns): string
     {
-        $cols = [];
-        $relationCols = [];
-        $validCols = array_keys($this->fields());
+        // If all columns selected
+        if (in_array('*', $columns)) return "*";
 
-        // If all columns not selected:
-        // Always include relation columns
+        $parsedCols = [];
+        $fieldNames = $this->getFieldNames();
+        $relationNames = $this->getRelationNames();
+
+        // Always include relation mapping column names
+        foreach ($this->getRelations() as $relation) {
+            $columns = array_merge($columns, array_keys($relation->getReferences()));
+        }
+
         // Always exclude relation names from valid columns
-        if (!in_array('*', $columns)) {
-            foreach ($this->getRelations() as $relation) {
-                $validCols = array_diff($validCols, [$relation->getName()]);
-                $relationCols = array_keys($relation->getReferences());
-                $columns = array_merge($columns, $relationCols); // Add relationship columns
-                $columns = array_intersect($columns, $validCols); // Remove columns not in valid columns
+        foreach (array_unique($columns) as $key => $col) {
+            // Add relation columns to requested relations
+            if (in_array($col, $relationNames)) $this->_requestedRelations[] = $col;
+            // Only include field names in columns to be parsed. Exclude not negated fields (market to excludes)
+            else if (is_string($col) && in_array($col, $fieldNames) && !str_starts_with($col, '-')) {
+                $parsedCols[] = is_numeric($key) ? "`$col`" : sprintf('`%s` AS %s', $this->cleanCond($key), $this->cleanCond($col));
             }
         }
 
-        foreach ($columns as $key => $col) {
-            if (!str_starts_with($col, '-')) {
-                if ($col === '*') {
-                    if (!in_array($col, $cols)) {
-                        $cols = [$col];
-                        break;
-                    }
-                } else {
-                    $cols[] = is_numeric($key) ? "`$col`" : sprintf('`%s` AS %s', $this->cleanCond($key), $this->cleanCond($col));
-                }
-            }
-        }
-
-        return  implode(',', $cols);
+        return  implode(',', $parsedCols);
     }
 
     /**
@@ -899,49 +909,72 @@ abstract class Model extends DataObject implements ModelInterface
      *
      * @return string
      */
-    public function parseConditions(array $conditions): string
+    protected function parseConditions(array $conditions): string
     {
         $result = null;
 
-        $parseCondtionalArray = function ($result, $key, $cond) {
+        // Conditional array
+        $parseCondtionalArray = function ($result, $key, $cond): string {
             $key = strtoupper($key);
 
-            return  $result ?
-                $result.sprintf(' %s %s', in_array($key, ['AND', 'OR']) ? $key : 'AND', $this->parseConditions($cond)) :
-                sprintf('%s %s', $key == 'NOT' ? $key : '', $this->parseConditions($cond));
+            // Key is a conditional (teneray) operator
+            if (in_array($key, ['=', '!=', '<>', '>', '<', '>=', '<='])) {
+                $list = [];
+                foreach ($cond as $col => $value) {
+                    $list[] =  sprintf('(`%s` %s %s)', $col, $key, $this->escapeCond($value));
+                }
+                return $result ? $result . sprintf(' AND %s', implode(' AND ', $list)) :
+                    sprintf('%s', implode(' AND ', $list));
+            }
+            // Key is a conditional query values
+            elseif (in_array($key, ['AND', 'OR'])) {
+                return $result ? $result . sprintf(' %s %s', $key, $this->parseConditions($cond)) :
+                    $this->parseConditions($cond);
+            }
+            // Key is a conditional (NOT) operator
+            elseif (strtoupper($key) == 'NOT') {
+                return  $result ? $result . sprintf(' NOT %s', $this->parseConditions($cond)) :
+                    sprintf('NOT %s', $this->parseConditions($cond));
+            }
+            return  $result ? $result . sprintf(' AND %s', $this->parseConditions($cond)) :
+                $this->parseConditions($cond);
         };
-        $parseArrayList = function ($result, $key, $cond) {
+        // Array list
+        $parseArrayList = function ($result, $key, $cond): string {
             return $result ?
-                $result.' AND '.sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
+                $result . ' AND ' . sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond))) :
                 sprintf('`%s` IN (%s)', $key, implode(',', array_map(fn ($c) => $this->escapeCond($c), $cond)));
         };
-        $parseArray = function ($result, $cond) {
+        // Array string
+        $parseArray = function ($result, $cond): string {
             return  $result ?
-                $result.' AND '.sprintf('%s', $this->parseConditions($cond)) :
+                $result . ' AND ' . sprintf('%s', $this->parseConditions($cond)) :
                 sprintf('%s', $this->parseConditions($cond));
         };
-        $parseString = function ($result, $cond) {
+        // String
+        $parseString = function ($result, $cond): string {
             return $result ?
-                $result.' AND '.sprintf('(%s)', $this->cleanCond($cond)) :
+                $result . ' AND ' . sprintf('(%s)', $this->cleanCond($cond)) :
                 sprintf('(%s)', $this->cleanCond($cond));
         };
-        $parseKeyedString = function ($result, $key, $cond) {
-            // Key is a conditional operator
+        // String with key
+        $parseKeyedString = function ($result, $key, $cond): string {
+            // Key is a conditional query values
             if (in_array(strtoupper($key), ['AND', 'OR'])) {
                 return $result ?
-                    $result.sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
+                    $result . sprintf(' %s (%s)', strtoupper($key), $this->cleanCond($cond)) :
                     sprintf('(%s)', $this->cleanCond($cond));
             }
             // Key is a conditional (NOT) operator
             elseif (strtoupper($key) == 'NOT') {
                 return $result ?
-                    $result.sprintf('(%s)', $this->cleanCond($cond)) :
+                    $result . sprintf('(%s)', $this->cleanCond($cond)) :
                     sprintf('%s (%s)', $key, $this->cleanCond($cond));
             }
             // Key is a parameter
             else {
                 return $result ?
-                    $result.' AND '.sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
+                    $result . ' AND ' . sprintf('`%s` = %s', $key, $this->escapeCond($cond)) :
                     sprintf('`%s` = %s', $key, $this->escapeCond($cond));
             }
         };
@@ -965,7 +998,7 @@ abstract class Model extends DataObject implements ModelInterface
                         if (array_is_list($cond)) {
                             $result = $parseArrayList($result, $key, $cond);
                         }
-                        // Key value type (['AND/OR' => [a=>1, b=>2, c=>3]])
+                        // List type with sql tenary operators (['AND/OR/=/>/</>=/<=/!=' => [a=>1, b=>2, c=>3]])
                         else {
                             $result = $parseCondtionalArray($result, $key, $cond);
                         }
@@ -983,7 +1016,34 @@ abstract class Model extends DataObject implements ModelInterface
             }
         }
 
-        return $result ? '('.$result.')' : '';
+        return $result ? '(' . $result . ')' : '';
+    }
+
+    /**
+     * Parse sort query.
+     *
+     * @param array $sort
+     *
+     * @return string
+     */
+    protected function parseSort(array $sort): string
+    {
+        $list = [];
+        $fieldNames = $this->getFieldNames();
+
+        foreach ($sort as $key => $value) {
+            // Key not available - only value
+            if (is_numeric($key)) {
+                $list[] = $this->cleanCond($value);
+            }
+            // Key available
+            else if (in_array($key, $fieldNames)) {
+                $value = strtoupper($value);
+                $list[] = sprintf('`%s` %s', $this->cleanCond($key), in_array($value, ['ASC', 'DESC']) ? $value : 'ASC');
+            }
+        }
+
+        return implode(', ', $list);
     }
 
     /**
@@ -1007,7 +1067,21 @@ abstract class Model extends DataObject implements ModelInterface
      */
     private function cleanCond(string $cond): string
     {
-        return trim($cond == '?' ? $cond : preg_replace("/\/|\/\*|\*\/|where|join|from/im", '', $cond));
+        $cond  = trim($cond);
+
+        return $cond == '?'
+            || (str_starts_with($cond, '`') && str_ends_with($cond, '`'))
+            || (str_starts_with($cond, '\'') && str_ends_with($cond, '\''))
+            || (str_starts_with($cond, '"') && str_ends_with($cond, '"'))
+            ? $cond
+            : preg_replace([
+                "/(\/\/)|\/\*|\*\/|(--)/im",
+                Connection::SELECT_QUERY_REGX,
+                Connection::INSERT_QUERY_REGX,
+                Connection::UPDATE_QUERY_REGX,
+                Connection::DELETE_QUERY_REGX,
+                Connection::LIMIT_QUERY_REGX,
+            ], '', $cond);
     }
 
     //### Statics #####
@@ -1025,35 +1099,25 @@ abstract class Model extends DataObject implements ModelInterface
     }
 
     /**
-     * Create model instance with relations to be loaded.
+     * Create model instance with relations
      *
      * @param array<string>|array<string,callable> $relations List of relation names or Relation name as key with callback as value.
      *
      * @return static
      */
-    public static function withRelations(array $relations): static
+    public static function withRelations(array $relations = []): static
     {
-        return (new static())->setRequestedRelations($relations);
+        return (new static())->setAutoLoadRelations(true)->setRequestedRelations($relations);
     }
 
     /**
-     * Create model instance with support for auto loaded relations.
+     * Create model instance without relations.
      *
      * @return static
      */
-    public static function withAutoRelations(): static
+    public static function withoutRelations(): static
     {
-        return (new static())->setAutoLoadRelations(true);
-    }
-
-    /**
-     * Create model instance without support for auto loaded relations.
-     *
-     * @return static
-     */
-    public static function withoutAutoRelations(): static
-    {
-        return (new static())->setAutoLoadRelations(false);
+        return (new static())->setAutoLoadRelations(false)->setRequestedRelations([]);
     }
 
     /**
@@ -1096,8 +1160,8 @@ abstract class Model extends DataObject implements ModelInterface
      * Find model for id. Without trashed (deleted) models.
      *
      * @param string|int $id
-     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array      $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array      $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array      $columns    Select Colomn names.
      *
      * @return static|null
@@ -1111,8 +1175,8 @@ abstract class Model extends DataObject implements ModelInterface
      * Find model for id. With trashed (deleted) models.
      *
      * @param string|int $id
-     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array      $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array      $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array      $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array      $columns    Select Colomn names.
      *
      * @return static|null
@@ -1125,52 +1189,55 @@ abstract class Model extends DataObject implements ModelInterface
     /**
      * Get list of model. Without trashed (deleted) models.
      *
-     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array    $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array    $columns    Select Colomn names.
+     * @param array    $sort       Sort Result. e.g `['name' => 'ASC']`
      * @param int|null $limit      Query limit
      *
      * @return static[]
      */
-    public static function getAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): array
+    public static function getAll(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int|null $limit = null): array
     {
         $model = (new static());
 
-        return $model->setAutoLoadRelations(false)->all($conditions, $params, $columns, $limit ?? 0);
+        return $model->setAutoLoadRelations(false)->all($conditions, $params, $columns, $sort, $limit ?? 0);
     }
 
     /**
      * Get list of model. With trashed (deleted) models.
      *
-     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array    $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array    $columns    Select Colomn names.
+     * @param array    $sort       Sort Result. e.g `['name' => 'ASC']`
      * @param int|null $limit      Query limit
      *
      * @return static[]
      */
-    public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): array
+    public static function getAllTrashed(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int|null $limit = null): array
     {
         $model = (new static());
 
-        return $model->setAutoLoadRelations(false)->allTrashed($conditions, $params, $columns, $limit ?? 0);
+        return $model->setAutoLoadRelations(false)->allTrashed($conditions, $params, $columns, $sort, $limit ?? 0);
     }
 
     /**
      * Itterate upon list of model. With trashed (deleted) models.
      *
-     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array    $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array    $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array    $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array    $columns    Select Colomn names.
+     * @param array    $sort       Sort Result. e.g `['name' => 'ASC']`
      * @param int|null $limit      Query limit
      *
      * @return Generator<int,static>
      */
-    public static function itterateAll(array $conditions = [], array $params = [], array $columns = [], int|null $limit = null): Generator
+    public static function itterateAll(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int|null $limit = null): Generator
     {
         $model = (new static());
 
-        return $model->setAutoLoadRelations(false)->itterate($conditions, $params, $columns, $limit ?? 0);
+        return $model->setAutoLoadRelations(false)->itterate($conditions, $params, $columns, $sort, $limit ?? 0);
     }
 
     //### Clones #####
@@ -1204,20 +1271,25 @@ abstract class Model extends DataObject implements ModelInterface
      */
     public function fields($all = false, $trim = false): array
     {
-        if (!empty($fields = $this->getFields())) {
-            $attrs = [];
-            if ($this->_autoLoadRelations) {
-                $fields = array_merge($fields, $this->getRelations());
-            } elseif (!empty($this->_loadedRelations)) {
-                $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->_loadedRelations)));
-            }
-            foreach ($fields as $field) {
-                $attrs[$field->getName()] = $field->getType()->value;
-            }
+        $props = parent::fields($all, $trim);
 
-            return $attrs;
+        // Get model fields
+        $fields = $this->getFields();
+
+        // Get model relations fields
+        if ($this->_autoLoadRelations) {
+            $fields = array_merge($fields, $this->getRelations());
+        } elseif (!empty($this->_loadedRelations)) {
+            $fields = array_merge($fields, array_filter($this->getRelations(), fn ($rel) => in_array(strval($rel), $this->_loadedRelations)));
         }
 
-        return parent::fields($all, $trim);
+        // Merge fields with props
+        if (!empty($fields)) {
+            foreach ($fields as $field) {
+                $props[$field->getName()] = $field->getType()->value;
+            }
+        }
+
+        return $props;
     }
 }

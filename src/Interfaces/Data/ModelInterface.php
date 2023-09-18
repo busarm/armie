@@ -84,8 +84,8 @@ interface ModelInterface
      * Find model for id. Without trashed (deleted) models.
      *
      * @param mixed $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array $columns    Select Colomn names.
      *
      * @return self|null
@@ -96,8 +96,8 @@ interface ModelInterface
      * Find model for id. With trashed (deleted) models.
      *
      * @param mixed $id
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array $columns    Select Colomn names.
      *
      * @return self|null
@@ -107,8 +107,8 @@ interface ModelInterface
     /**
      * Find model with condition.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']`  or `['id' => ':id']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      * @param array $columns    Select Colomn names.
      *
      * @return self|null
@@ -118,41 +118,44 @@ interface ModelInterface
     /**
      * Get list of model. Without trashed (deleted) models.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names.
-     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
+     * @param int   $limit      Query Limit. Default: 0 to use `perPage`
      * @param int   $page       Query List Page.
      *
      * @return self[]
      */
-    public function all($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array;
+    public function all($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): array;
 
     /**
      * Get list of model. With trashed (deleted) models.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names.
-     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
+     * @param int   $limit      Query Limit. Default: 0 to use `perPage`
      * @param int   $page       Query List Page.
      *
      * @return self[]
      */
-    public function allTrashed($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): array;
+    public function allTrashed($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): array;
 
     /**
      * Itterate upon list of model. With trashed (deleted) models.
      *
-     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]`
-     * @param array $params     Query Params. e.g SQL query params
+     * @param array $conditions Query Conditions. e.g `createdAt < now()` or `['id' => 1]` or `['id' => '?']` or `['id' => [1,2,3]]` or `['>=' => ['age'=>18]]` or `['AND/OR/NOT' => ['age'=>18]]`. Must not include un-escaped query keywords like: select,where,from etc.
+     * @param array $params     Query Params. e.g SQL query bind params
      * @param array $columns    Select Colomn names.
-     * @param int   $limit      Query Limit. Default: 0 to disable
+     * @param array $sort       Sort Result. e.g `['name' => 'ASC']`
+     * @param int   $limit      Query Limit. Default: 0 to use `perPage`
      * @param int   $page       Query List Page.
      *
      * @return Generator<int,static>
      */
-    public function itterate($conditions = [], $params = [], $columns = [], int $limit = 0, int $page = 0): Generator;
+    public function itterate($conditions = [], $params = [], $columns = [], array $sort = [], int $limit = 0, int $page = 0): Generator;
 
     /**
      * Delete model.

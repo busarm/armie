@@ -12,7 +12,7 @@ use Armie\Traits\CustomConfig;
  * Armie Framework
  *
  * @copyright busarm.com
- * @license s://github.com/busarm/armie/blob/master/LICENSE (MIT License)
+ * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  */
 class HttpConfig implements ConfigurationInterface
 {

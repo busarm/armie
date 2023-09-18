@@ -54,7 +54,7 @@ class CorsMiddleware implements MiddlewareInterface
      *
      * @return ResponseInterface|false
      */
-    private function preflight(RequestInterface $request): ResponseInterface|bool
+    protected function preflight(RequestInterface $request): ResponseInterface|bool
     {
         // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
         if ($request->method() === HttpMethod::OPTIONS) {
@@ -72,7 +72,7 @@ class CorsMiddleware implements MiddlewareInterface
      *
      * @return ResponseInterface
      */
-    private function handle(RequestInterface $request, ResponseInterface|null $response = null): ResponseInterface
+    protected function handle(RequestInterface $request, ResponseInterface|null $response = null): ResponseInterface
     {
         $response = $response ?: new Response(version: $request->version());
 

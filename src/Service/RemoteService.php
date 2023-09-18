@@ -24,6 +24,12 @@ use function Armie\Helpers\http_parse_query;
  */
 class RemoteService extends BaseService
 {
+    /**
+     * @param string                         $name      Name of service
+     * @param string|null                    $location  Endpoint location of service
+     * @param ServiceDiscoveryInterface|null $discovery Service discovery
+     * @param integer                        $timeout   Service request timeout. Default: 10 secs
+     */
     public function __construct(
         protected string $name,
         protected ?string $location = null,

@@ -12,8 +12,8 @@ namespace Armie\Dto;
  */
 class PaginatedCollectionDto extends BaseDto
 {
-    /** @var CollectionBaseDto<T>|array<T> */
-    public CollectionBaseDto|array $data = [];
+    /** @var iterable<T> */
+    public iterable $data = [];
     /** @var int */
     public int $count = 0;
     /** @var int */
@@ -29,12 +29,11 @@ class PaginatedCollectionDto extends BaseDto
     /** @var int */
     public int $last = 0;
 
-    public function __construct(CollectionBaseDto|array $data = null, int|null $page = null, int|null $limit = null, int|null $total = null)
+    public function __construct(iterable $data = [], int|null $page = null, int|null $limit = null, int|null $total = null)
     {
-        if ($data !== null) {
-            $this->setData($data);
-            $this->setCount(count($data));
-        }
+        $this->setData($data);
+        $this->setCount(iterator_count($data));
+
         if ($total !== null) {
             $this->setTotal($total);
         }
@@ -56,7 +55,7 @@ class PaginatedCollectionDto extends BaseDto
      *
      * @return self
      */
-    public function setData(CollectionBaseDto|array $data)
+    public function setData(iterable $data)
     {
         $this->data = $data;
 

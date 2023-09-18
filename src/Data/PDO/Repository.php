@@ -5,6 +5,7 @@ namespace Armie\Data\PDO;
 use Armie\Dto\BaseDto;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Dto\PaginatedCollectionDto;
+use Armie\Errors\SystemError;
 use Armie\Interfaces\Data\QueryRepositoryInterface;
 
 use function Armie\Helpers\dispatch;
@@ -16,22 +17,25 @@ use function Armie\Helpers\dispatch;
  * @license https://github.com/busarm/armie/blob/master/LICENSE (MIT License)
  *
  * @template ModelType
- * @template DtoType
  */
 class Repository implements QueryRepositoryInterface
 {
     /**
-     * @param Model&ModelType $model
+     * @param Model&ModelType       $model
+     * @param class-string<BaseDto> $dtoClass
      */
-    public function __construct(private Model $model)
+    public function __construct(private Model $model, private ?string $dtoClass = null)
     {
+        if ($dtoClass && !is_subclass_of($dtoClass, BaseDto::class)) {
+            throw new SystemError("Repository dto class `$dtoClass` must be an instance of " . BaseDto::class);
+        } else $this->dtoClass = BaseDto::class;
     }
 
     /**
      * Count number of rows or rows in query.
      *
      * @param string|null $query  Model Provider Query. e.g SQL query
-     * @param array       $params Query Params. e.g SQL query params
+     * @param array       $params Query Params. e.g SQL query bind params
      *
      * @return int
      */
@@ -44,7 +48,7 @@ class Repository implements QueryRepositoryInterface
      * Execute query.
      *
      * @param string $query  Model Provider Query. e.g SQL query
-     * @param array  $params Query Params. e.g SQL query params `[$id]` or [':id' => $id]
+     * @param array  $params Query Params. e.g SQL query bind params `[$id]` or [':id' => $id]
      *
      * @return int|bool Returns row count for modification query or boolean success status
      */
@@ -69,7 +73,7 @@ class Repository implements QueryRepositoryInterface
                 dispatch(Model::EVENT_AFTER_QUERY, ['query' => $stmt->queryString, 'params' => $params]);
 
                 if (($result = $stmt->fetch(Connection::FETCH_ASSOC)) !== false) {
-                    return BaseDto::with($result);
+                    return $this->dtoClass::with($result);
                 }
             }
         }
@@ -101,7 +105,7 @@ class Repository implements QueryRepositoryInterface
                     }
                 };
 
-                return CollectionBaseDto::of($generator());
+                return CollectionBaseDto::of($generator(), $this->dtoClass);
             }
         }
 
@@ -113,11 +117,12 @@ class Repository implements QueryRepositoryInterface
      */
     public function queryPaginate(string $query, $params = [], int $page = 1, int $limit = 0): PaginatedCollectionDto
     {
-        $limit = $limit > 0 ? $limit : $this->model->getPerPage();
-        $total = $this->count($query, $params);
-        $query = $this->model->getDatabase()->applyLimit($query, $page, $limit);
+        if ($this->model->getDatabase()->matchSelectQuery($query)) {
 
-        if (!empty($query) && $this->model->getDatabase()->matchSelectQuery($query)) {
+            $total = $this->count($query, $params);
+            $limit = $limit > 0 ? $limit : $this->model->getPerPage();
+
+            $query = $this->model->getDatabase()->applyLimit($query, $page, $limit);
             $stmt = $this->model->getDatabase()->prepare($query);
 
             // Dispatch event
@@ -133,7 +138,7 @@ class Repository implements QueryRepositoryInterface
                     }
                 };
 
-                return new PaginatedCollectionDto(CollectionBaseDto::of($generator()), $page, $limit, $total);
+                return new PaginatedCollectionDto(CollectionBaseDto::of($generator(), $this->dtoClass), $page, $limit, $total);
             }
         }
 
@@ -143,29 +148,29 @@ class Repository implements QueryRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function all(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto
+    public function all(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $limit = 0): CollectionBaseDto
     {
         if (!empty($this->model->getSoftDeleteDateName())) {
             return CollectionBaseDto::of($this->model->itterate(array_merge($conditions, [
                 sprintf('ISNULL(%s)', $this->model->getSoftDeleteDateName()),
-            ]), $params, $columns, $limit));
+            ]), $params, $columns, $sort, $limit), $this->dtoClass);
         } else {
-            return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $limit));
+            return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $sort, $limit), $this->dtoClass);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function allTrashed(array $conditions = [], array $params = [], array $columns = [], int $limit = 0): CollectionBaseDto
+    public function allTrashed(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $limit = 0): CollectionBaseDto
     {
-        return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $limit));
+        return CollectionBaseDto::of($this->model->itterate($conditions, $params, $columns, $sort, $limit), $this->dtoClass);
     }
 
     /**
      * @inheritDoc
      */
-    public function paginate(array $conditions = [], array $params = [], array $columns = [], int $page = 1, int $limit = 0): PaginatedCollectionDto
+    public function paginate(array $conditions = [], array $params = [], array $columns = [], array $sort = [], int $page = 1, int $limit = 0): PaginatedCollectionDto
     {
         if (empty($columns)) {
             $columns = ['*'];
@@ -173,12 +178,14 @@ class Repository implements QueryRepositoryInterface
 
         $colsPlaceHolders = $this->model->parseColumns($columns);
         $condPlaceHolders = $this->model->parseConditions($conditions);
+        $sortPlaceHolders = $this->model->parseSort($sort);
 
         $query = sprintf(
-            'SELECT %s FROM %s %s',
+            'SELECT %s FROM %s %s %s',
             $colsPlaceHolders,
             $this->model->getTableName(),
-            !empty($condPlaceHolders) ? 'WHERE '.$condPlaceHolders : ''
+            !empty($condPlaceHolders) ? 'WHERE ' . $condPlaceHolders : '',
+            !empty($sortPlaceHolders) ? "ORDER BY $sortPlaceHolders" : '',
         );
 
         return $this->queryPaginate($query, $params, $page, $limit);
@@ -191,7 +198,7 @@ class Repository implements QueryRepositoryInterface
     {
         $data = $this->model->find($id, $conditions, $params, $columns);
 
-        return $data ? BaseDto::with($data) : $data;
+        return $data ? $this->dtoClass::with($data) : $data;
     }
 
     /**
@@ -202,7 +209,7 @@ class Repository implements QueryRepositoryInterface
         if (!empty($this->model->getSoftDeleteDateName())) {
             $data = $this->model->findTrashed($id, $conditions, $params, $columns);
 
-            return $data ? BaseDto::with($data) : $data;
+            return $data ? $this->dtoClass::with($data) : $data;
         }
 
         return $this->findById($id, $conditions, $params, $columns);
@@ -216,7 +223,7 @@ class Repository implements QueryRepositoryInterface
         $model = $this->model->clone();
         $model->load($data);
         if ($model->save()) {
-            return BaseDto::with($model);
+            return $this->dtoClass::with($model);
         }
 
         return null;

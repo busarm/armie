@@ -4,8 +4,10 @@ use Armie\App;
 use Armie\Bags\FileStore;
 use Armie\Config;
 use Armie\Configs\HttpConfig;
+use Armie\Configs\HttpServerConfig;
 use Armie\Configs\PDOConfig;
 use Armie\Configs\ServerConfig;
+use Armie\Configs\TaskWorkerServerConfig;
 use Armie\Dto\CollectionBaseDto;
 use Armie\Enums\Cron;
 use Armie\Enums\Env;
@@ -35,8 +37,9 @@ use function Armie\Helpers\enqueue;
 use function Armie\Helpers\env;
 use function Armie\Helpers\listen;
 use function Armie\Helpers\log_debug;
+use function Armie\Helpers\log_warning;
 
-require __DIR__.'/../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 $config = (new Config('TestApp', '1'))
     ->setAppPath(__DIR__)
@@ -48,7 +51,7 @@ $config = (new Config('TestApp', '1'))
         ->setAllowAnyCorsDomain(true)
         ->setAllowedCorsHeaders(['*'])
         ->setAllowedCorsMethods(['GET']))
-    ->setLogRequest(false)
+    ->setLogRequest(true)
     ->setSessionEnabled(true)
     ->setSessionLifetime(60)
     ->setDb(
@@ -66,12 +69,12 @@ $config = (new Config('TestApp', '1'))
 
 $app = new App($config, Env::parse(env('ENV')));
 $app->addBinding(ProviderInterface::class, ServiceRegistryProvider::class);
-$app->addProvider(new ServiceRegistryProvider(new FileStore($config->tempPath.'/store')));
+$app->addProvider(new ServiceRegistryProvider(new FileStore($config->tempPath . '/store')));
 $app->setServiceDiscovery($discovery ?? new LocalServiceDiscovery([]));
 
 $app->get('ping')->to(HomeTestController::class, 'ping');
 $app->get('pingHtml')->call(function (App $app) {
-    return 'success-'.$app->env->value;
+    return 'success-' . $app->env->value;
 });
 $app->get('auth/test')->to(AuthTestController::class, 'test');
 $app->get('test/view-old/{name}')->call(function (RequestInterface $req, string $name) {
@@ -80,6 +83,10 @@ $app->get('test/view-old/{name}')->call(function (RequestInterface $req, string 
 $app->get('test/view/{name}')->view(TestViewPage::class);
 $app->get('test')->call(function (RequestInterface $req, App $app) {
     $req->cookie()->set('TestCookie', 'test', 30);
+    (new Promise(function () {
+        log_warning("Promise processing");
+        return ProductTestModel::findById(4);
+    }));
 
     return [
         'name'          => 'v1',
@@ -114,7 +121,7 @@ $app->get('test/queue')->call(function () {
 $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
     $count = ConnectionInterface::$statistics['total_request'];
     $promise = (new Promise(function () use ($count) {
-        log_debug('Processing promise db - count: '.$count);
+        log_debug('Processing promise db - count: ' . $count);
 
         return ProductTestModel::update(2, [
             'name' => md5(uniqid()),
@@ -130,7 +137,7 @@ $app->get('test/promise')->call(function (App $app, RequestInterface $request) {
         log_debug('2 - Result of promise db - ' . $data->get('name'));
     });
     $waited = await($promise);
-    log_debug('Promise completed - '.$promise->done().' - '.$waited?->get('name'));
+    log_debug('Promise completed - ' . $promise->done() . ' - ' . $waited?->get('name'));
 });
 
 listen(ProductTestModel::class, function ($data) {
@@ -204,8 +211,7 @@ $app->get('test/db-async')->call(function () {
 });
 $app->get('test/async-class')->to(ProductTestController::class, 'task');
 $app->get('test/async-list')->call(function () {
-    log_debug('Script cached - ', opcache_is_script_cached(__FILE__));
-    $res = concurrent([
+    $parallel = concurrent([
         function () {
             ProductTestModel::update(1, [
                 'name' => md5(uniqid()),
@@ -281,51 +287,48 @@ $app->get('test/async-list')->call(function () {
 
             return $data->at(9);
         },
-    ], true);
-    log_debug('Completed');
-    // foreach($res as $item) {
-    //     log_debug('Item completed', $item);
-    // }
+    ]);
 
-    return $res;
+    log_debug('Completed');
+    return $parallel;
 });
 $app->get('test/async')->call(function () {
-    print_r(PHP_EOL.'0 Test async started');
+    print_r(PHP_EOL . '0 Test async started');
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('1 Non-wait async success'.PHP_EOL);
+        print_r('1 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('2 Non-wait async success'.PHP_EOL);
+        print_r('2 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('3 Non-wait async success'.PHP_EOL);
+        print_r('3 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('5 Non-wait async success'.PHP_EOL);
+        print_r('5 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('6 Non-wait async success'.PHP_EOL);
+        print_r('6 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('7 Non-wait async success'.PHP_EOL);
+        print_r('7 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('8 Non-wait async success'.PHP_EOL);
+        print_r('8 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('9 Non-wait async success'.PHP_EOL);
+        print_r('9 Non-wait async success' . PHP_EOL);
     });
     async(function () {
         CollectionBaseDto::of(ProductTestModel::itterateAll());
-        print_r('10 Non-wait async success'.PHP_EOL);
+        print_r('10 Non-wait async success' . PHP_EOL);
     });
 });
 
@@ -340,7 +343,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
             RequestOptions::VERIFY => false,
         ]
     )->then(function () {
-        print_r('Test Http Success'.PHP_EOL);
+        print_r('Test Http Success' . PHP_EOL);
     });
 
     return 'Test success';
@@ -348,7 +351,7 @@ $app->get('test/http')->call(function (RequestInterface $req, App $app) {
 
 $app->get('test/session')->call(function (RequestInterface $req, App $app) {
     $req->session()?->set('TestSession', 'test');
-    $store = new FileStore($app->config->tempPath.'/files');
+    $store = new FileStore($app->config->tempPath . '/files');
     $store->set('TestSession-File', ['test', $app->env]);
 
     return [
@@ -361,16 +364,17 @@ $app->get('test/session')->call(function (RequestInterface $req, App $app) {
 });
 
 $app->get('test/download')->call(function (Response $response) {
-    return $response->downloadFile(__DIR__.'../../../README.md', 'README.md', true);
+    return $response->downloadFile(__DIR__ . '../../../README.md', 'README.md', true);
 });
+
 
 $app->start(
     'localhost',
     8181,
-    (new ServerConfig())
+    (new HttpServerConfig())
         ->setLooper(Looper::EV)
-        ->setHttpWorkers(4)
-        ->setTaskWorkers(2)
+        ->setHttpWorkers(8)
+        ->setTaskWorkers(4)
         ->addJob(function () {
             log_debug('Testing EVERY_MINUTE Cron Job');
         }, Cron::EVERY_MINUTE)

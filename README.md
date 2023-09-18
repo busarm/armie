@@ -154,7 +154,7 @@ High perfomant Asychronous HTTP Server with support for serveral event-looping p
     $app->get('/product/{id}')->to(ProductController::class, 'get');
 
     $app->start("localhost", 8080,
-        (new ServerConfig)
+        (new HttpServerConfig)
             ->setLooper(Looper::EV)
             ->setHttpWorkers(8)
             ->setTaskWorkers(4)

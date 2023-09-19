@@ -50,9 +50,9 @@
 
 ## Introduction
 
-Armie is an expressive and very extendable light-weight PHP framework designed to provide high performance with all the basic features needed for quick application development.
+Armie is an expressive and extendable lightweight PHP framework designed to provide high performance with all the essential features needed for quick application development.
 
-It is more suited for small applications but can easily handle developent of large scale applications with minimum extension or abstraction.
+It is more suited for small applications or microservices but can easily handle the development of large-scale applications with minimum extension or abstraction.
 
 It includes support for different design paradigms and architectural patterns:
 
